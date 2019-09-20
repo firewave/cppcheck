@@ -284,7 +284,7 @@ namespace {
 
         void print(std::ostream &out) {
             std::set<std::pair<int,int>> locations;
-            for (auto it : mMap) {
+            for (const auto& it : mMap) {
                 locations.insert(std::pair<int,int>(it.first->linenr(), it.first->column()));
             }
             for (const std::pair<int,int> &loc : locations) {
@@ -538,7 +538,7 @@ namespace {
             std::ostringstream s;
             s << mDataIndex << ":" << "memory:{";
             bool first = true;
-            for (auto mem : memory) {
+            for (const auto &mem : memory) {
                 ExprEngine::ValuePtr value = mem.second;
                 const Variable *var = symbolDatabase->getVariableFromVarId(mem.first);
                 if (!var)
@@ -1728,7 +1728,7 @@ static ExprEngine::ValuePtr getValueRangeFromValueType(const ValueType *valueTyp
 static void call(const std::vector<ExprEngine::Callback> &callbacks, const Token *tok, ExprEngine::ValuePtr value, Data *dataBase)
 {
     if (value) {
-        for (ExprEngine::Callback f : callbacks) {
+        for (const ExprEngine::Callback& f : callbacks) {
             try {
                 f(tok, *value, dataBase);
             } catch (const ExprEngineException &e) {
