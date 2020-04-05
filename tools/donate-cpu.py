@@ -16,6 +16,8 @@
 #                                 --bandwidth-limit=2m => max. 2 megabytes per second
 #  --max-packages=N     Process N packages and then exit. A value of 0 means infinitely.
 #  --no-upload          Do not upload anything. Defaults to False.
+#  --local=dir          Adds a local build as additional version - will not upload any results.
+#  --valgrind=tool      Run cppcheck using the specified valgrind tool - will not upload any results.
 #
 # What this script does:
 # 1. Check requirements
@@ -31,6 +33,7 @@
 import platform
 from donate_cpu_lib import *
 
+additonal_reqs = []
 for arg in sys.argv[1:]:
     # --stop-time=12:00 => run until ~12:00 and then stop
     if arg.startswith('--stop-time='):
@@ -48,10 +51,13 @@ for arg in sys.argv[1:]:
         print('Package:' + package_url)
     elif arg.startswith('--work-path='):
         work_path = arg[arg.find('=')+1:]
+        if work_path:
+            work_path = os.path.abspath(work_path)
         print('work_path:' + work_path)
-        if not os.path.exists(work_path):
-            print('work path does not exist!')
-            sys.exit(1)
+        # TODO: behavior differed between no path and non-existing path - if no path is specified it will be created
+        #if not os.path.exists(work_path):
+        #    print('work path does not exist!')
+        #    sys.exit(1)
     elif arg == '--test':
         server_address = ('localhost', 8001)
     elif arg.startswith('--bandwidth-limit='):
@@ -72,6 +78,16 @@ for arg in sys.argv[1:]:
             max_packages = None
     elif arg.startswith('--no-upload'):
         do_upload = False
+    elif arg.startswith('--local='):
+        cppcheck_local = arg[arg.find('=')+1:]
+        if cppcheck_local:
+            cppcheck_local = os.path.abspath(cppcheck_local)
+            do_upload = False
+    elif arg.startswith('--valgrind='):
+        valgrind_tool = arg[arg.find('=')+1:]
+        if valgrind_tool:
+            additonal_reqs.append('valgrind')
+            do_upload = False
     elif arg == '--help':
         print('Donate CPU to Cppcheck project')
         print('')
@@ -86,6 +102,8 @@ for arg in sys.argv[1:]:
         print('                                 --bandwidth-limit=2m => max. 2 megabytes per second')
         print('  --max-packages=N     Process N packages and then exit. A value of 0 means infinitely.')
         print('  --no-upload          Do not upload anything. Defaults to False.')
+        print('  --local=dir          Adds a local build as additional version - will not upload any results.')
+        print('  --valgrind=tool      Run cppcheck using the specified valgrind tool - will not upload any results.')
         print('')
         print('Quick start: just run this script without any arguments')
         sys.exit(0)
@@ -102,7 +120,7 @@ if sys.version_info.major < 3 or (sys.version_info.major == 3 and sys.version_in
     sys.exit(1)
 
 print('Thank you!')
-if not check_requirements():
+if not check_requirements(additonal_reqs):
     sys.exit(1)
 if bandwidth_limit and isinstance(bandwidth_limit, str):
     if subprocess.call(['wget', '--limit-rate=' + bandwidth_limit, '-q', '--spider', 'cppcheck1.osuosl.org']) == 2:
@@ -140,6 +158,7 @@ while True:
     if len(cppcheck_versions) == 0:
         print('Did not get any cppcheck versions from server, retry later')
         sys.exit(1)
+    # TODO: the following code is based on two versions being available - head and another ones - should be cleaned up
     for ver in cppcheck_versions:
         if ver == 'head':
             if not compile_cppcheck(cppcheck_path, jobs):
@@ -148,6 +167,14 @@ while True:
         elif not compile_version(work_path, jobs, ver):
             print('Failed to compile Cppcheck-{}, retry later'.format(ver))
             sys.exit(1)
+    if cppcheck_local:
+        cppcheck_versions.insert(0, 'local')
+    # TODO: just output the first entry instead? head/local should always be first
+    latest_version = None
+    if 'local' in cppcheck_versions:
+        latest_version = 'local'
+    elif 'head' in cppcheck_versions:
+        latest_version = 'head'
     if package_url:
         package = package_url
     else:
@@ -166,18 +193,21 @@ while True:
     results_to_diff = []
     cppcheck_options = ''
     head_info_msg = ''
+    local_timing_info = ''
     head_timing_info = ''
     old_timing_info = ''
     cppcheck_head_info = ''
     libraries = get_libraries()
 
     for ver in cppcheck_versions:
-        if ver == 'head':
+        if ver == 'local':
+            current_cppcheck_dir = cppcheck_local
+        elif ver == 'head':
             current_cppcheck_dir = 'cppcheck'
             cppcheck_head_info = get_cppcheck_info(work_path + '/cppcheck')
         else:
             current_cppcheck_dir = ver
-        c, errout, info, t, cppcheck_options, timing_info = scan_package(work_path, current_cppcheck_dir, jobs, libraries)
+        c, errout, info, t, cppcheck_options, timing_info = scan_package(work_path, current_cppcheck_dir, jobs, libraries, valgrind_tool)
         if c < 0:
             if c == -101 and 'error: could not find or open any of the paths given.' in errout:
                 # No sourcefile found (for example only headers present)
@@ -193,7 +223,10 @@ while True:
             count += ' ' + str(c)
         elapsed_time += " {:.1f}".format(t)
         results_to_diff.append(errout)
-        if ver == 'head':
+        # TODO: this assumes only two versions
+        if ver == 'local':
+          local_timing_info = timing_info
+        elif ver == 'head':
             head_info_msg = info
             head_timing_info = timing_info
         else:
@@ -208,19 +241,22 @@ while True:
     output += 'head-info: ' + cppcheck_head_info + '\n'
     output += 'count:' + count + '\n'
     output += 'elapsed-time:' + elapsed_time + '\n'
+    output += 'local-timing-info:\n' + local_timing_info + '\n'
     output += 'head-timing-info:\n' + head_timing_info + '\n'
     output += 'old-timing-info:\n' + old_timing_info + '\n'
     info_output = output
     info_output += 'info messages:\n' + head_info_msg
-    if 'head' in cppcheck_versions:
-        output += 'head results:\n' + results_to_diff[cppcheck_versions.index('head')]
+
+    if latest_version:
+        output += latest_version + ' results:\n' + results_to_diff[cppcheck_versions.index(latest_version)]
     if not crash and not timeout:
+        # TODO: this assumes only two versions
         output += 'diff:\n' + diff_results(cppcheck_versions[0], results_to_diff[0], cppcheck_versions[1], results_to_diff[1]) + '\n'
     if package_url:
         print('=========================================================')
         print(output)
-        print('=========================================================')
-        print(info_output)
+        #print('=========================================================')
+        #print(info_output)
         print('=========================================================')
     if do_upload:
         upload_results(package, output, server_address)

@@ -25,9 +25,13 @@ CPPCHECK_TIMEOUT = 30 * 60
 RETURN_CODE_TIMEOUT = -999
 
 
-def check_requirements():
+def check_requirements(additonal_reqs=None):
+    if additonal_reqs is None:
+        additonal_reqs = []
     result = True
-    for app in ['g++', 'git', 'make', 'wget', 'gdb']:
+    apps = ['g++', 'git', 'make', 'wget', 'gdb']
+    apps.extend(additonal_reqs)
+    for app in apps:
         try:
             subprocess.call([app, '--version'])
         except OSError:
@@ -285,7 +289,7 @@ def run_command(cmd):
     return return_code, stdout, stderr, elapsed_time
 
 
-def scan_package(work_path, cppcheck_path, jobs, libraries):
+def scan_package(work_path, cppcheck_path, jobs, libraries, valgrind_tool):
     print('Analyze..')
     os.chdir(work_path)
     libs = ''
@@ -297,7 +301,11 @@ def scan_package(work_path, cppcheck_path, jobs, libraries):
     options = libs + jobs + ' --showtime=top5 --check-library --inconclusive --enable=style,information --template=daca2 -rp=temp'
     options += ' -D__GNUC__ --platform=unix64 temp'
     cppcheck_cmd = cppcheck_path + '/cppcheck' + ' ' + options
-    cmd = 'nice ' + cppcheck_cmd
+    if valgrind_tool:
+        # run with a single thread so no additional processes are being spawned
+        cmd = 'valgrind --tool={} {} -j1'.format(valgrind_tool, cppcheck_cmd)
+    else:
+        cmd = 'nice ' + cppcheck_cmd
     returncode, stdout, stderr, elapsed_time = run_command(cmd)
 
     # collect messages
@@ -529,3 +537,5 @@ server_address = ('cppcheck1.osuosl.org', 8000)
 bandwidth_limit = None
 max_packages = None
 do_upload = True
+valgrind_tool = None
+cppcheck_local = None
