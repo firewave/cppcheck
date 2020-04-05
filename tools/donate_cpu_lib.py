@@ -325,6 +325,7 @@ def scan_package(work_path, cppcheck_path, jobs, libraries):
         return -signr, '', '', -signr, options, ''
     if stderr.find('#### ThreadExecutor') > 0:
         print('Thread!')
+        # TODO: this would conflict with (-100)-122
         return -222, '', '', -222, options, ''
     information_messages_list = []
     issue_messages_list = []
