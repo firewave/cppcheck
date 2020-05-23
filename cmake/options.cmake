@@ -32,6 +32,8 @@ else()
     set(USE_MATCHCOMPILER_OPT ${USE_MATCHCOMPILER})
 endif()
 
+option(USE_LTO              "Use Link-time optimizations"                                   OFF)
+
 option(BUILD_TESTS          "Build tests"                                                   OFF)
 option(ENABLE_CHECK_INTERNAL "Enable internal checks"                                       OFF)
 option(BUILD_GUI            "Build the qt application"                                      OFF)

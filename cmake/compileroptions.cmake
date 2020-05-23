@@ -6,9 +6,19 @@ endif()
 
 if (CMAKE_CXX_COMPILER_ID MATCHES "GNU" OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
     if (CMAKE_BUILD_TYPE MATCHES "Debug")
-        add_definitions(-g -O0)
+        add_compile_options(-g -O0)
     elseif(CMAKE_BUILD_TYPE MATCHES "Release" OR CMAKE_BUILD_TYPE MATCHES "RelWithDebInfo")
-        add_definitions(-O2)
+        add_compile_options(-O2)
+    endif()
+
+    if (USE_LTO)
+        # TODO: specify thread count
+        add_compile_options(-flto)
+
+        set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -flto")
+    endif()
+
+    if (USE_O3)
     endif()
 
     if (WARNINGS_ARE_ERRORS)
