@@ -845,7 +845,7 @@ bool ProjectFile::write(const QString &filename)
 
     if (!mFunctionContracts.empty()) {
         xmlWriter.writeStartElement(CppcheckXml::FunctionContracts);
-        for (const auto contract: mFunctionContracts) {
+        for (const auto& contract: mFunctionContracts) {
             xmlWriter.writeStartElement(CppcheckXml::FunctionContract);
             xmlWriter.writeAttribute(CppcheckXml::ContractFunction, QString::fromStdString(contract.first));
             xmlWriter.writeAttribute(CppcheckXml::ContractExpects, QString::fromStdString(contract.second));

@@ -8,6 +8,8 @@ if (CMAKE_CXX_COMPILER_ID MATCHES "GNU" OR CMAKE_CXX_COMPILER_ID MATCHES "Clang"
     if (WARNINGS_ARE_ERRORS)
         add_compile_options(-Werror)
     endif()
+
+    add_compile_options(-Wall -Wextra)
 endif()
 
 if (CMAKE_CXX_COMPILER_ID MATCHES "GNU")

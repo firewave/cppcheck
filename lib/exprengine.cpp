@@ -1496,7 +1496,7 @@ static ExprEngine::ValuePtr executeFunctionCall(const Token *tok, Data &data)
 #endif
         } else if (!argValues.empty()) {
             bool bailout = false;
-            for (const auto v: argValues)
+            for (const auto& v: argValues)
                 bailout |= (v && v->type == ExprEngine::ValueType::BailoutValue);
             if (!bailout)
                 data.addMissingContract(functionName);

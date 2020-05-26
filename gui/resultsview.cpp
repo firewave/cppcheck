@@ -95,7 +95,7 @@ void ResultsView::setAddedContracts(const QStringList &addedContracts)
 {
     mUI.mListAddedContracts->clear();
     mUI.mListAddedContracts->addItems(addedContracts);
-    for (const QString f: addedContracts) {
+    for (const QString& f: addedContracts) {
         auto res = mUI.mListMissingContracts->findItems(f, Qt::MatchExactly);
         if (!res.empty())
             delete res.front();

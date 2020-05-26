@@ -611,7 +611,7 @@ void MainWindow::updateContractsTab()
 {
     QStringList addedContracts;
     if (mProjectFile) {
-        for (const auto it: mProjectFile->getFunctionContracts()) {
+        for (const auto& it: mProjectFile->getFunctionContracts()) {
             addedContracts << QString::fromStdString(it.first);
         }
     }
