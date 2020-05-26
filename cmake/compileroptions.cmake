@@ -34,6 +34,8 @@ if (CMAKE_CXX_COMPILER_ID MATCHES "GNU")
     add_compile_options(-Wno-multichar)
 elseif (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
 
+   add_compile_options(-Wno-c++98-compat)
+   add_compile_options(-Wno-c++98-compat-pedantic)
    add_compile_options(-Wno-deprecated-declarations)
    add_compile_options(-Wno-four-char-constants)
    add_compile_options(-Wno-missing-braces)
