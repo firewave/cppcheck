@@ -106,7 +106,7 @@ static bool isAutoVarArray(const Token *tok)
         return false;
 
     // &x[..]
-    if (tok->isUnaryOp("&") && Token::simpleMatch(tok->astOperand1(), "["))
+    if (tok->isUnaryOp("&") && Token::exactMatch(tok->astOperand1(), "["))
         return isAutoVarArray(tok->astOperand1()->astOperand1());
 
     // x+y
@@ -472,7 +472,7 @@ static bool isEscapedReference(const Variable* var)
         return false;
     if (!var->declEndToken())
         return false;
-    if (!Token::simpleMatch(var->declEndToken(), "="))
+    if (!Token::exactMatch(var->declEndToken(), "="))
         return false;
     const Token* vartok = var->declEndToken()->astOperand2();
     return !isTemporary(true, vartok, nullptr, false);
@@ -540,7 +540,7 @@ void CheckAutoVariables::checkVarLifetimeScope(const Token * start, const Token 
                 } else if (tokvalue->variable() && isInScope(tokvalue->variable()->nameToken(), tok->scope())) {
                     const Variable * var = nullptr;
                     const Token * tok2 = tok;
-                    if (Token::simpleMatch(tok->astParent(), "=")) {
+                    if (Token::exactMatch(tok->astParent(), "=")) {
                         if (tok->astParent()->astOperand2() == tok) {
                             var = getLHSVariable(tok->astParent());
                             tok2 = tok->astParent()->astOperand1();

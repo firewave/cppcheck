@@ -128,12 +128,12 @@ static void programMemoryParseCondition(ProgramMemory& pm, const Token* tok, con
         if (endTok && isVariableChanged(tok->next(), endTok, tok->varId(), false, settings, true))
             return;
         pm.setIntValue(tok->varId(), then);
-    } else if (Token::simpleMatch(tok, "!")) {
+    } else if (Token::exactMatch(tok, "!")) {
         programMemoryParseCondition(pm, tok->astOperand1(), endTok, settings, !then);
-    } else if (then && Token::simpleMatch(tok, "&&")) {
+    } else if (then && Token::exactMatch(tok, "&&")) {
         programMemoryParseCondition(pm, tok->astOperand1(), endTok, settings, then);
         programMemoryParseCondition(pm, tok->astOperand2(), endTok, settings, then);
-    } else if (!then && Token::simpleMatch(tok, "||")) {
+    } else if (!then && Token::exactMatch(tok, "||")) {
         programMemoryParseCondition(pm, tok->astOperand1(), endTok, settings, then);
         programMemoryParseCondition(pm, tok->astOperand2(), endTok, settings, then);
     }

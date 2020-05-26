@@ -2469,7 +2469,7 @@ void Tokenizer::combineOperators()
         } else if (tok->str() == "->") {
             // If the preceding sequence is "( & %name% )", replace it by "%name%"
             Token *t = tok->tokAt(-4);
-            if (Token::Match(t, "( & %name% )") && !Token::simpleMatch(t->previous(), ">")) {
+            if (Token::Match(t, "( & %name% )") && !Token::exactMatch(t->previous(), ">")) {
                 t->deleteThis();
                 t->deleteThis();
                 t->deleteNext();
@@ -2531,7 +2531,7 @@ void Tokenizer::simplifyExternC()
                 tok->linkAt(2)->deleteThis(); // }
                 tok->deleteNext(2); // "C" {
             } else {
-                while ((tok2 = tok2->next()) && !Token::simpleMatch(tok2, ";"))
+                while ((tok2 = tok2->next()) && !Token::exactMatch(tok2, ";"))
                     tok2->isExternC(true);
                 tok->deleteNext(); // "C"
             }
@@ -2904,7 +2904,7 @@ void Tokenizer::calculateScopes()
                     nextScopeNameAddition = nextScopeNameAddition.substr(0, nextScopeNameAddition.length() - 1);
             }
 
-            if (Token::simpleMatch(tok, "{")) {
+            if (Token::exactMatch(tok, "{")) {
                 // This might be the opening of a member function
                 Token *tok1 = tok;
                 while (Token::Match(tok1->previous(), "const|volatile|final|override|&|&&|noexcept"))
@@ -3786,7 +3786,7 @@ void Tokenizer::setVarIdPass2()
             }
             tokStart = tokStart->next();
         }
-        if (!Token::simpleMatch(tokStart, "{"))
+        if (!Token::exactMatch(tokStart, "{"))
             continue;
 
         // What member variables are there in this class?
@@ -4025,7 +4025,7 @@ void Tokenizer::createLinks2()
                     continue;
                 if (token->next() &&
                     !Token::Match(token->next(), "%name%|%comp%|&|&&|*|::|,|(|)|{|}|;|[|:|.|=") &&
-                    !Token::simpleMatch(token->next(), "...") &&
+                    !Token::exactMatch(token->next(), "...") &&
                     !Token::Match(token->next(), "&& %name% ="))
                     continue;
             }
@@ -4143,7 +4143,7 @@ bool Tokenizer::simplifySizeof()
         if (tok->str() != "sizeof")
             continue;
 
-        if (Token::simpleMatch(tok->next(), "...")) {
+        if (Token::exactMatch(tok->next(), "...")) {
             //tok->deleteNext(3);
             tok->deleteNext();
         }
@@ -5021,7 +5021,7 @@ void Tokenizer::simplifyHeaders()
             const Token *prev = tok->previous();
             while (prev && prev->isName())
                 prev = prev->previous();
-            if (Token::simpleMatch(prev, ")")) {
+            if (Token::exactMatch(prev, ")")) {
                 // Replace all tokens from { to } with a ";".
                 Token::eraseTokens(tok,tok->link()->next());
                 tok->str(";");
@@ -5625,9 +5625,9 @@ Token *Tokenizer::simplifyAddBracesToCommand(Token *tok)
         tokEnd=simplifyAddBracesPair(tok,true);
     } else if (tok->str()=="while") {
         Token *tokPossibleDo=tok->previous();
-        if (Token::simpleMatch(tok->previous(), "{"))
+        if (Token::exactMatch(tok->previous(), "{"))
             tokPossibleDo = nullptr;
-        else if (Token::simpleMatch(tokPossibleDo,"}"))
+        else if (Token::exactMatch(tokPossibleDo,"}"))
             tokPossibleDo = tokPossibleDo->link();
         if (!tokPossibleDo || tokPossibleDo->strAt(-1) != "do")
             tokEnd=simplifyAddBracesPair(tok,true);
@@ -6718,7 +6718,7 @@ void Tokenizer::simplifyVarDecl(Token * tokBegin, const Token * const tokEnd, co
                 --typelen;
             //skip all the pointer part
             bool isPointerOrRef = false;
-            while (Token::simpleMatch(varName, "*") || Token::Match(varName, "& %name% ,")) {
+            while (Token::exactMatch(varName, "*") || Token::Match(varName, "& %name% ,")) {
                 isPointerOrRef = true;
                 varName = varName->next();
             }
@@ -6931,7 +6931,7 @@ void Tokenizer::simplifyIfAndWhileAssign()
         const bool iswhile(tok->next()->str() == "while");
 
         // simplifying a "do { } while(cond);" condition ?
-        const bool isDoWhile = iswhile && Token::simpleMatch(tok, "}") && Token::simpleMatch(tok->link()->previous(), "do");
+        const bool isDoWhile = iswhile && Token::exactMatch(tok, "}") && Token::exactMatch(tok->link()->previous(), "do");
         Token* openBraceTok = tok->link();
 
         // delete the "if|while"
@@ -9586,7 +9586,7 @@ void Tokenizer::findGarbageCode() const
         if (Token::Match(tok, "%or%|%oror%|~|^|!|%comp%|+|-|/|% )|]|}")) {
             if (isC())
                 syntaxError(tok, tok->str() + tok->next()->str());
-            if (tok->str() != ">" && !Token::simpleMatch(tok->previous(), "operator"))
+            if (tok->str() != ">" && !Token::exactMatch(tok->previous(), "operator"))
                 syntaxError(tok, tok->str() + " " + tok->next()->str());
         }
         if (Token::Match(tok, "%num%|%bool%|%char%|%str% %num%|%bool%|%char%|%str%") && !Token::Match(tok, "%str% %str%"))
@@ -9601,16 +9601,16 @@ void Tokenizer::findGarbageCode() const
             syntaxError(tok);
         if (Token::Match(tok, "[+-] [;,)]}]") && !(isCPP() && Token::Match(tok->previous(), "operator [+-] ;")))
             syntaxError(tok);
-        if (Token::simpleMatch(tok, ",") &&
+        if (Token::exactMatch(tok, ",") &&
             !Token::Match(tok->tokAt(-2), "[ = , &|%name%")) {
             if (Token::Match(tok->previous(), "(|[|{|<|%assign%|%or%|%oror%|==|!=|+|-|/|!|>=|<=|~|^|::|sizeof|throw|decltype|typeof"))
                 syntaxError(tok);
             if (Token::Match(tok->next(), ")|]|>|%assign%|%or%|%oror%|==|!=|/|>=|<=|&&"))
                 syntaxError(tok);
         }
-        if (Token::simpleMatch(tok, ".") &&
-            !Token::simpleMatch(tok->previous(), ".") &&
-            !Token::simpleMatch(tok->next(), ".") &&
+        if (Token::exactMatch(tok, ".") &&
+            !Token::exactMatch(tok->previous(), ".") &&
+            !Token::exactMatch(tok->next(), ".") &&
             !Token::Match(tok->previous(), "{|, . %name% =|.|[|{") &&
             !Token::Match(tok->previous(), ", . %name%")) {
             if (!Token::Match(tok->previous(), "%name%|)|]|>|}"))
@@ -10217,7 +10217,7 @@ void Tokenizer::simplifyCPPAttribute()
                 else
                     head->previous()->isAttributeNodiscard(true);
             }
-        } else if (Token::simpleMatch(tok->tokAt(2), "maybe_unused")) {
+        } else if (Token::exactMatch(tok->tokAt(2), "maybe_unused")) {
             Token* head = tok->tokAt(5);
             while (isCPPAttribute(head))
                 head = head->tokAt(5);
@@ -10278,7 +10278,7 @@ void Tokenizer::simplifyKeyword()
     for (Token *tok = list.front(); tok; tok = tok->next()) {
         if (keywords.find(tok->str()) != keywords.end()) {
             // Don't remove struct members
-            if (!Token::simpleMatch(tok->previous(), "."))
+            if (!Token::exactMatch(tok->previous(), "."))
                 tok->deleteThis(); // Simplify..
         }
 
@@ -10449,7 +10449,7 @@ void Tokenizer::simplifyAsm()
             if (Token::simpleMatch(endasm, "__endasm")) {
                 instruction = tok->next()->stringifyList(endasm);
                 Token::eraseTokens(tok, endasm->next());
-                if (!Token::simpleMatch(tok->next(), ";"))
+                if (!Token::exactMatch(tok->next(), ";"))
                     tok->insertToken(";");
             } else if (firstSemiColon) {
                 instruction = tok->next()->stringifyList(firstSemiColon);
@@ -10793,7 +10793,7 @@ void Tokenizer::simplifyMicrosoftMemoryFunctions()
                 tok1 = tok1->next();
                 tok1->insertToken(",");
             }
-        } else if (Token::simpleMatch(tok, "RtlCompareMemory")) {
+        } else if (Token::exactMatch(tok, "RtlCompareMemory")) {
             // RtlCompareMemory(src1, src2, len) -> memcmp(src1, src2, len)
             tok->str("memcmp");
             // For the record, when memcmp returns 0, both strings are equal.
@@ -11619,9 +11619,9 @@ void Tokenizer::simplifyNamespaceAliases()
             Token * tok2 = tokNext;
 
             while (tok2 && endScope >= scope) {
-                if (Token::simpleMatch(tok2, "{"))
+                if (Token::exactMatch(tok2, "{"))
                     endScope++;
-                else if (Token::simpleMatch(tok2, "}"))
+                else if (Token::exactMatch(tok2, "}"))
                     endScope--;
                 else if (tok2->str() == name) {
                     if (Token::Match(tok2->previous(), "namespace %name% =")) {

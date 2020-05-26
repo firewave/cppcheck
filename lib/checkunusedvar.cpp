@@ -959,7 +959,7 @@ void CheckUnusedVar::checkFunctionVariableUsage_iterateScopes(const Scope* const
         }
 
         // assignment
-        else if ((Token::Match(tok, "%name% [") && Token::simpleMatch(skipBracketsAndMembers(tok->next()), "=")) ||
+        else if ((Token::Match(tok, "%name% [") && Token::exactMatch(skipBracketsAndMembers(tok->next()), "=")) ||
                  (Token::simpleMatch(tok, "* (") && Token::simpleMatch(tok->next()->link(), ") ="))) {
             const Token *eq = tok;
             while (eq && !eq->isAssignmentOp())
@@ -1118,9 +1118,9 @@ void CheckUnusedVar::checkFunctionVariableUsage()
             const Token *varDecl = nullptr;
             if (tok->variable() && tok->variable()->nameToken() == tok) {
                 const Token * eq = tok->next();
-                while (Token::simpleMatch(eq, "["))
+                while (Token::exactMatch(eq, "["))
                     eq = eq->link()->next();
-                if (Token::simpleMatch(eq, "=")) {
+                if (Token::exactMatch(eq, "=")) {
                     varDecl = tok;
                     tok = eq;
                 }

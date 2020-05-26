@@ -269,6 +269,13 @@ public:
 
     static bool simpleMatch(const Token *tok, const char pattern[], size_t pattern_len);
 
+	template<size_t count>
+	static bool exactMatch(const Token *tok, const char (&pattern)[count]) {
+		return exactMatch(tok, pattern, count-1);
+	}
+
+	static bool exactMatch(const Token *tok, const char pattern[], size_t pattern_len);
+
     /**
      * Match given token (or list of tokens) to a pattern list.
      *
@@ -680,11 +687,23 @@ public:
     }
     static const Token *findsimplematch(const Token * const startTok, const char pattern[], size_t pattern_len);
 
+	template<size_t count>
+	static const Token *findexactmatch(const Token * const startTok, const char (&pattern)[count]) {
+		return findexactmatch(startTok, pattern, count-1);
+	}
+	static const Token *findexactmatch(const Token * const startTok, const char pattern[], size_t pattern_len);
+
     template<size_t count>
     static const Token *findsimplematch(const Token * const startTok, const char (&pattern)[count], const Token * const end) {
         return findsimplematch(startTok, pattern, count-1, end);
     }
     static const Token *findsimplematch(const Token * const startTok, const char pattern[], size_t pattern_len, const Token * const end);
+
+	template<size_t count>
+	static const Token *findexactmatch(const Token * const startTok, const char (&pattern)[count], const Token * const end) {
+		return findexactmatch(startTok, pattern, count-1, end);
+	}
+	static const Token *findexactmatch(const Token * const startTok, const char pattern[], size_t pattern_len, const Token * const end);
 
     static const Token *findmatch(const Token * const startTok, const char pattern[], const nonneg int varId = 0);
     static const Token *findmatch(const Token * const startTok, const char pattern[], const Token * const end, const nonneg int varId = 0);
@@ -703,6 +722,21 @@ public:
     static Token *findsimplematch(Token * const startTok, const char pattern[], size_t pattern_len, const Token * const end) {
         return const_cast<Token *>(findsimplematch(const_cast<const Token *>(startTok), pattern, pattern_len, end));
     }
+
+	template<size_t count>
+	static Token *findexactmatch(Token * const startTok, const char (&pattern)[count]) {
+		return findexactmatch(startTok, pattern, count-1);
+	}
+	static Token *findexactmatch(Token * const startTok, const char pattern[], size_t pattern_len) {
+		return const_cast<Token *>(findexactmatch(const_cast<const Token *>(startTok), pattern, pattern_len));
+	}
+	template<size_t count>
+	static Token *findexactmatch(Token * const startTok, const char (&pattern)[count], const Token * const end) {
+		return findexactmatch(startTok, pattern, count-1, end);
+	}
+	static Token *findexactmatch(Token * const startTok, const char pattern[], size_t pattern_len, const Token * const end) {
+		return const_cast<Token *>(findexactmatch(const_cast<const Token *>(startTok), pattern, pattern_len, end));
+	}
 
     static Token *findmatch(Token * const startTok, const char pattern[], const nonneg int varId = 0) {
         return const_cast<Token *>(findmatch(const_cast<const Token *>(startTok), pattern, varId));

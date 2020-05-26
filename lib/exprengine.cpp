@@ -1811,7 +1811,7 @@ static void execute(const Token *start, const Token *end, Data &data, int recurs
                 return;
         }
 
-        if (Token::simpleMatch(tok, "try"))
+        if (Token::exactMatch(tok, "try"))
             // TODO this is a bailout
             throw VerifyException(tok, "Unhandled:" + tok->str());
 
@@ -2179,7 +2179,7 @@ static float getKnownFloatValue(const Token *tok, float def)
 void ExprEngine::runChecks(ErrorLogger *errorLogger, const Tokenizer *tokenizer, const Settings *settings)
 {
     std::function<void(const Token *, const ExprEngine::Value &, ExprEngine::DataBase *)> bufferOverflow = [=](const Token *tok, const ExprEngine::Value &value, ExprEngine::DataBase *dataBase) {
-        if (!Token::simpleMatch(tok->astParent(), ","))
+        if (!Token::exactMatch(tok->astParent(), ","))
             return;
 
         if (!tok->valueType() || tok->valueType()->pointer != 1 || tok->valueType()->type != ::ValueType::Type::CHAR)
@@ -2187,7 +2187,7 @@ void ExprEngine::runChecks(ErrorLogger *errorLogger, const Tokenizer *tokenizer,
 
         int argnr = (tok == tok->astParent()->astOperand1()) ? 0 : 1;
         const Token *ftok = tok->astParent();
-        while (Token::simpleMatch(ftok, ",")) {
+        while (Token::exactMatch(ftok, ",")) {
             ++argnr;
             ftok = ftok->astParent();
         }
@@ -2368,7 +2368,7 @@ void ExprEngine::runChecks(ErrorLogger *errorLogger, const Tokenizer *tokenizer,
         if (!Token::Match(tok->astParent(), "[(,]"))
             return;
         const Token *parent = tok->astParent();
-        while (Token::simpleMatch(parent, ","))
+        while (Token::exactMatch(parent, ","))
             parent = parent->astParent();
         if (!parent || parent->str() != "(")
             return;
@@ -2479,10 +2479,10 @@ void ExprEngine::runChecks(ErrorLogger *errorLogger, const Tokenizer *tokenizer,
     };
 
     std::function<void(const Token *, const ExprEngine::Value &, ExprEngine::DataBase *)> checkAssignment = [=](const Token *tok, const ExprEngine::Value &value, ExprEngine::DataBase *dataBase) {
-        if (!Token::simpleMatch(tok->astParent(), "="))
+        if (!Token::exactMatch(tok->astParent(), "="))
             return;
         const Token *lhs = tok->astParent()->astOperand1();
-        while (Token::simpleMatch(lhs, "."))
+        while (Token::exactMatch(lhs, "."))
             lhs = lhs->astOperand2();
         if (!lhs || !lhs->variable() || !lhs->variable()->nameToken())
             return;

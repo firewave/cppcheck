@@ -76,9 +76,9 @@ void CheckStl::outOfBounds()
                 if (Token::Match(tok, "%name% . %name% (") && container->getYield(tok->strAt(2)) == Library::Container::Yield::START_ITERATOR) {
                     const Token *fparent = tok->tokAt(3)->astParent();
                     const Token *other = nullptr;
-                    if (Token::simpleMatch(fparent, "+") && fparent->astOperand1() == tok->tokAt(3))
+                    if (Token::exactMatch(fparent, "+") && fparent->astOperand1() == tok->tokAt(3))
                         other = fparent->astOperand2();
-                    else if (Token::simpleMatch(fparent, "+") && fparent->astOperand2() == tok->tokAt(3))
+                    else if (Token::exactMatch(fparent, "+") && fparent->astOperand2() == tok->tokAt(3))
                         other = fparent->astOperand1();
                     if (other && other->hasKnownIntValue() && other->getKnownIntValue() > value.intvalue) {
                         outOfBoundsError(fparent, tok->expressionString(), &value, other->expressionString(), &other->values().back());
@@ -458,7 +458,7 @@ void CheckStl::iterators()
                                 name1 = name1->next();
                                 name2 = name2->next();
                             }
-                            if (!Token::simpleMatch(name1, ";") || !Token::Match(name2, "[;,()=]"))
+                            if (!Token::exactMatch(name1, ";") || !Token::Match(name2, "[;,()=]"))
                                 continue;
                         }
                     }
@@ -851,7 +851,7 @@ static const Token* getLoopContainer(const Token* tok)
     if (!Token::simpleMatch(tok, "for ("))
         return nullptr;
     const Token * sepTok = tok->next()->astOperand2();
-    if (!Token::simpleMatch(sepTok, ":"))
+    if (!Token::exactMatch(sepTok, ":"))
         return nullptr;
     return sepTok->astOperand2();
 }
@@ -939,7 +939,7 @@ void CheckStl::stlOutOfBounds()
 
         const Token *condition = nullptr;
         if (scope.type == Scope::eFor) {
-            if (Token::simpleMatch(tok->next()->astOperand2(), ";") && Token::simpleMatch(tok->next()->astOperand2()->astOperand2(), ";"))
+            if (Token::exactMatch(tok->next()->astOperand2(), ";") && Token::exactMatch(tok->next()->astOperand2()->astOperand2(), ";"))
                 condition = tok->next()->astOperand2()->astOperand2()->astOperand1();
         } else if (Token::simpleMatch(tok, "do {") && Token::simpleMatch(tok->linkAt(1), "} while ("))
             condition = tok->linkAt(1)->tokAt(2)->astOperand2();
@@ -1081,7 +1081,7 @@ void CheckStl::eraseCheckLoopVar(const Scope &scope, const Variable *var)
         // Vector erases are handled by invalidContainer check
         if (isVector(tok->tokAt(-3)))
             continue;
-        if (Token::simpleMatch(tok->astParent(), "="))
+        if (Token::exactMatch(tok->astParent(), "="))
             continue;
         // Iterator is invalid..
         int indentlevel = 0U;
@@ -1099,7 +1099,7 @@ void CheckStl::eraseCheckLoopVar(const Scope &scope, const Variable *var)
                 continue;
             }
             if (tok2->varId() == var->declarationId()) {
-                if (Token::simpleMatch(tok2->next(), "="))
+                if (Token::exactMatch(tok2->next(), "="))
                     break;
                 dereferenceErasedError(tok, tok2, tok2->str(), inconclusiveType);
                 break;
@@ -1173,7 +1173,7 @@ void CheckStl::if_find()
             continue;
 
         const Token *conditionStart = scope.classDef->next();
-        if (conditionStart && Token::simpleMatch(conditionStart->astOperand2(), ";"))
+        if (conditionStart && Token::exactMatch(conditionStart->astOperand2(), ";"))
             conditionStart = conditionStart->astOperand2();
 
         for (const Token *tok = conditionStart; tok->str() != "{"; tok = tok->next()) {
@@ -1247,9 +1247,9 @@ void CheckStl::if_findError(const Token *tok, bool str)
 
 static std::pair<const Token *, const Token *> isMapFind(const Token *tok)
 {
-    if (!Token::simpleMatch(tok, "("))
+    if (!Token::exactMatch(tok, "("))
         return {};
-    if (!Token::simpleMatch(tok->astOperand1(), "."))
+    if (!Token::exactMatch(tok->astOperand1(), "."))
         return {};
     if (!astIsContainer(tok->astOperand1()->astOperand1()))
         return {};
@@ -1270,7 +1270,7 @@ static const Token *skipLocalVars(const Token *tok)
 {
     if (!tok)
         return tok;
-    if (Token::simpleMatch(tok, "{"))
+    if (Token::exactMatch(tok, "{"))
         return skipLocalVars(tok->next());
     const Scope *scope = tok->scope();
 
@@ -1314,15 +1314,15 @@ static const Token *findInsertValue(const Token *tok, const Token *containerTok,
     const Token *icontainerTok = nullptr;
     const Token *ikeyTok = nullptr;
     const Token *ivalueTok = nullptr;
-    if (Token::simpleMatch(top, "=") && Token::simpleMatch(top->astOperand1(), "[")) {
+    if (Token::exactMatch(top, "=") && Token::exactMatch(top->astOperand1(), "[")) {
         icontainerTok = top->astOperand1()->astOperand1();
         ikeyTok = top->astOperand1()->astOperand2();
         ivalueTok = top->astOperand2();
     }
-    if (Token::simpleMatch(top, "(") && Token::Match(top->astOperand1(), ". insert|emplace (") && !astIsIterator(top->astOperand1()->tokAt(2))) {
+    if (Token::exactMatch(top, "(") && Token::Match(top->astOperand1(), ". insert|emplace (") && !astIsIterator(top->astOperand1()->tokAt(2))) {
         icontainerTok = top->astOperand1()->astOperand1();
         const Token *itok = top->astOperand1()->tokAt(2)->astOperand2();
-        if (Token::simpleMatch(itok, ",")) {
+        if (Token::exactMatch(itok, ",")) {
             ikeyTok = itok->astOperand1();
             ivalueTok = itok->astOperand2();
         } else {
@@ -1688,7 +1688,7 @@ void CheckStl::string_c_str()
                 if (Token::Match(tok2, "std :: string|wstring (") &&
                     Token::Match(tok2->linkAt(3), ") . c_str|data ( ) ;")) {
                     err = true;
-                } else if (Token::simpleMatch(tok2, "(") &&
+                } else if (Token::exactMatch(tok2, "(") &&
                            Token::Match(tok2->link(), ") . c_str|data ( ) ;")) {
                     // Check for "+ localvar" or "+ std::string(" inside the bracket
                     bool is_implicit_std_string = printInconclusive;
@@ -2139,7 +2139,7 @@ static bool accumulateBoolLiteral(const Token *tok, nonneg int varid)
 static bool accumulateBool(const Token *tok, nonneg int varid)
 {
     // Missing %oreq% so we have to check both manually
-    if (Token::simpleMatch(tok, "&=") || Token::simpleMatch(tok, "|=")) {
+    if (Token::exactMatch(tok, "&=") || Token::exactMatch(tok, "|=")) {
         return true;
     }
     if (Token::Match(tok, "= %varid% %oror%|%or%|&&|&", varid)) {
@@ -2198,7 +2198,7 @@ void CheckStl::useStlAlgorithm()
                 continue;
             const Token *bodyTok = tok->next()->link()->next();
             const Token *splitTok = tok->next()->astOperand2();
-            if (!Token::simpleMatch(splitTok, ":"))
+            if (!Token::exactMatch(splitTok, ":"))
                 continue;
             const Token *loopVar = splitTok->previous();
             if (!Token::Match(loopVar, "%var%"))

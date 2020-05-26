@@ -282,7 +282,7 @@ static const Token * skipValueInConditionalExpression(const Token * const valuet
 
 static bool isEscapeScope(const Token* tok, TokenList * tokenlist, bool unknown = false)
 {
-    if (!Token::simpleMatch(tok, "{"))
+    if (!Token::exactMatch(tok, "{"))
         return false;
     // TODO this search for termTok in all subscopes. It should check the end of the scope.
     const Token * termTok = Token::findmatch(tok, "return|continue|break|throw|goto", tok->link());
@@ -471,7 +471,7 @@ static void setTokenValue(Token* tok, const ValueFlow::Value &value, const Setti
     // cast..
     if (const Token *castType = getCastTypeStartToken(parent)) {
         if (astIsPointer(tok) && value.valueType == ValueFlow::Value::INT &&
-            Token::simpleMatch(parent->astOperand1(), "dynamic_cast"))
+            Token::exactMatch(parent->astOperand1(), "dynamic_cast"))
             return;
         const ValueType &valueType = ValueType::parseDecl(castType, settings);
         setTokenValueCast(parent, valueType, value, settings);
@@ -542,13 +542,13 @@ static void setTokenValue(Token* tok, const ValueFlow::Value &value, const Setti
         }
 
         // known result when a operand is true.
-        if (Token::simpleMatch(parent, "&&") && value.isKnown() && value.isIntValue() && value.intvalue==0) {
+        if (Token::exactMatch(parent, "&&") && value.isKnown() && value.isIntValue() && value.intvalue==0) {
             setTokenValue(parent, value, settings);
             return;
         }
 
         // known result when a operand is false.
-        if (Token::simpleMatch(parent, "||") && value.isKnown() && value.isIntValue() && value.intvalue!=0) {
+        if (Token::exactMatch(parent, "||") && value.isKnown() && value.isIntValue() && value.intvalue!=0) {
             setTokenValue(parent, value, settings);
             return;
         }
@@ -1100,7 +1100,7 @@ static void valueFlowArray(TokenList *tokenlist)
             // pointer = array
             else if (tok->variable() &&
                      tok->variable()->isArray() &&
-                     Token::simpleMatch(tok->astParent(), "=") &&
+                     Token::exactMatch(tok->astParent(), "=") &&
                      tok == tok->astParent()->astOperand2() &&
                      tok->astParent()->astOperand1() &&
                      tok->astParent()->astOperand1()->variable() &&
@@ -1191,7 +1191,7 @@ static void valueFlowPointerAlias(TokenList *tokenlist)
             continue;
 
         // parent should be a '='
-        if (!Token::simpleMatch(tok->astParent(), "="))
+        if (!Token::exactMatch(tok->astParent(), "="))
             continue;
 
         // child should be some buffer or variable
@@ -1880,7 +1880,7 @@ static void valueFlowReverse(TokenList *tokenlist,
         } else if (tok2->str() == "{") {
             // if variable is assigned in loop don't look before the loop
             if (tok2->previous() &&
-                (Token::simpleMatch(tok2->previous(), "do") ||
+                (Token::exactMatch(tok2->previous(), "do") ||
                  (tok2->strAt(-1) == ")" && Token::Match(tok2->linkAt(-1)->previous(), "for|while (")))) {
 
                 const Token *start = tok2;
@@ -2363,7 +2363,7 @@ struct ValueFlowForwardAnalyzer : ForwardAnalyzer {
 
         const bool isAssert = Token::Match(at, "assert|ASSERT");
 
-        if (!isAssert && !Token::simpleMatch(at, "}")) {
+        if (!isAssert && !Token::exactMatch(at, "}")) {
             std::string s = state ? "true" : "false";
             addErrorPath(tok, "Assuming condition is " + s);
         }
@@ -2574,7 +2574,7 @@ struct ExpressionForwardAnalyzer : SingleValueFlowForwardAnalyzer {
             }
             if (tok->varId() > 0) {
                 varids[tok->varId()] = tok->variable();
-                if (!Token::simpleMatch(tok->previous(), ".")) {
+                if (!Token::exactMatch(tok->previous(), ".")) {
                     const Variable *var = tok->variable();
                     if (var && var->isReference() && var->isLocal() && Token::Match(var->nameToken(), "%var% [=(]") && !isGlobalData(var->nameToken()->next()->astOperand2(), isCPP()))
                         return ChildrenToVisit::none;
@@ -2722,7 +2722,7 @@ static std::vector<const Token*> findReturns(const Function* f)
             tok = tok->link();
             continue;
         }
-        if (Token::simpleMatch(tok->astParent(), "return")) {
+        if (Token::exactMatch(tok->astParent(), "return")) {
             result.push_back(tok);
         }
         // Skip lambda functions since the scope may not be set correctly
@@ -2835,7 +2835,7 @@ std::vector<LifetimeToken> getLifetimeTokens(const Token* tok, ValueFlow::Value:
             if (var->isArgument()) {
                 errorPath.emplace_back(var->declEndToken(), "Passed to reference.");
                 return {{tok, true, std::move(errorPath)}};
-            } else if (Token::simpleMatch(var->declEndToken(), "=")) {
+            } else if (Token::exactMatch(var->declEndToken(), "=")) {
                 errorPath.emplace_back(var->declEndToken(), "Assigned to reference.");
                 const Token *vartok = var->declEndToken()->astOperand2();
                 if (vartok == tok || (var->isConst() && isTemporary(true, vartok, nullptr, true)))
@@ -2912,7 +2912,7 @@ std::vector<LifetimeToken> getLifetimeTokens(const Token* tok, ValueFlow::Value:
             }
         } else {
             return LifetimeToken::setAddressOf(getLifetimeTokens(vartok, std::move(errorPath)),
-                                               !(astIsContainer(vartok) && Token::simpleMatch(vartok->astParent(), "[")));
+                                               !(astIsContainer(vartok) && Token::exactMatch(vartok->astParent(), "[")));
         }
     }
     return {{tok, std::move(errorPath)}};
@@ -3027,8 +3027,8 @@ bool isLifetimeBorrowed(const Token *tok, const Settings *settings)
         return true;
     if (!tok->astParent())
         return true;
-    if (!Token::Match(tok->astParent()->previous(), "%name% (") && !Token::simpleMatch(tok->astParent(), ",")) {
-        if (!Token::simpleMatch(tok, "{")) {
+    if (!Token::Match(tok->astParent()->previous(), "%name% (") && !Token::exactMatch(tok->astParent(), ",")) {
+        if (!Token::exactMatch(tok, "{")) {
             const ValueType *vt = tok->valueType();
             const ValueType *vtParent = tok->astParent()->valueType();
             if (isLifetimeBorrowed(vt, vtParent))
@@ -3080,7 +3080,7 @@ static void valueFlowForwardLifetime(Token * tok, TokenList *tokenlist, ErrorLog
     if (!parent)
         return;
     // Assignment
-    if (parent->str() == "=" && (!parent->astParent() || Token::simpleMatch(parent->astParent(), ";"))) {
+    if (parent->str() == "=" && (!parent->astParent() || Token::exactMatch(parent->astParent(), ";"))) {
         // Rhs values..
         if (!parent->astOperand2() || parent->astOperand2()->values().empty())
             return;
@@ -3134,7 +3134,7 @@ static void valueFlowForwardLifetime(Token * tok, TokenList *tokenlist, ErrorLog
             }
         }
         // Constructor
-    } else if (Token::simpleMatch(parent, "{") && !isScopeBracket(parent)) {
+    } else if (Token::exactMatch(parent, "{") && !isScopeBracket(parent)) {
         valueFlowLifetimeConstructor(parent, tokenlist, errorLogger, settings);
         valueFlowForwardLifetime(parent, tokenlist, errorLogger, settings);
         // Function call
@@ -3470,11 +3470,11 @@ static void valueFlowLifetimeConstructor(Token* tok, TokenList* tokenlist, Error
     if (!Token::Match(tok, "(|{"))
         return;
     Token* parent = tok->astParent();
-    while (Token::simpleMatch(parent, ","))
+    while (Token::exactMatch(parent, ","))
         parent = parent->astParent();
-    if (Token::simpleMatch(parent, "{") && hasInitList(parent->astParent())) {
+    if (Token::exactMatch(parent, "{") && hasInitList(parent->astParent())) {
         valueFlowLifetimeConstructor(tok, Token::typeOf(parent->previous()), tokenlist, errorLogger, settings);
-    } else if (Token::simpleMatch(tok, "{") && hasInitList(parent)) {
+    } else if (Token::exactMatch(tok, "{") && hasInitList(parent)) {
         std::vector<const Token *> args = getArguments(tok);
         // Assume range constructor if passed a pair of iterators
         if (astIsContainer(parent) && args.size() == 2 && astIsIterator(args[0]) && astIsIterator(args[1])) {
@@ -3496,7 +3496,7 @@ static void valueFlowLifetimeConstructor(Token* tok, TokenList* tokenlist, Error
 struct Lambda {
     explicit Lambda(const Token * tok)
         : capture(nullptr), arguments(nullptr), returnTok(nullptr), bodyTok(nullptr) {
-        if (!Token::simpleMatch(tok, "[") || !tok->link())
+        if (!Token::exactMatch(tok, "[") || !tok->link())
             return;
         capture = tok;
 
@@ -3507,7 +3507,7 @@ struct Lambda {
         if (afterArguments && afterArguments->originalName() == "->") {
             returnTok = afterArguments->next();
             bodyTok = Token::findsimplematch(returnTok, "{");
-        } else if (Token::simpleMatch(afterArguments, "{")) {
+        } else if (Token::exactMatch(afterArguments, "{")) {
             bodyTok = afterArguments;
         }
     }
@@ -3528,11 +3528,11 @@ static bool isDecayedPointer(const Token *tok)
         return false;
     if (!tok->astParent())
         return false;
-    if (astIsPointer(tok->astParent()) && !Token::simpleMatch(tok->astParent(), "return"))
+    if (astIsPointer(tok->astParent()) && !Token::exactMatch(tok->astParent(), "return"))
         return true;
     if (tok->astParent()->isConstOp())
         return true;
-    if (!Token::simpleMatch(tok->astParent(), "return"))
+    if (!Token::exactMatch(tok->astParent(), "return"))
         return false;
     return astIsPointer(tok->astParent());
 }
@@ -3954,9 +3954,9 @@ static void valueFlowSetConditionToKnown(const Token* tok, std::list<ValueFlow::
 
 static bool isBreakScope(const Token* const endToken)
 {
-    if (!Token::simpleMatch(endToken, "}"))
+    if (!Token::exactMatch(endToken, "}"))
         return false;
-    if (!Token::simpleMatch(endToken->link(), "{"))
+    if (!Token::exactMatch(endToken->link(), "{"))
         return false;
     return Token::findmatch(endToken->link(), "break|goto", endToken);
 }
@@ -4251,7 +4251,7 @@ static void valueFlowAfterCondition(TokenList *tokenlist,
 
         } else if (tok->astParent() && (Token::Match(tok->astParent(), "%oror%|&&") ||
                                         Token::Match(tok->astParent()->previous(), "if|while ("))) {
-            if (Token::simpleMatch(tok, "="))
+            if (Token::exactMatch(tok, "="))
                 vartok = tok->astOperand1();
             else if (!Token::Match(tok, "%comp%|%assign%"))
                 vartok = tok;
@@ -4635,8 +4635,8 @@ static void valueFlowForLoop(TokenList *tokenlist, SymbolDatabase* symboldatabas
         Token* tok = const_cast<Token*>(scope.classDef);
         Token* const bodyStart = const_cast<Token*>(scope.bodyStart);
 
-        if (!Token::simpleMatch(tok->next()->astOperand2(), ";") ||
-            !Token::simpleMatch(tok->next()->astOperand2()->astOperand2(), ";"))
+        if (!Token::exactMatch(tok->next()->astOperand2(), ";") ||
+            !Token::exactMatch(tok->next()->astOperand2()->astOperand2(), ";"))
             continue;
 
         int varid(0);
@@ -5452,7 +5452,7 @@ static bool isContainerSizeChangedByFunction(const Token *tok, int depth = 20)
         if (yield != Library::Container::Yield::NO_YIELD)
             return false;
     }
-    if (Token::simpleMatch(tok->astParent(), "["))
+    if (Token::exactMatch(tok->astParent(), "["))
         return false;
 
     // address of variable
@@ -5519,7 +5519,7 @@ static void valueFlowContainerForward(Token *tok, nonneg int containerId, ValueF
             break;
         if (Token::Match(tok, "while|for (")) {
             const Token *start = tok->linkAt(1)->next();
-            if (!Token::simpleMatch(start->link(), "{"))
+            if (!Token::exactMatch(start->link(), "{"))
                 break;
             if (isContainerSizeChanged(containerId, start, start->link()))
                 break;

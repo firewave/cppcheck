@@ -89,7 +89,7 @@ static const Token* skipScopeIdentifiers(const Token* tok)
 
 static bool isExecutableScope(const Token* tok)
 {
-    if (!Token::simpleMatch(tok, "{"))
+    if (!Token::exactMatch(tok, "{"))
         return false;
     const Token * tok2 = tok->link()->previous();
     if (Token::simpleMatch(tok2, "; }"))
@@ -153,7 +153,7 @@ void SymbolDatabase::createSymbolDatabaseFindAllScopes()
             }
 
             // skip over final
-            if (mTokenizer->isCPP() && Token::simpleMatch(tok2, "final"))
+            if (mTokenizer->isCPP() && Token::exactMatch(tok2, "final"))
                 tok2 = tok2->next();
 
             // make sure we have valid code
@@ -176,20 +176,20 @@ void SymbolDatabase::createSymbolDatabaseFindAllScopes()
                     else if (Token::Match(tok2, "%name% ["))
                         continue;
                     // skip template
-                    else if (Token::simpleMatch(tok2, ";") &&
+                    else if (Token::exactMatch(tok2, ";") &&
                              Token::Match(tok->previous(), "template|> class|struct")) {
                         tok = tok2;
                         continue;
                     }
                     // forward declaration
-                    else if (Token::simpleMatch(tok2, ";") &&
+                    else if (Token::exactMatch(tok2, ";") &&
                              Token::Match(tok, "class|struct|union")) {
                         // TODO: see if it can be used
                         tok = tok2;
                         continue;
                     }
                     // skip constructor
-                    else if (Token::simpleMatch(tok2, "(") &&
+                    else if (Token::exactMatch(tok2, "(") &&
                              Token::simpleMatch(tok2->link(), ") ;")) {
                         tok = tok2->link()->next();
                         continue;
@@ -681,7 +681,7 @@ void SymbolDatabase::createSymbolDatabaseFindAllScopes()
             } else if (const Token *lambdaEndToken = findLambdaEndToken(tok)) {
                 const Token *lambdaStartToken = lambdaEndToken->link();
                 const Token * argStart = lambdaStartToken->astParent();
-                const Token * funcStart = Token::simpleMatch(argStart, "[") ? argStart : argStart->astParent();
+                const Token * funcStart = Token::exactMatch(argStart, "[") ? argStart : argStart->astParent();
                 const Function * function = addGlobalFunction(scope, tok, argStart, funcStart);
                 if (!function)
                     mTokenizer->syntaxError(tok);
@@ -1392,7 +1392,7 @@ void SymbolDatabase::createSymbolDatabaseIncompleteVars()
             continue;
         if (Token::Match(tok->next(), "&|&&|* )|%var%"))
             continue;
-        if (Token::simpleMatch(tok->next(), ")") && Token::simpleMatch(tok->next()->link()->previous(), "catch ("))
+        if (Token::exactMatch(tok->next(), ")") && Token::simpleMatch(tok->next()->link()->previous(), "catch ("))
             continue;
         // Very likely a typelist
         if (Token::Match(tok->tokAt(-2), "%type% ,"))
@@ -1400,10 +1400,10 @@ void SymbolDatabase::createSymbolDatabaseIncompleteVars()
         // Inside template brackets
         if (Token::Match(tok->next(), "<|>") && tok->next()->link())
             continue;
-        if (Token::simpleMatch(tok->previous(), "<") && tok->previous()->link())
+        if (Token::exactMatch(tok->previous(), "<") && tok->previous()->link())
             continue;
         // Skip goto labels
-        if (Token::simpleMatch(tok->previous(), "goto"))
+        if (Token::exactMatch(tok->previous(), "goto"))
             continue;
         if (cppkeywords.count(tok->str()) > 0)
             continue;
@@ -1594,7 +1594,7 @@ bool SymbolDatabase::isFunction(const Token *tok, const Scope* outerScope, const
             tok1 = tok1->previous();
 
         // skip over qualification
-        while (Token::simpleMatch(tok1, "::")) {
+        while (Token::exactMatch(tok1, "::")) {
             tok1 = tok1->previous();
             if (Token::Match(tok1, "%name%"))
                 tok1 = tok1->previous();
@@ -1645,7 +1645,7 @@ bool SymbolDatabase::isFunction(const Token *tok, const Scope* outerScope, const
             }
 
             // skip over qualification
-            while (Token::simpleMatch(tok1, "::")) {
+            while (Token::exactMatch(tok1, "::")) {
                 tok1 = tok1->previous();
                 if (Token::Match(tok1, "%name%"))
                     tok1 = tok1->previous();
@@ -3480,7 +3480,7 @@ void Function::addArguments(const SymbolDatabase *symbolDatabase, const Scope *s
 {
     // check for non-empty argument list "( ... )"
     const Token * start = arg ? arg : argDef;
-    if (!Token::simpleMatch(start, "("))
+    if (!Token::exactMatch(start, "("))
         return;
     if (!(start && start->link() != start->next() && !Token::simpleMatch(start, "( void )")))
         return;
@@ -3583,7 +3583,7 @@ void Function::addArguments(const SymbolDatabase *symbolDatabase, const Scope *s
 
         if (tok->str() == ")") {
             // check for a variadic function
-            if (Token::simpleMatch(startTok, "..."))
+            if (Token::exactMatch(startTok, "..."))
                 isVariadic(true);
 
             break;
@@ -3826,7 +3826,7 @@ void Scope::getVariableList(const Settings* settings)
         return;
 
     // Variable declared in condition: if (auto x = bar())
-    if (Token::Match(classDef, "if|while ( %type%") && Token::simpleMatch(classDef->next()->astOperand2(), "=")) {
+    if (Token::Match(classDef, "if|while ( %type%") && Token::exactMatch(classDef->next()->astOperand2(), "=")) {
         checkVariable(classDef->tokAt(2), defaultAccess(), settings);
     }
 
@@ -4808,7 +4808,7 @@ const Function* SymbolDatabase::findFunction(const Token *tok) const
                 return var->typeScope()->findFunction(tok, var->valueType()->constness == 1);
             if (var && var->smartPointerType() && var->smartPointerType()->classScope && tok1->next()->originalName() == "->")
                 return var->smartPointerType()->classScope->findFunction(tok, var->valueType()->constness == 1);
-        } else if (Token::simpleMatch(tok->previous()->astOperand1(), "(")) {
+        } else if (Token::exactMatch(tok->previous()->astOperand1(), "(")) {
             const Token *castTok = tok->previous()->astOperand1();
             if (castTok->isCast()) {
                 ValueType vt = ValueType::parseDecl(castTok->next(),mSettings);
@@ -5380,7 +5380,7 @@ void SymbolDatabase::setValueType(Token *tok, const ValueType &valuetype)
         setValueType(parent, vt);
         return;
     }
-    if (parent->str() == "*" && Token::simpleMatch(parent->astOperand2(), "[") && valuetype.pointer > 0U) {
+    if (parent->str() == "*" && Token::exactMatch(parent->astOperand2(), "[") && valuetype.pointer > 0U) {
         const Token *op1 = parent->astOperand2()->astOperand1();
         while (op1 && op1->str() == "[")
             op1 = op1->astOperand1();
@@ -5422,8 +5422,8 @@ void SymbolDatabase::setValueType(Token *tok, const ValueType &valuetype)
         parent->str() == ":" &&
         Token::Match(parent->astParent(), "( const| auto *|&| %var% :") &&
         !parent->previous()->valueType() &&
-        Token::simpleMatch(parent->astParent()->astOperand1(), "for")) {
-        const bool isconst = Token::simpleMatch(parent->astParent()->next(), "const");
+        Token::exactMatch(parent->astParent()->astOperand1(), "for")) {
+        const bool isconst = Token::exactMatch(parent->astParent()->next(), "const");
         Token * const autoToken = parent->astParent()->tokAt(isconst ? 2 : 1);
         if (vt2->pointer) {
             ValueType autovt(*vt2);
@@ -5883,14 +5883,14 @@ void SymbolDatabase::setValueTypeInTokenList(bool reportDebugWarnings, Token *to
             // cast
             if (tok->isCast() && !tok->astOperand2() && Token::Match(tok, "( %name%")) {
                 ValueType valuetype;
-                if (Token::simpleMatch(parsedecl(tok->next(), &valuetype, mDefaultSignedness, mSettings), ")"))
+                if (Token::exactMatch(parsedecl(tok->next(), &valuetype, mDefaultSignedness, mSettings), ")"))
                     setValueType(tok, valuetype);
             }
 
             // C++ cast
             else if (tok->astOperand2() && Token::Match(tok->astOperand1(), "static_cast|const_cast|dynamic_cast|reinterpret_cast < %name%") && tok->astOperand1()->linkAt(1)) {
                 ValueType valuetype;
-                if (Token::simpleMatch(parsedecl(tok->astOperand1()->tokAt(2), &valuetype, mDefaultSignedness, mSettings), ">"))
+                if (Token::exactMatch(parsedecl(tok->astOperand1()->tokAt(2), &valuetype, mDefaultSignedness, mSettings), ">"))
                     setValueType(tok, valuetype);
             }
 
@@ -5983,7 +5983,7 @@ void SymbolDatabase::setValueTypeInTokenList(bool reportDebugWarnings, Token *to
                 }
 
                 if (typestr.empty() || typestr == "iterator") {
-                    if (Token::simpleMatch(tok->astOperand1(), ".") &&
+                    if (Token::exactMatch(tok->astOperand1(), ".") &&
                         tok->astOperand1()->astOperand1() &&
                         tok->astOperand1()->astOperand2() &&
                         tok->astOperand1()->astOperand1()->valueType() &&

@@ -500,7 +500,7 @@ static bool iscast(const Token *tok)
     if (tok->previous() && tok->previous()->isName() && tok->previous()->str() != "return")
         return false;
 
-    if (Token::simpleMatch(tok->previous(), ">") && tok->previous()->link())
+    if (Token::exactMatch(tok->previous(), ">") && tok->previous()->link())
         return false;
 
     if (Token::Match(tok, "( (| typeof (") && Token::Match(tok->link(), ") %num%"))
@@ -570,29 +570,29 @@ static const Token* findTypeEnd(const Token* tok)
 
 static const Token * findLambdaEndScope(const Token *tok)
 {
-    if (!Token::simpleMatch(tok, "["))
+    if (!Token::exactMatch(tok, "["))
         return nullptr;
     tok = tok->link();
     if (!Token::Match(tok, "] (|{"))
         return nullptr;
     tok = tok->linkAt(1);
-    if (Token::simpleMatch(tok, "}"))
+    if (Token::exactMatch(tok, "}"))
         return tok;
     if (Token::simpleMatch(tok, ") {"))
         return tok->linkAt(1);
-    if (!Token::simpleMatch(tok, ")"))
+    if (!Token::exactMatch(tok, ")"))
         return nullptr;
     tok = tok->next();
     while (Token::Match(tok, "mutable|constexpr|constval|noexcept|.")) {
         if (Token::simpleMatch(tok, "noexcept ("))
             tok = tok->linkAt(1);
-        if (Token::simpleMatch(tok, ".")) {
+        if (Token::exactMatch(tok, ".")) {
             tok = findTypeEnd(tok);
             break;
         }
         tok = tok->next();
     }
-    if (Token::simpleMatch(tok, "{"))
+    if (Token::exactMatch(tok, "{"))
         return tok->link();
     return nullptr;
 }
@@ -632,7 +632,7 @@ static bool iscpp11init(const Token * const tok)
 
 static bool iscpp11init_impl(const Token * const tok)
 {
-    if (Token::simpleMatch(tok, "{") && Token::simpleMatch(tok->link()->previous(), "; }"))
+    if (Token::exactMatch(tok, "{") && Token::simpleMatch(tok->link()->previous(), "; }"))
         return false;
     const Token *nameToken = tok;
     while (nameToken && nameToken->str() == "{") {
@@ -648,7 +648,7 @@ static bool iscpp11init_impl(const Token * const tok)
         nameToken = nameToken->link()->previous();
 
     const Token *endtok = nullptr;
-    if (Token::Match(nameToken, "%name%|return {") && (!Token::simpleMatch(nameToken->tokAt(2), "[") || findLambdaEndScope(nameToken->tokAt(2))))
+    if (Token::Match(nameToken, "%name%|return {") && (!Token::exactMatch(nameToken->tokAt(2), "[") || findLambdaEndScope(nameToken->tokAt(2))))
         endtok = nameToken->linkAt(1);
     else if (Token::Match(nameToken,"%name% <") && Token::simpleMatch(nameToken->linkAt(1),"> {"))
         endtok = nameToken->linkAt(1)->linkAt(1);
@@ -658,7 +658,7 @@ static bool iscpp11init_impl(const Token * const tok)
         return false;
     if (Token::Match(nameToken, "else|try|do|const|override|volatile|&|&&"))
         return false;
-    if (Token::simpleMatch(nameToken->previous(), "namespace"))
+    if (Token::exactMatch(nameToken->previous(), "namespace"))
         return false;
     if (Token::Match(nameToken, "%any% {")) {
         // If there is semicolon between {..} this is not a initlist
@@ -826,7 +826,7 @@ static void compileTerm(Token *&tok, AST_state& state)
                 state.inArrayAssignment--;
                 tok = tok1->link()->next();
             }
-        } else if (!state.inArrayAssignment && !Token::simpleMatch(prev, "=")) {
+        } else if (!state.inArrayAssignment && !Token::exactMatch(prev, "=")) {
             state.op.push(tok);
             tok = tok->link()->next();
         } else {
@@ -965,7 +965,7 @@ static void compilePrecedence2(Token *&tok, AST_state& state)
                 compileUnaryOp(tok, state, compileExpression);
             else
                 compileBinOp(tok, state, compileExpression);
-            while (Token::simpleMatch(tok, "}"))
+            while (Token::exactMatch(tok, "}"))
                 tok = tok->next();
         } else break;
     }
@@ -1263,7 +1263,7 @@ static bool isLambdaCaptureList(const Token * tok)
         return false;
     if (!Token::Match(tok->link(), "] (|{"))
         return false;
-    if (Token::simpleMatch(tok->astOperand1(), "{") && tok->astOperand1() == tok->link()->next())
+    if (Token::exactMatch(tok->astOperand1(), "{") && tok->astOperand1() == tok->link()->next())
         return true;
     if (!tok->astOperand1() || tok->astOperand1()->str() != "(")
         return false;
@@ -1579,7 +1579,7 @@ void TokenList::validateAst() const
             if (Token::simpleMatch(tok->previous(), ") = 0"))
                 continue;
             // Skip operator definitions
-            if (Token::simpleMatch(tok->previous(), "operator"))
+            if (Token::exactMatch(tok->previous(), "operator"))
                 continue;
             // Skip incomplete code
             if (!tok->astOperand1() && !tok->astOperand2() && !tok->astParent())

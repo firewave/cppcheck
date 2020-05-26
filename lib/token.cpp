@@ -588,6 +588,14 @@ bool Token::simpleMatch(const Token *tok, const char pattern[], size_t pattern_l
     return true;
 }
 
+bool Token::exactMatch(const Token *tok, const char pattern[], size_t pattern_len)
+{
+	if (!tok || pattern_len != tok->mStr.length() || std::strncmp(pattern, tok->mStr.c_str(), pattern_len))
+		return false;
+
+	return true;
+}
+
 bool Token::firstWordEquals(const char *str, const char *word)
 {
     for (;;) {
@@ -948,6 +956,15 @@ const Token *Token::findsimplematch(const Token * const startTok, const char pat
     return nullptr;
 }
 
+const Token *Token::findexactmatch(const Token * const startTok, const char pattern[], size_t pattern_len)
+{
+	for (const Token* tok = startTok; tok; tok = tok->next()) {
+		if (Token::exactMatch(tok, pattern, pattern_len))
+			return tok;
+	}
+	return nullptr;
+}
+
 const Token *Token::findsimplematch(const Token * const startTok, const char pattern[], size_t pattern_len, const Token * const end)
 {
     for (const Token* tok = startTok; tok && tok != end; tok = tok->next()) {
@@ -955,6 +972,15 @@ const Token *Token::findsimplematch(const Token * const startTok, const char pat
             return tok;
     }
     return nullptr;
+}
+
+const Token *Token::findexactmatch(const Token * const startTok, const char pattern[], size_t pattern_len, const Token * const end)
+{
+	for (const Token* tok = startTok; tok && tok != end; tok = tok->next()) {
+		if (Token::exactMatch(tok, pattern, pattern_len))
+			return tok;
+	}
+	return nullptr;
 }
 
 const Token *Token::findmatch(const Token * const startTok, const char pattern[], const nonneg int varId)
@@ -1085,9 +1111,9 @@ void Token::insertToken(const std::string &tokenStr, const std::string &original
             } else if (newToken->str() == "}") {
                 Token* matchingTok = newToken->previous();
                 int depth = 0;
-                while (matchingTok && (depth != 0 || !Token::simpleMatch(matchingTok, "{"))) {
-                    if (Token::simpleMatch(matchingTok, "}")) depth++;
-                    if (Token::simpleMatch(matchingTok, "{")) depth--;
+                while (matchingTok && (depth != 0 || !Token::exactMatch(matchingTok, "{"))) {
+                    if (Token::exactMatch(matchingTok, "}")) depth++;
+                    if (Token::exactMatch(matchingTok, "{")) depth--;
                     matchingTok = matchingTok->previous();
                 }
                 if (matchingTok && matchingTok->previous()) {
@@ -1367,7 +1393,7 @@ std::pair<const Token *, const Token *> Token::findExpressionStartEndTokens() co
     // skip parentheses
     start = goToLeftParenthesis(start, end);
     end = goToRightParenthesis(start, end);
-    if (Token::simpleMatch(end, "{"))
+    if (Token::exactMatch(end, "{"))
         end = end->link();
     return std::pair<const Token *, const Token *>(start,end);
 }
@@ -2054,7 +2080,7 @@ void Token::type(const ::Type *t)
 
 const ::Type *Token::typeOf(const Token *tok)
 {
-    if (Token::simpleMatch(tok, "return")) {
+    if (Token::exactMatch(tok, "return")) {
         const Scope *scope = tok->scope();
         if (!scope)
             return nullptr;
@@ -2074,11 +2100,11 @@ const ::Type *Token::typeOf(const Token *tok)
         if (!function)
             return nullptr;
         return function->retType;
-    } else if (Token::simpleMatch(tok, "=")) {
+    } else if (Token::exactMatch(tok, "=")) {
         return Token::typeOf(tok->astOperand1());
-    } else if (Token::simpleMatch(tok, ".")) {
+    } else if (Token::exactMatch(tok, ".")) {
         return Token::typeOf(tok->astOperand2());
-    } else if (Token::simpleMatch(tok, "[")) {
+    } else if (Token::exactMatch(tok, "[")) {
         return Token::typeOf(tok->astOperand1());
     }
     return nullptr;
@@ -2086,7 +2112,7 @@ const ::Type *Token::typeOf(const Token *tok)
 
 std::pair<const Token*, const Token*> Token::typeDecl(const Token * tok)
 {
-    if (Token::simpleMatch(tok, "return")) {
+    if (Token::exactMatch(tok, "return")) {
         const Scope *scope = tok->scope();
         if (!scope)
             return {};
@@ -2108,9 +2134,9 @@ std::pair<const Token*, const Token*> Token::typeDecl(const Token * tok)
         if (!function)
             return {};
         return {function->retDef, function->returnDefEnd()};
-    } else if (Token::simpleMatch(tok, "=")) {
+    } else if (Token::exactMatch(tok, "=")) {
         return Token::typeDecl(tok->astOperand1());
-    } else if (Token::simpleMatch(tok, ".")) {
+    } else if (Token::exactMatch(tok, ".")) {
         return Token::typeDecl(tok->astOperand2());
     } else {
         const ::Type * t = typeOf(tok);

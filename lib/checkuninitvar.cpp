@@ -437,7 +437,7 @@ bool CheckUninitVar::checkScopeForVariable(const Token *tok, const Variable& var
                 const Token *rhs = condition->astOperand2();
                 const Token *vartok = (lhs && lhs->hasKnownIntValue()) ? rhs : lhs;
                 const Token *numtok = (lhs == vartok) ? rhs : lhs;
-                while (Token::simpleMatch(vartok, "."))
+                while (Token::exactMatch(vartok, "."))
                     vartok = vartok->astOperand2();
                 if (vartok && vartok->varId() && numtok && numtok->hasKnownIntValue()) {
                     const std::map<int,VariableValue>::const_iterator it = variableValue.find(vartok->varId());
@@ -712,7 +712,7 @@ bool CheckUninitVar::checkScopeForVariable(const Token *tok, const Variable& var
         // variable is seen..
         if (tok->varId() == var.declarationId()) {
             // calling function that returns uninit data through pointer..
-            if (var.isPointer() && Token::simpleMatch(tok->next(), "=")) {
+            if (var.isPointer() && Token::exactMatch(tok->next(), "=")) {
                 const Token *rhs = tok->next()->astOperand2();
                 while (rhs && rhs->isCast())
                     rhs = rhs->astOperand2() ? rhs->astOperand2() : rhs->astOperand1();
@@ -1007,7 +1007,7 @@ bool CheckUninitVar::isVariableUsage(const Token *vartok, bool pointer, Alloc al
                 return (use>0);
         }
 
-        else if (!pointer && Token::simpleMatch(possibleParent, "=") && vartok->astParent()->str() == "&") {
+        else if (!pointer && Token::exactMatch(possibleParent, "=") && vartok->astParent()->str() == "&") {
             return false;
         }
     }
@@ -1018,7 +1018,7 @@ bool CheckUninitVar::isVariableUsage(const Token *vartok, bool pointer, Alloc al
             parent = parent->astParent();
         while (parent && parent->str() == ",")
             parent = parent->astParent();
-        if (Token::simpleMatch(parent, "{"))
+        if (Token::exactMatch(parent, "{"))
             return true;
     }
 
@@ -1072,7 +1072,7 @@ bool CheckUninitVar::isVariableUsage(const Token *vartok, bool pointer, Alloc al
         const Token *prev = vartok->tokAt(-2);
         while (Token::Match(prev, "%name%|*"))
             prev = prev->previous();
-        if (!Token::simpleMatch(prev, "&"))
+        if (!Token::exactMatch(prev, "&"))
             return true;
     }
 
@@ -1090,7 +1090,7 @@ bool CheckUninitVar::isVariableUsage(const Token *vartok, bool pointer, Alloc al
         const Token *parent = vartok->next()->astParent();
         while (Token::Match(parent, "[|."))
             parent = parent->astParent();
-        if (Token::simpleMatch(parent, "&") && !parent->astOperand2())
+        if (Token::exactMatch(parent, "&") && !parent->astOperand2())
             return false;
         if (parent && Token::Match(parent->previous(), "if|while|switch ("))
             return true;
@@ -1099,7 +1099,7 @@ bool CheckUninitVar::isVariableUsage(const Token *vartok, bool pointer, Alloc al
         return true;
     }
 
-    if (mTokenizer->isCPP() && Token::simpleMatch(vartok->next(), "<<")) {
+    if (mTokenizer->isCPP() && Token::exactMatch(vartok->next(), "<<")) {
         return false;
     }
 
@@ -1284,8 +1284,8 @@ bool CheckUninitVar::isMemberVariableUsage(const Token *tok, bool isPointer, All
 
     // = *(&var);
     else if (!isPointer &&
-             Token::simpleMatch(tok->astParent(),"&") &&
-             Token::simpleMatch(tok->astParent()->astParent(),"*") &&
+             Token::exactMatch(tok->astParent(),"&") &&
+             Token::exactMatch(tok->astParent()->astParent(),"*") &&
              Token::Match(tok->astParent()->astParent()->astParent(), "= * (| &") &&
              tok->astParent()->astParent()->astParent()->astOperand2() == tok->astParent()->astParent())
         return true;
@@ -1328,7 +1328,7 @@ static bool isLeafDot(const Token* tok)
     if (!tok)
         return false;
     const Token * parent = tok->astParent();
-    if (!Token::simpleMatch(parent, "."))
+    if (!Token::exactMatch(parent, "."))
         return false;
     if (parent->astOperand2() == tok)
         return true;
@@ -1374,7 +1374,7 @@ void CheckUninitVar::valueFlowUninit()
                 continue;
             uninitvarError(tok, tok->expressionString(), v->errorPath);
             const Token * nextTok = tok;
-            while (Token::simpleMatch(nextTok->astParent(), "."))
+            while (Token::exactMatch(nextTok->astParent(), "."))
                 nextTok = nextTok->astParent();
             nextTok = nextAfterAstRightmostLeaf(nextTok);
             if (nextTok == scope.bodyEnd)

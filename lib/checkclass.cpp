@@ -93,7 +93,7 @@ void CheckClass::constructors()
 
     const bool printInconclusive = mSettings->inconclusive;
     for (const Scope * scope : mSymbolDatabase->classAndStructScopes) {
-        const bool unusedTemplate = Token::simpleMatch(scope->classDef->previous(), ">");
+        const bool unusedTemplate = Token::exactMatch(scope->classDef->previous(), ">");
 
         bool usedInUnion = false;
         for (const Scope &unionScope : mSymbolDatabase->scopeList) {
@@ -112,7 +112,7 @@ void CheckClass::constructors()
             // If there is a private variable, there should be a constructor..
             for (const Variable &var : scope->varlist) {
                 const Token *initTok = var.nameToken();
-                while (Token::simpleMatch(initTok->next(), "["))
+                while (Token::exactMatch(initTok->next(), "["))
                     initTok = initTok->linkAt(1);
                 if (var.isPrivate() && !var.isStatic() && !Token::Match(var.nameToken(), "%varid% ; %varid% =", var.declarationId()) &&
                     !Token::Match(initTok, "%var%|] {|=") &&
@@ -1174,7 +1174,7 @@ void CheckClass::checkMemset()
                     if (var && arg1->strAt(1) == ",") {
                         if (var->isArrayOrPointer()) {
                             const Token *endTok = var->typeEndToken();
-                            while (Token::simpleMatch(endTok, "*")) {
+                            while (Token::exactMatch(endTok, "*")) {
                                 ++numIndirToVariableType;
                                 endTok = endTok->previous();
                             }
@@ -1424,7 +1424,7 @@ void CheckClass::checkReturnPtrThis(const Scope *scope, const Function *func, co
         const Token *retExpr = tok->astOperand1();
         if (retExpr && retExpr->str() == "=")
             retExpr = retExpr->astOperand1();
-        if (retExpr && retExpr->isUnaryOp("*") && Token::simpleMatch(retExpr->astOperand1(), "this"))
+        if (retExpr && retExpr->isUnaryOp("*") && Token::exactMatch(retExpr->astOperand1(), "this"))
             continue;
 
         std::string cast("( " + scope->className + " & )");
@@ -1608,9 +1608,9 @@ bool CheckClass::hasAssignSelf(const Function *func, const Token *rhs)
         [&](const Token *tok2) {
             if (!Token::Match(tok2, "==|!="))
                 return ChildrenToVisit::op1_and_op2;
-            if (Token::simpleMatch(tok2->astOperand1(), "this"))
+            if (Token::exactMatch(tok2->astOperand1(), "this"))
                 tok2 = tok2->astOperand2();
-            else if (Token::simpleMatch(tok2->astOperand2(), "this"))
+            else if (Token::exactMatch(tok2->astOperand2(), "this"))
                 tok2 = tok2->astOperand1();
             else
                 return ChildrenToVisit::op1_and_op2;
@@ -2380,7 +2380,7 @@ const std::list<const Token *> & CheckClass::getVirtualFunctionCalls(const Funct
         }
 
         if (callFunction->isImplicitlyVirtual()) {
-            if (!callFunction->isPure() && Token::simpleMatch(tok->previous(), "::"))
+            if (!callFunction->isPure() && Token::exactMatch(tok->previous(), "::"))
                 continue;
             virtualFunctionCalls.push_back(tok);
             continue;

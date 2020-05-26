@@ -469,9 +469,9 @@ struct ForwardTraversal {
             return getInitTok(tok->next());
         if (tok->str() !=  "(")
             return nullptr;
-        if (!Token::simpleMatch(tok->astOperand2(), ";"))
+        if (!Token::exactMatch(tok->astOperand2(), ";"))
             return nullptr;
-        if (Token::simpleMatch(tok->astOperand2()->astOperand1(), ";"))
+        if (Token::exactMatch(tok->astOperand2()->astOperand1(), ";"))
             return nullptr;
         return tok->astOperand2()->astOperand1();
     }
@@ -483,9 +483,9 @@ struct ForwardTraversal {
             return getStepTok(tok->next());
         if (tok->str() != "(")
             return nullptr;
-        if (!Token::simpleMatch(tok->astOperand2(), ";"))
+        if (!Token::exactMatch(tok->astOperand2(), ";"))
             return nullptr;
-        if (!Token::simpleMatch(tok->astOperand2()->astOperand2(), ";"))
+        if (!Token::exactMatch(tok->astOperand2()->astOperand2(), ";"))
             return nullptr;
         return tok->astOperand2()->astOperand2()->astOperand2();
     }
