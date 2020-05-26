@@ -1,3 +1,5 @@
+include(cmake/add_compile_options_optional.cmake)
+
 if (CMAKE_CXX_COMPILER_ID MATCHES "GNU" OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
     if(CMAKE_BUILD_TYPE MATCHES "Release")
         # "Release" uses -O3 by default
@@ -37,9 +39,7 @@ elseif (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
    add_compile_options(-Wno-multichar)
    add_compile_options(-Wno-sign-compare)
    add_compile_options(-Wno-unused-function)
-   if (NOT CMAKE_CXX_COMPILER_VERSION VERSION_LESS "8.0.0")
-      add_compile_options(-Wextra-semi-stmt)
-   endif()
+   add_compile_options_optional(-Wextra-semi-stmt)
 
    if(ENABLE_COVERAGE OR ENABLE_COVERAGE_XML)
       message(FATAL_ERROR "Not use clang for generate code coverage. Use gcc.")

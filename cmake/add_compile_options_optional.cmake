@@ -1,0 +1,11 @@
+include(CheckCXXCompilerFlag)
+
+function(add_compile_options_optional FLAG)
+    message(STATUS "checking for CXX option ${FLAG}")
+    check_cxx_compiler_flag(${FLAG} _has_cxx_flag)
+    if (_has_cxx_flag)
+        message(STATUS "found ${FLAG}")
+        add_compile_options(${FLAG})
+    endif()
+    unset(_has_cxx_flag)
+endfunction()
