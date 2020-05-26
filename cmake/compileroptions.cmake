@@ -41,6 +41,7 @@ elseif (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
    add_compile_options(-Wno-unused-function)
    add_compile_options_optional(-Wextra-semi-stmt)
    add_compile_options_optional(-Wdocumentation)
+   #add_compile_options_optional(-Wzero-as-null-pointer-constant) # cannot enable since simplcpp and tinyxml2 are not c++11
 
    if(ENABLE_COVERAGE OR ENABLE_COVERAGE_XML)
       message(FATAL_ERROR "Not use clang for generate code coverage. Use gcc.")
