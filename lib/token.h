@@ -340,7 +340,7 @@ public:
      * @param tok token with C-string
      * @param settings Settings
      **/
-    static nonneg int getStrSize(const Token *tok, const Settings *const);
+    static nonneg int getStrSize(const Token *tok, const Settings *const settings);
 
     /**
      * @return char of C-string at index (possible escaped "\\n")
