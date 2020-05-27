@@ -12,14 +12,13 @@ if (BUILD_TESTS)
     set(CTEST_PARALLEL_LEVEL ${N} CACHE STRING "CTest parallel level")
     add_custom_target(check COMMAND ${CMAKE_CTEST_COMMAND} --output-on-failure -j ${CTEST_PARALLEL_LEVEL} -C ${CMAKE_CFG_INTDIR} --timeout 90)
 
-    include_directories(${PROJECT_SOURCE_DIR}/lib/ ${PROJECT_SOURCE_DIR}/cli/)
-    include_directories(SYSTEM ${PROJECT_SOURCE_DIR}/externals/tinyxml)
-    include_directories(${PROJECT_SOURCE_DIR}/externals/simplecpp/)
-
     file(GLOB hdrs "*.h")
     file(GLOB srcs "*.cpp")
 
     add_executable(testrunner ${hdrs} ${srcs} $<TARGET_OBJECTS:lib_objs> $<TARGET_OBJECTS:cli_objs> $<TARGET_OBJECTS:tinyxml_objs> $<TARGET_OBJECTS:simplecpp_objs>)
+    target_include_directories(testrunner PRIVATE ${PROJECT_SOURCE_DIR}/lib/ ${PROJECT_SOURCE_DIR}/cli/)
+    target_include_directories(testrunner SYSTEM PRIVATE ${PROJECT_SOURCE_DIR}/externals/tinyxml)
+    target_include_directories(testrunner SYSTEM PRIVATE ${PROJECT_SOURCE_DIR}/externals/simplecpp/)
     if (HAVE_RULES)
         target_link_libraries(testrunner ${PCRE_LIBRARY})
     endif()

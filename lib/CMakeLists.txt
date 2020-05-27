@@ -1,7 +1,3 @@
-include_directories(SYSTEM ${PROJECT_SOURCE_DIR}/externals/)
-include_directories(SYSTEM ${PROJECT_SOURCE_DIR}/externals/tinyxml/)
-include_directories(${PROJECT_SOURCE_DIR}/externals/simplecpp/)
-
 file(GLOB_RECURSE hdrs "*.h")
 file(GLOB_RECURSE srcs "*.cpp")
 
@@ -37,7 +33,14 @@ else()
 endif()
 
 add_library(lib_objs OBJECT ${srcs_lib} ${hdrs})
+target_include_directories(lib_objs SYSTEM PRIVATE ${PROJECT_SOURCE_DIR}/externals/)
+target_include_directories(lib_objs SYSTEM PRIVATE ${PROJECT_SOURCE_DIR}/externals/tinyxml/)
+target_include_directories(lib_objs SYSTEM PRIVATE ${PROJECT_SOURCE_DIR}/externals/simplecpp/)
+
 if (ENABLE_OSS_FUZZ AND CMAKE_CXX_COMPILER_ID MATCHES "Clang")
     add_library(lib_objs_sanitized OBJECT EXCLUDE_FROM_ALL ${srcs_lib} ${hdrs})
+    target_include_directories(lib_objs SYSTEM PRIVATE ${PROJECT_SOURCE_DIR}/externals/)
+    target_include_directories(lib_objs_sanitized SYSTEM PRIVATE ${PROJECT_SOURCE_DIR}/externals/tinyxml/)
+    target_include_directories(lib_objs_sanitized SYSTEM PRIVATE ${PROJECT_SOURCE_DIR}/externals/simplecpp/)
     target_compile_options(lib_objs_sanitized PRIVATE -fsanitize=address)
 endif()
