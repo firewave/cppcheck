@@ -19,6 +19,8 @@
 #ifndef TXT_REPORT_H
 #define TXT_REPORT_H
 
+#include "config.h"
+
 #include <QString>
 #include <QTextStream>
 #include "report.h"
@@ -36,7 +38,7 @@ class TxtReport : public Report {
 
 public:
     explicit TxtReport(const QString &filename);
-    virtual ~TxtReport();
+    virtual ~TxtReport() OVERRIDE;
 
     /**
     * @brief Create the report (file).

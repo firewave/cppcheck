@@ -19,6 +19,8 @@
 #ifndef CSV_REPORT_H
 #define CSV_REPORT_H
 
+#include "config.h"
+
 #include <QString>
 #include <QTextStream>
 #include "report.h"
@@ -36,7 +38,7 @@
 class CsvReport : public Report {
 public:
     explicit CsvReport(const QString &filename);
-    virtual ~CsvReport();
+    virtual ~CsvReport() OVERRIDE;
 
     /**
     * @brief Create the report (file).

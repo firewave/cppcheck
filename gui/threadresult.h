@@ -20,6 +20,8 @@
 #ifndef THREADRESULT_H
 #define THREADRESULT_H
 
+#include "config.h"
+
 #include <QMutex>
 #include <QObject>
 #include <QStringList>
@@ -39,7 +41,7 @@ class ThreadResult : public QObject, public ErrorLogger {
     Q_OBJECT
 public:
     ThreadResult();
-    virtual ~ThreadResult();
+    virtual ~ThreadResult() OVERRIDE;
 
     /**
     * @brief Get next unprocessed file

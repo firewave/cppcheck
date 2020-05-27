@@ -1,6 +1,8 @@
 #ifndef CODEEDITOR_H
 #define CODEEDITOR_H
 
+#include "config.h"
+
 #include <QSyntaxHighlighter>
 #include <QPlainTextEdit>
 #include <QObject>
@@ -63,7 +65,7 @@ public:
     explicit CodeEditor(QWidget *parent);
     CodeEditor(const CodeEditor &) = delete;
     CodeEditor &operator=(const CodeEditor &) = delete;
-    ~CodeEditor();
+    ~CodeEditor() OVERRIDE;
 
     void lineNumberAreaPaintEvent(QPaintEvent *event);
     int lineNumberAreaWidth();

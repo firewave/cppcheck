@@ -19,6 +19,8 @@
 #ifndef XML_REPORTV2_H
 #define XML_REPORTV2_H
 
+#include "config.h"
+
 #include <QObject>
 #include <QString>
 #include <QXmlStreamReader>
@@ -37,7 +39,7 @@
 class XmlReportV2 : public XmlReport {
 public:
     explicit XmlReportV2(const QString &filename);
-    virtual ~XmlReportV2();
+    virtual ~XmlReportV2() OVERRIDE;
 
     /**
     * @brief Create the report (file).

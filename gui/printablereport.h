@@ -32,7 +32,7 @@
 class PrintableReport : public Report {
 public:
     PrintableReport();
-    virtual ~PrintableReport();
+    virtual ~PrintableReport() OVERRIDE;
 
     /**
     * @brief Create the report (file).
