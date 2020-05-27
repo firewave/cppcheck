@@ -825,7 +825,7 @@ public:
     /**
      * Stringify a token
      * @param os The result is shifted into that output stream
-     * @param varid Print varids. (Style: "varname@id")
+     * @param varid Print varids. (Style: "varname\@id")
      * @param attributes Print attributes of tokens like "unsigned" in front of it.
      * @param macro Prints $ in front of the token if it was expanded from a macro.
      */
@@ -833,7 +833,7 @@ public:
 
     /**
      * Stringify a list of token, from current instance on.
-     * @param varid Print varids. (Style: "varname@id")
+     * @param varid Print varids. (Style: "varname\@id")
      * @param attributes Print attributes of tokens like "unsigned" in front of it.
      * @param linenumbers Print line number in front of each line
      * @param linebreaks Insert "\\n" into string when line number changes
