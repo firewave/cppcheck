@@ -75,6 +75,7 @@ namespace ExprEngine {
             : currentFunction(currentFunction)
             , settings(settings) {
         }
+        virtual ~DataBase() = default;
         virtual std::string getNewSymbolName() = 0;
         const std::string currentFunction;
         const Settings * const settings;
