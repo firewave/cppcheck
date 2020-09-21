@@ -41,5 +41,5 @@ endif()
 
 add_library(lib_objs OBJECT ${srcs_lib} ${hdrs})
 if (NOT CMAKE_DISABLE_PRECOMPILE_HEADERS)
-    target_precompile_headers(lib_objs PRIVATE precompiled.h)
+    #target_precompile_headers(lib_objs PRIVATE precompiled.h)
 endif()

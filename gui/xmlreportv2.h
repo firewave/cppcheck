@@ -37,7 +37,7 @@ class QXmlStreamWriter;
 class XmlReportV2 : public XmlReport {
 public:
     explicit XmlReportV2(const QString &filename);
-    virtual ~XmlReportV2();
+    virtual ~XmlReportV2() override;
 
     /**
     * @brief Create the report (file).
