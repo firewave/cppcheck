@@ -2155,7 +2155,7 @@ static ExprEngine::ValuePtr executeStringLiteral(const Token *tok, Data &data)
 
 static ExprEngine::ValuePtr executeExpression1(const Token *tok, Data &data)
 {
-    if (data.settings->terminated())
+    if (Settings::terminated())
         throw TerminateExpression();
 
     if (tok->str() == "return")

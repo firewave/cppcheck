@@ -998,7 +998,7 @@ Settings MainWindow::getCppcheckSettings()
         result.jobs = 1;
     }
 
-    result.terminate(false);
+    Settings::terminate(false);
 
     return result;
 }
