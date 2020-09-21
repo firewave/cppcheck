@@ -83,7 +83,7 @@ ImportProject::FileSettings ThreadResult::getNextFileSettings()
     if (mFileSettings.empty()) {
         return ImportProject::FileSettings();
     }
-    const ImportProject::FileSettings fs = mFileSettings.front();
+    ImportProject::FileSettings fs = mFileSettings.front();
     mFileSettings.pop_front();
     return fs;
 }

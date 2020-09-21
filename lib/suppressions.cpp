@@ -64,7 +64,7 @@ std::string Suppressions::parseFile(std::istream &istr)
         if (line.length() >= 2 && line[0] == '/' && line[1] == '/')
             continue;
 
-        const std::string errmsg(addSuppressionLine(line));
+        std::string errmsg(addSuppressionLine(line));
         if (!errmsg.empty())
             return errmsg;
     }
@@ -104,7 +104,7 @@ std::string Suppressions::parseXmlFile(const char *filename)
                 return "Unknown suppression element \"" + std::string(e2->Name()) + "\", expected id/fileName/lineNumber/symbolName/hash";
         }
 
-        const std::string err = addSuppression(s);
+        std::string err = addSuppression(s);
         if (!err.empty())
             return err;
     }

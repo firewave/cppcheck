@@ -942,7 +942,7 @@ std::string Library::getFunctionName(const Token *ftok, bool *error) const
                 continue;
             const std::vector<Type::BaseInfo> &derivedFrom = scope->definedType->derivedFrom;
             for (const Type::BaseInfo & baseInfo : derivedFrom) {
-                const std::string name(baseInfo.name + "::" + ftok->str());
+                std::string name(baseInfo.name + "::" + ftok->str());
                 if (functions.find(name) != functions.end() && matchArguments(ftok, name))
                     return name;
             }
