@@ -5074,7 +5074,7 @@ void Tokenizer::simplifyHeaders()
         if (Token::Match(tok, "[;{}]")) {
             // Remove unused function declarations
             if (isIncluded && removeUnusedIncludedFunctions) {
-                while (1) {
+                while (true) {
                     Token *start = tok->next();
                     while (start && functionStart.find(start->str()) != functionStart.end())
                         start = start->next();
