@@ -665,7 +665,7 @@ private:
     }
 
     void garbageCode48() { // #6712
-        checkCode(" { d\" ) d ...\" } int main ( ) { ( ) catch ( A a ) { { } catch ( ) \"\" } }");
+        checkCode(R"( { d" ) d ..." } int main ( ) { ( ) catch ( A a ) { { } catch ( ) "" } })");
     }
 
     void garbageCode49() { // #6715

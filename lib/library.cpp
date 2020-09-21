@@ -828,7 +828,7 @@ Library::Error Library::loadFunction(const tinyxml2::XMLElement * const node, co
             } else {
                 const char * const message = functionnode->GetText();
                 if (!message) {
-                    return Error(MISSING_ATTRIBUTE, "\"reason\" and \"alternatives\" or some text.");
+                    return Error(MISSING_ATTRIBUTE, R"("reason" and "alternatives" or some text.)");
                 } else
                     wi.message = message;
             }

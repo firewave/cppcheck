@@ -1801,10 +1801,10 @@ private:
                               "}\n";
         ASSERT_EQUALS(tok(code2), tok(code1));
 
-        const char code3[] = "x = L\"1\" TEXT(\"2\") L\"3\";";
+        const char code3[] = R"(x = L"1" TEXT("2") L"3";)";
         ASSERT_EQUALS("x = L\"123\" ;", tok(code3, false, Settings::Win64));
 
-        const char code4[] = "x = TEXT(\"1\") L\"2\";";
+        const char code4[] = R"(x = TEXT("1") L"2";)";
         ASSERT_EQUALS("x = L\"1\" L\"2\" ;", tok(code4, false, Settings::Win64));
     }
 
@@ -1821,7 +1821,7 @@ private:
     }
 
     void combine_ustrings() {
-        const char code[] =  "abcd = u\"ab\" u\"cd\";";
+        const char code[] =  R"(abcd = u"ab" u"cd";)";
 
         const char expected[] =  "abcd = u\"abcd\" ;";
 
@@ -1833,7 +1833,7 @@ private:
     }
 
     void combine_Ustrings() {
-        const char code[] =  "abcd = U\"ab\" U\"cd\";";
+        const char code[] =  R"(abcd = U"ab" U"cd";)";
 
         const char expected[] =  "abcd = U\"abcd\" ;";
 
@@ -1845,7 +1845,7 @@ private:
     }
 
     void combine_u8strings() {
-        const char code[] =  "abcd = u8\"ab\" u8\"cd\";";
+        const char code[] =  R"(abcd = u8"ab" u8"cd";)";
 
         const char expected[] =  "abcd = u8\"abcd\" ;";
 
@@ -1857,7 +1857,7 @@ private:
     }
 
     void combine_mixedstrings() {
-        const char code[] = "abcdef = \"ab\" L\"cd\" \"ef\";";
+        const char code[] = R"(abcdef = "ab" L"cd" "ef";)";
 
         const char expected[] =  "abcdef = L\"abcdef\" ;";
 
@@ -2076,16 +2076,16 @@ private:
         const char expected1[] = "void f ( ) { char str [ 4 ] = \"100\" ; }";
         ASSERT_EQUALS(expected1, tok(code1));
 
-        const char code2[] = "char str [ ] = \"\\x00\";";
-        const char expected2[] = "char str [ 2 ] = \"\\0\" ;";
+        const char code2[] = R"(char str [ ] = "\x00";)";
+        const char expected2[] = R"(char str [ 2 ] = "\0" ;)";
         ASSERT_EQUALS(expected2, tok(code2));
 
-        const char code3[] = "char str [ ] = \"\\0\";";
-        const char expected3[] = "char str [ 2 ] = \"\\0\" ;";
+        const char code3[] = R"(char str [ ] = "\0";)";
+        const char expected3[] = R"(char str [ 2 ] = "\0" ;)";
         ASSERT_EQUALS(expected3, tok(code3));
 
-        const char code4[] = "char str [ ] = \"\\n\\n\";";
-        const char expected4[] = "char str [ 3 ] = \"\\n\\n\" ;";
+        const char code4[] = R"(char str [ ] = "\n\n";)";
+        const char expected4[] = R"(char str [ 3 ] = "\n\n" ;)";
         ASSERT_EQUALS(expected4, tok(code4));
     }
 

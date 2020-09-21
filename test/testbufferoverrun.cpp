@@ -397,7 +397,7 @@ private:
         check("p = &\"abc\"[4];");
         ASSERT_EQUALS("", errout.str());
 
-        check("char c = \"\\0abc\"[2];");
+        check(R"(char c = "\0abc"[2];)");
         ASSERT_EQUALS("", errout.str());
 
         check("char c = L\"abc\"[4];");

@@ -4956,7 +4956,7 @@ void Tokenizer::dump(std::ostream &out) const
             if (MathLib::isFloat(tok->str()))
                 out << " isFloat=\"true\"";
         } else if (tok->tokType() == Token::eString)
-            out << " type=\"string\" strlen=\"" << Token::getStrLength(tok) << '\"';
+            out << R"( type="string" strlen=")" << Token::getStrLength(tok) << '\"';
         else if (tok->tokType() == Token::eChar)
             out << " type=\"char\"";
         else if (tok->isBoolean())

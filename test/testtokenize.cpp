@@ -2399,7 +2399,7 @@ private:
                             "    const char *q = \"hello\";"
                             "    strcpy(p, q);"
                             "}";
-        const char expected[] = "void f ( ) { const char * q ; q = \"hello\" ; strcpy ( p , \"hello\" ) ; }";
+        const char expected[] = R"(void f ( ) { const char * q ; q = "hello" ; strcpy ( p , "hello" ) ; })";
         ASSERT_EQUALS(expected, tokenizeAndStringify(code, true));
 
         // Ticket #5972
@@ -6019,20 +6019,20 @@ private:
     }
 
     void microsoftString() {
-        const char code1a[] = "void foo() { _tprintf (_T(\"test\") _T(\"1\")); }";
+        const char code1a[] = R"(void foo() { _tprintf (_T("test") _T("1")); })";
         ASSERT_EQUALS("void foo ( ) { printf ( \"test1\" ) ; }", tokenizeAndStringify(code1a, false, true, Settings::Win32A));
-        const char code1b[] = "void foo() { _tprintf (_TEXT(\"test\") _TEXT(\"2\")); }";
+        const char code1b[] = R"(void foo() { _tprintf (_TEXT("test") _TEXT("2")); })";
         ASSERT_EQUALS("void foo ( ) { printf ( \"test2\" ) ; }", tokenizeAndStringify(code1b, false, true, Settings::Win32A));
-        const char code1c[] = "void foo() { _tprintf (TEXT(\"test\") TEXT(\"3\")); }";
+        const char code1c[] = R"(void foo() { _tprintf (TEXT("test") TEXT("3")); })";
         ASSERT_EQUALS("void foo ( ) { printf ( \"test3\" ) ; }", tokenizeAndStringify(code1c, false, true, Settings::Win32A));
 
-        const char code2a[] = "void foo() { _tprintf (_T(\"test\") _T(\"1\")); }";
+        const char code2a[] = R"(void foo() { _tprintf (_T("test") _T("1")); })";
         ASSERT_EQUALS("void foo ( ) { wprintf ( L\"test1\" ) ; }", tokenizeAndStringify(code2a, false, true, Settings::Win32W));
         ASSERT_EQUALS("void foo ( ) { wprintf ( L\"test1\" ) ; }", tokenizeAndStringify(code2a, false, true, Settings::Win64));
-        const char code2b[] = "void foo() { _tprintf (_TEXT(\"test\") _TEXT(\"2\")); }";
+        const char code2b[] = R"(void foo() { _tprintf (_TEXT("test") _TEXT("2")); })";
         ASSERT_EQUALS("void foo ( ) { wprintf ( L\"test2\" ) ; }", tokenizeAndStringify(code2b, false, true, Settings::Win32W));
         ASSERT_EQUALS("void foo ( ) { wprintf ( L\"test2\" ) ; }", tokenizeAndStringify(code2b, false, true, Settings::Win64));
-        const char code2c[] = "void foo() { _tprintf (TEXT(\"test\") TEXT(\"3\")); }";
+        const char code2c[] = R"(void foo() { _tprintf (TEXT("test") TEXT("3")); })";
         ASSERT_EQUALS("void foo ( ) { wprintf ( L\"test3\" ) ; }", tokenizeAndStringify(code2c, false, true, Settings::Win32W));
         ASSERT_EQUALS("void foo ( ) { wprintf ( L\"test3\" ) ; }", tokenizeAndStringify(code2c, false, true, Settings::Win64));
     }
@@ -7255,13 +7255,13 @@ private:
     }
 
     void platformWin32AStringCat() { //#5150
-        const char code[] = "TCHAR text[] = _T(\"123\") _T(\"456\") _T(\"789\");";
+        const char code[] = R"(TCHAR text[] = _T("123") _T("456") _T("789");)";
         const char expected[] = "char text [ 10 ] = \"123456789\" ;";
         ASSERT_EQUALS(expected, tokenizeAndStringifyWindows(code, true, true, Settings::Win32A));
     }
 
     void platformWin32WStringCat() { //#5150
-        const char code[] = "TCHAR text[] = _T(\"123\") _T(\"456\") _T(\"789\");";
+        const char code[] = R"(TCHAR text[] = _T("123") _T("456") _T("789");)";
         const char expected[] = "wchar_t text [ 10 ] = L\"123456789\" ;";
         ASSERT_EQUALS(expected, tokenizeAndStringifyWindows(code, true, true, Settings::Win32W));
     }
@@ -8119,7 +8119,7 @@ private:
         const char code2[] = "void foo() { dostuff(x 0); }";
         ASSERT_THROW(tokenizeAndStringify(code2), InternalError);
 
-        const char code3[] = "f(\"1\" __stringify(48) \"1\");";
+        const char code3[] = R"(f("1" __stringify(48) "1");)";
         ASSERT_THROW(tokenizeAndStringify(code3), InternalError);
 
         const char code4[] = "struct Foo {\n"

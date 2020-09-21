@@ -190,7 +190,7 @@ private:
         header += "\"/>\n    <errors>";
         ASSERT_EQUALS(header, ErrorMessage::getXMLHeader());
         ASSERT_EQUALS("    </errors>\n</results>", ErrorMessage::getXMLFooter());
-        std::string message("        <error id=\"errorId\" severity=\"error\"");
+        std::string message(R"(        <error id="errorId" severity="error")");
         message += " msg=\"Programming error.\" verbose=\"Verbose error\">\n";
         message += "            <location file=\"foo.cpp\" line=\"5\" column=\"1\"/>\n        </error>";
         ASSERT_EQUALS(message, msg.toXML());
@@ -206,7 +206,7 @@ private:
         header += "\"/>\n    <errors>";
         ASSERT_EQUALS(header, ErrorMessage::getXMLHeader());
         ASSERT_EQUALS("    </errors>\n</results>", ErrorMessage::getXMLFooter());
-        std::string message("        <error id=\"errorId\" severity=\"error\"");
+        std::string message(R"(        <error id="errorId" severity="error")");
         message += " msg=\"Programming error.\" verbose=\"Verbose error\">\n";
         message += "            <location file=\"bar.cpp\" line=\"8\" column=\"1\" info=\"\\303\\244\"/>\n";
         message += "            <location file=\"foo.cpp\" line=\"5\" column=\"1\"/>\n        </error>";
@@ -217,7 +217,7 @@ private:
         {
             std::list<ErrorMessage::FileLocation> locs;
             ErrorMessage msg(locs, emptyString, Severity::error, "Programming error.\nComparing \"\203\" with \"\003\"", "errorId", false);
-            const std::string expected("        <error id=\"errorId\" severity=\"error\" msg=\"Programming error.\" verbose=\"Comparing &quot;\\203&quot; with &quot;\\003&quot;\"/>");
+            const std::string expected(R"(        <error id="errorId" severity="error" msg="Programming error." verbose="Comparing &quot;\203&quot; with &quot;\003&quot;"/>)");
             ASSERT_EQUALS(expected, msg.toXML());
         }
         {

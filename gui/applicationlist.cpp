@@ -222,7 +222,7 @@ bool ApplicationList::findDefaultWindowsEditor()
     if (checkAndAddApplication(windowsPath + "\\system32\\notepad.exe", "Notepad", "(file)"))
         foundOne = true;
 
-    QString regPath = "HKEY_CLASSES_ROOT\\Applications\\QtProject.QtCreator.pro\\shell\\Open\\command";
+    QString regPath = R"(HKEY_CLASSES_ROOT\Applications\QtProject.QtCreator.pro\shell\Open\command)";
     QSettings registry(regPath, QSettings::NativeFormat);
     QString qtCreatorRegistry = registry.value("Default", QString()).toString();
     QString qtCreatorPath = qtCreatorRegistry.left(qtCreatorRegistry.indexOf(".exe") + 4);
@@ -230,7 +230,7 @@ bool ApplicationList::findDefaultWindowsEditor()
         foundOne = true;
     }
 
-    const QString regPathUEdit32 = "HKEY_CLASSES_ROOT\\Applications\\Uedit32.exe\\shell\\open\\Command";
+    const QString regPathUEdit32 = R"(HKEY_CLASSES_ROOT\Applications\Uedit32.exe\shell\open\Command)";
     const QSettings registryUEdit32(regPathUEdit32, QSettings::NativeFormat);
     const QString uedit32Registry = registryUEdit32.value("Default", QString()).toString();
     if (!uedit32Registry.isEmpty()) {
@@ -241,7 +241,7 @@ bool ApplicationList::findDefaultWindowsEditor()
         }
     }
 
-    const QString regPathUEdit64 = "HKEY_CLASSES_ROOT\\Applications\\uedit64.exe\\shell\\open\\Command";
+    const QString regPathUEdit64 = R"(HKEY_CLASSES_ROOT\Applications\uedit64.exe\shell\open\Command)";
     const QSettings registryUEdit64(regPathUEdit64, QSettings::NativeFormat);
     const QString uedit64Registry = registryUEdit64.value("Default", QString()).toString();
     if (!uedit64Registry.isEmpty()) {
@@ -252,7 +252,7 @@ bool ApplicationList::findDefaultWindowsEditor()
         }
     }
 
-    const QString regPathMSVSCode = "HKEY_CLASSES_ROOT\\Applications\\Code.exe\\shell\\open\\command";
+    const QString regPathMSVSCode = R"(HKEY_CLASSES_ROOT\Applications\Code.exe\shell\open\command)";
     const QSettings registryMSVSCode(regPathMSVSCode, QSettings::NativeFormat);
     const QString msvscodeRegistry = registryMSVSCode.value("Default", QString()).toString();
     if (!msvscodeRegistry.isEmpty()) {

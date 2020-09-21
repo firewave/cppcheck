@@ -377,7 +377,7 @@ std::string ErrorMessage::getXMLHeader()
     tinyxml2::XMLPrinter printer;
 
     // standard xml header
-    printer.PushDeclaration("xml version=\"1.0\" encoding=\"UTF-8\"");
+    printer.PushDeclaration(R"(xml version="1.0" encoding="UTF-8")");
 
     // header
     printer.OpenElement("results", false);

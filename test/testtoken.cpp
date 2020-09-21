@@ -371,10 +371,10 @@ private:
         tok.str("\"test\"");
         ASSERT_EQUALS(4, Token::getStrLength(&tok));
 
-        tok.str("\"test \\\\test\"");
+        tok.str(R"("test \\test")");
         ASSERT_EQUALS(10, Token::getStrLength(&tok));
 
-        tok.str("\"a\\0\"");
+        tok.str(R"("a\0")");
         ASSERT_EQUALS(1, Token::getStrLength(&tok));
 
         tok.str("L\"\"");
@@ -383,10 +383,10 @@ private:
         tok.str("u8\"test\"");
         ASSERT_EQUALS(4, Token::getStrLength(&tok));
 
-        tok.str("U\"test \\\\test\"");
+        tok.str(R"(U"test \\test")");
         ASSERT_EQUALS(10, Token::getStrLength(&tok));
 
-        tok.str("u\"a\\0\"");
+        tok.str(R"(u"a\0")");
         ASSERT_EQUALS(1, Token::getStrLength(&tok));
     }
 
@@ -400,10 +400,10 @@ private:
         tok.str("\"abc\"");
         ASSERT_EQUALS(sizeof("abc"), Token::getStrSize(&tok, &settings));
 
-        tok.str("\"\\0abc\"");
+        tok.str(R"("\0abc")");
         ASSERT_EQUALS(sizeof("\0abc"), Token::getStrSize(&tok, &settings));
 
-        tok.str("\"\\\\\"");
+        tok.str(R"("\\")");
         ASSERT_EQUALS(sizeof("\\"), Token::getStrSize(&tok, &settings));
     }
 
@@ -414,17 +414,17 @@ private:
         ASSERT_EQUALS("a", Token::getCharAt(&tok, 0));
         ASSERT_EQUALS("s", Token::getCharAt(&tok, 1));
 
-        tok.str("\"a\\ts\"");
+        tok.str(R"("a\ts")");
         ASSERT_EQUALS("\\t", Token::getCharAt(&tok, 1));
 
         tok.str("\"\"");
         ASSERT_EQUALS("\\0", Token::getCharAt(&tok, 0));
 
-        tok.str("L\"a\\ts\"");
+        tok.str(R"(L"a\ts")");
         ASSERT_EQUALS("a", Token::getCharAt(&tok, 0));
         ASSERT_EQUALS("\\t", Token::getCharAt(&tok, 1));
 
-        tok.str("u\"a\\ts\"");
+        tok.str(R"(u"a\ts")");
         ASSERT_EQUALS("\\t", Token::getCharAt(&tok, 1));
         ASSERT_EQUALS("s", Token::getCharAt(&tok, 2));
     }
@@ -438,25 +438,25 @@ private:
         tok.str("\"0\"");
         ASSERT_EQUALS("0", tok.strValue());
 
-        tok.str("\"a\\n\"");
+        tok.str(R"("a\n")");
         ASSERT_EQUALS("a\n", tok.strValue());
 
-        tok.str("\"a\\r\"");
+        tok.str(R"("a\r")");
         ASSERT_EQUALS("a\r", tok.strValue());
 
-        tok.str("\"a\\t\"");
+        tok.str(R"("a\t")");
         ASSERT_EQUALS("a\t", tok.strValue());
 
-        tok.str("\"\\\\\"");
+        tok.str(R"("\\")");
         ASSERT_EQUALS("\\", tok.strValue());
 
-        tok.str("\"a\\0\"");
+        tok.str(R"("a\0")");
         ASSERT_EQUALS("a", tok.strValue());
 
-        tok.str("L\"a\\t\"");
+        tok.str(R"(L"a\t")");
         ASSERT_EQUALS("a\t", tok.strValue());
 
-        tok.str("U\"a\\0\"");
+        tok.str(R"(U"a\0")");
         ASSERT_EQUALS("a", tok.strValue());
     }
 
@@ -1117,7 +1117,7 @@ private:
         givenACodeSampleToTokenize data5("void f() { return U\"a\"; }");
         ASSERT_EQUALS("returnU\"a\"", data5.tokens()->tokAt(5)->expressionString());
 
-        givenACodeSampleToTokenize data6("x = \"\\0\\x1\\x2\\x3\\x4\\x5\\x6\\x7\";");
+        givenACodeSampleToTokenize data6(R"(x = "\0\x1\x2\x3\x4\x5\x6\x7";)");
         ASSERT_EQUALS("x=\"\\x00\\x01\\x02\\x03\\x04\\x05\\x06\\x07\"", data6.tokens()->next()->expressionString());
     }
 

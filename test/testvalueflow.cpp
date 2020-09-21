@@ -833,7 +833,7 @@ private:
         }
 
         // Comparison of string
-        values = tokenValues("f(\"xyz\" == \"xyz\");", "=="); // implementation defined
+        values = tokenValues(R"(f("xyz" == "xyz");)", "=="); // implementation defined
         ASSERT_EQUALS(0U, values.size()); // <- no value
 
         values = tokenValues("f(\"xyz\" == 0);", "==");

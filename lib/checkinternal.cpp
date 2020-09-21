@@ -409,7 +409,7 @@ void CheckInternal::redundantNextPreviousError(const Token* tok, const std::stri
 void CheckInternal::orInComplexPattern(const Token* tok, const std::string& pattern, const std::string &funcname)
 {
     reportError(tok, Severity::error, "orInComplexPattern",
-                "Token::" + funcname + "() pattern \"" + pattern + "\" contains \"||\" or \"|\". Replace it by \"%oror%\" or \"%or%\".");
+                "Token::" + funcname + "() pattern \"" + pattern + R"(" contains "||" or "|". Replace it by "%oror%" or "%or%".)");
 }
 
 void CheckInternal::extraWhitespaceError(const Token* tok, const std::string& pattern, const std::string &funcname)

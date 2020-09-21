@@ -946,9 +946,9 @@ Settings MainWindow::getCppcheckSettings()
             addonFilePath.replace(QChar('\\'), QChar('/'));
 
             QString json;
-            json += "{ \"script\":\"" + addonFilePath + "\"";
+            json += R"({ "script":")" + addonFilePath + "\"";
             if (!pythonCmd.isEmpty())
-                json += ", \"python\":\"" + pythonCmd + "\"";
+                json += R"(, "python":")" + pythonCmd + "\"";
             QString misraFile = mSettings->value(SETTINGS_MISRA_FILE).toString();
             if (addon == "misra" && !misraFile.isEmpty()) {
                 QString arg;
@@ -956,7 +956,7 @@ Settings MainWindow::getCppcheckSettings()
                     arg = "--misra-pdf=" + misraFile;
                 else
                     arg = "--rule-texts=" + misraFile;
-                json += ", \"args\":[\"" + arg + "\"]";
+                json += R"(, "args":[")" + arg + "\"]";
             }
             json += " }";
             result.addons.push_back(json.toStdString());

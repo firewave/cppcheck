@@ -473,7 +473,7 @@ private:
               "}");
         ASSERT_EQUALS("[test.cpp:7]: (error) Invalid strlen() argument nr 1. A nul-terminated string is required.\n", errout.str());
 
-        check("int f() { char x = '\\0'; return strcmp(\"Hello world\", &x); }");
+        check(R"(int f() { char x = '\0'; return strcmp("Hello world", &x); })");
         ASSERT_EQUALS("", errout.str());
 
         check("int f() { char x = 'x'; return strcmp(\"Hello world\", &x); }");

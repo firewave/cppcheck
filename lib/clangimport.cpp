@@ -539,15 +539,15 @@ Token *clangimport::AstNode::createTokens(TokenList *tokenList)
     if (nodeType == CharacterLiteral) {
         int c = MathLib::toLongNumber(mExtTokens.back());
         if (c == 0)
-            return addtoken(tokenList, "\'\\0\'");
+            return addtoken(tokenList, R"('\0')");
         if (c == '\r')
-            return addtoken(tokenList, "\'\\r\'");
+            return addtoken(tokenList, R"('\r')");
         if (c == '\n')
-            return addtoken(tokenList, "\'\\n\'");
+            return addtoken(tokenList, R"('\n')");
         if (c == '\t')
-            return addtoken(tokenList, "\'\\t\'");
+            return addtoken(tokenList, R"('\t')");
         if (c == '\\')
-            return addtoken(tokenList, "\'\\\\\'");
+            return addtoken(tokenList, R"('\\')");
         if (c < ' ' || c >= 0x80) {
             std::ostringstream hex;
             hex << std::hex << ((c>>4) & 0xf) << (c&0xf);

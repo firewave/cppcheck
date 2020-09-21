@@ -384,7 +384,7 @@ QLineSeries *StatsDialog::numberOfReports(const QString &fileName, const QString
         QTextStream in(&f);
         while (!in.atEnd()) {
             QString line = in.readLine();
-            QRegExp rxdate("\\[(\\d\\d)\\.(\\d\\d)\\.(\\d\\d\\d\\d)\\]");
+            QRegExp rxdate(R"(\[(\d\d)\.(\d\d)\.(\d\d\d\d)\])");
             if (rxdate.exactMatch(line)) {
                 int y = rxdate.cap(3).toInt();
                 int m = rxdate.cap(2).toInt();
