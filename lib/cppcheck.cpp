@@ -1411,7 +1411,7 @@ void CppCheck::getErrorMessages()
 
 void CppCheck::analyseClangTidy(const ImportProject::FileSettings &fileSettings)
 {
-    std::string allIncludes = "";
+    std::string allIncludes;
     for (const std::string &inc : fileSettings.includePaths) {
         allIncludes = allIncludes + "-I\"" + inc + "\" ";
     }
