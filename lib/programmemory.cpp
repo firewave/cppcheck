@@ -3,6 +3,7 @@
 #include "astutils.h"
 #include "mathlib.h"
 #include "symboldatabase.h"
+#include "matchcompiler.h"
 #include "token.h"
 #include "valueflow.h"
 #include <algorithm>
@@ -241,12 +242,12 @@ static void fillProgramMemoryFromAssignments(ProgramMemory& pm, const Token* tok
             pm.setUnknown(tok2->exprId());
         }
 
-        if (tok2->str() == "{") {
+        if (tok2->str() == MatchCompiler::makeConstString("{")) {
             if (indentlevel <= 0)
                 break;
             --indentlevel;
         }
-        if (tok2->str() == "}") {
+        if (tok2->str() == MatchCompiler::makeConstString("}")) {
             const Token *cond = tok2->link();
             cond = Token::simpleMatch(cond->previous(), ") {") ? cond->linkAt(-1) : nullptr;
             if (cond && conditionIsFalse(cond->astOperand2(), state))
