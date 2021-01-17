@@ -30,6 +30,7 @@
 #include "valueflow.h"
 
 #include <algorithm>
+#include <cstring>
 #include <deque>
 #include <functional>
 #include <iterator>
@@ -100,14 +101,14 @@ const Token* findExpression(const nonneg int exprid,
     return nullptr;
 }
 
-static void astFlattenRecursive(const Token *tok, std::vector<const Token *> *result, const char* op, nonneg int depth = 0)
+static void astFlattenRecursive(const Token *tok, std::vector<const Token *> *result, const char* op, size_t op_len, nonneg int depth = 0)
 {
     ++depth;
     if (!tok || depth >= 100)
         return;
-    if (tok->str() == op) {
-        astFlattenRecursive(tok->astOperand1(), result, op, depth);
-        astFlattenRecursive(tok->astOperand2(), result, op, depth);
+    if (tok->str().compare(0, std::string::npos, op, op_len) == 0) {
+        astFlattenRecursive(tok->astOperand1(), result, op, op_len, depth);
+        astFlattenRecursive(tok->astOperand2(), result, op, op_len, depth);
     } else {
         result->push_back(tok);
     }
@@ -116,7 +117,7 @@ static void astFlattenRecursive(const Token *tok, std::vector<const Token *> *re
 std::vector<const Token*> astFlatten(const Token* tok, const char* op)
 {
     std::vector<const Token*> result;
-    astFlattenRecursive(tok, &result, op);
+    astFlattenRecursive(tok, &result, op, strlen(op));
     return result;
 }
 
