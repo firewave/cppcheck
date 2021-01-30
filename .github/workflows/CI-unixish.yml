@@ -24,6 +24,7 @@ jobs:
           sudo apt-get install libxml2-utils
           sudo apt-get install z3 libz3-dev
           cp externals/z3_version_old.h externals/z3_version.h
+          sudo apt-get install python3-pytest
 
       - name: Install missing software on ubuntu 20.04
         if: matrix.os == 'ubuntu-20.04' 
@@ -31,6 +32,7 @@ jobs:
           sudo apt-get update
           sudo apt-get install libxml2-utils
           sudo apt-get install z3 libz3-dev
+          sudo apt-get install python3-pytest
 
       - name: Install missing software on macos
         if: contains(matrix.os, 'macos')
@@ -80,6 +82,12 @@ jobs:
         run: |
           ./cppcheck --addon=threadsafety addons/test/threadsafety
           ./cppcheck --addon=threadsafety --std=c++03 addons/test/threadsafety
+
+      - name: Test cli
+        if: contains(matrix.os, 'ubuntu')
+        run: |
+          cd test/cli
+          python3 -m pytest
 
       - name: Build GUI on ubuntu
         if: contains(matrix.os, 'ubuntu')
