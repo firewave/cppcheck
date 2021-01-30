@@ -1,5 +1,5 @@
 
-# python -m pytest test-helloworld.py
+# python -m pytest helloworld_test.py
 
 import os
 import re

@@ -46,6 +46,6 @@ jobs:
       - name: test addons
         run: |
           make -s
-          PYTHONPATH=./addons python -m pytest addons/test/test-*.py
-          PYTHONPATH=./addons python3 -m pytest addons/test/test-*.py
+          PYTHONPATH=./addons python -m pytest addons/test
+          PYTHONPATH=./addons python3 -m pytest addons/test
 

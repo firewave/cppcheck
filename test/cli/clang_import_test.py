@@ -1,5 +1,5 @@
 
-# python -m pytest test-clang-import.py
+# python -m pytest clang_import_test.py
 
 import os
 import re

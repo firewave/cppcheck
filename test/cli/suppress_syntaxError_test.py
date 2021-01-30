@@ -1,5 +1,5 @@
 
-# python -m pytest test-suppress-syntaxError.py
+# python -m pytest suppress_syntaxError_test.py
 
 from testutils import cppcheck
 

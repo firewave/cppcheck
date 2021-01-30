@@ -1,11 +1,11 @@
 # Running the test with Python 2:
 # Be sure to install pytest version 4.6.4 (newer should also work)
 # Command in cppcheck directory:
-# python -m pytest addons/test/test-cert.py
+# python -m pytest addons/test/cert_test.py
 #
 # Running the test with Python 3:
 # Command in cppcheck directory:
-# PYTHONPATH=./addons python3 -m pytest addons/test/test-cert.py
+# PYTHONPATH=./addons python3 -m pytest addons/test/cert_test.py
 
 import sys
 import pytest

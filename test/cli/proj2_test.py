@@ -1,5 +1,5 @@
 
-# python -m pytest test-proj2.py
+# python -m pytest proj2_test.py
 
 import json
 import os

@@ -1,5 +1,5 @@
 
-# python -m pytest test-inline-suppress.py
+# python -m pytest inline_suppress_test.py
 
 import json
 import os
