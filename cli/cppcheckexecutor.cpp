@@ -55,9 +55,8 @@
 #elif !defined(__OpenBSD__)
 #   include <ucontext.h>
 #endif
-#ifdef __linux__
+#if defined(__linux__) && defined(REG_ERR)
 #include <sys/syscall.h>
-#include <sys/types.h>
 #endif
 #endif
 
