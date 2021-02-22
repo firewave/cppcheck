@@ -55,7 +55,7 @@
 #elif !defined(__OpenBSD__)
 #   include <ucontext.h>
 #endif
-#if defined(__linux__) && defined(REG_ERR)
+#ifdef __linux__
 #include <sys/syscall.h>
 #endif
 #endif
@@ -382,15 +382,18 @@ static void CppcheckSignalHandler(int signo, siginfo_t * info, void * context)
 {
     int type = -1;
     pid_t killid;
-#if defined(__linux__) && defined(REG_ERR)
-    const ucontext_t* const uc = reinterpret_cast<const ucontext_t*>(context);
+#ifdef __linux__
     killid = (pid_t) syscall(SYS_gettid);
+#else
+    killid = getpid();
+#endif
+#ifdef REG_ERR
+    const ucontext_t* const uc = reinterpret_cast<const ucontext_t*>(context);
     if (uc) {
         type = (int)uc->uc_mcontext.gregs[REG_ERR] & 2;
     }
 #else
     UNUSED(context);
-    killid = getpid();
 #endif
 
     const Signalmap_t::const_iterator it=listofsignals.find(signo);
