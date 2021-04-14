@@ -1,8 +1,8 @@
 if (BUILD_GUI)
     if (NOT WITH_QCHART)
-        find_package(Qt5 COMPONENTS Core Gui Widgets PrintSupport LinguistTools Help REQUIRED)
+        find_package(Qt5 COMPONENTS Core Gui Widgets PrintSupport LinguistTools Help Test REQUIRED)
     else()
-        find_package(Qt5 COMPONENTS Core Gui Widgets PrintSupport LinguistTools Help Charts REQUIRED)
+        find_package(Qt5 COMPONENTS Core Gui Widgets PrintSupport LinguistTools Help Test Charts REQUIRED)
     endif()
 endif()
 
