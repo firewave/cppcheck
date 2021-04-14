@@ -36,6 +36,7 @@ jobs:
           sudo apt-get update
           sudo apt-get install libxml2-utils
           sudo apt-get install z3 libz3-dev
+          sudo apt-get install mingw-w64
 
       - name: Install missing software on macos
         if: contains(matrix.os, 'macos')
@@ -151,6 +152,16 @@ jobs:
         run: |
           pushd gui/help
           qhelpgenerator online-help.qhcp -o online-help.qhc
+
+      - name: Run MinGW cross-compilation Build
+        if: matrix.os == 'ubuntu-20.04'
+        run: |
+          make clean
+          make -j$(nproc)
+        env:
+          CC: x86_64-w64-mingw32-gcc
+          CXX: x86_64-w64-mingw32-g++
+          RDYNAMIC: ""
 
       # Run self check after "Build GUI" to include generated headers in analysis
       - name: Self check
