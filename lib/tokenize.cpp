@@ -8255,14 +8255,16 @@ bool Tokenizer::simplifyKnownVariablesSimplify(Token **tok2, Token *tok3, nonneg
                 // Continue
                 //tok2 = bailOutFromLoop;
                 break;
-            } else if (tok3 == bailOutFromLoop) {
+            }
+            if (tok3 == bailOutFromLoop) {
                 // We have skipped the loop
                 bailOutFromLoop = nullptr;
                 continue;
             }
 
             continue;
-        } else if (tok3->str() == "{" && tok3->previous()->str() == ")") {
+        }
+        if (tok3->str() == "{" && tok3->previous()->str() == ")") {
             // There is a possible loop after the assignment. Try to skip it.
             if (tok3->previous()->link() &&
                 tok3->previous()->link()->strAt(-1) != "if")
@@ -9053,7 +9055,7 @@ bool Tokenizer::duplicateDefinition(Token ** tokPtr)
             } else {
                 if (Token::Match(tok->previous(), "enum|,"))
                     return true;
-                else if (Token::Match(tok->previous(), "%type%")) {
+                if (Token::Match(tok->previous(), "%type%")) {
                     // look backwards
                     const Token *back = tok;
                     while (back && back->isName())
@@ -9147,7 +9149,7 @@ bool Tokenizer::isFunctionParameterPassedByValue(const Token *fpar) const
     for (ftok = fpar->previous(); ftok; ftok = ftok->previous()) {
         if (ftok->str() == "(")
             break;
-        else if (ftok->str() == ")")
+        if (ftok->str() == ")")
             ftok = ftok->link();
         else if (ftok->str() == ",")
             ++parameter;
@@ -9222,7 +9224,8 @@ void Tokenizer::eraseDeadCode(Token *begin, const Token *end)
             ++roundbraces;
             tok->deleteNext();
             continue;
-        } else if (tok->next()->str() == ")") {
+        }
+        if (tok->next()->str() == ")") {
             if (!roundbraces)
                 break;  //too many ending round parentheses
             --roundbraces;
@@ -9764,7 +9767,8 @@ void Tokenizer::simplifyComma()
                     endAt = tok2;
                     break;
 
-                } else if (Token::Match(tok2, "(|[") ||
+                }
+                if (Token::Match(tok2, "(|[") ||
                            (tok2->str() == "{" && tok2->previous() && tok2->previous()->str() == "=")) {
                     tok2 = tok2->link();
 
@@ -9926,7 +9930,8 @@ static const Token* skipCPPOrAlignAttribute(const Token * tok)
 {
     if (isCPPAttribute(tok)) {
         return tok->link();
-    } else if (isAlignAttribute(tok)) {
+    }
+    if (isAlignAttribute(tok)) {
         return tok->next()->link();
     }
     return tok;
@@ -10648,7 +10653,8 @@ void Tokenizer::simplifyStructDecl()
             if (!restart) {
                 simplifyStructDecl();
                 return;
-            } else if (!restart->next())
+            }
+            if (!restart->next())
                 return;
 
             tok = restart;
@@ -11643,8 +11649,7 @@ void Tokenizer::simplifyQtSignalsSlots()
             } else if (tok2->str() == "}") {
                 if (indentlevel<2)
                     break;
-                else
-                    --indentlevel;
+                --indentlevel;
             } else if (tok2->str() == ";" && indentlevel == 0)
                 break;
 
@@ -11857,7 +11862,7 @@ void Tokenizer::simplifyOverloadedOperators()
             for (const Token *tok2 = tok->next(); tok2; tok2 = tok2->next()) {
                 if (tok2->str() == "}")
                     break;
-                else if (indent == 0 && tok2->str() == ";")
+                if (indent == 0 && tok2->str() == ";")
                     break;
                 else if (tok2->str() == "{") {
                     if (indent == 0)
@@ -12405,21 +12410,20 @@ void Tokenizer::simplifyNamespaceAliases()
                             // delete duplicate
                             tok2 = deleteAlias(tok2->previous());
                             continue;
-                        } else {
-                            // conflicting declaration (syntax error)
-                            // cppcheck-suppress duplicateBranch - remove when TODO below is addressed
-                            if (endScope == scope) {
-                                // delete conflicting declaration
-                                tok2 = deleteAlias(tok2->previous());
-                            }
-
-                            // new declaration
-                            else {
-                                // TODO: use the new alias in this scope
-                                tok2 = deleteAlias(tok2->previous());
-                            }
-                            continue;
                         }
+                        // conflicting declaration (syntax error)
+                        // cppcheck-suppress duplicateBranch - remove when TODO below is addressed
+                        if (endScope == scope) {
+                            // delete conflicting declaration
+                            tok2 = deleteAlias(tok2->previous());
+                        }
+
+                        // new declaration
+                        else {
+                            // TODO: use the new alias in this scope
+                            tok2 = deleteAlias(tok2->previous());
+                        }
+                        continue;
                     }
 
                     if (tok2->strAt(1) == "::") {

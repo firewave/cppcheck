@@ -186,7 +186,8 @@ bool CppCheckExecutor::parseFromArgs(CppCheck *cppcheck, int argc, const char* c
         if (!ignored.empty())
             std::cout << "cppcheck: Maybe all paths were ignored?" << std::endl;
         return false;
-    } else if (!mSettings->fileFilter.empty() && settings.project.fileSettings.empty()) {
+    }
+    if (!mSettings->fileFilter.empty() && settings.project.fileSettings.empty()) {
         std::map<std::string, std::size_t> newMap;
         for (std::map<std::string, std::size_t>::const_iterator i = mFiles.begin(); i != mFiles.end(); ++i)
             if (matchglob(mSettings->fileFilter, i->first)) {
@@ -346,8 +347,7 @@ static bool IsAddressOnStack(const void* ptr)
     char a;
     if (bStackBelowHeap)
         return ptr < &a;
-    else
-        return ptr > &a;
+    return ptr > &a;
 }
 
 /* (declare this list here, so it may be used in signal handlers in addition to main())

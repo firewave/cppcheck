@@ -1478,7 +1478,8 @@ Token * clangimport::AstNode::createTokensVarDecl(TokenList *tokenList)
         eq->astOperand1(vartok1);
         eq->astOperand2(children.back()->createTokens(tokenList));
         return eq;
-    } else if (mExtTokens.back() == "callinit") {
+    }
+    if (mExtTokens.back() == "callinit") {
         Token *par1 = addtoken(tokenList, "(");
         par1->astOperand1(vartok1);
         par1->astOperand2(getChild(0)->createTokens(tokenList));

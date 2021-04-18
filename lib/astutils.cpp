@@ -306,12 +306,12 @@ bool isTemporary(bool cpp, const Token* tok, const Library* library, bool unknow
             return false;
         if (const Function * f = ftok->function()) {
             return !Function::returnsReference(f, true);
-        } else if (library) {
+        }
+        if (library) {
             std::string returnType = library->returnValueType(ftok);
             return !returnType.empty() && returnType.back() != '&';
-        } else {
-            return unknown;
         }
+        return unknown;
     }
     if (tok->isCast())
         return false;
@@ -495,7 +495,8 @@ static T* getCondTokFromEndImpl(T* endBlock)
         return nullptr;
     if (Token::simpleMatch(startBlock->previous(), ")")) {
         return getCondTok(startBlock->previous()->link());
-    } else if (Token::simpleMatch(startBlock->tokAt(-2), "} else {")) {
+    }
+    if (Token::simpleMatch(startBlock->tokAt(-2), "} else {")) {
         return getCondTokFromEnd(startBlock->tokAt(-2));
     }
     return nullptr;
@@ -667,7 +668,8 @@ bool exprDependsOnThis(const Token* expr, nonneg int depth)
             nestedIn = nestedIn->nestedIn;
         }
         return nestedIn == expr->function()->nestedIn;
-    } else if (Token::Match(expr, "%var%") && expr->variable()) {
+    }
+    if (Token::Match(expr, "%var%") && expr->variable()) {
         const Variable* var = expr->variable();
         return (var->isPrivate() || var->isPublic() || var->isProtected());
     }
@@ -772,13 +774,15 @@ std::vector<ReferenceToken> followAllReferences(const Token* tok, bool inconclus
     if (var && var->declarationId() == tok->varId()) {
         if (var->nameToken() == tok) {
             return {{tok, std::move(errors)}};
-        } else if (var->isReference() || var->isRValueReference()) {
+        }
+        if (var->isReference() || var->isRValueReference()) {
             if (!var->declEndToken())
                 return {{tok, std::move(errors)}};
             if (var->isArgument()) {
                 errors.emplace_back(var->declEndToken(), "Passed to reference.");
                 return {{tok, std::move(errors)}};
-            } else if (Token::simpleMatch(var->declEndToken(), "=")) {
+            }
+            if (Token::simpleMatch(var->declEndToken(), "=")) {
                 errors.emplace_back(var->declEndToken(), "Assigned to reference.");
                 const Token *vartok = var->declEndToken()->astOperand2();
                 if (vartok == tok)
@@ -1349,7 +1353,7 @@ bool isOppositeCond(bool isNot, bool cpp, const Token * const cond1, const Token
 
         if (op1 == "<" || op1 == "<=")
             return (op2 == "==" || op2 == ">" || op2 == ">=") && (rhsValue1.intvalue < rhsValue2.intvalue);
-        else if (op1 == ">=" || op1 == ">")
+        if (op1 == ">=" || op1 == ">")
             return (op2 == "==" || op2 == "<" || op2 == "<=") && (rhsValue1.intvalue > rhsValue2.intvalue);
 
         return false;
@@ -1389,7 +1393,7 @@ bool isConstExpression(const Token *tok, const Library& library, bool pure, bool
     if (tok->isName() && tok->next()->str() == "(") {
         if (!tok->function() && !Token::Match(tok->previous(), ".|::") && !library.isFunctionConst(tok->str(), pure))
             return false;
-        else if (tok->function() && !tok->function()->isConst())
+        if (tok->function() && !tok->function()->isConst())
             return false;
     }
     if (tok->tokType() == Token::eIncDecOp)
@@ -1478,8 +1482,7 @@ static bool isEscaped(const Token* tok, bool functionsScope, const Library* libr
         return true;
     if (functionsScope)
         return Token::simpleMatch(tok, "throw");
-    else
-        return Token::Match(tok, "return|throw");
+    return Token::Match(tok, "return|throw");
 }
 
 static bool isEscapedOrJump(const Token* tok, bool functionsScope, const Library* library)
@@ -1488,8 +1491,7 @@ static bool isEscapedOrJump(const Token* tok, bool functionsScope, const Library
         return true;
     if (functionsScope)
         return Token::simpleMatch(tok, "throw");
-    else
-        return Token::Match(tok, "return|goto|throw|continue|break");
+    return Token::Match(tok, "return|goto|throw|continue|break");
 }
 
 bool isEscapeFunction(const Token* ftok, const Library* library)
@@ -1531,7 +1533,8 @@ static bool hasNoreturnFunction(const Token* tok, const Library* library, const 
         if (unknownFunc && !function && library && library->functions.count(library->getFunctionName(ftok)) == 0)
             *unknownFunc = ftok;
         return false;
-    } else if (tok->isConstOp()) {
+    }
+    if (tok->isConstOp()) {
         return hasNoreturnFunction(tok->astOperand1(), library, unknownFunc) || hasNoreturnFunction(tok->astOperand2(), library, unknownFunc);
     }
 
@@ -1744,7 +1747,7 @@ bool isVariableChangedByFunctionCall(const Token *tok, int indirect, const Setti
             const Library::ArgumentChecks::Direction argDirection = settings->library.getArgDirection(tok, 1 + argnr);
             if (argDirection == Library::ArgumentChecks::Direction::DIR_IN)
                 return false;
-            else if (argDirection == Library::ArgumentChecks::Direction::DIR_OUT ||
+            if (argDirection == Library::ArgumentChecks::Direction::DIR_OUT ||
                      argDirection == Library::ArgumentChecks::Direction::DIR_INOUT) {
                 // With out or inout the direction of the content is specified, not a pointer itself, so ignore pointers for now
                 const ValueType * const valueType = tok1->valueType();
@@ -1842,8 +1845,7 @@ bool isVariableChanged(const Token *tok, int indirect, const Settings *settings,
         const Function * fun = ftok->function();
         if (!isConst && (!fun || !fun->isConst()))
             return true;
-        else
-            return false;
+        return false;
     }
 
     const Token *ftok = tok2;
