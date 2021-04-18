@@ -189,7 +189,7 @@ static bool getDimensionsEtc(const Token * const arrayToken, const Settings *set
 
     if (array->variable() && array->variable()->isArray() && !array->variable()->dimensions().empty()) {
         *dimensions = array->variable()->dimensions();
-        if (dimensions->size() >= 1 && ((*dimensions)[0].num <= 1 || !(*dimensions)[0].tok)) {
+        if (!dimensions->empty() && ((*dimensions)[0].num <= 1 || !(*dimensions)[0].tok)) {
             visitAstNodes(arrayToken,
             [&](const Token *child) {
                 if (child->originalName() == "->") {

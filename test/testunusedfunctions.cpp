@@ -82,7 +82,7 @@ private:
         checkUnusedFunctions.parseTokens(tokenizer,  "someFile.c", &settings);
         // check() returns error if and only if errout is not empty.
         if (checkUnusedFunctions.check(this, settings)) {
-            ASSERT(errout.str() != "");
+            ASSERT(!errout.str().empty());
         } else {
             ASSERT_EQUALS("", errout.str());
         }

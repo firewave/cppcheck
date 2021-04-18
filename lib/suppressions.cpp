@@ -14,6 +14,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
  */
 
 #include "suppressions.h"
@@ -257,7 +258,7 @@ std::string Suppressions::addSuppressions(const std::list<Suppression> &suppress
 {
     for (const auto &newSuppression : suppressions) {
         auto errmsg = addSuppression(newSuppression);
-        if (errmsg != "")
+        if (!errmsg.empty())
             return errmsg;
     }
     return "";

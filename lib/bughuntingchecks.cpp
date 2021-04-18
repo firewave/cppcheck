@@ -328,7 +328,7 @@ static void uninit(const Token *tok, const ExprEngine::Value &value, ExprEngine:
     if (!value.isUninit() && uninitStructMember.empty()) {
         if (Token::Match(tok->astParent(), "[(,]")) {
             if (const auto* arrayValue = dynamic_cast<const ExprEngine::ArrayValue*>(&value)) {
-                uninitData = arrayValue->data.size() >= 1 && arrayValue->data[0].value->isUninit();
+                uninitData = !arrayValue->data.empty() && arrayValue->data[0].value->isUninit();
             }
         }
 
