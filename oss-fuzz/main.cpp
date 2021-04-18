@@ -9,8 +9,7 @@ private:
 
 public:
     CppcheckExecutor()
-        : ErrorLogger()
-        , cppcheck(*this, false, nullptr) {
+        : cppcheck(*this, false, nullptr) {
         cppcheck.settings().addEnabled("all");
         cppcheck.settings().certainty.setEnabled(Certainty::inconclusive, true);
     }

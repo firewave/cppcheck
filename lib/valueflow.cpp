@@ -1866,9 +1866,9 @@ struct ValueFlowAnalyzer : Analyzer {
     const TokenList* tokenlist;
     ProgramMemoryState pms;
 
-    ValueFlowAnalyzer() : tokenlist(nullptr), pms() {}
+    ValueFlowAnalyzer() : tokenlist(nullptr) {}
 
-    explicit ValueFlowAnalyzer(const TokenList* t) : tokenlist(t), pms() {}
+    explicit ValueFlowAnalyzer(const TokenList* t) : tokenlist(t) {}
 
     virtual const ValueFlow::Value* getValue(const Token* tok) const = 0;
     virtual ValueFlow::Value* getValue(const Token* tok) = 0;
@@ -2168,7 +2168,7 @@ struct SingleValueFlowAnalyzer : ValueFlowAnalyzer {
     std::unordered_map<nonneg int, const Variable*> aliases;
     ValueFlow::Value value;
 
-    SingleValueFlowAnalyzer() : ValueFlowAnalyzer() {}
+    SingleValueFlowAnalyzer() {}
 
     SingleValueFlowAnalyzer(const ValueFlow::Value& v, const TokenList* t) : ValueFlowAnalyzer(t), value(v) {}
 
@@ -2276,7 +2276,7 @@ struct SingleValueFlowAnalyzer : ValueFlowAnalyzer {
 struct VariableAnalyzer : SingleValueFlowAnalyzer {
     const Variable* var;
 
-    VariableAnalyzer() : SingleValueFlowAnalyzer(), var(nullptr) {}
+    VariableAnalyzer() : var(nullptr) {}
 
     VariableAnalyzer(const Variable* v,
                      const ValueFlow::Value& val,
@@ -2380,7 +2380,7 @@ struct ExpressionAnalyzer : SingleValueFlowAnalyzer {
     bool local;
     bool unknown;
 
-    ExpressionAnalyzer() : SingleValueFlowAnalyzer(), expr(nullptr), local(true), unknown(false) {}
+    ExpressionAnalyzer() : expr(nullptr), local(true), unknown(false) {}
 
     ExpressionAnalyzer(const Token* e, const ValueFlow::Value& val, const TokenList* t)
         : SingleValueFlowAnalyzer(val, t), expr(e), local(true), unknown(false) {
@@ -2440,7 +2440,7 @@ struct ExpressionAnalyzer : SingleValueFlowAnalyzer {
 struct OppositeExpressionAnalyzer : ExpressionAnalyzer {
     bool isNot;
 
-    OppositeExpressionAnalyzer() : ExpressionAnalyzer(), isNot(false) {}
+    OppositeExpressionAnalyzer() : isNot(false) {}
 
     OppositeExpressionAnalyzer(bool pIsNot, const Token* e, const ValueFlow::Value& val, const TokenList* t)
         : ExpressionAnalyzer(e, val, t), isNot(pIsNot)
@@ -3103,7 +3103,7 @@ struct LifetimeStore {
     };
 
     LifetimeStore()
-        : argtok(nullptr), message(), type(), errorPath(), inconclusive(false), forward(true), mContext(nullptr)
+        : argtok(nullptr), inconclusive(false), forward(true), mContext(nullptr)
     {}
 
     LifetimeStore(const Token* argtok,
@@ -3113,7 +3113,6 @@ struct LifetimeStore {
         : argtok(argtok),
           message(message),
           type(type),
-          errorPath(),
           inconclusive(inconclusive),
           forward(true),
           mContext(nullptr)
@@ -3495,7 +3494,7 @@ struct Lambda {
         ByReference
     };
     explicit Lambda(const Token * tok)
-        : capture(nullptr), arguments(nullptr), returnTok(nullptr), bodyTok(nullptr), explicitCaptures(), implicitCapture(Capture::Undefined) {
+        : capture(nullptr), arguments(nullptr), returnTok(nullptr), bodyTok(nullptr), implicitCapture(Capture::Undefined) {
         if (!Token::simpleMatch(tok, "[") || !tok->link())
             return;
         capture = tok;
@@ -4178,7 +4177,7 @@ struct ConditionHandler {
         std::list<ValueFlow::Value> false_values;
         bool inverted = false;
 
-        Condition() : vartok(nullptr), true_values(), false_values(), inverted(false) {}
+        Condition() : vartok(nullptr), inverted(false) {}
     };
 
     virtual bool forward(Token* start,
@@ -5060,10 +5059,10 @@ struct MultiValueFlowAnalyzer : ValueFlowAnalyzer {
     std::unordered_map<nonneg int, const Variable*> vars;
     SymbolDatabase* symboldatabase;
 
-    MultiValueFlowAnalyzer() : ValueFlowAnalyzer(), values(), vars(), symboldatabase(nullptr) {}
+    MultiValueFlowAnalyzer() : symboldatabase(nullptr) {}
 
     MultiValueFlowAnalyzer(const std::unordered_map<const Variable*, ValueFlow::Value>& args, const TokenList* t, SymbolDatabase* s)
-        : ValueFlowAnalyzer(t), values(), vars(), symboldatabase(s) {
+        : ValueFlowAnalyzer(t), symboldatabase(s) {
         for (const auto& p:args) {
             values[p.first->declarationId()] = p.second;
             vars[p.first->declarationId()] = p.first;
@@ -5878,7 +5877,7 @@ static bool isContainerSizeChangedByFunction(const Token *tok, int depth = 20)
 }
 
 struct ContainerVariableAnalyzer : VariableAnalyzer {
-    ContainerVariableAnalyzer() : VariableAnalyzer() {}
+    ContainerVariableAnalyzer() {}
 
     ContainerVariableAnalyzer(const Variable* v,
                               const ValueFlow::Value& val,
