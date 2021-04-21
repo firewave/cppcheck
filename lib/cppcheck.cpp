@@ -488,7 +488,7 @@ unsigned int CppCheck::check(const ImportProject::FileSettings &fs)
         temp.mSettings.userDefines += fs.defines;
     else
         temp.mSettings.userDefines += fs.cppcheckDefines();
-    temp.mSettings.includePaths = fs.includePaths;
+    temp.mSettings.includePaths.insert(temp.mSettings.includePaths.end(), fs.includePaths.begin(), fs.includePaths.end());
     temp.mSettings.userUndefs.insert(fs.undefs.cbegin(), fs.undefs.cend());
     if (fs.standard.find("++") != std::string::npos)
         temp.mSettings.standards.setCPP(fs.standard);
@@ -497,7 +497,6 @@ unsigned int CppCheck::check(const ImportProject::FileSettings &fs)
     if (fs.platformType != Settings::Unspecified)
         temp.mSettings.platform(fs.platformType);
     if (mSettings.clang) {
-        temp.mSettings.includePaths.insert(temp.mSettings.includePaths.end(), fs.systemIncludePaths.cbegin(), fs.systemIncludePaths.cend());
         return temp.check(Path::simplifyPath(fs.filename));
     }
     std::ifstream fin(fs.filename);

@@ -382,6 +382,30 @@ bool CmdLineParser::parseFromArgs(int argc, const char* const argv[])
                 break;
             }
 
+            // system includes
+            else if (std::strncmp(argv[i], "-isystem", 8) == 0) {
+                std::string path;
+
+                // -isystem path/
+                if (std::strcmp(argv[i], "-isystem") == 0) {
+                    ++i;
+                    if (i >= argc || argv[i][0] == '-') {
+                        printMessage("cppcheck: argument to '-isystem' is missing.");
+                        return false;
+                    }
+                    path = argv[i];
+                }
+
+                path = Path::removeQuotationMarks(path);
+                path = Path::fromNativeSeparators(path);
+
+                // If path doesn't end with / or \, add it
+                if (!endsWith(path,'/'))
+                    path += '/';
+
+                mSettings->includePaths.push_back(path);
+            }
+
             // Ignored paths
             else if (std::strncmp(argv[i], "-i", 2) == 0) {
                 std::string path;
