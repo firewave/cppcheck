@@ -127,6 +127,16 @@ def checkout_cppcheck_version(repo_path, version, cppcheck_path):
         if version != 'main':
             return
 
+        print('Fetching {}'.format(version))
+        subprocess.check_call(['git', 'fetch', '--depth=1', 'origin', 'main'], cwd=cppcheck_path)
+
+        print('Checking for commits to pull')
+        commit_count = subprocess.check_output(['git', 'rev-list', 'HEAD...origin/main', '--count'], cwd=cppcheck_path, universal_newlines=True).strip()
+        print('Found {} commits to pull'.format(commit_count))
+        if commit_count == "0":
+            # nothing to pull
+            return
+
         print('Pulling {}'.format(version))
         subprocess.check_call(['git', 'pull'], cwd=cppcheck_path)
     else:
