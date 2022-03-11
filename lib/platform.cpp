@@ -29,23 +29,14 @@
 
 cppcheck::Platform::Platform()
 {
-    // This assumes the code you are checking is for the same architecture this is compiled on.
-#if defined(_WIN64)
-    platform(Win64);
-#elif defined(_WIN32)
-    platform(Win32A);
-#else
-    platform(Native);
-#endif
 }
 
-
-bool cppcheck::Platform::platform(cppcheck::Platform::PlatformType type)
+bool cppcheck::Platform::loadPlatformFile(const char exename[], const std::string &filename)
 {
-    switch (type) {
-    case Unspecified: // unknown type sizes (sizes etc are set but are not known)
-    case Native: // same as system this code was compile on
-        platformType = type;
+    platformString = filename;
+
+    if (filename == "" || filename == "unspecified" || filename == "native") {
+        platformType = filename == "native" ? PlatformType::Native : PlatformType::Unspecified;
         sizeof_bool = sizeof(bool);
         sizeof_short = sizeof(short);
         sizeof_int = sizeof(int);
@@ -57,7 +48,7 @@ bool cppcheck::Platform::platform(cppcheck::Platform::PlatformType type)
         sizeof_wchar_t = sizeof(wchar_t);
         sizeof_size_t = sizeof(std::size_t);
         sizeof_pointer = sizeof(void *);
-        if (type == Unspecified) {
+        if (platformType == Unspecified) {
             defaultSign = '\0';
         } else {
             defaultSign = (std::numeric_limits<char>::is_signed) ? 's' : 'u';
@@ -68,97 +59,17 @@ bool cppcheck::Platform::platform(cppcheck::Platform::PlatformType type)
         long_bit = char_bit * sizeof_long;
         long_long_bit = char_bit * sizeof_long_long;
         return true;
-    case Win32W:
-    case Win32A:
-        platformType = type;
-        sizeof_bool = 1; // 4 in Visual C++ 4.2
-        sizeof_short = 2;
-        sizeof_int = 4;
-        sizeof_long = 4;
-        sizeof_long_long = 8;
-        sizeof_float = 4;
-        sizeof_double = 8;
-        sizeof_long_double = 8;
-        sizeof_wchar_t = 2;
-        sizeof_size_t = 4;
-        sizeof_pointer = 4;
-        defaultSign = '\0';
-        char_bit = 8;
-        short_bit = char_bit * sizeof_short;
-        int_bit = char_bit * sizeof_int;
-        long_bit = char_bit * sizeof_long;
-        long_long_bit = char_bit * sizeof_long_long;
-        return true;
-    case Win64:
-        platformType = type;
-        sizeof_bool = 1;
-        sizeof_short = 2;
-        sizeof_int = 4;
-        sizeof_long = 4;
-        sizeof_long_long = 8;
-        sizeof_float = 4;
-        sizeof_double = 8;
-        sizeof_long_double = 8;
-        sizeof_wchar_t = 2;
-        sizeof_size_t = 8;
-        sizeof_pointer = 8;
-        defaultSign = '\0';
-        char_bit = 8;
-        short_bit = char_bit * sizeof_short;
-        int_bit = char_bit * sizeof_int;
-        long_bit = char_bit * sizeof_long;
-        long_long_bit = char_bit * sizeof_long_long;
-        return true;
-    case Unix32:
-        platformType = type;
-        sizeof_bool = 1;
-        sizeof_short = 2;
-        sizeof_int = 4;
-        sizeof_long = 4;
-        sizeof_long_long = 8;
-        sizeof_float = 4;
-        sizeof_double = 8;
-        sizeof_long_double = 12;
-        sizeof_wchar_t = 4;
-        sizeof_size_t = 4;
-        sizeof_pointer = 4;
-        defaultSign = '\0';
-        char_bit = 8;
-        short_bit = char_bit * sizeof_short;
-        int_bit = char_bit * sizeof_int;
-        long_bit = char_bit * sizeof_long;
-        long_long_bit = char_bit * sizeof_long_long;
-        return true;
-    case Unix64:
-        platformType = type;
-        sizeof_bool = 1;
-        sizeof_short = 2;
-        sizeof_int = 4;
-        sizeof_long = 8;
-        sizeof_long_long = 8;
-        sizeof_float = 4;
-        sizeof_double = 8;
-        sizeof_long_double = 16;
-        sizeof_wchar_t = 4;
-        sizeof_size_t = 8;
-        sizeof_pointer = 8;
-        defaultSign = '\0';
-        char_bit = 8;
-        short_bit = char_bit * sizeof_short;
-        int_bit = char_bit * sizeof_int;
-        long_bit = char_bit * sizeof_long;
-        long_long_bit = char_bit * sizeof_long_long;
-        return true;
-    case PlatformFile:
-        // sizes are not set.
-        return false;
     }
-    // unsupported platform
-    return false;
-}
 
-bool cppcheck::Platform::loadPlatformFile(const char exename[], const std::string &filename)
-{
+    if (filename == "win32A") {
+        //filename = "win32";
+        //printMessage("platform 'win32A' is deprecated and will be removed in 2.12 - please use 'win32' instead");
+    }
+    else if (filename == "win32W") {
+        //filename = "win32";
+        //printMessage("platform 'win32W' is deprecated and will be removed in 2.12 - please use 'win32' instead");
+    }
+
     // open file..
     tinyxml2::XMLDocument doc;
     if (doc.LoadFile(filename.c_str()) != tinyxml2::XML_SUCCESS) {
@@ -198,6 +109,7 @@ bool cppcheck::Platform::loadFromXmlDocument(const tinyxml2::XMLDocument *doc)
     if (!rootnode || std::strcmp(rootnode->Name(), "platform") != 0)
         return false;
 
+    // TODO: warn about missing fields
     for (const tinyxml2::XMLElement *node = rootnode->FirstChildElement(); node; node = node->NextSiblingElement()) {
         if (std::strcmp(node->Name(), "default-sign") == 0)
             defaultSign = *node->GetText();

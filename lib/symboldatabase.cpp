@@ -6605,8 +6605,8 @@ void SymbolDatabase::setValueTypeInTokenList(bool reportDebugWarnings, Token *to
 
             else if (Token::simpleMatch(tok->previous(), "sizeof (")) {
                 ValueType valuetype(ValueType::Sign::UNSIGNED, ValueType::Type::LONG, 0U);
-                if (mSettings->platformType == cppcheck::Platform::Win64)
-                    valuetype.type = ValueType::Type::LONGLONG;
+                /*if (mSettings->platformType == cppcheck::Platform::Win64)
+                    valuetype.type = ValueType::Type::LONGLONG;*/
 
                 valuetype.originalTypeName = "size_t";
                 setValueType(tok, valuetype);
@@ -6897,7 +6897,7 @@ bool ValueType::fromLibraryType(const std::string &typestr, const Settings *sett
         return true;
     }
 
-    const Library::PlatformType *platformType = settings->library.platform_type(typestr, settings->platformString());
+    const Library::PlatformType *platformType = settings->library.platform_type(typestr, settings->platformString);
     if (platformType) {
         if (platformType->mType == "char")
             type = ValueType::Type::CHAR;

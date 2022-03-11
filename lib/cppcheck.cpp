@@ -264,7 +264,8 @@ static void createDumpFile(const Settings& settings,
     fdump << "<?xml version=\"1.0\"?>" << std::endl;
     fdump << "<dumps>" << std::endl;
     fdump << "  <platform"
-          << " name=\"" << settings.platformString() << '\"'
+          << " name=\"" << settings.platformString << '\"'
+          // TODO: the sizeof_* are missing
           << " char_bit=\"" << settings.char_bit << '\"'
           << " short_bit=\"" << settings.short_bit << '\"'
           << " int_bit=\"" << settings.int_bit << '\"'
@@ -569,8 +570,7 @@ unsigned int CppCheck::check(const ImportProject::FileSettings &fs)
         temp.mSettings.standards.setCPP(fs.standard);
     else if (!fs.standard.empty())
         temp.mSettings.standards.setC(fs.standard);
-    if (fs.platformType != Settings::Unspecified)
-        temp.mSettings.platform(fs.platformType);
+    //temp.mSettings.platform(fs.platformString);
     if (mSettings.clang) {
         temp.mSettings.includePaths.insert(temp.mSettings.includePaths.end(), fs.systemIncludePaths.cbegin(), fs.systemIncludePaths.cend());
         return temp.check(Path::simplifyPath(fs.filename));
@@ -610,7 +610,7 @@ unsigned int CppCheck::checkFile(const std::string& filename, const std::string 
             for (const std::string &I : mSettings.includePaths)
                 includePaths += " -I" + I;
             mErrorLogger.reportOut("Includes:" + includePaths);
-            mErrorLogger.reportOut(std::string("Platform:") + mSettings.platformString());
+            mErrorLogger.reportOut(std::string("Platform:") + mSettings.platformString);
         }
     }
 

@@ -798,9 +798,9 @@ bool ImportProject::importVcxproj(const std::string &filename, std::map<std::str
             fs.useMfc = useOfMfc;
             fs.defines = "_WIN32=1";
             if (p.platform == ProjectConfiguration::Win32)
-                fs.platformType = cppcheck::Platform::Win32W;
+                fs.platformString = "win32";
             else if (p.platform == ProjectConfiguration::x64) {
-                fs.platformType = cppcheck::Platform::Win64;
+                fs.platformString = "win64";
                 fs.defines += ";_WIN64=1";
             }
             std::string additionalIncludePaths;
@@ -1306,12 +1306,14 @@ void ImportProject::selectOneVsConfig(Settings::PlatformType platform)
         bool remove = false;
         if (fs.cfg.compare(0,5,"Debug") != 0)
             remove = true;
-        if (platform == Settings::Win64 && fs.platformType != platform)
+        /*
+        if (platform == Win64 && fs.platformType != platform)
             remove = true;
-        else if ((platform == Settings::Win32A || platform == Settings::Win32W) && fs.platformType == Settings::Win64)
+        else if ((platform == Win32A || platform == Win32W) && fs.platformType == Win64)
             remove = true;
-        else if (fs.platformType != Settings::Win64 && platform == Settings::Win64)
+        else if (fs.platformType != Win64 && platform == Win64)
             remove = true;
+        */
         else if (filenames.find(fs.filename) != filenames.end())
             remove = true;
         if (remove) {

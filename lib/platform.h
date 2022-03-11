@@ -100,21 +100,18 @@ namespace cppcheck {
         char defaultSign;  // unsigned:'u', signed:'s', unknown:'\0'
 
         enum PlatformType {
+            None,
             Unspecified, // No platform specified
             Native, // whatever system this code was compiled on
-            Win32A,
-            Win32W,
-            Win64,
-            Unix32,
-            Unix64,
+            Win,
             PlatformFile
         };
 
+        /** platform string */
+        std::string platformString;
+
         /** platform type */
         PlatformType platformType;
-
-        /** set the platform type for predefined platforms */
-        bool platform(PlatformType type);
 
         /**
          * load platform file
@@ -132,36 +129,7 @@ namespace cppcheck {
          * @return true if Windows platform type.
          */
         bool isWindowsPlatform() const {
-            return platformType == Win32A ||
-                   platformType == Win32W ||
-                   platformType == Win64;
-        }
-
-        const char *platformString() const {
-            return platformString(platformType);
-        }
-
-        static const char *platformString(PlatformType pt) {
-            switch (pt) {
-            case Unspecified:
-                return "Unspecified";
-            case Native:
-                return "Native";
-            case Win32A:
-                return "win32A";
-            case Win32W:
-                return "win32W";
-            case Win64:
-                return "win64";
-            case Unix32:
-                return "unix32";
-            case Unix64:
-                return "unix64";
-            case PlatformFile:
-                return "platformFile";
-            default:
-                return "unknown";
-            }
+            return platformType == Win;
         }
 
         long long unsignedCharMax() const {
