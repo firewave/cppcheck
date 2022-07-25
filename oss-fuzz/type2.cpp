@@ -72,7 +72,7 @@ static std::string generateExpression2_Expr(const uint8_t *data, size_t dataSize
     ++depth;
     const int type = (depth > 3) ? 0 : getValue(data, dataSize, 3);
     const char binop[] = "=<>+-*/%&|^";
-    const char *unop[] = {"++","--","()","~"};
+    const char *unop[] = {"++","--","()","~"}; //FP
 
     switch (type) {
     case 0:

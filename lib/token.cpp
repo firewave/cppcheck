@@ -220,7 +220,7 @@ bool Token::isUpperCaseName() const
 {
     if (!isName())
         return false;
-    for (char i : mStr) {
+    for (const char i : mStr) {
         if (std::islower(i))
             return false;
     }
@@ -1125,7 +1125,7 @@ Token* Token::insertToken(const std::string& tokenStr, const std::string& origin
                 newScopeInfo->name.append(nextScopeNameAddition);
                 nextScopeNameAddition = "";
 
-                newToken->scopeInfo(newScopeInfo);
+                newToken->scopeInfo(std::move(newScopeInfo));
             } else if (newToken->str() == "}") {
                 Token* matchingTok = newToken->previous();
                 int depth = 0;
@@ -1224,14 +1224,14 @@ std::string Token::stringify(const stringifyOptions& options) const
     if (options.macro && isExpandedMacro())
         ret += '$';
     if (isName() && mStr.find(' ') != std::string::npos) {
-        for (char i : mStr) {
+        for (const char i : mStr) {
             if (i != ' ')
                 ret += i;
         }
     } else if (mStr[0] != '\"' || mStr.find('\0') == std::string::npos)
         ret += mStr;
     else {
-        for (char i : mStr) {
+        for (const char i : mStr) {
             if (i == '\0')
                 ret += "\\0";
             else
@@ -1538,7 +1538,7 @@ static std::string stringFromTokenRange(const Token* start, const Token* end)
         if (tok->isLong() && !tok->isLiteral())
             ret += "long ";
         if (tok->tokType() == Token::eString) {
-            for (unsigned char c: tok->str()) {
+            for (const unsigned char c: tok->str()) {
                 if (c == '\n')
                     ret += "\\n";
                 else if (c == '\r')
@@ -1698,7 +1698,7 @@ void Token::printValueFlow(bool xml, std::ostream &out) const
             out << "Line " << tok->linenr() << std::endl;
         line = tok->linenr();
         if (!xml) {
-            ValueFlow::Value::ValueKind valueKind = tok->mImpl->mValues->front().valueKind;
+            const ValueFlow::Value::ValueKind valueKind = tok->mImpl->mValues->front().valueKind;
             bool same = true;
             for (const ValueFlow::Value &value : *tok->mImpl->mValues) {
                 if (value.valueKind != valueKind) {
@@ -2296,7 +2296,7 @@ std::string Token::typeStr(const Token* tok)
         if (!ret.empty())
             return ret;
     }
-    std::pair<const Token*, const Token*> r = Token::typeDecl(tok);
+    const std::pair<const Token*, const Token*> r = Token::typeDecl(tok);
     if (!r.first || !r.second)
         return "";
     return r.first->stringifyList(r.second, false);
@@ -2304,7 +2304,7 @@ std::string Token::typeStr(const Token* tok)
 
 void Token::scopeInfo(std::shared_ptr<ScopeInfo2> newScopeInfo)
 {
-    mImpl->mScopeInfo = newScopeInfo;
+    mImpl->mScopeInfo = std::move(newScopeInfo);
 }
 std::shared_ptr<ScopeInfo2> Token::scopeInfo() const
 {

@@ -47,7 +47,7 @@ bool FileList::filterMatches(const QFileInfo &inf)
 
 void FileList::addFile(const QString &filepath)
 {
-    QFileInfo inf(filepath);
+    const QFileInfo inf(filepath);
     if (filterMatches(inf))
         mFileList << inf;
 }
@@ -61,11 +61,11 @@ void FileList::addDirectory(const QString &directory, bool recursive)
     dir.setNameFilters(filters);
     if (!recursive) {
         dir.setFilter(QDir::Files | QDir::NoDotAndDotDot);
-        QFileInfoList items = dir.entryInfoList();
+        const QFileInfoList items = dir.entryInfoList();
         mFileList += items;
     } else {
         dir.setFilter(QDir::Files | QDir::NoDotAndDotDot);
-        QFileInfoList items = dir.entryInfoList();
+        const QFileInfoList items = dir.entryInfoList();
         mFileList += items;
 
         dir.setNameFilters(origNameFilters);
@@ -80,7 +80,7 @@ void FileList::addDirectory(const QString &directory, bool recursive)
 void FileList::addPathList(const QStringList &paths)
 {
     for (const QString& path : paths) {
-        QFileInfo inf(path);
+        const QFileInfo inf(path);
         if (inf.isFile())
             addFile(path);
         else
@@ -93,7 +93,7 @@ QStringList FileList::getFileList() const
     if (mExcludedPaths.empty()) {
         QStringList names;
         for (const QFileInfo& item : mFileList) {
-            QString name = QDir::fromNativeSeparators(item.filePath());
+            const QString name = QDir::fromNativeSeparators(item.filePath());
             names << name;
         }
         return names;
@@ -126,7 +126,7 @@ QStringList FileList::applyExcludeList() const
 
     QStringList paths;
     for (const QFileInfo& item : mFileList) {
-        QString name = QDir::fromNativeSeparators(item.canonicalFilePath());
+        const QString name = QDir::fromNativeSeparators(item.canonicalFilePath());
         if (!pathMatch.match(name.toStdString()))
             paths << name;
     }

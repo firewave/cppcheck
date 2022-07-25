@@ -89,8 +89,8 @@ ProjectFileDialog::ProjectFileDialog(ProjectFile *projectFile, QWidget *parent)
     mUI->mToolClangAnalyzer->hide();
 
     const QFileInfo inf(projectFile->getFilename());
-    QString filename = inf.fileName();
-    QString title = tr("Project file: %1").arg(filename);
+    const QString filename = inf.fileName();
+    const QString title = tr("Project file: %1").arg(filename);
     setWindowTitle(title);
     loadSettings();
 
@@ -115,7 +115,7 @@ ProjectFileDialog::ProjectFileDialog(ProjectFile *projectFile, QWidget *parent)
         dir.setNameFilters(QStringList("*.cfg"));
         dir.setFilter(QDir::Files | QDir::NoDotAndDotDot);
         for (const QFileInfo& item : dir.entryInfoList()) {
-            QString library = item.fileName();
+            const QString library = item.fileName();
             if (library.compare("std.cfg", Qt::CaseInsensitive) != 0)
                 continue;
             Library lib;
@@ -167,7 +167,7 @@ ProjectFileDialog::ProjectFileDialog(ProjectFile *projectFile, QWidget *parent)
 
     // Platforms..
     Platforms platforms;
-    for (cppcheck::Platform::PlatformType builtinPlatform : builtinPlatforms)
+    for (const cppcheck::Platform::PlatformType builtinPlatform : builtinPlatforms)
         mUI->mComboBoxPlatform->addItem(platforms.get(builtinPlatform).mTitle);
     QStringList platformFiles;
     for (QString sp : searchPaths) {
@@ -228,7 +228,7 @@ ProjectFileDialog::~ProjectFileDialog()
 
 void ProjectFileDialog::loadSettings()
 {
-    QSettings settings;
+    const QSettings settings;
     resize(settings.value(SETTINGS_PROJECT_DIALOG_WIDTH, 470).toInt(),
            settings.value(SETTINGS_PROJECT_DIALOG_HEIGHT, 330).toInt());
 }
@@ -336,7 +336,7 @@ void ProjectFileDialog::loadFromProjectFile(const ProjectFile *projectFile)
      */
 
     // Addons..
-    QSettings settings;
+    const QSettings settings;
     const QString dataDir = getDataDir();
     updateAddonCheckBox(mUI->mAddonThreadSafety, projectFile, dataDir, "threadsafety");
     updateAddonCheckBox(mUI->mAddonY2038, projectFile, dataDir, "y2038");
@@ -381,7 +381,7 @@ void ProjectFileDialog::saveToProjectFile(ProjectFile *projectFile) const
     if (mUI->mComboBoxPlatform->currentText().endsWith(".xml"))
         projectFile->setPlatform(mUI->mComboBoxPlatform->currentText());
     else {
-        int i = mUI->mComboBoxPlatform->currentIndex();
+        const int i = mUI->mComboBoxPlatform->currentIndex();
         if (i < numberOfBuiltinPlatforms)
             projectFile->setPlatform(cppcheck::Platform::platformString(builtinPlatforms[i]));
         else
@@ -464,8 +464,8 @@ void ProjectFileDialog::browseBuildDir()
 void ProjectFileDialog::updatePathsAndDefines()
 {
     const QString &fileName = mUI->mEditImportProject->text();
-    bool importProject = !fileName.isEmpty();
-    bool hasConfigs = fileName.endsWith(".sln") || fileName.endsWith(".vcxproj");
+    const bool importProject = !fileName.isEmpty();
+    const bool hasConfigs = fileName.endsWith(".sln") || fileName.endsWith(".vcxproj");
     mUI->mBtnClearImportProject->setEnabled(importProject);
     mUI->mListCheckPaths->setEnabled(!importProject);
     mUI->mListIncludeDirs->setEnabled(!importProject);
@@ -499,7 +499,7 @@ void ProjectFileDialog::browseImportProject()
     filters[tr("Visual Studio")] = "*.sln *.vcxproj";
     filters[tr("Compile database")] = "compile_commands.json";
     filters[tr("Borland C++ Builder 6")] = "*.bpr";
-    QString fileName = QFileDialog::getOpenFileName(this, tr("Import Project"),
+    const QString fileName = QFileDialog::getOpenFileName(this, tr("Import Project"),
                                                     dir.canonicalPath(),
                                                     toFilterString(filters));
     if (!fileName.isEmpty()) {
@@ -690,14 +690,14 @@ void ProjectFileDialog::setLibraries(const QStringList &libraries)
 void ProjectFileDialog::addSingleSuppression(const Suppressions::Suppression &suppression)
 {
     QString suppression_name;
-    static char sep = QDir::separator().toLatin1();
+    static const char sep = QDir::separator().toLatin1();
     bool found_relative = false;
 
     // Replace relative file path in the suppression with the absolute one
     if ((suppression.fileName.find("*") == std::string::npos) &&
         (suppression.fileName.find(sep) == std::string::npos)) {
-        QFileInfo inf(mProjectFile->getFilename());
-        QString rootpath = inf.absolutePath();
+        const QFileInfo inf(mProjectFile->getFilename());
+        const QString rootpath = inf.absolutePath();
         if (QFile::exists(QString{"%1%2%3"}.arg(rootpath,
                                                 QDir::separator(),
                                                 QString::fromStdString(suppression.fileName)))) {
@@ -722,7 +722,7 @@ void ProjectFileDialog::addSingleSuppression(const Suppressions::Suppression &su
 void ProjectFileDialog::setSuppressions(const QList<Suppressions::Suppression> &suppressions)
 {
     mUI->mListSuppressions->clear();
-    QList<Suppressions::Suppression> new_suppressions = suppressions;
+    const QList<Suppressions::Suppression> &new_suppressions = suppressions; //?
     mSuppressions.clear();
     for (const Suppressions::Suppression &suppression : new_suppressions) {
         addSingleSuppression(suppression);
@@ -732,7 +732,7 @@ void ProjectFileDialog::setSuppressions(const QList<Suppressions::Suppression> &
 
 void ProjectFileDialog::addCheckPath()
 {
-    QString dir = getExistingDirectory(tr("Select a directory to check"), false);
+    const QString dir = getExistingDirectory(tr("Select a directory to check"), false);
     if (!dir.isEmpty())
         addCheckPath(dir);
 }
@@ -832,7 +832,7 @@ void ProjectFileDialog::removeSuppression()
     if (!item)
         return;
 
-    int suppressionIndex = getSuppressionIndex(item->text());
+    const int suppressionIndex = getSuppressionIndex(item->text());
     if (suppressionIndex >= 0)
         mSuppressions.removeAt(suppressionIndex);
     delete item;
@@ -842,7 +842,7 @@ void ProjectFileDialog::editSuppression(const QModelIndex &)
 {
     const int row = mUI->mListSuppressions->currentRow();
     QListWidgetItem *item = mUI->mListSuppressions->item(row);
-    int suppressionIndex = getSuppressionIndex(item->text());
+    const int suppressionIndex = getSuppressionIndex(item->text());
     if (suppressionIndex >= 0) { // TODO what if suppression is not found?
         NewSuppressionDialog dlg;
         dlg.setSuppression(mSuppressions[suppressionIndex]);

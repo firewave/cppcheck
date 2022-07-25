@@ -99,7 +99,7 @@ void ThreadHandler::check(const Settings &settings)
 
     QStringList addonsAndTools = mAddonsAndTools;
     for (const std::string& addon: settings.addons) {
-        QString s = QString::fromStdString(addon);
+        const QString s = QString::fromStdString(addon);
         if (!addonsAndTools.contains(s))
             addonsAndTools << s;
     }
@@ -272,7 +272,7 @@ bool ThreadHandler::needsReCheck(const QString &filename, std::set<QString> &mod
         QString line = in.readLine();
         if (line.startsWith("#include \"")) {
             line.remove(0,10);
-            int i = line.indexOf("\"");
+            const int i = line.indexOf("\"");
             if (i > 0) {
                 line.remove(i,line.length());
                 line = QFileInfo(filename).absolutePath() + "/" + line;

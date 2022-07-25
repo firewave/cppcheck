@@ -3891,7 +3891,7 @@ private:
     }
 
     void functioncalllibrary() {
-        Settings settings1;
+        const Settings settings1;
         Tokenizer tokenizer(&settings1,this);
         std::istringstream code("void f() { int a,b,c; x(a,b,c); }");
         ASSERT_EQUALS(true, tokenizer.tokenize(code, "test.c"));
@@ -3900,7 +3900,7 @@ private:
         // nothing bad..
         {
             Library library;
-            Library::ArgumentChecks arg;
+            const Library::ArgumentChecks arg;
             library.functions["x"].argumentChecks[1] = arg;
             library.functions["x"].argumentChecks[2] = arg;
             library.functions["x"].argumentChecks[3] = arg;
@@ -3913,7 +3913,7 @@ private:
         // for 1st parameter null pointer is not ok..
         {
             Library library;
-            Library::ArgumentChecks arg;
+            const Library::ArgumentChecks arg;
             library.functions["x"].argumentChecks[1] = arg;
             library.functions["x"].argumentChecks[2] = arg;
             library.functions["x"].argumentChecks[3] = arg;

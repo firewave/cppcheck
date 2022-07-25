@@ -74,7 +74,7 @@ static int findArgumentPosRecursive(const Token* tok, const Token* tokToFind,  b
             return -1;
         if (found)
             return res;
-        int argn = res;
+        const int argn = res;
         res = findArgumentPosRecursive(tok->astOperand2(), tokToFind, found, depth);
         if (res == -1)
             return -1;
@@ -88,7 +88,7 @@ static int findArgumentPosRecursive(const Token* tok, const Token* tokToFind,  b
 
 static int findArgumentPos(const Token* tok, const Token* tokToFind){
     bool found = false;
-    int argn = findArgumentPosRecursive(tok, tokToFind, found, 0);
+    const int argn = findArgumentPosRecursive(tok, tokToFind, found, 0);
     if (found)
         return argn - 1;
     return -1;
@@ -299,7 +299,7 @@ std::string astCanonicalType(const Token *expr)
 {
     if (!expr)
         return "";
-    std::pair<const Token*, const Token*> decl = Token::typeDecl(expr);
+    const std::pair<const Token*, const Token*> decl = Token::typeDecl(expr);
     if (decl.first && decl.second) {
         std::string ret;
         for (const Token *type = decl.first; Token::Match(type,"%name%|::") && type != decl.second; type = type->next()) {
@@ -1045,7 +1045,7 @@ static void followVariableExpressionError(const Token *tok1, const Token *tok2, 
     ErrorPathItem item = std::make_pair(tok2, "'" + tok1->str() + "' is assigned value '" + tok2->expressionString() + "' here.");
     if (std::find(errors->begin(), errors->end(), item) != errors->end())
         return;
-    errors->push_back(item);
+    errors->push_back(std::move(item));
 }
 
 std::vector<ReferenceToken> followAllReferences(const Token* tok,
@@ -1109,7 +1109,7 @@ std::vector<ReferenceToken> followAllReferences(const Token* tok,
             if (!Function::returnsReference(f))
                 return {{tok, std::move(errors)}};
             std::set<ReferenceToken, ReferenceTokenLess> result;
-            std::vector<const Token*> returns = Function::findReturns(f);
+            const std::vector<const Token*> returns = Function::findReturns(f);
             for (const Token* returnTok : returns) {
                 if (returnTok == tok)
                     continue;
@@ -1119,7 +1119,7 @@ std::vector<ReferenceToken> followAllReferences(const Token* tok,
                     if (!argvar)
                         return {{tok, std::move(errors)}};
                     if (argvar->isArgument() && (argvar->isReference() || argvar->isRValueReference())) {
-                        int n = getArgumentPos(argvar, f);
+                        const int n = getArgumentPos(argvar, f);
                         if (n < 0)
                             return {{tok, std::move(errors)}};
                         std::vector<const Token*> args = getArguments(tok->previous());
@@ -1159,8 +1159,8 @@ const Token* followReferences(const Token* tok, ErrorPath* errors)
 
 static bool isSameLifetime(const Token * const tok1, const Token * const tok2)
 {
-    ValueFlow::Value v1 = getLifetimeObjValue(tok1);
-    ValueFlow::Value v2 = getLifetimeObjValue(tok2);
+    const ValueFlow::Value v1 = getLifetimeObjValue(tok1);
+    const ValueFlow::Value v2 = getLifetimeObjValue(tok2);
     if (!v1.isLifetimeValue() || !v2.isLifetimeValue())
         return false;
     return v1.tokvalue == v2.tokvalue;
@@ -1771,7 +1771,7 @@ bool isConstFunctionCall(const Token* ftok, const Library& library)
             return true;
         return false;
     } else {
-        bool memberFunction = Token::Match(ftok->previous(), ". %name% (");
+        const bool memberFunction = Token::Match(ftok->previous(), ". %name% (");
         bool constMember = !memberFunction;
         if (Token::Match(ftok->tokAt(-2), "%var% . %name% (")) {
             const Variable* var = ftok->tokAt(-2)->variable();
@@ -1857,12 +1857,12 @@ bool isUniqueExpression(const Token* tok)
         const Type * varType = var->type();
         // Iterate over the variables in scope and the parameters of the function if possible
         const Function * fun = scope->function;
-        const std::list<Variable>* setOfVars[] = {&scope->varlist, fun ? &fun->argumentList : nullptr};
+        const std::list<Variable>* setOfVars[] = {&scope->varlist, fun ? &fun->argumentList : nullptr}; // FP
 
         for (const std::list<Variable>* vars:setOfVars) {
             if (!vars)
                 continue;
-            bool other = std::any_of(vars->cbegin(), vars->cend(), [=](const Variable &v) {
+            const bool other = std::any_of(vars->cbegin(), vars->cend(), [=](const Variable &v) {
                 if (varType)
                     return v.type() && v.type()->name() == varType->name() && v.name() != var->name();
                 return v.isFloatingType() == var->isFloatingType() &&
@@ -2246,7 +2246,7 @@ bool isVariableChangedByFunctionCall(const Token *tok, int indirect, const Setti
         return true;
     }
 
-    std::vector<const Variable*> args = getArgumentVars(tok, argnr);
+    const std::vector<const Variable*> args = getArgumentVars(tok, argnr);
     bool conclusive = false;
     for (const Variable *arg:args) {
         if (!arg)
@@ -3088,7 +3088,7 @@ struct FwdAnalysis::Result FwdAnalysis::checkRecursive(const Token *expr, const 
             const Token* opTok = tok->astOperand1();
             if (!opTok)
                 opTok = tok->next();
-            std::pair<const Token*, const Token*> startEndTokens = opTok->findExpressionStartEndTokens();
+            const std::pair<const Token*, const Token*> startEndTokens = opTok->findExpressionStartEndTokens();
             FwdAnalysis::Result result =
                 checkRecursive(expr, startEndTokens.first, startEndTokens.second->next(), exprVarIds, local, true, depth);
             if (result.type != Result::Type::NONE)
@@ -3174,7 +3174,7 @@ struct FwdAnalysis::Result FwdAnalysis::checkRecursive(const Token *expr, const 
             const Token *conditionStart = tok->next();
             const Token *condTok = conditionStart->astOperand2();
             if (condTok->hasKnownIntValue()) {
-                bool cond = condTok->values().front().intvalue;
+                const bool cond = condTok->values().front().intvalue;
                 if (cond) {
                     FwdAnalysis::Result result = checkRecursive(expr, bodyStart, bodyStart->link(), exprVarIds, local, true, depth);
                     if (result.type != Result::Type::NONE)
@@ -3399,7 +3399,7 @@ FwdAnalysis::Result FwdAnalysis::check(const Token* expr, const Token* startToke
     // all variable ids in expr.
     bool local = true;
     bool unknownVarId = false;
-    std::set<nonneg int> exprVarIds = getExprVarIds(expr, &local, &unknownVarId);
+    const std::set<nonneg int> exprVarIds = getExprVarIds(expr, &local, &unknownVarId);
 
     if (unknownVarId)
         return Result(FwdAnalysis::Result::Type::BAILOUT);
@@ -3439,7 +3439,7 @@ const Token *FwdAnalysis::reassign(const Token *expr, const Token *startToken, c
     if (hasVolatileCastOrVar(expr))
         return nullptr;
     mWhat = What::Reassign;
-    Result result = check(expr, startToken, endToken);
+    const Result result = check(expr, startToken, endToken);
     return result.type == FwdAnalysis::Result::Type::WRITE ? result.token : nullptr;
 }
 
@@ -3450,7 +3450,7 @@ bool FwdAnalysis::unusedValue(const Token *expr, const Token *startToken, const 
     if (hasVolatileCastOrVar(expr))
         return false;
     mWhat = What::UnusedValue;
-    Result result = check(expr, startToken, endToken);
+    const Result result = check(expr, startToken, endToken);
     return (result.type == FwdAnalysis::Result::Type::NONE || result.type == FwdAnalysis::Result::Type::RETURN) && !possiblyAliased(expr, startToken);
 }
 

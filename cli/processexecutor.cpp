@@ -170,7 +170,7 @@ int ProcessExecutor::handleRead(int rpipe, unsigned int &result)
             // Alert only about unique errors
             std::string errmsg = msg.toString(mSettings.verbose);
             if (std::find(mErrorList.begin(), mErrorList.end(), errmsg) == mErrorList.end()) {
-                mErrorList.emplace_back(errmsg);
+                mErrorList.emplace_back(std::move(errmsg));
                 if (type == PipeWriter::REPORT_ERROR)
                     mErrorLogger.reportErr(msg);
                 else
@@ -229,7 +229,7 @@ unsigned int ProcessExecutor::check()
     std::list<ImportProject::FileSettings>::const_iterator iFileSettings = mSettings.project.fileSettings.begin();
     for (;;) {
         // Start a new child
-        size_t nchildren = childFile.size();
+        const size_t nchildren = childFile.size();
         if ((iFile != mFiles.end() || iFileSettings != mSettings.project.fileSettings.end()) && nchildren < mSettings.jobs && checkLoadAverage(nchildren)) {
             int pipes[2];
             if (pipe(pipes) == -1) {
@@ -248,7 +248,7 @@ unsigned int ProcessExecutor::check()
                 std::exit(EXIT_FAILURE);
             }
 
-            pid_t pid = fork();
+            const pid_t pid = fork();
             if (pid < 0) {
                 // Error
                 std::cerr << "#### ThreadExecutor::check, Failed to create child process: "<< std::strerror(errno) << std::endl;
@@ -297,20 +297,20 @@ unsigned int ProcessExecutor::check()
             struct timeval tv; // for every second polling of load average condition
             tv.tv_sec = 1;
             tv.tv_usec = 0;
-            int r = select(*std::max_element(rpipes.begin(), rpipes.end()) + 1, &rfds, nullptr, nullptr, &tv);
+            const int r = select(*std::max_element(rpipes.begin(), rpipes.end()) + 1, &rfds, nullptr, nullptr, &tv);
 
             if (r > 0) {
                 std::list<int>::iterator rp = rpipes.begin();
                 while (rp != rpipes.end()) {
                     if (FD_ISSET(*rp, &rfds)) {
-                        int readRes = handleRead(*rp, result);
+                        const int readRes = handleRead(*rp, result);
                         if (readRes == -1) {
                             std::size_t size = 0;
-                            std::map<int, std::string>::iterator p = pipeFile.find(*rp);
+                            const std::map<int, std::string>::iterator p = pipeFile.find(*rp);
                             if (p != pipeFile.end()) {
-                                std::string name = p->second;
+                                const std::string name = p->second;
                                 pipeFile.erase(p);
-                                std::map<std::string, std::size_t>::const_iterator fs = mFiles.find(name);
+                                const std::map<std::string, std::size_t>::const_iterator fs = mFiles.find(name);
                                 if (fs != mFiles.end()) {
                                     size = fs->second;
                                 }
@@ -332,10 +332,10 @@ unsigned int ProcessExecutor::check()
         }
         if (!childFile.empty()) {
             int stat = 0;
-            pid_t child = waitpid(0, &stat, WNOHANG);
+            const pid_t child = waitpid(0, &stat, WNOHANG);
             if (child > 0) {
                 std::string childname;
-                std::map<pid_t, std::string>::iterator c = childFile.find(child);
+                const std::map<pid_t, std::string>::iterator c = childFile.find(child);
                 if (c != childFile.end()) {
                     childname = c->second;
                     childFile.erase(c);

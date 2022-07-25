@@ -1856,12 +1856,12 @@ private:
                              "char *(a); "
                              "char &(b); "
                              "const static char *(c); "
-                             "} ;";
+                             "} ;"; // FN
         static char exp[] = "struct S { "
                             "char * a ; "
                             "char & b ; "
                             "static const char * c ; "
-                            "} ;";
+                            "} ;"; // FP?
         ASSERT_EQUALS(exp, tokenizeAndStringify(code));
     }
 
@@ -3399,7 +3399,7 @@ private:
 
     void simplifyString() {
         errout.str("");
-        Tokenizer tokenizer(&settings0, this);
+        const Tokenizer tokenizer(&settings0, this);
         ASSERT_EQUALS("\"abc\"", tokenizer.simplifyString("\"abc\""));
         ASSERT_EQUALS("\"\n\"", tokenizer.simplifyString("\"\\xa\""));
         ASSERT_EQUALS("\"3\"", tokenizer.simplifyString("\"\\x33\""));
@@ -7117,7 +7117,7 @@ private:
                             "a = reinterpret_cast<int>(x);\n"
                             "a = static_cast<int>(x);\n";
 
-        Settings settings;
+        const Settings settings;
         Tokenizer tokenizer(&settings, this);
         std::istringstream istr(code);
         ASSERT(tokenizer.tokenize(istr, "test.cpp"));

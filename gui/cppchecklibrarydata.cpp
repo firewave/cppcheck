@@ -139,8 +139,8 @@ static CppcheckLibraryData::TypeChecks loadTypeChecks(QXmlStreamReader &xmlReade
             continue;
         const QString elementName = xmlReader.name().toString();
         if (elementName == "suppress" || elementName == "check") {
-            QPair<QString, QString> entry(elementName, xmlReader.readElementText());
-            typeChecks.append(entry);
+            const QPair<QString, QString> entry(elementName, xmlReader.readElementText());
+            typeChecks.append(std::move(entry));
         }
     }
     return typeChecks;
@@ -149,7 +149,7 @@ static CppcheckLibraryData::TypeChecks loadTypeChecks(QXmlStreamReader &xmlReade
 static CppcheckLibraryData::Function::Arg loadFunctionArg(QXmlStreamReader &xmlReader)
 {
     CppcheckLibraryData::Function::Arg arg;
-    QString argnr = xmlReader.attributes().value("nr").toString();
+    const QString argnr = xmlReader.attributes().value("nr").toString();
     if (argnr == "any")
         arg.nr = CppcheckLibraryData::Function::Arg::ANY;
     else if (argnr == "variadic")

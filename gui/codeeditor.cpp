@@ -204,7 +204,7 @@ void Highlighter::highlightBlock(const QString &text)
     for (const HighlightingRule &rule : mHighlightingRulesWithSymbols) {
         QRegularExpressionMatchIterator matchIterator = rule.pattern.globalMatch(text);
         while (matchIterator.hasNext()) {
-            QRegularExpressionMatch match = matchIterator.next();
+            const QRegularExpressionMatch match = matchIterator.next();
             setFormat(match.capturedStart(), match.capturedLength(), rule.format);
         }
     }
@@ -216,8 +216,8 @@ void Highlighter::highlightBlock(const QString &text)
         startIndex = text.indexOf(mCommentStartExpression);
 
     while (startIndex >= 0) {
-        QRegularExpressionMatch match = mCommentEndExpression.match(text, startIndex);
-        int endIndex = match.capturedStart();
+        const QRegularExpressionMatch match = mCommentEndExpression.match(text, startIndex);
+        const int endIndex = match.capturedStart();
         int commentLength = 0;
         if (endIndex == -1) {
             setCurrentBlockState(1);
@@ -353,9 +353,9 @@ int CodeEditor::lineNumberAreaWidth()
     }
 
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 11, 0))
-    int space = 3 + fontMetrics().horizontalAdvance(QLatin1Char('9')) * digits;
+    const int space = 3 + fontMetrics().horizontalAdvance(QLatin1Char('9')) * digits;
 #else
-    int space = 3 + fontMetrics().width(QLatin1Char('9')) * digits;
+    const int space = 3 + fontMetrics().width(QLatin1Char('9')) * digits;
 #endif
     return space;
 }
@@ -379,7 +379,7 @@ void CodeEditor::updateLineNumberArea(const QRect &rect, int dy)
 void CodeEditor::resizeEvent(QResizeEvent *event)
 {
     QPlainTextEdit::resizeEvent(event);
-    QRect cr = contentsRect();
+    const QRect cr = contentsRect();
     mLineNumberArea->setGeometry(QRect(cr.left(), cr.top(), lineNumberAreaWidth(), cr.height()));
 }
 
@@ -415,7 +415,7 @@ void CodeEditor::lineNumberAreaPaintEvent(QPaintEvent *event)
 
     while (block.isValid() && top <= event->rect().bottom()) {
         if (block.isVisible() && bottom >= event->rect().top()) {
-            QString number = QString::number(blockNumber + 1);
+            const QString number = QString::number(blockNumber + 1);
             painter.setPen(mWidgetStyle->lineNumFGColor);
             painter.drawText(0, top, mLineNumberArea->width(), fontMetrics().height(),
                              Qt::AlignRight, number);
@@ -430,11 +430,11 @@ void CodeEditor::lineNumberAreaPaintEvent(QPaintEvent *event)
 
 QString CodeEditor::generateStyleString()
 {
-    QString bgcolor = QString("background:rgb(%1,%2,%3);")
+    const QString bgcolor = QString("background:rgb(%1,%2,%3);")
                       .arg(mWidgetStyle->widgetBGColor.red())
                       .arg(mWidgetStyle->widgetBGColor.green())
                       .arg(mWidgetStyle->widgetBGColor.blue());
-    QString fgcolor = QString("color:rgb(%1,%2,%3);")
+    const QString fgcolor = QString("color:rgb(%1,%2,%3);")
                       .arg(mWidgetStyle->widgetFGColor.red())
                       .arg(mWidgetStyle->widgetFGColor.green())
                       .arg(mWidgetStyle->widgetFGColor.blue());

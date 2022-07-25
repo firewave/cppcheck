@@ -1655,7 +1655,7 @@ struct OnException {
 
 void TokenList::validateAst() const
 {
-    OnException oe{[&] {
+    const OnException oe{[&] {
             if (mSettings->debugnormal)
                 mTokensFrontBack.front->printOut();
         }};

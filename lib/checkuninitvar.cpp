@@ -1572,7 +1572,7 @@ static ExprUsage getFunctionUsage(const Token* tok, int indirect, const Settings
     if (!ftok)
         return ExprUsage::None;
     if (ftok->function()) {
-        std::vector<const Variable*> args = getArgumentVars(ftok, argnr);
+        const std::vector<const Variable*> args = getArgumentVars(ftok, argnr);
         for (const Variable* arg : args) {
             if (!arg)
                 continue;
@@ -1623,7 +1623,7 @@ void CheckUninitVar::valueFlowUninit()
     const SymbolDatabase *symbolDatabase = mTokenizer->getSymbolDatabase();
 
     std::unordered_set<nonneg int> ids;
-    for (bool subfunction : {false, true}) {
+    for (const bool subfunction : {false, true}) {
         // check every executable scope
         for (const Scope* scope : symbolDatabase->functionScopes) {
             for (const Token* tok = scope->bodyStart; tok != scope->bodyEnd; tok = tok->next()) {
@@ -1671,7 +1671,7 @@ void CheckUninitVar::valueFlowUninit()
                     if (Token::Match(tok->astParent(), ". %var%") && !isleaf)
                         continue;
                 }
-                ExprUsage usage = getExprUsage(tok, v->indirect, mSettings);
+                const ExprUsage usage = getExprUsage(tok, v->indirect, mSettings);
                 if (usage == ExprUsage::NotUsed)
                     continue;
                 if (!v->subexpressions.empty() && usage == ExprUsage::PassedByReference)

@@ -349,7 +349,7 @@ bool CmdLineParser::parseFromArgs(int argc, const char* const argv[])
             // Filter errors
             else if (std::strncmp(argv[i], "--exitcode-suppressions=", 24) == 0) {
                 // exitcode-suppressions=filename.txt
-                std::string filename = 24 + argv[i];
+                const std::string filename = 24 + argv[i];
 
                 std::ifstream f(filename);
                 if (!f.is_open()) {

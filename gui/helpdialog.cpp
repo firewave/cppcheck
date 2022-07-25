@@ -74,7 +74,7 @@ HelpDialog::HelpDialog(QWidget *parent) :
 {
     mUi->setupUi(this);
 
-    QString helpFile = getHelpFile();
+    const QString helpFile = getHelpFile();
     if (helpFile.isEmpty()) {
         const QString msg = tr("Helpfile '%1' was not found").arg("online-help.qhc");
         QMessageBox msgBox(QMessageBox::Warning,

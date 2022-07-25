@@ -107,7 +107,7 @@ static bool parseInlineSuppressionCommentToken(const simplecpp::Token *tok, std:
     if (comment[pos2] == '[') {
         // multi suppress format
         std::string errmsg;
-        std::vector<Suppressions::Suppression> suppressions = Suppressions::parseMultiSuppressComment(comment, &errmsg);
+        const std::vector<Suppressions::Suppression> suppressions = Suppressions::parseMultiSuppressComment(comment, &errmsg);
 
         if (!errmsg.empty())
             bad->push_back(BadInlineSuppression(tok->location, errmsg));
@@ -328,7 +328,7 @@ static bool hasDefine(const std::string &userDefines, const std::string &cfg)
 
 static std::string cfg(const std::vector<std::string> &configs, const std::string &userDefines)
 {
-    std::set<std::string> configs2(configs.begin(), configs.end());
+    const std::set<std::string> configs2(configs.begin(), configs.end());
     std::string ret;
     for (const std::string &c : configs2) {
         if (c.empty())
@@ -734,7 +734,7 @@ simplecpp::TokenList Preprocessor::preprocess(const simplecpp::TokenList &tokens
 
 std::string Preprocessor::getcode(const simplecpp::TokenList &tokens1, const std::string &cfg, std::vector<std::string> &files, const bool writeLocations)
 {
-    simplecpp::TokenList tokens2 = preprocess(tokens1, cfg, files, false);
+    const simplecpp::TokenList tokens2 = preprocess(tokens1, cfg, files, false);
     unsigned int prevfile = 0;
     unsigned int line = 1;
     std::ostringstream ret;
@@ -868,7 +868,7 @@ void Preprocessor::missingInclude(const std::string &filename, unsigned int line
             loc.setfile(Path::toNativeSeparators(filename));
             locationList.push_back(loc);
         }
-        ErrorMessage errmsg(locationList, mFile0, Severity::information,
+        const ErrorMessage errmsg(locationList, mFile0, Severity::information,
                             (headerType==SystemHeader) ?
                             "Include file: <" + header + "> not found. Please note: Cppcheck does not need standard library headers to get proper results." :
                             "Include file: \"" + header + "\" not found.",
@@ -892,7 +892,7 @@ bool Preprocessor::validateCfg(const std::string &cfg, const std::list<simplecpp
                 continue;
             if (mu.macroName != macroName)
                 continue;
-            bool directiveLocation = std::any_of(mDirectives.cbegin(), mDirectives.cend(),
+            const bool directiveLocation = std::any_of(mDirectives.cbegin(), mDirectives.cend(),
                                                  [=](const Directive &dir) {
                 return mu.useLocation.file() == dir.file && mu.useLocation.line == dir.linenr;
             });

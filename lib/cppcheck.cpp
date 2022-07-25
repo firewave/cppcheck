@@ -255,7 +255,7 @@ static void createDumpFile(const Settings& settings,
         return;
 
     {
-        std::ofstream fout(getCtuInfoFileName(dumpFile));
+        const std::ofstream fout(getCtuInfoFileName(dumpFile));
     }
 
     fdump << "<?xml version=\"1.0\"?>" << std::endl;
@@ -288,9 +288,9 @@ static std::string executeAddon(const AddonInfo &addonInfo,
         pythonExe = cmdFileName(defaultPythonExe);
     else {
 #ifdef _WIN32
-        const char *py_exes[] = { "python3.exe", "python.exe" };
+        const char *py_exes[] = { "python3.exe", "python.exe" }; // FP
 #else
-        const char *py_exes[] = { "python3", "python" };
+        const char *py_exes[] = { "python3", "python" }; // FP
 #endif
         for (const char* py_exe : py_exes) {
             std::string out;
@@ -414,7 +414,7 @@ static bool reportClangErrors(std::istream &is, std::function<void(const ErrorMe
                             Certainty::normal);
 
         if (line.compare(pos3, 10, ": warning:") == 0) {
-            warnings->push_back(errmsg);
+            warnings->push_back(std::move(errmsg));
             continue;
         }
 
@@ -436,6 +436,7 @@ unsigned int CppCheck::check(const std::string &path)
         const std::string clangcmd = analyzerInfo + ".clang-cmd";
         const std::string clangStderr = analyzerInfo + ".clang-stderr";
         const std::string clangAst = analyzerInfo + ".clang-ast";
+        // NOLINTNEXTLINE(misc-const-correctness)
         std::string exe = mSettings.clangExecutable;
 #ifdef _WIN32
         // append .exe if it is not a path
@@ -565,7 +566,7 @@ unsigned int CppCheck::check(const ImportProject::FileSettings &fs)
         return temp.check(Path::simplifyPath(fs.filename));
     }
     std::ifstream fin(fs.filename);
-    unsigned int returnValue = temp.checkFile(Path::simplifyPath(fs.filename), fs.cfg, fin);
+    const unsigned int returnValue = temp.checkFile(Path::simplifyPath(fs.filename), fs.cfg, fin);
     mSettings.nomsg.addSuppressions(temp.mSettings.nomsg.getSuppressions());
     return returnValue;
 }
@@ -642,9 +643,9 @@ unsigned int CppCheck::checkFile(const std::string& filename, const std::string 
                     file = Path::getRelativePath(file, mSettings.basePaths);
 
                 const ErrorMessage::FileLocation loc1(file, output.location.line, output.location.col);
-                std::list<ErrorMessage::FileLocation> callstack(1, loc1);
+                const std::list<ErrorMessage::FileLocation> callstack(1, loc1);
 
-                ErrorMessage errmsg(callstack,
+                const ErrorMessage errmsg(callstack,
                                     "",
                                     Severity::error,
                                     output.msg,
@@ -664,7 +665,7 @@ unsigned int CppCheck::checkFile(const std::string& filename, const std::string 
                 filename2 = filename.substr(filename.rfind('/') + 1);
             else
                 filename2 = filename;
-            std::size_t fileNameHash = std::hash<std::string> {}(filename);
+            const std::size_t fileNameHash = std::hash<std::string> {}(filename);
             filename2 = mSettings.plistOutput + filename2.substr(0, filename2.find('.')) + "_" + std::to_string(fileNameHash) + ".plist";
             plistFile.open(filename2);
             plistFile << ErrorLogger::plistHeader(version(), files);
@@ -736,7 +737,7 @@ unsigned int CppCheck::checkFile(const std::string& filename, const std::string 
 
         // Get configurations..
         if ((mSettings.checkAllConfigurations && mSettings.userDefines.empty()) || mSettings.force) {
-            Timer t("Preprocessor::getConfigs", mSettings.showtime, &s_timerResults);
+            const Timer t("Preprocessor::getConfigs", mSettings.showtime, &s_timerResults);
             configurations = preprocessor.getConfigs(tokens1);
         } else {
             configurations.insert(mSettings.userDefines);
@@ -829,7 +830,7 @@ unsigned int CppCheck::checkFile(const std::string& filename, const std::string 
             try {
                 // Create tokens, skip rest of iteration if failed
                 {
-                    Timer timer("Tokenizer::createTokens", mSettings.showtime, &s_timerResults);
+                    const Timer timer("Tokenizer::createTokens", mSettings.showtime, &s_timerResults);
                     simplecpp::TokenList tokensP = preprocessor.preprocess(tokens1, mCurrentConfig, files, true);
                     tokenizer.createTokens(std::move(tokensP));
                 }
@@ -854,7 +855,7 @@ unsigned int CppCheck::checkFile(const std::string& filename, const std::string 
 
                 // Simplify tokens into normal form, skip rest of iteration if failed
                 Timer timer2("Tokenizer::simplifyTokens1", mSettings.showtime, &s_timerResults);
-                bool result = tokenizer.simplifyTokens1(mCurrentConfig);
+                const bool result = tokenizer.simplifyTokens1(mCurrentConfig);
                 timer2.stop();
                 if (!result)
                     continue;
@@ -906,15 +907,15 @@ unsigned int CppCheck::checkFile(const std::string& filename, const std::string 
                 std::list<ErrorMessage::FileLocation> locationList;
                 if (e.token) {
                     ErrorMessage::FileLocation loc(e.token, &tokenizer.list);
-                    locationList.push_back(loc);
+                    locationList.push_back(std::move(loc));
                 } else {
                     ErrorMessage::FileLocation loc(tokenizer.list.getSourceFilePath(), 0, 0);
                     ErrorMessage::FileLocation loc2(filename, 0, 0);
-                    locationList.push_back(loc2);
+                    locationList.push_back(std::move(loc2));
                     if (filename != tokenizer.list.getSourceFilePath())
-                        locationList.push_back(loc);
+                        locationList.push_back(std::move(loc));
                 }
-                ErrorMessage errmsg(locationList,
+                const ErrorMessage errmsg(locationList,
                                     tokenizer.list.getSourceFilePath(),
                                     Severity::error,
                                     e.errorMessage,
@@ -936,13 +937,13 @@ unsigned int CppCheck::checkFile(const std::string& filename, const std::string 
             std::list<ErrorMessage::FileLocation> locationList;
             ErrorMessage::FileLocation loc;
             loc.setfile(Path::toNativeSeparators(filename));
-            locationList.push_back(loc);
-            ErrorMessage errmsg(locationList,
+            const ErrorMessage errmsg(locationList,
                                 loc.getfile(),
                                 Severity::information,
                                 msg,
                                 "noValidConfiguration",
                                 Certainty::normal);
+            locationList.push_back(std::move(loc));
             reportErr(errmsg);
         }
 
@@ -984,9 +985,9 @@ void CppCheck::internalError(const std::string &filename, const std::string &msg
 
     if (mSettings.severity.isEnabled(Severity::information)) {
         const ErrorMessage::FileLocation loc1(filename, 0, 0);
-        std::list<ErrorMessage::FileLocation> callstack(1, loc1);
+        const std::list<ErrorMessage::FileLocation> callstack(1, loc1);
 
-        ErrorMessage errmsg(callstack,
+        const ErrorMessage errmsg(callstack,
                             emptyString,
                             Severity::information,
                             fullmsg,
@@ -1023,7 +1024,7 @@ void CppCheck::checkNormalTokens(const Tokenizer &tokenizer)
         if (Tokenizer::isMaxTime())
             return;
 
-        Timer timerRunChecks(check->name() + "::runChecks", mSettings.showtime, &s_timerResults);
+        const Timer timerRunChecks(check->name() + "::runChecks", mSettings.showtime, &s_timerResults);
         check->runChecks(&tokenizer, &mSettings, this);
     }
 
@@ -1334,7 +1335,7 @@ void CppCheck::executeRules(const std::string &tokenlist, const Tokenizer &token
 void CppCheck::executeAddons(const std::string& dumpFile)
 {
     if (!dumpFile.empty()) {
-        std::vector<std::string> f{dumpFile};
+        const std::vector<std::string> f{dumpFile};
         executeAddons(f);
         if (!mSettings.dump && mSettings.buildDir.empty())
             std::remove(dumpFile.c_str());
@@ -1478,7 +1479,7 @@ void CppCheck::tooManyConfigsError(const std::string &file, const int numberOfCo
         msg << " For more details, use --enable=information.";
 
 
-    ErrorMessage errmsg(loclist,
+    const ErrorMessage errmsg(loclist,
                         emptyString,
                         Severity::information,
                         msg.str(),
@@ -1502,7 +1503,7 @@ void CppCheck::purgedConfigurationMessage(const std::string &file, const std::st
         loclist.push_back(location);
     }
 
-    ErrorMessage errmsg(loclist,
+    const ErrorMessage errmsg(loclist,
                         emptyString,
                         Severity::information,
                         "The configuration '" + configuration + "' was not checked because its code equals another one.",

@@ -259,7 +259,7 @@ static std::string unescape(const std::string &in)
 {
     std::string out;
     bool escape = false;
-    for (char c: in) {
+    for (const char c: in) {
         if (escape) {
             escape = false;
             if (!std::strchr("\\\"\'",c))
@@ -577,7 +577,7 @@ namespace {
             replaceAll(c, "$(Platform)", p.platformStr);
 
             // TODO : Better evaluation
-            Settings s;
+            const Settings s;
             std::istringstream istr(c);
             Tokenizer tokenizer(&s, nullptr);
             tokenizer.tokenize(istr,"vcxproj");
@@ -875,7 +875,7 @@ bool ImportProject::importBcb6Prj(const std::string &projectFilename)
     {
         std::string arg;
 
-        for (char i : cflag1) {
+        for (const char i : cflag1) {
             if (i == ' ' && !arg.empty()) {
                 cflags.insert(arg);
                 arg.clear();
@@ -1108,7 +1108,7 @@ static std::string join(const std::list<std::string> &strlist, const char *sep)
 
 static std::string istream_to_string(std::istream &istr)
 {
-    std::istreambuf_iterator<char> eos;
+    const std::istreambuf_iterator<char> eos;
     return std::string(std::istreambuf_iterator<char>(istr), eos);
 }
 

@@ -34,9 +34,9 @@ AboutDialog::AboutDialog(const QString &version, const QString &extraVersion, QW
         fmtVersion += " (" + extraVersion + ")";
     }
     mUI->mVersion->setText(mUI->mVersion->text().arg(fmtVersion));
-    QString date = __DATE__;
+    const QString date = __DATE__;
     mUI->mCopyright->setText(mUI->mCopyright->text().arg(date.right(4)));
-    QString url = "<a href=\"https://cppcheck.sourceforge.io/\">https://cppcheck.sourceforge.io/</a>";
+    const QString url = "<a href=\"https://cppcheck.sourceforge.io/\">https://cppcheck.sourceforge.io/</a>";
     mUI->mHomepage->setText(mUI->mHomepage->text().arg(url));
     connect(mUI->mButtons, &QDialogButtonBox::accepted, this, &AboutDialog::accept);
 }

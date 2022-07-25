@@ -97,7 +97,7 @@ static bool CheckArgs(const QStringList &args)
 
 static void ShowUsage()
 {
-    QString helpMessage = MainWindow::tr(
+    const QString helpMessage = MainWindow::tr(
         "Cppcheck GUI.\n\n"
         "Syntax:\n"
         "    cppcheck-gui [OPTIONS] [files or paths]\n\n"

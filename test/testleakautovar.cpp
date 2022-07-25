@@ -471,7 +471,7 @@ private:
     }
 
     void assign23() {
-        Settings s = settings;
+        const Settings s = settings;
         LOAD_LIB_2(settings.library, "posix.cfg");
         check("void f() {\n"
               "    int n1, n2, n3, n4, n5, n6, n7, n8, n9, n10, n11, n12, n13, n14;\n"

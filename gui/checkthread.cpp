@@ -57,8 +57,8 @@ static bool executeCommand(std::string exe, std::vector<std::string> args, std::
     process.waitForFinished();
 
     if (redirect == "2>&1") {
-        QString s1 = process.readAllStandardOutput();
-        QString s2 = process.readAllStandardError();
+        const QString s1 = process.readAllStandardOutput();
+        const QString s2 = process.readAllStandardError();
         *output = (s1 + "\n" + s2).toStdString();
     } else
         *output = process.readAllStandardOutput().toStdString();
@@ -174,9 +174,9 @@ void CheckThread::runAddonsAndTools(const ImportProject::FileSettings *fileSetti
 
             const QString clangPath = CheckThread::clangTidyCmd();
             if (!clangPath.isEmpty()) {
-                QDir dir(clangPath + "/../lib/clang");
+                const QDir dir(clangPath + "/../lib/clang");
                 for (QString ver : dir.entryList()) {
-                    QString includePath = dir.absolutePath() + '/' + ver + "/include";
+                    const QString includePath = dir.absolutePath() + '/' + ver + "/include";
                     if (ver[0] != '.' && QDir(includePath).exists()) {
                         args << "-isystem" << includePath;
                         break;
@@ -317,7 +317,7 @@ void CheckThread::parseClangErrors(const QString &tool, const QString &file0, QS
     static const QRegularExpression r2("^(.*)\\[([a-zA-Z0-9\\-_\\.]+)\\]$");
     QTextStream in(&err, QIODevice::ReadOnly);
     while (!in.atEnd()) {
-        QString line = in.readLine();
+        const QString line = in.readLine();
 
         if (line.startsWith("Assertion failed:")) {
             ErrorItem e;
@@ -403,7 +403,7 @@ void CheckThread::parseClangErrors(const QString &tool, const QString &file0, QS
         const std::string f0 = file0.toStdString();
         const std::string msg = e.message.toStdString();
         const std::string id = e.errorId.toStdString();
-        ErrorMessage errmsg(callstack, f0, e.severity, msg, id, Certainty::normal);
+        const ErrorMessage errmsg(callstack, f0, e.severity, msg, id, Certainty::normal);
         mResult.reportErr(errmsg);
     }
 }

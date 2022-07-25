@@ -238,7 +238,7 @@ void CheckCondition::assignIfError(const Token *tok1, const Token *tok2, const s
 {
     if (tok2 && diag(tok2->tokAt(2)))
         return;
-    std::list<const Token *> locations = { tok1, tok2 };
+    const std::list<const Token *> locations = { tok1, tok2 };
     reportError(locations,
                 Severity::style,
                 "assignIfError",
@@ -248,7 +248,7 @@ void CheckCondition::assignIfError(const Token *tok1, const Token *tok2, const s
 
 void CheckCondition::mismatchingBitAndError(const Token *tok1, const MathLib::bigint num1, const Token *tok2, const MathLib::bigint num2)
 {
-    std::list<const Token *> locations = { tok1, tok2 };
+    const std::list<const Token *> locations = { tok1, tok2 };
 
     std::ostringstream msg;
     msg << "Mismatching bitmasks. Result is always 0 ("
@@ -488,7 +488,7 @@ void CheckCondition::duplicateConditionError(const Token *tok1, const Token *tok
     errorPath.emplace_back(tok1, "First condition");
     errorPath.emplace_back(tok2, "Second condition");
 
-    std::string msg = "The if condition is the same as the previous if condition";
+    const std::string msg = "The if condition is the same as the previous if condition";
 
     reportError(errorPath, Severity::style, "duplicateCondition", msg, CWE398, Certainty::normal);
 }
@@ -660,7 +660,7 @@ void CheckCondition::multiCondition2()
         std::vector<MULTICONDITIONTYPE> types = {MULTICONDITIONTYPE::INNER};
         if (Token::Match(scope.bodyStart, "{ return|throw|continue|break"))
             types.push_back(MULTICONDITIONTYPE::AFTER);
-        for (MULTICONDITIONTYPE type:types) {
+        for (const MULTICONDITIONTYPE type:types) {
             if (type == MULTICONDITIONTYPE::AFTER) {
                 tok = scope.bodyEnd->next();
             } else {
@@ -748,7 +748,7 @@ void CheckCondition::multiCondition2()
                         break;
                     }
                     bool changed = false;
-                    for (int varid : vars) {
+                    for (const int varid : vars) {
                         if (isVariableChanged(tok1, tok2, varid, nonlocal, mSettings, mTokenizer->isCPP())) {
                             changed = true;
                             break;
@@ -1554,7 +1554,7 @@ void CheckCondition::checkInvalidTestForOverflow()
         if (!Token::Match(tok, "<|<=|>=|>") || !tok->isBinaryOp())
             continue;
 
-        const Token *lhsTokens[2] = {tok->astOperand1(), tok->astOperand2()};
+        const Token *lhsTokens[2] = {tok->astOperand1(), tok->astOperand2()}; // FP
         for (const Token *lhs: lhsTokens) {
             std::string cmp = tok->str();
             if (lhs == tok->astOperand2())
@@ -1568,7 +1568,7 @@ void CheckCondition::checkInvalidTestForOverflow()
             if (!isSignedInteger && !isPointer)
                 continue;
 
-            const Token *exprTokens[2] = {lhs->astOperand1(), lhs->astOperand2()};
+            const Token *exprTokens[2] = {lhs->astOperand1(), lhs->astOperand2()}; // FP
             for (const Token *expr: exprTokens) {
                 if (lhs->str() == "-" && expr == lhs->astOperand2())
                     continue; // TODO?
@@ -1770,7 +1770,7 @@ void CheckCondition::checkAssignmentInCondition()
 
 void CheckCondition::assignmentInCondition(const Token *eq)
 {
-    std::string expr = eq ? eq->expressionString() : "x=y";
+    const std::string expr = eq ? eq->expressionString() : "x=y";
 
     reportError(
         eq,

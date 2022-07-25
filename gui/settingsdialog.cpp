@@ -151,7 +151,7 @@ bool SettingsDialog::checkStateToBool(Qt::CheckState state)
 
 void SettingsDialog::loadSettings()
 {
-    QSettings settings;
+    const QSettings settings;
     resize(settings.value(SETTINGS_CHECK_DIALOG_WIDTH, 800).toInt(),
            settings.value(SETTINGS_CHECK_DIALOG_HEIGHT, 600).toInt());
 }
@@ -213,7 +213,7 @@ void SettingsDialog::validateEditPythonPath()
         return;
     }
 
-    QFileInfo pythonPathInfo(pythonPath);
+    const QFileInfo pythonPathInfo(pythonPath);
     if (!pythonPathInfo.exists() ||
         !pythonPathInfo.isFile() ||
         !pythonPathInfo.isExecutable()) {
@@ -257,7 +257,7 @@ void SettingsDialog::removeApplication()
 void SettingsDialog::editApplication()
 {
     for (QListWidgetItem *item : mUI->mListWidget->selectedItems()) {
-        int row = mUI->mListWidget->row(item);
+        const int row = mUI->mListWidget->row(item);
         Application& app = mTempApplications->getApplication(row);
         ApplicationDialog dialog(tr("Modify an application"), app, this);
 
@@ -274,7 +274,7 @@ void SettingsDialog::defaultApplication()
 {
     QList<QListWidgetItem *> selected = mUI->mListWidget->selectedItems();
     if (!selected.isEmpty()) {
-        int index = mUI->mListWidget->row(selected[0]);
+        const int index = mUI->mListWidget->row(selected[0]);
         mTempApplications->setDefault(index);
         mUI->mListWidget->clear();
         populateApplicationList();
@@ -344,7 +344,7 @@ bool SettingsDialog::showInconclusive() const
 
 void SettingsDialog::browsePythonPath()
 {
-    QString fileName = QFileDialog::getOpenFileName(this, tr("Select python binary"), QDir::rootPath());
+    const QString fileName = QFileDialog::getOpenFileName(this, tr("Select python binary"), QDir::rootPath());
     if (fileName.contains("python", Qt::CaseInsensitive))
         mUI->mEditPythonPath->setText(fileName);
 }
@@ -372,7 +372,7 @@ void SettingsDialog::setCodeEditorStyleDefault()
 void SettingsDialog::editCodeEditorStyle()
 {
     StyleEditDialog dlg(*mCurrentStyle, this);
-    int nResult = dlg.exec();
+    const int nResult = dlg.exec();
     if (nResult == QDialog::Accepted) {
         *mCurrentStyle = dlg.getStyle();
         manageStyleControls();
@@ -381,7 +381,7 @@ void SettingsDialog::editCodeEditorStyle()
 
 void SettingsDialog::browseClangPath()
 {
-    QString selectedDir = QFileDialog::getExistingDirectory(this,
+    const QString selectedDir = QFileDialog::getExistingDirectory(this,
                                                             tr("Select clang path"),
                                                             QDir::rootPath());
 
@@ -392,9 +392,9 @@ void SettingsDialog::browseClangPath()
 
 void SettingsDialog::manageStyleControls()
 {
-    bool isSystemTheme = mCurrentStyle->isSystemTheme();
-    bool isDefaultLight = !isSystemTheme && *mCurrentStyle == defaultStyleLight;
-    bool isDefaultDark =  !isSystemTheme && *mCurrentStyle == defaultStyleDark;
+    const bool isSystemTheme = mCurrentStyle->isSystemTheme();
+    const bool isDefaultLight = !isSystemTheme && *mCurrentStyle == defaultStyleLight;
+    const bool isDefaultDark =  !isSystemTheme && *mCurrentStyle == defaultStyleDark;
     mUI->mThemeSystem->setChecked(isSystemTheme);
     mUI->mThemeLight->setChecked(isDefaultLight && !isDefaultDark);
     mUI->mThemeDark->setChecked(!isDefaultLight && isDefaultDark);

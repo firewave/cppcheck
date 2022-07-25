@@ -190,7 +190,7 @@ private:
         settings.severity.enable(Severity::information);
         settings.jointSuppressionReport = true;
         if (!suppression.empty()) {
-            std::string r = settings.nomsg.addSuppressionLine(suppression);
+            const std::string r = settings.nomsg.addSuppressionLine(suppression);
             EXPECT_EQ("", r);
         }
 

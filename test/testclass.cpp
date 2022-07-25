@@ -8002,7 +8002,7 @@ private:
 
 
     void ctu(const std::vector<std::string> &code) {
-        Settings settings;
+        const Settings settings;
         CheckClass check;
 
         // getFileInfo
@@ -8053,7 +8053,7 @@ private:
         ASSERT_LOC(tokenizer.tokenize(istr, "test.cpp"), file, line);
 
         // Check..
-        CheckClass checkClass(&tokenizer, &settings1, this);
+        const CheckClass checkClass(&tokenizer, &settings1, this);
 
         Check::FileInfo * fileInfo = (checkClass.getFileInfo)(&tokenizer, &settings1);
 

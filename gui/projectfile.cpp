@@ -222,10 +222,10 @@ bool ProjectFile::read(const QString &filename)
 
 void ProjectFile::readRootPath(QXmlStreamReader &reader)
 {
-    QXmlStreamAttributes attribs = reader.attributes();
+    const QXmlStreamAttributes attribs = reader.attributes();
     QString name = attribs.value(QString(), CppcheckXml::RootPathNameAttrib).toString();
     if (!name.isEmpty())
-        mRootPath = name;
+        mRootPath = std::move(name);
 }
 
 void ProjectFile::readBuildDir(QXmlStreamReader &reader)
@@ -343,8 +343,8 @@ void ProjectFile::readIncludeDirs(QXmlStreamReader &reader)
 
             // Read dir-elements
             if (reader.name().toString() == CppcheckXml::DirElementName) {
-                QXmlStreamAttributes attribs = reader.attributes();
-                QString name = attribs.value(QString(), CppcheckXml::DirNameAttrib).toString();
+                const QXmlStreamAttributes attribs = reader.attributes();
+                const QString name = attribs.value(QString(), CppcheckXml::DirNameAttrib).toString();
                 if (!name.isEmpty())
                     mIncludeDirs << name;
             }
@@ -380,8 +380,8 @@ void ProjectFile::readDefines(QXmlStreamReader &reader)
         case QXmlStreamReader::StartElement:
             // Read define-elements
             if (reader.name().toString() == CppcheckXml::DefineName) {
-                QXmlStreamAttributes attribs = reader.attributes();
-                QString name = attribs.value(QString(), CppcheckXml::DefineNameAttrib).toString();
+                const QXmlStreamAttributes attribs = reader.attributes();
+                const QString name = attribs.value(QString(), CppcheckXml::DefineNameAttrib).toString();
                 if (!name.isEmpty())
                     mDefines << name;
             }
@@ -418,8 +418,8 @@ void ProjectFile::readCheckPaths(QXmlStreamReader &reader)
 
             // Read dir-elements
             if (reader.name().toString() == CppcheckXml::PathName) {
-                QXmlStreamAttributes attribs = reader.attributes();
-                QString name = attribs.value(QString(), CppcheckXml::PathNameAttrib).toString();
+                const QXmlStreamAttributes attribs = reader.attributes();
+                const QString name = attribs.value(QString(), CppcheckXml::PathNameAttrib).toString();
                 if (!name.isEmpty())
                     mPaths << name;
             }
@@ -455,15 +455,15 @@ void ProjectFile::readExcludes(QXmlStreamReader &reader)
         case QXmlStreamReader::StartElement:
             // Read exclude-elements
             if (reader.name().toString() == CppcheckXml::ExcludePathName) {
-                QXmlStreamAttributes attribs = reader.attributes();
-                QString name = attribs.value(QString(), CppcheckXml::ExcludePathNameAttrib).toString();
+                const QXmlStreamAttributes attribs = reader.attributes();
+                const QString name = attribs.value(QString(), CppcheckXml::ExcludePathNameAttrib).toString();
                 if (!name.isEmpty())
                     mExcludedPaths << name;
             }
             // Read ignore-elements - deprecated but support reading them
             else if (reader.name().toString() == CppcheckXml::IgnorePathName) {
-                QXmlStreamAttributes attribs = reader.attributes();
-                QString name = attribs.value(QString(), CppcheckXml::IgnorePathNameAttrib).toString();
+                const QXmlStreamAttributes attribs = reader.attributes();
+                const QString name = attribs.value(QString(), CppcheckXml::IgnorePathNameAttrib).toString();
                 if (!name.isEmpty())
                     mExcludedPaths << name;
             }
@@ -611,7 +611,7 @@ void ProjectFile::readTagWarnings(QXmlStreamReader &reader, const QString &tag)
         case QXmlStreamReader::StartElement:
             // Read library-elements
             if (reader.name().toString() == CppcheckXml::WarningElementName) {
-                std::size_t hash = reader.attributes().value(QString(), CppcheckXml::HashAttributeName).toULongLong();
+                const std::size_t hash = reader.attributes().value(QString(), CppcheckXml::HashAttributeName).toULongLong();
                 mWarningTags[hash] = tag;
             }
             break;
@@ -649,7 +649,7 @@ void ProjectFile::readStringList(QStringList &stringlist, QXmlStreamReader &read
             if (reader.name().toString() == elementname) {
                 type = reader.readNext();
                 if (type == QXmlStreamReader::Characters) {
-                    QString text = reader.text().toString();
+                    const QString text = reader.text().toString();
                     stringlist << text;
                 }
             }

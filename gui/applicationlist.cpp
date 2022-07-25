@@ -39,7 +39,7 @@ ApplicationList::~ApplicationList()
 
 bool ApplicationList::loadSettings()
 {
-    QSettings settings;
+    const QSettings settings;
     QStringList names = settings.value(SETTINGS_APPLICATION_NAMES, QStringList()).toStringList();
     QStringList paths = settings.value(SETTINGS_APPLICATION_PATHS, QStringList()).toStringList();
     QStringList params = settings.value(SETTINGS_APPLICATION_PARAMS, QStringList()).toStringList();

@@ -209,7 +209,7 @@ Library::Error Library::load(const tinyxml2::XMLDocument &doc)
     if (strcmp(rootnode->Name(),"def") != 0)
         return Error(ErrorCode::UNSUPPORTED_FORMAT, rootnode->Name());
 
-    int format = rootnode->IntAttribute("format", 1); // Assume format version 1 if nothing else is specified (very old .cfg files had no 'format' attribute)
+    const int format = rootnode->IntAttribute("format", 1); // Assume format version 1 if nothing else is specified (very old .cfg files had no 'format' attribute)
 
     if (format > 2 || format <= 0)
         return Error(ErrorCode::UNSUPPORTED_FORMAT);
@@ -466,7 +466,7 @@ Library::Error Library::load(const tinyxml2::XMLDocument &doc)
                         const char* const action_ptr = functionNode->Attribute("action");
                         Container::Action action = Container::Action::NO_ACTION;
                         if (action_ptr) {
-                            std::string actionName = action_ptr;
+                            const std::string actionName = action_ptr;
                             action = Container::actionFrom(actionName);
                             if (action == Container::Action::NO_ACTION)
                                 return Error(ErrorCode::BAD_ATTRIBUTE_VALUE, actionName);
@@ -475,7 +475,7 @@ Library::Error Library::load(const tinyxml2::XMLDocument &doc)
                         const char* const yield_ptr = functionNode->Attribute("yields");
                         Container::Yield yield = Container::Yield::NO_YIELD;
                         if (yield_ptr) {
-                            std::string yieldName = yield_ptr;
+                            const std::string yieldName = yield_ptr;
                             yield = Container::yieldFrom(yieldName);
                             if (yield == Container::Yield::NO_YIELD)
                                 return Error(ErrorCode::BAD_ATTRIBUTE_VALUE, yieldName);
@@ -507,7 +507,7 @@ Library::Error Library::load(const tinyxml2::XMLDocument &doc)
                         container.stdAssociativeLike = std::string(associative) == "std-like";
                     const char* const unstable = containerNode->Attribute("unstable");
                     if (unstable) {
-                        std::string unstableType = unstable;
+                        const std::string unstableType = unstable;
                         if (unstableType.find("erase") != std::string::npos)
                             container.unstableErase = true;
                         if (unstableType.find("insert") != std::string::npos)
@@ -701,7 +701,7 @@ Library::Error Library::loadFunction(const tinyxml2::XMLElement * const node, co
             if (const char *unknownReturnValues = functionnode->Attribute("unknownValues")) {
                 if (std::strcmp(unknownReturnValues, "all") == 0) {
                     std::vector<MathLib::bigint> values{LLONG_MIN, LLONG_MAX};
-                    mUnknownReturnValues[name] = values;
+                    mUnknownReturnValues[name] = std::move(values);
                 }
             }
         } else if (functionnodename == "arg") {
@@ -875,7 +875,7 @@ Library::Error Library::loadFunction(const tinyxml2::XMLElement * const node, co
             const char* const action_ptr = functionnode->Attribute("action");
             Container::Action action = Container::Action::NO_ACTION;
             if (action_ptr) {
-                std::string actionName = action_ptr;
+                const std::string actionName = action_ptr;
                 action = Container::actionFrom(actionName);
                 if (action == Container::Action::NO_ACTION)
                     return Error(ErrorCode::BAD_ATTRIBUTE_VALUE, actionName);
@@ -885,7 +885,7 @@ Library::Error Library::loadFunction(const tinyxml2::XMLElement * const node, co
             const char* const yield_ptr = functionnode->Attribute("yields");
             Container::Yield yield = Container::Yield::NO_YIELD;
             if (yield_ptr) {
-                std::string yieldName = yield_ptr;
+                const std::string yieldName = yield_ptr;
                 yield = Container::yieldFrom(yieldName);
                 if (yield == Container::Yield::NO_YIELD)
                     return Error(ErrorCode::BAD_ATTRIBUTE_VALUE, yieldName);
@@ -1227,7 +1227,7 @@ const Library::WarnInfo* Library::getWarnInfo(const Token* ftok) const
 {
     if (isNotLibraryFunction(ftok))
         return nullptr;
-    std::map<std::string, WarnInfo>::const_iterator i = functionwarn.find(getFunctionName(ftok));
+    const std::map<std::string, WarnInfo>::const_iterator i = functionwarn.find(getFunctionName(ftok));
     if (i == functionwarn.cend())
         return nullptr;
     return &i->second;
@@ -1634,7 +1634,7 @@ std::shared_ptr<Token> createTokenFromExpression(const std::string& returnValue,
                                                  const Settings* settings,
                                                  std::unordered_map<nonneg int, const Token*>* lookupVarId)
 {
-    std::shared_ptr<TokenList> tokenList = std::make_shared<TokenList>(settings);
+    const std::shared_ptr<TokenList> tokenList = std::make_shared<TokenList>(settings);
     {
         const std::string code = "return " + returnValue + ";";
         std::istringstream istr(code);
@@ -1664,7 +1664,7 @@ std::shared_ptr<Token> createTokenFromExpression(const std::string& returnValue,
     for (Token* tok2 = tokenList->front(); tok2; tok2 = tok2->next()) {
         if (tok2->str().compare(0, 3, "arg") != 0)
             continue;
-        nonneg int id = std::atoi(tok2->str().c_str() + 3);
+        const nonneg int id = std::atoi(tok2->str().c_str() + 3);
         tok2->varId(id);
         if (lookupVarId)
             (*lookupVarId)[id] = tok2;

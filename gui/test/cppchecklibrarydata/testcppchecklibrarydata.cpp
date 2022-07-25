@@ -163,8 +163,8 @@ void TestCppcheckLibraryData::typechecksValid()
     QCOMPARE(libraryData.typeChecks.size(), fileLibraryData.typeChecks.size());
     QCOMPARE(libraryData.typeChecks.size(), 3);
     for (int idx=0; idx < libraryData.typeChecks.size(); idx++) {
-        CppcheckLibraryData::TypeChecks lhs = libraryData.typeChecks[idx];
-        CppcheckLibraryData::TypeChecks rhs = fileLibraryData.typeChecks[idx];
+        const CppcheckLibraryData::TypeChecks lhs = libraryData.typeChecks[idx];
+        const CppcheckLibraryData::TypeChecks rhs = fileLibraryData.typeChecks[idx];
         QCOMPARE(lhs.size(), rhs.size());
         QCOMPARE(lhs, rhs);
     }
@@ -255,8 +255,8 @@ void TestCppcheckLibraryData::platformTypeValid()
     QCOMPARE(libraryData.platformTypes.size(), fileLibraryData.platformTypes.size());
     QCOMPARE(libraryData.platformTypes.size(), 3);
     for (int idx=0; idx < libraryData.platformTypes.size(); idx++) {
-        CppcheckLibraryData::PlatformType lhs = libraryData.platformTypes[idx];
-        CppcheckLibraryData::PlatformType rhs = fileLibraryData.platformTypes[idx];
+        const CppcheckLibraryData::PlatformType lhs = libraryData.platformTypes[idx];
+        const CppcheckLibraryData::PlatformType rhs = fileLibraryData.platformTypes[idx];
         QCOMPARE(lhs.name, rhs.name);
         QCOMPARE(lhs.value, rhs.value);
         QCOMPARE(lhs.types.size(), rhs.types.size());

@@ -72,10 +72,10 @@ void ResultsView::initialize(QSettings *settings, ApplicationList *list, ThreadH
     mUI->mProgress->setMinimum(0);
     mUI->mProgress->setVisible(false);
 
-    CodeEditorStyle theStyle(CodeEditorStyle::loadSettings(settings));
+    const CodeEditorStyle theStyle(CodeEditorStyle::loadSettings(settings));
     mUI->mCode->setStyle(theStyle);
 
-    QByteArray state = settings->value(SETTINGS_MAINWND_SPLITTER_STATE).toByteArray();
+    const QByteArray state = settings->value(SETTINGS_MAINWND_SPLITTER_STATE).toByteArray();
     mUI->mVerticalSplitter->restoreState(state);
     mShowNoErrorsMessage = settings->value(SETTINGS_SHOW_NO_ERRORS, true).toBool();
 
@@ -225,7 +225,7 @@ void ResultsView::print(QPrinter* printer)
 
     PrintableReport report;
     mUI->mTree->saveResults(&report);
-    QTextDocument doc(report.getFormattedReportText());
+    const QTextDocument doc(report.getFormattedReportText());
     doc.print(printer);
 }
 
@@ -242,7 +242,7 @@ void ResultsView::updateSettings(bool showFullPath,
 
 void ResultsView::updateStyleSetting(QSettings *settings)
 {
-    CodeEditorStyle theStyle(CodeEditorStyle::loadSettings(settings));
+    const CodeEditorStyle theStyle(CodeEditorStyle::loadSettings(settings));
     mUI->mCode->setStyle(theStyle);
 }
 
@@ -286,7 +286,7 @@ void ResultsView::checkingFinished()
             msg.exec();
         } //If we have errors but they aren't visible, tell user about it
         else if (!mUI->mTree->hasVisibleResults()) {
-            QString text = tr("Errors were found, but they are configured to be hidden.\n" \
+            const QString text = tr("Errors were found, but they are configured to be hidden.\n" \
                               "To toggle what kind of errors are shown, open view menu.");
             QMessageBox msg(QMessageBox::Information,
                             tr("Cppcheck"),
@@ -312,7 +312,7 @@ bool ResultsView::hasResults() const
 void ResultsView::saveSettings(QSettings *settings)
 {
     mUI->mTree->saveSettings();
-    QByteArray state = mUI->mVerticalSplitter->saveState();
+    const QByteArray state = mUI->mVerticalSplitter->saveState();
     settings->setValue(SETTINGS_MAINWND_SPLITTER_STATE, state);
     mUI->mVerticalSplitter->restoreState(state);
 }
@@ -363,7 +363,7 @@ void ResultsView::readErrorsXml(const QString &filename)
 
     QString dir;
     if (!errors.isEmpty() && !errors[0].errorPath.isEmpty()) {
-        QString relativePath = QFileInfo(filename).canonicalPath();
+        const QString relativePath = QFileInfo(filename).canonicalPath();
         if (QFileInfo(relativePath + '/' + errors[0].errorPath[0].file).exists())
             dir = relativePath;
     }

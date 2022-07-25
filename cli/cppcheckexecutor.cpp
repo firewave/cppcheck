@@ -199,7 +199,7 @@ bool CppCheckExecutor::parseFromArgs(CppCheck *cppcheck, int argc, const char* c
         // Execute recursiveAddFiles() to each given file parameter
         const PathMatch matcher(ignored, caseSensitive);
         for (const std::string &pathname : pathnames) {
-            std::string err = FileLister::recursiveAddFiles(mFiles, Path::toNativeSeparators(pathname), mSettings->library.markupExtensions(), matcher);
+            const std::string err = FileLister::recursiveAddFiles(mFiles, Path::toNativeSeparators(pathname), mSettings->library.markupExtensions(), matcher);
             if (!err.empty()) {
                 std::cout << "cppcheck: " << err << std::endl;
             }
@@ -899,7 +899,7 @@ int CppCheckExecutor::check_internal(CppCheck& cppcheck)
         if (!tryLoadLibrary(settings.library, settings.exename, lib.c_str())) {
             const std::string msg("Failed to load the library " + lib);
             const std::list<ErrorMessage::FileLocation> callstack;
-            ErrorMessage errmsg(callstack, emptyString, Severity::information, msg, "failedToLoadCfg", Certainty::normal);
+            const ErrorMessage errmsg(callstack, emptyString, Severity::information, msg, "failedToLoadCfg", Certainty::normal);
             reportErr(errmsg);
             return EXIT_FAILURE;
         }
@@ -918,7 +918,7 @@ int CppCheckExecutor::check_internal(CppCheck& cppcheck)
                                   "std.cfg should be available in " + cfgfolder + " or the FILESDIR "
                                   "should be configured.");
 #endif
-        ErrorMessage errmsg(callstack, emptyString, Severity::information, msg+" "+details, "failedToLoadCfg", Certainty::normal);
+        const ErrorMessage errmsg(callstack, emptyString, Severity::information, msg+" "+details, "failedToLoadCfg", Certainty::normal);
         reportErr(errmsg);
         return EXIT_FAILURE;
     }
@@ -1218,10 +1218,10 @@ bool CppCheckExecutor::executeCommand(std::string exe, std::vector<std::string> 
     if (exe.find(" ") != std::string::npos)
         exe = "\"" + exe + "\"";
     const std::string cmd = exe + " " + joinedArgs + " " + redirect;
-    std::unique_ptr<FILE, decltype(&_pclose)> pipe(_popen(cmd.c_str(), "r"), _pclose);
+    const std::unique_ptr<FILE, decltype(&_pclose)> pipe(_popen(cmd.c_str(), "r"), _pclose);
 #else
     const std::string cmd = exe + " " + joinedArgs + " " + redirect;
-    std::unique_ptr<FILE, decltype(&pclose)> pipe(popen(cmd.c_str(), "r"), pclose);
+    const std::unique_ptr<FILE, decltype(&pclose)> pipe(popen(cmd.c_str(), "r"), pclose);
 #endif
     if (!pipe)
         return false;

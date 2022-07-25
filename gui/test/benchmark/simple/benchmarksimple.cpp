@@ -31,7 +31,7 @@
 void BenchmarkSimple::tokenize()
 {
     QFile file(QString(SRCDIR) + "/../../data/benchmark/simple.cpp");
-    QByteArray data = file.readAll();
+    const QByteArray data = file.readAll();
 
     Settings settings;
     settings.debugwarnings = true;

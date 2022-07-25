@@ -3957,11 +3957,11 @@ private:
         TODO_ASSERT_EQUALS(true, false, testConditionalValueOfX(code, 4U, 14));
         TODO_ASSERT_EQUALS(true, false, testConditionalValueOfX(code, 6U, 14));
 
-        ValueFlow::Value value1 = valueOfTok(code, "-");
+        const ValueFlow::Value value1 = valueOfTok(code, "-");
         ASSERT_EQUALS(13, value1.intvalue);
         ASSERT(!value1.isKnown());
 
-        ValueFlow::Value value2 = valueOfTok(code, "+");
+        const ValueFlow::Value value2 = valueOfTok(code, "+");
         TODO_ASSERT_EQUALS(16, 0, value2.intvalue);
         TODO_ASSERT_EQUALS(true, false, value2.isKnown());
     }

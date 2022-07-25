@@ -133,7 +133,7 @@ void XmlReportV2::writeError(const ErrorItem &error)
     for (int i = error.errorPath.count() - 1; i >= 0; i--) {
         mXmlWriter->writeStartElement(LocationElementName);
 
-        QString file = QDir::toNativeSeparators(error.errorPath[i].file);
+        const QString file = QDir::toNativeSeparators(error.errorPath[i].file);
         mXmlWriter->writeAttribute(FilenameAttribute, XmlReport::quoteMessage(file));
         mXmlWriter->writeAttribute(LineAttribute, QString::number(error.errorPath[i].line));
         if (error.errorPath[i].column > 0)
@@ -163,8 +163,8 @@ QList<ErrorItem> XmlReportV2::read()
 
             // Read error element from inside result element
             if (insideResults && mXmlReader->name() == ErrorElementName) {
-                ErrorItem item = readError(mXmlReader);
-                errors.append(item);
+                const ErrorItem item = readError(mXmlReader);
+                errors.append(std::move(item));
             }
             break;
 
@@ -204,7 +204,7 @@ ErrorItem XmlReportV2::readError(QXmlStreamReader *reader)
 
     // Read error element from inside errors element
     if (mXmlReader->name() == ErrorElementName) {
-        QXmlStreamAttributes attribs = reader->attributes();
+        const QXmlStreamAttributes attribs = reader->attributes();
         item.errorId = attribs.value(QString(), IdAttribute).toString();
         item.severity = GuiSeverity::fromString(attribs.value(QString(), SeverityAttribute).toString());
         const QString summary = attribs.value(QString(), MsgAttribute).toString();
@@ -232,8 +232,8 @@ ErrorItem XmlReportV2::readError(QXmlStreamReader *reader)
 
             // Read location element from inside error element
             if (mXmlReader->name() == LocationElementName) {
-                QXmlStreamAttributes attribs = mXmlReader->attributes();
-                QString file0 = attribs.value(QString(), IncludedFromFilenameAttribute).toString();
+                const QXmlStreamAttributes attribs = mXmlReader->attributes();
+                const QString file0 = attribs.value(QString(), IncludedFromFilenameAttribute).toString();
                 if (!file0.isEmpty())
                     item.file0 = XmlReport::unquoteMessage(file0);
                 QErrorPathItem loc;

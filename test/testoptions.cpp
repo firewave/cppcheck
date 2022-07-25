@@ -45,76 +45,76 @@ private:
 
     void which_test() const {
         const char* argv[] = {"./test_runner", "TestClass"};
-        options args(sizeof argv / sizeof argv[0], argv);
+        const options args(sizeof argv / sizeof argv[0], argv);
         ASSERT(std::set<std::string> {"TestClass"} == args.which_test());
     }
 
 
     void which_test_method() const {
         const char* argv[] = {"./test_runner", "TestClass::TestMethod"};
-        options args(sizeof argv / sizeof argv[0], argv);
+        const options args(sizeof argv / sizeof argv[0], argv);
         ASSERT(std::set<std::string> {"TestClass::TestMethod"} == args.which_test());
     }
 
 
     void no_test_method() const {
         const char* argv[] = {"./test_runner"};
-        options args(sizeof argv / sizeof argv[0], argv);
+        const options args(sizeof argv / sizeof argv[0], argv);
         ASSERT(std::set<std::string> {""} == args.which_test());
     }
 
 
     void not_quiet() const {
         const char* argv[] = {"./test_runner", "TestClass::TestMethod", "-v"};
-        options args(sizeof argv / sizeof argv[0], argv);
+        const options args(sizeof argv / sizeof argv[0], argv);
         ASSERT_EQUALS(false, args.quiet());
     }
 
 
     void quiet() const {
         const char* argv[] = {"./test_runner", "TestClass::TestMethod", "-q"};
-        options args(sizeof argv / sizeof argv[0], argv);
+        const options args(sizeof argv / sizeof argv[0], argv);
         ASSERT_EQUALS(true, args.quiet());
     }
 
     void not_help() const {
         const char* argv[] = {"./test_runner", "TestClass::TestMethod", "-v"};
-        options args(sizeof argv / sizeof argv[0], argv);
+        const options args(sizeof argv / sizeof argv[0], argv);
         ASSERT_EQUALS(false, args.help());
     }
 
 
     void help() const {
         const char* argv[] = {"./test_runner", "TestClass::TestMethod", "-h"};
-        options args(sizeof argv / sizeof argv[0], argv);
+        const options args(sizeof argv / sizeof argv[0], argv);
         ASSERT_EQUALS(true, args.help());
     }
 
 
     void help_long() const {
         const char* argv[] = {"./test_runner", "TestClass::TestMethod", "--help"};
-        options args(sizeof argv / sizeof argv[0], argv);
+        const options args(sizeof argv / sizeof argv[0], argv);
         ASSERT_EQUALS(true, args.help());
     }
 
     void multiple_testcases() const {
         const char* argv[] = {"./test_runner", "TestClass::TestMethod", "TestClass::AnotherTestMethod"};
-        options args(sizeof argv / sizeof argv[0], argv);
-        std::set<std::string> expected {"TestClass::TestMethod", "TestClass::AnotherTestMethod"};
+        const options args(sizeof argv / sizeof argv[0], argv);
+        const std::set<std::string> expected {"TestClass::TestMethod", "TestClass::AnotherTestMethod"};
         ASSERT(expected == args.which_test());
     }
 
     void multiple_testcases_ignore_duplicates() const {
         const char* argv[] = {"./test_runner", "TestClass::TestMethod", "TestClass"};
-        options args(sizeof argv / sizeof argv[0], argv);
-        std::set<std::string> expected {"TestClass"};
+        const options args(sizeof argv / sizeof argv[0], argv);
+        const std::set<std::string> expected {"TestClass"};
         ASSERT(expected == args.which_test());
     }
 
     void invalid_switches() const {
         const char* argv[] = {"./test_runner", "TestClass::TestMethod", "-a", "-v", "-q"};
-        options args(sizeof argv / sizeof argv[0], argv);
-        std::set<std::string> expected {"TestClass::TestMethod"};
+        const options args(sizeof argv / sizeof argv[0], argv);
+        const std::set<std::string> expected {"TestClass::TestMethod"};
         ASSERT(expected == args.which_test());
         ASSERT_EQUALS(true, args.quiet());
     }

@@ -557,7 +557,7 @@ ValueFlow::Value CheckBufferOverrun::getBufferSize(const Token *bufTok) const
     if (!var)
         return ValueFlow::Value(-1);
 
-    MathLib::bigint dim = std::accumulate(var->dimensions().begin(), var->dimensions().end(), 1LL, [](MathLib::bigint i1, const Dimension &dim) {
+    const MathLib::bigint dim = std::accumulate(var->dimensions().begin(), var->dimensions().end(), 1LL, [](MathLib::bigint i1, const Dimension &dim) {
         return i1 * dim.num;
     });
 
@@ -606,7 +606,7 @@ static bool checkBufferSize(const Token *ftok, const Library::ArgumentChecks::Mi
         break;
     case Library::ArgumentChecks::MinSize::Type::VALUE: {
         MathLib::bigint myMinsize = minsize.value;
-        unsigned int baseSize = tokenizer->sizeOfType(minsize.baseType);
+        const unsigned int baseSize = tokenizer->sizeOfType(minsize.baseType);
         if (baseSize != 0)
             myMinsize *= baseSize;
         return myMinsize <= bufferSize;
@@ -1025,7 +1025,7 @@ void CheckBufferOverrun::objectIndex()
             if (idx->hasKnownIntValue() && idx->getKnownIntValue() == 0)
                 continue;
 
-            std::vector<ValueFlow::Value> values = getLifetimeObjValues(obj, false, -1);
+            const std::vector<ValueFlow::Value> values = getLifetimeObjValues(obj, false, -1);
             for (const ValueFlow::Value& v:values) {
                 if (v.lifetimeKind != ValueFlow::Value::LifetimeKind::Address)
                     continue;
@@ -1090,7 +1090,7 @@ void CheckBufferOverrun::objectIndexError(const Token *tok, const ValueFlow::Val
         errorPath = v->errorPath;
     }
     errorPath.emplace_back(tok, "");
-    std::string verb = known ? "is" : "might be";
+    const std::string verb = known ? "is" : "might be";
     reportError(errorPath,
                 known ? Severity::error : Severity::warning,
                 "objectIndex",

@@ -331,7 +331,7 @@ void MainWindow::loadSettings()
     mUI->mActionToolBarFilter->setChecked(showFilterToolbar);
     mUI->mToolBarFilter->setVisible(showFilterToolbar);
 
-    Settings::Language enforcedLanguage = (Settings::Language)mSettings->value(SETTINGS_ENFORCED_LANGUAGE, 0).toInt();
+    const Settings::Language enforcedLanguage = (Settings::Language)mSettings->value(SETTINGS_ENFORCED_LANGUAGE, 0).toInt();
     if (enforcedLanguage == Settings::CPP)
         mUI->mActionEnforceCpp->setChecked(true);
     else if (enforcedLanguage == Settings::C)
@@ -339,7 +339,7 @@ void MainWindow::loadSettings()
     else
         mUI->mActionAutoDetectLanguage->setChecked(true);
 
-    bool succeeded = mApplications->loadSettings();
+    const bool succeeded = mApplications->loadSettings();
     if (!succeeded) {
         const QString msg = tr("There was a problem with loading the editor application settings.\n\n"
                                "This is probably because the settings were changed between the Cppcheck versions. "
@@ -355,7 +355,7 @@ void MainWindow::loadSettings()
 
     const QString projectFile = mSettings->value(SETTINGS_OPEN_PROJECT, QString()).toString();
     if (!projectFile.isEmpty() && QCoreApplication::arguments().size()==1) {
-        QFileInfo inf(projectFile);
+        const QFileInfo inf(projectFile);
         if (inf.exists() && inf.isReadable()) {
             setPath(SETTINGS_LAST_PROJECT_PATH, projectFile);
             mProjectFile = new ProjectFile(this);
@@ -436,7 +436,7 @@ void MainWindow::doAnalyzeProject(ImportProject p, const bool checkLibrary, cons
         p.ignorePaths(v);
 
         if (!mProjectFile->getAnalyzeAllVsConfigs()) {
-            Settings::PlatformType platform = (Settings::PlatformType) mSettings->value(SETTINGS_CHECKED_PLATFORM, 0).toInt();
+            const Settings::PlatformType platform = (Settings::PlatformType) mSettings->value(SETTINGS_CHECKED_PLATFORM, 0).toInt();
             p.selectOneVsConfig(platform);
         }
     } else {
@@ -448,7 +448,7 @@ void MainWindow::doAnalyzeProject(ImportProject p, const bool checkLibrary, cons
 
     mUI->mResults->checkingStarted(p.fileSettings.size());
 
-    QDir inf(mCurrentDirectory);
+    const QDir inf(mCurrentDirectory);
     const QString checkPath = inf.canonicalPath();
     setPath(SETTINGS_LAST_CHECK_PATH, checkPath);
 
@@ -465,14 +465,14 @@ void MainWindow::doAnalyzeProject(ImportProject p, const bool checkLibrary, cons
 
     if (!checkSettings.buildDir.empty()) {
         checkSettings.loadSummaries();
-        std::list<std::string> sourcefiles;
+        const std::list<std::string> sourcefiles;
         AnalyzerInformation::writeFilesTxt(checkSettings.buildDir, sourcefiles, checkSettings.userDefines, p.fileSettings);
     }
 
     //mThread->SetanalyzeProject(true);
     if (mProjectFile) {
         mThread->setAddonsAndTools(mProjectFile->getAddonsAndTools());
-        QString clangHeaders = mSettings->value(SETTINGS_VS_INCLUDE_PATHS).toString();
+        const QString clangHeaders = mSettings->value(SETTINGS_VS_INCLUDE_PATHS).toString();
         mThread->setClangIncludePaths(clangHeaders.split(";"));
         mThread->setSuppressions(mProjectFile->getSuppressions());
     }
@@ -495,7 +495,7 @@ void MainWindow::doAnalyzeFiles(const QStringList &files, const bool checkLibrar
     } else {
         enableProjectActions(false);
     }
-    QStringList fileNames = pathList.getFileList();
+    const QStringList fileNames = pathList.getFileList();
 
     mUI->mResults->clear(true);
     mThread->clearFiles();
@@ -516,7 +516,7 @@ void MainWindow::doAnalyzeFiles(const QStringList &files, const bool checkLibrar
     if (mProjectFile && !checkConfiguration)
         mThread->setAddonsAndTools(mProjectFile->getAddonsAndTools());
     mThread->setSuppressions(mProjectFile ? mProjectFile->getSuppressions() : QList<Suppressions::Suppression>());
-    QDir inf(mCurrentDirectory);
+    const QDir inf(mCurrentDirectory);
     const QString checkPath = inf.canonicalPath();
     setPath(SETTINGS_LAST_CHECK_PATH, checkPath);
 
@@ -606,7 +606,7 @@ QStringList MainWindow::selectFilesToAnalyze(QFileDialog::FileMode mode)
         if (selected.isEmpty())
             mCurrentDirectory.clear();
         else {
-            QFileInfo inf(selected[0]);
+            const QFileInfo inf(selected[0]);
             mCurrentDirectory = inf.absolutePath();
         }
         formatAndSetTitle();
@@ -689,7 +689,7 @@ void MainWindow::analyzeDirectory()
             msgBox.addButton(QMessageBox::Yes);
             msgBox.addButton(QMessageBox::No);
             msgBox.setDefaultButton(QMessageBox::Yes);
-            int dlgResult = msgBox.exec();
+            const int dlgResult = msgBox.exec();
             if (dlgResult == QMessageBox::Yes) {
                 QString path = checkDir.canonicalPath();
                 if (!path.endsWith("/"))
@@ -712,7 +712,7 @@ void MainWindow::analyzeDirectory()
             msgBox.addButton(QMessageBox::Yes);
             msgBox.addButton(QMessageBox::No);
             msgBox.setDefaultButton(QMessageBox::Yes);
-            int dlgResult = msgBox.exec();
+            const int dlgResult = msgBox.exec();
             if (dlgResult == QMessageBox::Yes) {
                 doAnalyzeFiles(dir);
             }
@@ -744,7 +744,7 @@ Library::Error MainWindow::loadLibrary(Library *library, const QString &filename
 
     // Try to load the library from the project folder..
     if (mProjectFile) {
-        QString path = QFileInfo(mProjectFile->getFilename()).canonicalPath();
+        const QString path = QFileInfo(mProjectFile->getFilename()).canonicalPath();
         ret = library->load(nullptr, (path+"/"+filename).toLatin1());
         if (ret.errorcode != Library::ErrorCode::FILE_NOT_FOUND)
             return ret;
@@ -851,7 +851,7 @@ Settings MainWindow::getCppcheckSettings()
 
     // If project file loaded, read settings from it
     if (mProjectFile) {
-        QStringList dirs = mProjectFile->getIncludeDirs();
+        const QStringList dirs = mProjectFile->getIncludeDirs();
         addIncludeDirs(dirs, result);
 
         const QStringList defines = mProjectFile->getDefines();
@@ -891,7 +891,7 @@ Settings MainWindow::getCppcheckSettings()
             if (QDir(buildDir).isAbsolute()) {
                 result.buildDir = buildDir.toStdString();
             } else {
-                QString prjpath = QFileInfo(mProjectFile->getFilename()).absolutePath();
+                const QString prjpath = QFileInfo(mProjectFile->getFilename()).absolutePath();
                 result.buildDir = (prjpath + '/' + buildDir).toStdString();
             }
         }
@@ -921,7 +921,7 @@ Settings MainWindow::getCppcheckSettings()
         for (const QString& s : mProjectFile->getCheckUnknownFunctionReturn())
             result.checkUnknownFunctionReturn.insert(s.toStdString());
 
-        QString filesDir(getDataDir());
+        const QString filesDir(getDataDir());
         const QString pythonCmd = mSettings->value(SETTINGS_PYTHON_PATH).toString();
         for (const QString& addon : mProjectFile->getAddons()) {
             QString addonFilePath = ProjectFile::getAddonFilePath(filesDir, addon);
@@ -934,7 +934,7 @@ Settings MainWindow::getCppcheckSettings()
             json += "{ \"script\":\"" + addonFilePath + "\"";
             if (!pythonCmd.isEmpty())
                 json += ", \"python\":\"" + pythonCmd + "\"";
-            QString misraFile = mSettings->value(SETTINGS_MISRA_FILE).toString();
+            const QString misraFile = mSettings->value(SETTINGS_MISRA_FILE).toString();
             if (addon == "misra" && !misraFile.isEmpty()) {
                 QString arg;
                 if (misraFile.endsWith(".pdf", Qt::CaseInsensitive))
@@ -953,7 +953,7 @@ Settings MainWindow::getCppcheckSettings()
     // directories so per project include directories can override global ones.
     const QString globalIncludes = mSettings->value(SETTINGS_GLOBAL_INCLUDE_PATHS).toString();
     if (!globalIncludes.isEmpty()) {
-        QStringList includes = globalIncludes.split(";");
+        const QStringList includes = globalIncludes.split(";");
         addIncludeDirs(includes, result);
     }
 
@@ -1119,7 +1119,7 @@ void MainWindow::reAnalyzeSelected(QStringList files)
     pathList.addPathList(files);
     if (mProjectFile)
         pathList.addExcludeList(mProjectFile->getExcludedPaths());
-    QStringList fileNames = pathList.getFileList();
+    const QStringList fileNames = pathList.getFileList();
     checkLockDownUI(); // lock UI while checking
     mUI->mResults->checkingStarted(fileNames.size());
     mThread->setCheckFiles(fileNames);
@@ -1127,7 +1127,7 @@ void MainWindow::reAnalyzeSelected(QStringList files)
     // Saving last check start time, otherwise unchecked modified files will not be
     // considered in "Modified Files Check"  performed after "Selected Files Check"
     // TODO: Should we store per file CheckStartTime?
-    QDateTime saveCheckStartTime = mThread->getCheckStartTime();
+    const QDateTime saveCheckStartTime = mThread->getCheckStartTime();
     mThread->check(getCppcheckSettings());
     mThread->setCheckStartTime(saveCheckStartTime);
 }
@@ -1185,7 +1185,7 @@ void MainWindow::openResults()
         msgBox.addButton(QMessageBox::Yes);
         msgBox.addButton(QMessageBox::No);
         msgBox.setDefaultButton(QMessageBox::Yes);
-        int dlgResult = msgBox.exec();
+        const int dlgResult = msgBox.exec();
         if (dlgResult == QMessageBox::No) {
             return;
         }
@@ -1193,7 +1193,7 @@ void MainWindow::openResults()
 
     QString selectedFilter;
     const QString filter(tr("XML files (*.xml)"));
-    QString selectedFile = QFileDialog::getOpenFileName(this,
+    const QString selectedFile = QFileDialog::getOpenFileName(this,
                                                         tr("Open the report file"),
                                                         getPath(SETTINGS_LAST_RESULT_PATH),
                                                         filter,
@@ -1243,7 +1243,7 @@ void MainWindow::enableCheckButtons(bool enable)
 
 void MainWindow::enableResultsButtons()
 {
-    bool enabled = mUI->mResults->hasResults();
+    const bool enabled = mUI->mResults->hasResults();
     mUI->mActionClearResults->setEnabled(enabled);
     mUI->mActionSave->setEnabled(enabled);
     mUI->mActionPrint->setEnabled(enabled);
@@ -1307,7 +1307,7 @@ void MainWindow::closeEvent(QCloseEvent *event)
                         this);
 
         msg.setDefaultButton(QMessageBox::No);
-        int rv = msg.exec();
+        const int rv = msg.exec();
         if (rv == QMessageBox::Yes) {
             // This isn't really very clean way to close threads but since the app is
             // exiting it doesn't matter.
@@ -1431,7 +1431,7 @@ void MainWindow::formatAndSetTitle(const QString &text)
 {
     QString nameWithVersion = QString("Cppcheck %1").arg(CppCheck::version());
 
-    QString extraVersion = CppCheck::extraVersion();
+    const QString extraVersion = CppCheck::extraVersion();
     if (!extraVersion.isEmpty()) {
         nameWithVersion += " (" + extraVersion + ")";
     }
@@ -1523,7 +1523,7 @@ void MainWindow::showScratchpad()
 
 void MainWindow::loadProjectFile(const QString &filePath)
 {
-    QFileInfo inf(filePath);
+    const QFileInfo inf(filePath);
     const QString filename = inf.fileName();
     formatAndSetTitle(tr("Project:") + ' ' + filename);
     addProjectMRU(filePath);
@@ -1563,7 +1563,7 @@ void MainWindow::analyzeProject(const ProjectFile *projectFile, const bool check
 {
     Settings::terminate(false);
 
-    QFileInfo inf(projectFile->getFilename());
+    const QFileInfo inf(projectFile->getFilename());
     const QString rootpath = projectFile->getRootPath();
 
     QDir::setCurrent(inf.absolutePath());
@@ -1654,7 +1654,7 @@ void MainWindow::newProjectFile()
 
     setPath(SETTINGS_LAST_PROJECT_PATH, filepath);
 
-    QFileInfo inf(filepath);
+    const QFileInfo inf(filepath);
     const QString filename = inf.fileName();
     formatAndSetTitle(tr("Project:") + QString(" ") + filename);
 
@@ -1747,7 +1747,7 @@ void MainWindow::openRecentProject()
     if (!action)
         return;
     const QString project = action->data().toString();
-    QFileInfo inf(project);
+    const QFileInfo inf(project);
     if (inf.exists()) {
         if (inf.suffix() == "xml")
             loadResults(project);
@@ -1767,7 +1767,7 @@ void MainWindow::openRecentProject()
                         this);
 
         msg.setDefaultButton(QMessageBox::No);
-        int rv = msg.exec();
+        const int rv = msg.exec();
         if (rv == QMessageBox::Yes) {
             removeProjectMRU(project);
         }
@@ -1848,7 +1848,7 @@ void MainWindow::suppressIds(QStringList ids)
     QList<Suppressions::Suppression> suppressions = mProjectFile->getSuppressions();
     for (const QString& id : ids) {
         // Remove all matching suppressions
-        std::string id2 = id.toStdString();
+        const std::string id2 = id.toStdString();
         for (int i = 0; i < suppressions.size();) {
             if (suppressions[i].errorId == id2)
                 suppressions.removeAt(i);

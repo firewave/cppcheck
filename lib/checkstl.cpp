@@ -75,7 +75,7 @@ static bool isElementAccessYield(const Library::Container::Yield& yield)
 static bool containerAppendsElement(const Library::Container* container, const Token* parent)
 {
     if (Token::Match(parent, ". %name% (")) {
-        Library::Container::Action action = container->getAction(parent->strAt(1));
+        const Library::Container::Action action = container->getAction(parent->strAt(1));
         if (contains({Library::Container::Action::INSERT,
                       Library::Container::Action::CHANGE,
                       Library::Container::Action::CHANGE_INTERNAL,
@@ -90,7 +90,7 @@ static bool containerAppendsElement(const Library::Container* container, const T
 static bool containerYieldsElement(const Library::Container* container, const Token* parent)
 {
     if (Token::Match(parent, ". %name% (")) {
-        Library::Container::Yield yield = container->getYield(parent->strAt(1));
+        const Library::Container::Yield yield = container->getYield(parent->strAt(1));
         if (isElementAccessYield(yield))
             return true;
     }
@@ -100,7 +100,7 @@ static bool containerYieldsElement(const Library::Container* container, const To
 static const Token* getContainerIndex(const Library::Container* container, const Token* parent)
 {
     if (Token::Match(parent, ". %name% (")) {
-        Library::Container::Yield yield = container->getYield(parent->strAt(1));
+        const Library::Container::Yield yield = container->getYield(parent->strAt(1));
         if (yield == Library::Container::Yield::AT_INDEX && !Token::simpleMatch(parent->tokAt(2), "( )"))
             return parent->tokAt(2)->astOperand2();
     }
@@ -116,7 +116,7 @@ static const Token* getContainerFromSize(const Library::Container* container, co
     if (!tok)
         return nullptr;
     if (Token::Match(tok->tokAt(-2), ". %name% (")) {
-        Library::Container::Yield yield = container->getYield(tok->strAt(-1));
+        const Library::Container::Yield yield = container->getYield(tok->strAt(-1));
         if (yield == Library::Container::Yield::SIZE)
             return tok->tokAt(-2)->astOperand1();
     }
@@ -247,7 +247,7 @@ void CheckStl::outOfBoundsError(const Token *tok, const std::string &containerNa
     if (!indexValue)
         errorPath = getErrorPath(tok, containerSize, "Access out of bounds");
     else {
-        ErrorPath errorPath1 = getErrorPath(tok, containerSize, "Access out of bounds");
+        const ErrorPath errorPath1 = getErrorPath(tok, containerSize, "Access out of bounds");
         ErrorPath errorPath2 = getErrorPath(tok, indexValue, "Access out of bounds");
         if (errorPath1.size() <= 1)
             errorPath = errorPath2;
@@ -331,7 +331,7 @@ void CheckStl::outOfBoundsIndexExpressionError(const Token *tok, const Token *in
     const std::string varname = tok ? tok->str() : std::string("var");
     const std::string i = index ? index->expressionString() : std::string(varname + ".size()");
 
-    std::string errmsg = "Out of bounds access of $symbol, index '" + i + "' is out of bounds.";
+    const std::string errmsg = "Out of bounds access of $symbol, index '" + i + "' is out of bounds.";
 
     reportError(tok,
                 Severity::error,
@@ -359,7 +359,7 @@ void CheckStl::iteratorsError(const Token* tok, const std::string& containerName
 
 void CheckStl::iteratorsError(const Token* tok, const Token* containerTok, const std::string& containerName1, const std::string& containerName2)
 {
-    std::list<const Token*> callstack = { tok, containerTok };
+    const std::list<const Token*> callstack = { tok, containerTok };
     reportError(callstack, Severity::error, "iterators2",
                 "$symbol:" + containerName1 + "\n"
                 "$symbol:" + containerName2 + "\n"
@@ -368,7 +368,7 @@ void CheckStl::iteratorsError(const Token* tok, const Token* containerTok, const
 
 void CheckStl::iteratorsError(const Token* tok, const Token* containerTok, const std::string& containerName)
 {
-    std::list<const Token*> callstack = { tok, containerTok };
+    const std::list<const Token*> callstack = { tok, containerTok };
     reportError(callstack,
                 Severity::error,
                 "iterators3",
@@ -383,7 +383,7 @@ void CheckStl::iteratorsError(const Token* tok, const Token* containerTok, const
 void CheckStl::dereferenceErasedError(const Token *erased, const Token* deref, const std::string &itername, bool inconclusive)
 {
     if (erased) {
-        std::list<const Token*> callstack = { deref, erased };
+        const std::list<const Token*> callstack = { deref, erased };
         reportError(callstack, Severity::error, "eraseDereference",
                     "$symbol:" + itername + "\n"
                     "Iterator '$symbol' used after element has been erased.\n"
@@ -744,8 +744,8 @@ bool CheckStl::checkIteratorPair(const Token* tok1, const Token* tok2)
         return false;
     if (!tok2)
         return false;
-    ValueFlow::Value val1 = getLifetimeIteratorValue(tok1);
-    ValueFlow::Value val2 = getLifetimeIteratorValue(tok2);
+    const ValueFlow::Value val1 = getLifetimeIteratorValue(tok1);
+    const ValueFlow::Value val2 = getLifetimeIteratorValue(tok2);
     if (val1.tokvalue && val2.tokvalue && val1.lifetimeKind == val2.lifetimeKind) {
         if (val1.lifetimeKind == ValueFlow::Value::LifetimeKind::Lambda)
             return false;
@@ -817,8 +817,8 @@ void CheckStl::mismatchingContainers()
                 for (const auto& p : containers)
                 {
                     const std::vector<ArgIteratorInfo>& cargs = p.second;
-                    for (ArgIteratorInfo iter1 : cargs) {
-                        for (ArgIteratorInfo iter2 : cargs) {
+                    for (const ArgIteratorInfo iter1 : cargs) {
+                        for (const ArgIteratorInfo iter2 : cargs) {
                             if (iter1.tok == iter2.tok)
                                 continue;
                             if (iter1.info->first && iter2.info->last &&
@@ -858,7 +858,7 @@ void CheckStl::mismatchingContainerIterator()
             const std::vector<const Token *> args = getArguments(ftok);
 
             const Library::Container * c = tok->valueType()->container;
-            Library::Container::Action action = c->getAction(tok->strAt(2));
+            const Library::Container::Action action = c->getAction(tok->strAt(2));
             const Token* iterTok = nullptr;
             if (action == Library::Container::Action::INSERT && args.size() == 2) {
                 // Skip if iterator pair
@@ -875,7 +875,7 @@ void CheckStl::mismatchingContainerIterator()
                 continue;
             }
 
-            ValueFlow::Value val = getLifetimeIteratorValue(iterTok);
+            const ValueFlow::Value val = getLifetimeIteratorValue(iterTok);
             if (!val.tokvalue)
                 continue;
             if (val.lifetimeKind != ValueFlow::Value::LifetimeKind::Iterator)
@@ -901,7 +901,7 @@ static const Token* getInvalidMethod(const Token* tok)
     if (!ftok)
         return nullptr;
     if (const Library::Container * c = tok->valueType()->container) {
-        Library::Container::Action action = c->getAction(ftok->str());
+        const Library::Container::Action action = c->getAction(ftok->str());
         if (c->unstableErase) {
             if (action == Library::Container::Action::ERASE)
                 return ftok;
@@ -962,7 +962,7 @@ struct InvalidContainerAnalyzer {
             const Function* f = tok->function();
             if (!f)
                 return result;
-            ErrorPathItem epi = std::make_pair(tok, "Calling function " + tok->str());
+            const ErrorPathItem epi = std::make_pair(tok, "Calling function " + tok->str());
             const bool dependsOnThis = exprDependsOnThis(tok->next());
             auto it = invalidMethods.find(f);
             if (it != invalidMethods.end()) {
@@ -987,7 +987,7 @@ struct InvalidContainerAnalyzer {
                     if (!var)
                         continue;
                     if (var->isArgument()) {
-                        int n = getArgumentPos(var, f);
+                        const int n = getArgumentPos(var, f);
                         const Token* tok2 = nullptr;
                         if (n >= 0 && n < args.size())
                             tok2 = args[n];
@@ -1016,7 +1016,7 @@ struct InvalidContainerAnalyzer {
             for (const Token* tok = scope->bodyStart; tok != scope->bodyEnd; tok = tok->next()) {
                 if (Token::Match(tok, "if|while|for|goto|return"))
                     break;
-                std::vector<Info::Reference> c = invalidatesContainer(tok);
+                const std::vector<Info::Reference> c = invalidatesContainer(tok);
                 if (c.empty())
                     continue;
                 invalidMethods[f].add(c);
@@ -1110,7 +1110,7 @@ void CheckStl::invalidContainer()
                     // Skip if the variable is assigned to
                     const Token* assignExpr = tok;
                     while (assignExpr->astParent()) {
-                        bool isRHS = astIsRHS(assignExpr);
+                        const bool isRHS = astIsRHS(assignExpr);
                         assignExpr = assignExpr->astParent();
                         if (Token::Match(assignExpr, "%assign%")) {
                             if (!isRHS)
@@ -1199,15 +1199,15 @@ void CheckStl::invalidContainerError(const Token *tok, const Token * /*contTok*/
     const bool inconclusive = val ? val->isInconclusive() : false;
     if (val)
         errorPath.insert(errorPath.begin(), val->errorPath.begin(), val->errorPath.end());
-    std::string msg = "Using " + lifetimeMessage(tok, val, errorPath);
+    const std::string msg = "Using " + lifetimeMessage(tok, val, errorPath);
     errorPath.emplace_back(tok, "");
     reportError(errorPath, Severity::error, "invalidContainer", msg + " that may be invalid.", CWE664, inconclusive ? Certainty::inconclusive : Certainty::normal);
 }
 
 void CheckStl::invalidContainerReferenceError(const Token* tok, const Token* contTok, ErrorPath errorPath)
 {
-    std::string name = contTok ? contTok->expressionString() : "x";
-    std::string msg = "Reference to " + name;
+    const std::string name = contTok ? contTok->expressionString() : "x";
+    const std::string msg = "Reference to " + name;
     errorPath.emplace_back(tok, "");
     reportError(errorPath, Severity::error, "invalidContainerReference", msg + " that may be invalid.", CWE664, Certainty::normal);
 }
@@ -1871,7 +1871,7 @@ void CheckStl::missingComparison()
 
 void CheckStl::missingComparisonError(const Token *incrementToken1, const Token *incrementToken2)
 {
-    std::list<const Token*> callstack = { incrementToken1,incrementToken2 };
+    const std::list<const Token*> callstack = { incrementToken1,incrementToken2 };
 
     std::ostringstream errmsg;
     errmsg << "Missing bounds check for extra iterator increment in loop.\n"
@@ -2105,19 +2105,19 @@ void CheckStl::string_c_strParam(const Token* tok, nonneg int number)
 
 void CheckStl::string_c_strConstructor(const Token* tok)
 {
-    std::string msg = "Constructing a std::string from the result of c_str() is slow and redundant.\nSolve that by directly passing the string.";
+    const std::string msg = "Constructing a std::string from the result of c_str() is slow and redundant.\nSolve that by directly passing the string.";
     reportError(tok, Severity::performance, "stlcstrConstructor", msg, CWE704, Certainty::normal);
 }
 
 void CheckStl::string_c_strAssignment(const Token* tok)
 {
-    std::string msg = "Assigning the result of c_str() to a std::string is slow and redundant.\nSolve that by directly assigning the string.";
+    const std::string msg = "Assigning the result of c_str() to a std::string is slow and redundant.\nSolve that by directly assigning the string.";
     reportError(tok, Severity::performance, "stlcstrAssignment", msg, CWE704, Certainty::normal);
 }
 
 void CheckStl::string_c_strConcat(const Token* tok)
 {
-    std::string msg = "Concatenating the result of c_str() and a std::string is slow and redundant.\nSolve that by directly concatenating the strings.";
+    const std::string msg = "Concatenating the result of c_str() and a std::string is slow and redundant.\nSolve that by directly concatenating the strings.";
     reportError(tok, Severity::performance, "stlcstrConcat", msg, CWE704, Certainty::normal);
 }
 
@@ -2680,7 +2680,7 @@ void CheckStl::useStlAlgorithm()
             bool useLoopVarInAssign;
             const Token *assignTok = singleAssignInScope(bodyTok, loopVar->varId(), useLoopVarInAssign);
             if (assignTok) {
-                int assignVarId = assignTok->astOperand1()->varId();
+                const int assignVarId = assignTok->astOperand1()->varId();
                 std::string algo;
                 if (assignVarId == loopVar->varId()) {
                     if (useLoopVarInAssign)

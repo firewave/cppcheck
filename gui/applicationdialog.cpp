@@ -56,20 +56,21 @@ ApplicationDialog::~ApplicationDialog()
 
 void ApplicationDialog::browse()
 {
+    // NOLINTNEXTLINE(misc-const-correctness)
     QString filter;
 #ifdef Q_OS_WIN
     // In Windows (almost) all executables have .exe extension
     // so it does not make sense to show everything.
     filter += tr("Executable files (*.exe);;All files(*.*)");
 #endif // Q_OS_WIN
-    QString selectedFile = QFileDialog::getOpenFileName(this,
+    const QString selectedFile = QFileDialog::getOpenFileName(this,
                                                         tr("Select viewer application"),
                                                         getPath(SETTINGS_LAST_APP_PATH),
                                                         filter);
 
     if (!selectedFile.isEmpty()) {
         setPath(SETTINGS_LAST_APP_PATH, selectedFile);
-        QString path(QDir::toNativeSeparators(selectedFile));
+        const QString path(QDir::toNativeSeparators(selectedFile));
         mUI->mPath->setText(path);
     }
 }

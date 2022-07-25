@@ -81,7 +81,7 @@ std::string Summaries::create(const Tokenizer *tokenizer, const std::string &cfg
 
     if (!settings->buildDir.empty()) {
         std::string filename = AnalyzerInformation::getAnalyzerInfoFile(settings->buildDir, tokenizer->list.getSourceFilePath(), cfg);
-        std::string::size_type pos = filename.rfind(".a");
+        const std::string::size_type pos = filename.rfind(".a");
         if (pos != std::string::npos) {
             filename[pos+1] = 's';
             std::ofstream fout(filename);
@@ -103,8 +103,8 @@ static std::vector<std::string> getSummaryFiles(const std::string &filename)
         return ret;
     std::string line;
     while (std::getline(fin, line)) {
-        std::string::size_type dotA = line.find(".a");
-        std::string::size_type colon = line.find(":");
+        const std::string::size_type dotA = line.find(".a");
+        const std::string::size_type colon = line.find(":");
         if (colon > line.size() || dotA > colon)
             continue;
         std::string f = line.substr(0,colon);
@@ -126,7 +126,7 @@ static std::vector<std::string> getSummaryData(const std::string &line, const st
 
     std::string::size_type pos1 = start + 3 + data.size();
     while (pos1 < end) {
-        std::string::size_type pos2 = line.find_first_of(",]",pos1);
+        const std::string::size_type pos2 = line.find_first_of(",]",pos1);
         ret.push_back(line.substr(pos1, pos2-pos1-1));
         pos1 = pos2 + 1;
     }
@@ -139,7 +139,7 @@ static void removeFunctionCalls(const std::string& calledFunction,
                                 std::map<std::string, std::vector<std::string>> &functionCalls,
                                 std::vector<std::string> &add)
 {
-    std::vector<std::string> calledBy = functionCalledBy[calledFunction];
+    const std::vector<std::string> calledBy = functionCalledBy[calledFunction];
     functionCalledBy.erase(calledFunction);
     for (const std::string &c: calledBy) {
         std::vector<std::string> &calls = functionCalls[c];
@@ -161,7 +161,7 @@ void Summaries::loadReturn(const std::string &buildDir, std::set<std::string> &s
     std::map<std::string, std::vector<std::string>> functionCalledBy;
 
     // extract "functionNoreturn" and "functionCalledBy" from summaries
-    std::vector<std::string> summaryFiles = getSummaryFiles(buildDir + "/files.txt");
+    const std::vector<std::string> summaryFiles = getSummaryFiles(buildDir + "/files.txt");
     for (const std::string &filename: summaryFiles) {
         std::ifstream fin(buildDir + '/' + filename);
         if (!fin.is_open())
@@ -172,7 +172,7 @@ void Summaries::loadReturn(const std::string &buildDir, std::set<std::string> &s
             const std::string::size_type pos1 = 0;
             const std::string::size_type pos2 = line.find(" ", pos1);
             const std::string functionName = (pos2 == std::string::npos) ? line : line.substr(0, pos2);
-            std::vector<std::string> call = getSummaryData(line, "call");
+            const std::vector<std::string> call = getSummaryData(line, "call");
             functionCalls[functionName] = call;
             if (call.empty())
                 return1.push_back(functionName);

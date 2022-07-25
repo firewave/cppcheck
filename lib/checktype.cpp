@@ -242,7 +242,7 @@ void CheckType::checkSignConversion()
             continue;
 
         // Check if an operand can be negative..
-        const Token * astOperands[] = { tok->astOperand1(), tok->astOperand2() };
+        const Token * astOperands[] = { tok->astOperand1(), tok->astOperand2() }; // FP
         for (const Token * tok1 : astOperands) {
             if (!tok1)
                 continue;

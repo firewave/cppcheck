@@ -73,7 +73,7 @@ void FileViewDialog::loadTextFile(const QString &filename, QTextEdit *edit)
         msgbox.exec();
         return;
     }
-    QByteArray filedata = file.readAll();
+    const QByteArray filedata = file.readAll();
     file.close();
 
     edit->setPlainText(filedata);

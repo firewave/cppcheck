@@ -412,7 +412,7 @@ void Suppressions::dump(std::ostream & out) const
 
 std::list<Suppressions::Suppression> Suppressions::getUnmatchedLocalSuppressions(const std::string &file, const bool unusedFunctionChecking) const
 {
-    std::string tmpFile = Path::simplifyPath(file);
+    const std::string tmpFile = Path::simplifyPath(file);
     std::list<Suppression> result;
     for (const Suppression &s : mSuppressions) {
         if (s.matched || ((s.lineNumber != Suppression::NO_LINE) && !s.checked))

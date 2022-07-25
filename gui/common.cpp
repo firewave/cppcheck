@@ -27,7 +27,7 @@
 
 QString getPath(const QString &type)
 {
-    QSettings settings;
+    const QSettings settings;
     QString path = settings.value(type, QString()).toString();
     if (path.isEmpty()) {
         // if not set, fallback to last check path hoping that it will be close enough
@@ -70,7 +70,7 @@ QString toFilterString(const QMap<QString,QString>& filters, bool addAllSupporte
 
 QString getDataDir()
 {
-    QSettings settings;
+    const QSettings settings;
     const QString dataDir = settings.value("DATADIR", QString()).toString();
     if (!dataDir.isEmpty())
         return dataDir;

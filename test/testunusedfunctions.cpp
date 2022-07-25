@@ -443,7 +443,7 @@ private:
     }
 
     void multipleFiles() {
-        Tokenizer tokenizer(&settings, this);
+        const Tokenizer tokenizer(&settings, this);
         CheckUnusedFunctions c(&tokenizer, &settings, nullptr);
 
         // Clear the error buffer..

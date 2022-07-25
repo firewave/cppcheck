@@ -62,7 +62,7 @@ public:
 
     void reportOut(const std::string &outmsg, Color c) override
     {
-        std::lock_guard<std::mutex> lg(mReportSync);
+        const std::lock_guard<std::mutex> lg(mReportSync);
 
         mThreadExecutor.mErrorLogger.reportOut(outmsg, c);
     }
@@ -102,7 +102,7 @@ private:
         const std::string errmsg = msg.toString(mThreadExecutor.mSettings.verbose);
 
         {
-            std::lock_guard<std::mutex> lg(mErrorSync);
+            const std::lock_guard<std::mutex> lg(mErrorSync);
             if (std::find(mThreadExecutor.mErrorList.begin(), mThreadExecutor.mErrorList.end(), errmsg) == mThreadExecutor.mErrorList.end()) {
                 mThreadExecutor.mErrorList.emplace_back(errmsg);
                 reportError = true;
@@ -110,7 +110,7 @@ private:
         }
 
         if (reportError) {
-            std::lock_guard<std::mutex> lg(mReportSync);
+            const std::lock_guard<std::mutex> lg(mReportSync);
 
             switch (msgType) {
             case MessageType::REPORT_ERROR:
@@ -189,7 +189,7 @@ unsigned int STDCALL ThreadExecutor::threadProc(SyncLogForwarder* logForwarder)
         logForwarder->mProcessedSize += fileSize;
         logForwarder->mProcessedFiles++;
         if (!logForwarder->mThreadExecutor.mSettings.quiet) {
-            std::lock_guard<std::mutex> lg(logForwarder->mReportSync);
+            const std::lock_guard<std::mutex> lg(logForwarder->mReportSync);
             CppCheckExecutor::reportStatus(logForwarder->mProcessedFiles, logForwarder->mTotalFiles, logForwarder->mProcessedSize, logForwarder->mTotalFileSize);
         }
     }

@@ -217,7 +217,7 @@ struct Interval {
                                     const Interval& rhs,
                                     std::vector<const ValueFlow::Value*>* ref = nullptr)
     {
-        Interval diff = lhs - rhs;
+        const Interval diff = lhs - rhs;
         if (diff.isGreaterThan(0, ref))
             return {1};
         if (diff.isLessThan(0, ref))
@@ -311,13 +311,13 @@ std::vector<ValueFlow::Value> infer(const ValuePtr<InferModel>& model,
     if (lhsValues.empty() || rhsValues.empty())
         return result;
 
-    Interval lhs = Interval::fromValues(lhsValues);
-    Interval rhs = Interval::fromValues(rhsValues);
+    const Interval lhs = Interval::fromValues(lhsValues);
+    const Interval rhs = Interval::fromValues(rhsValues);
 
     if (op == "-") {
         Interval diff = lhs - rhs;
         if (diff.isScalar()) {
-            std::vector<const ValueFlow::Value*> refs = diff.getScalarRef();
+            const std::vector<const ValueFlow::Value*> refs = diff.getScalarRef();
             ValueFlow::Value value(diff.getScalar());
             addToErrorPath(value, refs);
             setValueKind(value, refs);
@@ -340,7 +340,7 @@ std::vector<ValueFlow::Value> infer(const ValuePtr<InferModel>& model,
         }
     } else if ((op == "!=" || op == "==") && lhs.isScalarOrEmpty() && rhs.isScalarOrEmpty()) {
         if (lhs.isScalar() && rhs.isScalar()) {
-            std::vector<const ValueFlow::Value*> refs = Interval::merge(lhs.getScalarRef(), rhs.getScalarRef());
+            const std::vector<const ValueFlow::Value*> refs = Interval::merge(lhs.getScalarRef(), rhs.getScalarRef());
             ValueFlow::Value value(calculate(op, lhs.getScalar(), rhs.getScalar()));
             addToErrorPath(value, refs);
             setValueKind(value, refs);

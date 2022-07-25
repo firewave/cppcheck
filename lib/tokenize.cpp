@@ -2188,7 +2188,7 @@ namespace {
         // scopes didn't match so try higher scopes
         index = newScope1.size();
         while (!newScope1.empty()) {
-            std::string::size_type separator = newScope1.rfind(" :: ", index - 1);
+            const std::string::size_type separator = newScope1.rfind(" :: ", index - 1);
             if (separator != std::string::npos)
                 newScope1.resize(separator);
             else
@@ -2336,7 +2336,7 @@ bool Tokenizer::simplifyUsing()
 
         const std::string& name = tok->strAt(1);
         const Token *nameToken = tok->next();
-        std::string scope = currentScope->fullName;
+        const std::string scope = currentScope->fullName;
         Token *usingStart = tok;
         Token *start;
         if (tok->strAt(2) == "=")
@@ -2704,7 +2704,7 @@ bool Tokenizer::simplifyUsing()
                         str += tok3->str();
                     }
                     str += " ;";
-                    std::list<const Token *> callstack(1, usingStart);
+                    const std::list<const Token *> callstack(1, usingStart);
                     mErrorLogger->reportErr(ErrorMessage(callstack, &list, Severity::debug, "simplifyUsing",
                                                          "Failed to parse \'" + str + "\'. The checking continues anyway.", Certainty::normal));
                 }
@@ -2769,7 +2769,7 @@ bool Tokenizer::simplifyTokens1(const std::string &configuration)
         return false;
 
     if (mTimerResults) {
-        Timer t("Tokenizer::simplifyTokens1::createAst", mSettings->showtime, mTimerResults);
+        const Timer t("Tokenizer::simplifyTokens1::createAst", mSettings->showtime, mTimerResults);
         list.createAst();
         list.validateAst();
     } else {
@@ -2778,14 +2778,14 @@ bool Tokenizer::simplifyTokens1(const std::string &configuration)
     }
 
     if (mTimerResults) {
-        Timer t("Tokenizer::simplifyTokens1::createSymbolDatabase", mSettings->showtime, mTimerResults);
+        const Timer t("Tokenizer::simplifyTokens1::createSymbolDatabase", mSettings->showtime, mTimerResults);
         createSymbolDatabase();
     } else {
         createSymbolDatabase();
     }
 
     if (mTimerResults) {
-        Timer t("Tokenizer::simplifyTokens1::setValueType", mSettings->showtime, mTimerResults);
+        const Timer t("Tokenizer::simplifyTokens1::setValueType", mSettings->showtime, mTimerResults);
         mSymbolDatabase->setValueTypeInTokenList(true);
     } else {
         mSymbolDatabase->setValueTypeInTokenList(true);
@@ -2800,7 +2800,7 @@ bool Tokenizer::simplifyTokens1(const std::string &configuration)
 
     if (doValueFlow) {
         if (mTimerResults) {
-            Timer t("Tokenizer::simplifyTokens1::ValueFlow", mSettings->showtime, mTimerResults);
+            const Timer t("Tokenizer::simplifyTokens1::ValueFlow", mSettings->showtime, mTimerResults);
             ValueFlow::setValues(&list, mSymbolDatabase, mErrorLogger, mSettings);
         } else {
             ValueFlow::setValues(&list, mSymbolDatabase, mErrorLogger, mSettings);
@@ -3337,7 +3337,7 @@ void Tokenizer::calculateScopes()
 
     std::string nextScopeNameAddition;
     std::shared_ptr<ScopeInfo2> primaryScope = std::make_shared<ScopeInfo2>(emptyString, nullptr);
-    list.front()->scopeInfo(primaryScope);
+    list.front()->scopeInfo(std::move(primaryScope));
 
     for (Token* tok = list.front(); tok; tok = tok->next()) {
         if (tok == list.front() || !tok->scopeInfo()) {
@@ -3415,7 +3415,7 @@ void Tokenizer::calculateScopes()
 
                 if (tok->link())
                     tok->link()->scopeInfo(tok->scopeInfo());
-                tok->scopeInfo(newScopeInfo);
+                tok->scopeInfo(std::move(newScopeInfo));
             }
         }
     }
@@ -3490,7 +3490,7 @@ void VariableMap::addVariable(const std::string& varname, bool globalNamespace)
             mVariableId_global[varname] = mVariableId[varname];
         return;
     }
-    std::map<std::string, nonneg int>::iterator it = mVariableId.find(varname);
+    const std::map<std::string, nonneg int>::iterator it = mVariableId.find(varname);
     if (it == mVariableId.end()) {
         mScopeInfo.top().push_back(std::pair<std::string, nonneg int>(varname, 0));
         mVariableId[varname] = ++mVarId;
@@ -4778,7 +4778,7 @@ bool Tokenizer::simplifyTokenList1(const char FileName[])
 
     // Bail out if code is garbage
     if (mTimerResults) {
-        Timer t("Tokenizer::tokenize::findGarbageCode", mSettings->showtime, mTimerResults);
+        const Timer t("Tokenizer::tokenize::findGarbageCode", mSettings->showtime, mTimerResults);
         findGarbageCode();
     } else {
         findGarbageCode();
@@ -4950,7 +4950,7 @@ bool Tokenizer::simplifyTokenList1(const char FileName[])
 
     // typedef..
     if (mTimerResults) {
-        Timer t("Tokenizer::tokenize::simplifyTypedef", mSettings->showtime, mTimerResults);
+        const Timer t("Tokenizer::tokenize::simplifyTypedef", mSettings->showtime, mTimerResults);
         simplifyTypedef();
     } else {
         simplifyTypedef();
@@ -5058,7 +5058,7 @@ bool Tokenizer::simplifyTokenList1(const char FileName[])
     if (!isC()) {
         // Handle templates..
         if (mTimerResults) {
-            Timer t("Tokenizer::tokenize::simplifyTemplates", mSettings->showtime, mTimerResults);
+            const Timer t("Tokenizer::tokenize::simplifyTemplates", mSettings->showtime, mTimerResults);
             simplifyTemplates();
         } else {
             simplifyTemplates();
@@ -5088,7 +5088,7 @@ bool Tokenizer::simplifyTokenList1(const char FileName[])
     validate(); // #6772 "segmentation fault (invalid code) in Tokenizer::setVarId"
 
     if (mTimerResults) {
-        Timer t("Tokenizer::tokenize::setVarId", mSettings->showtime, mTimerResults);
+        const Timer t("Tokenizer::tokenize::setVarId", mSettings->showtime, mTimerResults);
         setVarId();
     } else {
         setVarId();
@@ -5098,7 +5098,7 @@ bool Tokenizer::simplifyTokenList1(const char FileName[])
     createLinks2();
 
     if (mTimerResults) {
-        Timer t("Tokenizer::tokenize::setVarId (2)", mSettings->showtime, mTimerResults);
+        const Timer t("Tokenizer::tokenize::setVarId (2)", mSettings->showtime, mTimerResults);
         setVarId();
     }
     else {
@@ -5649,7 +5649,7 @@ void Tokenizer::simplifyEmptyNamespaces()
         }
         if (!Token::Match(tok, "namespace %name%| {"))
             continue;
-        bool isAnonymousNS = tok->strAt(1) == "{";
+        const bool isAnonymousNS = tok->strAt(1) == "{";
         if (tok->strAt(3 - isAnonymousNS) == "}") {
             tok->deleteNext(3 - isAnonymousNS); // remove '%name%| { }'
             if (!tok->previous()) {
@@ -5973,7 +5973,7 @@ void Tokenizer::simplifyFunctionParameters()
             if (argumentNames.size() != argumentNames2.size()) {
                 //move back 'tok1' to the last ';'
                 tok1 = tok1->previous();
-                for (std::pair<const std::string, Token *>& argumentName : argumentNames) {
+                for (const std::pair<const std::string, Token *>& argumentName : argumentNames) {
                     if (argumentNames2.find(argumentName.first) == argumentNames2.end()) {
                         //add the missing parameter argument declaration
                         tok1->insertToken(";");

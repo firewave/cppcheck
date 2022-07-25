@@ -49,7 +49,7 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
     std::srand(static_cast<unsigned int>(std::time(nullptr)));
-    QDir workFolder(WORK_FOLDER);
+    const QDir workFolder(WORK_FOLDER);
     if (!workFolder.exists()) {
         workFolder.mkdir(WORK_FOLDER);
     }
@@ -103,7 +103,7 @@ void MainWindow::load(QTextStream &textStream)
     QStringList versions;
     mAllErrors.clear();
     while (true) {
-        QString line = textStream.readLine();
+        const QString line = textStream.readLine();
         if (line.isNull())
             break;
         if (line.startsWith("ftp://")) {
@@ -212,7 +212,7 @@ bool MainWindow::runProcess(const QString &programName, const QStringList &argum
         errorstr.append(process.errorString());
         ui->statusBar->showMessage(errorstr);
     } else {
-        int exitCode = process.exitCode();
+        const int exitCode = process.exitCode();
         if (exitCode != 0) {
             success = false;
             const QByteArray stderrOutput = process.readAllStandardError();
@@ -332,7 +332,7 @@ void MainWindow::findInFilesClicked()
     if (ui->srcFilesFilter->isChecked())
         filter.append(srcFiles);
 
-    QMimeDatabase mimeDatabase;
+    const QMimeDatabase mimeDatabase;
     QDirIterator it(WORK_FOLDER, filter, QDir::AllEntries | QDir::NoSymLinks | QDir::NoDotAndDotDot, QDirIterator::Subdirectories);
 
     const auto common_path_len = WORK_FOLDER.length() + 1;  // let's remove common part of path improve UI
@@ -351,7 +351,7 @@ void MainWindow::findInFilesClicked()
             QTextStream in(&file);
             while (!in.atEnd()) {
                 ++lineN;
-                QString line = in.readLine();
+                const QString line = in.readLine();
                 if (line.contains(text, Qt::CaseInsensitive)) {
                     ui->inFilesResult->addItem(fileName.mid(common_path_len) + QString{":"} + QString::number(lineN));
                 }
@@ -367,7 +367,7 @@ void MainWindow::directorytreeDoubleClick()
 
 void MainWindow::searchResultsDoubleClick()
 {
-    QString filename = ui->inFilesResult->currentItem()->text();
+    const QString filename = ui->inFilesResult->currentItem()->text();
     const auto idx = filename.lastIndexOf(':');
     const int line = filename.mid(idx + 1).toInt();
     showSrcFile(WORK_FOLDER + QString{"/"} + filename.left(idx), "", line);

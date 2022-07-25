@@ -101,7 +101,7 @@ private:
     }
 
     void scopeExample() const {
-        Settings settings;
+        const Settings settings;
         Tokenizer tokenizer{ &settings, nullptr };
         std::istringstream sample("void a(){} void main(){ if(true){a();} }");
         ASSERT(tokenizer.tokenize(sample, "test.cpp"));
@@ -120,7 +120,7 @@ private:
         std::istringstream istr("void a(){} void main(){ if(true){a();} }");
         TokenList tokenList(nullptr);
         tokenList.createTokens(istr, "test.cpp");
-        ConstTokenRange range{ tokenList.front(), nullptr };
+        const ConstTokenRange range{ tokenList.front(), nullptr };
         ASSERT_EQUALS(true, std::all_of(range.begin(), range.end(), [](const Token*) {
             return true;
         }));

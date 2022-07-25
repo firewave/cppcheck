@@ -440,7 +440,7 @@ static int getPointerDepth(const Token *tok)
     if (tok->valueType())
         return tok->valueType()->pointer;
     int n = 0;
-    std::pair<const Token*, const Token*> decl = Token::typeDecl(tok);
+    const std::pair<const Token*, const Token*> decl = Token::typeDecl(tok);
     for (const Token* tok2 = decl.first; tok2 != decl.second; tok2 = tok2->next())
         if (Token::simpleMatch(tok, "*"))
             n++;
@@ -530,7 +530,7 @@ void CheckAutoVariables::checkVarLifetimeScope(const Token * start, const Token 
     // If the scope is not set correctly then skip checking it
     if (scope->bodyStart != start)
         return;
-    bool returnRef = Function::returnsReference(scope->function);
+    const bool returnRef = Function::returnsReference(scope->function);
     for (const Token *tok = start; tok && tok != end; tok = tok->next()) {
         // Return reference from function
         if (returnRef && Token::simpleMatch(tok->astParent(), "return")) {
@@ -670,7 +670,7 @@ void CheckAutoVariables::errorReturnDanglingLifetime(const Token *tok, const Val
 {
     const bool inconclusive = val ? val->isInconclusive() : false;
     ErrorPath errorPath = val ? val->errorPath : ErrorPath();
-    std::string msg = "Returning " + lifetimeMessage(tok, val, errorPath);
+    const std::string msg = "Returning " + lifetimeMessage(tok, val, errorPath);
     errorPath.emplace_back(tok, "");
     reportError(errorPath, Severity::error, "returnDanglingLifetime", msg + " that will be invalid when returning.", CWE562, inconclusive ? Certainty::inconclusive : Certainty::normal);
 }
@@ -679,7 +679,7 @@ void CheckAutoVariables::errorInvalidLifetime(const Token *tok, const ValueFlow:
 {
     const bool inconclusive = val ? val->isInconclusive() : false;
     ErrorPath errorPath = val ? val->errorPath : ErrorPath();
-    std::string msg = "Using " + lifetimeMessage(tok, val, errorPath);
+    const std::string msg = "Using " + lifetimeMessage(tok, val, errorPath);
     errorPath.emplace_back(tok, "");
     reportError(errorPath, Severity::error, "invalidLifetime", msg + " that is out of scope.", CWE562, inconclusive ? Certainty::inconclusive : Certainty::normal);
 }
@@ -688,7 +688,7 @@ void CheckAutoVariables::errorDanglingTemporaryLifetime(const Token* tok, const 
 {
     const bool inconclusive = val ? val->isInconclusive() : false;
     ErrorPath errorPath = val ? val->errorPath : ErrorPath();
-    std::string msg = "Using " + lifetimeMessage(tok, val, errorPath);
+    const std::string msg = "Using " + lifetimeMessage(tok, val, errorPath);
     errorPath.emplace_back(tempTok, "Temporary created here.");
     errorPath.emplace_back(tok, "");
     reportError(errorPath,
@@ -703,8 +703,8 @@ void CheckAutoVariables::errorDanglngLifetime(const Token *tok, const ValueFlow:
 {
     const bool inconclusive = val ? val->isInconclusive() : false;
     ErrorPath errorPath = val ? val->errorPath : ErrorPath();
-    std::string tokName = tok ? tok->expressionString() : "x";
-    std::string msg = "Non-local variable '" + tokName + "' will use " + lifetimeMessage(tok, val, errorPath);
+    const std::string tokName = tok ? tok->expressionString() : "x";
+    const std::string msg = "Non-local variable '" + tokName + "' will use " + lifetimeMessage(tok, val, errorPath);
     errorPath.emplace_back(tok, "");
     reportError(errorPath, Severity::error, "danglingLifetime", msg + ".", CWE562, inconclusive ? Certainty::inconclusive : Certainty::normal);
 }
@@ -725,9 +725,9 @@ void CheckAutoVariables::errorReturnReference(const Token* tok, ErrorPath errorP
 
 void CheckAutoVariables::errorDanglingReference(const Token *tok, const Variable *var, ErrorPath errorPath)
 {
-    std::string tokName = tok ? tok->str() : "x";
-    std::string varName = var ? var->name() : "y";
-    std::string msg = "Non-local reference variable '" + tokName + "' to local variable '" + varName + "'";
+    const std::string tokName = tok ? tok->str() : "x";
+    const std::string varName = var ? var->name() : "y";
+    const std::string msg = "Non-local reference variable '" + tokName + "' to local variable '" + varName + "'";
     errorPath.emplace_back(tok, "");
     reportError(errorPath, Severity::error, "danglingReference", msg, CWE562, Certainty::normal);
 }

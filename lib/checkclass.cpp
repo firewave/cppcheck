@@ -1064,7 +1064,7 @@ void CheckClass::uninitVarError(const Token *tok, bool isprivate, Function::Type
     std::string message("Member variable '$symbol' is not initialized in the " + ctor + "constructor.");
     if (derived)
         message += " Maybe it should be initialized directly in the class " + classname + "?";
-    std::string id = std::string("uninit") + (derived ? "Derived" : "") + "MemberVar" + (isprivate ? "Private" : "");
+    const std::string id = std::string("uninit") + (derived ? "Derived" : "") + "MemberVar" + (isprivate ? "Private" : "");
     reportError(tok, Severity::warning, id, "$symbol:" + classname + "::" + varname + "\n" + message, CWE398, inconclusive ? Certainty::inconclusive : Certainty::normal);
 }
 
@@ -1449,7 +1449,7 @@ void CheckClass::checkMemsetType(const Scope *start, const Token *tok, const Sco
 
 void CheckClass::mallocOnClassWarning(const Token* tok, const std::string &memfunc, const Token* classTok)
 {
-    std::list<const Token *> toks = { tok, classTok };
+    const std::list<const Token *> toks = { tok, classTok };
     reportError(toks, Severity::warning, "mallocOnClassWarning",
                 "$symbol:" + memfunc +"\n"
                 "Memory for class instance allocated with $symbol(), but class provides constructors.\n"
@@ -1459,7 +1459,7 @@ void CheckClass::mallocOnClassWarning(const Token* tok, const std::string &memfu
 
 void CheckClass::mallocOnClassError(const Token* tok, const std::string &memfunc, const Token* classTok, const std::string &classname)
 {
-    std::list<const Token *> toks = { tok, classTok };
+    const std::list<const Token *> toks = { tok, classTok };
     reportError(toks, Severity::error, "mallocOnClassError",
                 "$symbol:" + memfunc +"\n"
                 "$symbol:" + classname +"\n"
@@ -1543,7 +1543,7 @@ void CheckClass::checkReturnPtrThis(const Scope *scope, const Function *func, co
         if (retExpr && retExpr->isUnaryOp("*") && Token::simpleMatch(retExpr->astOperand1(), "this"))
             continue;
 
-        std::string cast("( " + scope->className + " & )");
+        const std::string cast("( " + scope->className + " & )");
         if (Token::simpleMatch(tok->next(), cast.c_str(), cast.size()))
             tok = tok->tokAt(4);
 
@@ -2518,7 +2518,7 @@ void CheckClass::initializerListOrder()
 
 void CheckClass::initializerListError(const Token *tok1, const Token *tok2, const std::string &classname, const std::string &varname)
 {
-    std::list<const Token *> toks = { tok1, tok2 };
+    const std::list<const Token *> toks = { tok1, tok2 };
     reportError(toks, Severity::style, "initializerList",
                 "$symbol:" + classname + "::" + varname +"\n"
                 "Member variable '$symbol' is in the wrong place in the initializer list.\n"
@@ -2666,7 +2666,7 @@ void CheckClass::getFirstVirtualFunctionCallStack(
         pureFuncStack.push_back(callFunction->tokenDef);
         return;
     }
-    std::map<const Function *, std::list<const Token *>>::const_iterator found = virtualFunctionCallsMap.find(callFunction);
+    const std::map<const Function *, std::list<const Token *>>::const_iterator found = virtualFunctionCallsMap.find(callFunction);
     if (found == virtualFunctionCallsMap.end() || found->second.empty()) {
         pureFuncStack.clear();
         return;
@@ -2942,7 +2942,7 @@ void CheckClass::checkThisUseAfterFree()
                     continue;
 
                 const Token * freeToken = nullptr;
-                std::set<const Function *> callstack;
+                const std::set<const Function *> callstack;
                 checkThisUseAfterFreeRecursive(classScope, &func, &var, callstack, &freeToken);
             }
         }
@@ -2990,7 +2990,7 @@ bool CheckClass::checkThisUseAfterFreeRecursive(const Scope *classScope, const F
 
 void CheckClass::thisUseAfterFree(const Token *self, const Token *free, const Token *use)
 {
-    std::string selfPointer = self ? self->str() : "ptr";
+    const std::string selfPointer = self ? self->str() : "ptr";
     const ErrorPath errorPath = { ErrorPathItem(self, "Assuming '" + selfPointer + "' is used as 'this'"), ErrorPathItem(free, "Delete '" + selfPointer + "', invalidating 'this'"), ErrorPathItem(use, "Call method when 'this' is invalid") };
     const std::string usestr = use ? use->str() : "x";
     const std::string usemsg = use && use->function() ? ("Calling method '" + usestr + "()'") : ("Using member '" + usestr + "'");
@@ -3044,7 +3044,7 @@ Check::FileInfo *CheckClass::getFileInfo(const Tokenizer *tokenizer, const Setti
             continue;
 
         // the full definition must be compared
-        bool fullDefinition = std::all_of(classScope->functionList.begin(),
+        const bool fullDefinition = std::all_of(classScope->functionList.begin(),
                                           classScope->functionList.end(),
                                           [](const Function& f) {
             return f.hasBody();

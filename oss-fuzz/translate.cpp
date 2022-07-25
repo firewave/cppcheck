@@ -36,7 +36,7 @@ int main(int argc, char **argv)
         return 1;
     }
 
-    std::string str((std::istreambuf_iterator<char>(f)),
+    const std::string str((std::istreambuf_iterator<char>(f)),
                     std::istreambuf_iterator<char>());
 
     std::cout << generateCode2(reinterpret_cast<const uint8_t *>(str.data()), str.size()) << std::endl;

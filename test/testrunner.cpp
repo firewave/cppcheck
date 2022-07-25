@@ -42,7 +42,7 @@ int main(int argc, char *argv[])
 #endif
     Preprocessor::macroChar = '$';     // While macroChar is char(1) per default outside test suite, we require it to be a human-readable character here.
 
-    options args(argc, argv);
+    const options args(argc, argv);
 
     if (args.help()) {
         TestFixture::printHelp();

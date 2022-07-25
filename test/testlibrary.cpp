@@ -823,9 +823,9 @@ private:
         Library library;
         ASSERT_EQUALS(true, Library::ErrorCode::OK == (readLibrary(library, xmldata)).errorcode);
 
-        Library::Container& A = library.containers["A"];
-        Library::Container& B = library.containers["B"];
-        Library::Container& C = library.containers["C"];
+        const Library::Container& A = library.containers["A"];
+        const Library::Container& B = library.containers["B"];
+        const Library::Container& C = library.containers["C"];
 
         ASSERT_EQUALS(A.type_templateArgNo, 1);
         ASSERT_EQUALS(A.size_templateArgNo, 4);

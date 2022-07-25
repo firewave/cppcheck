@@ -94,7 +94,7 @@ CodeEditorStyle CodeEditorStyle::loadSettings(QSettings *settings)
 
     // style section exists - load values
     settings->beginGroup(SETTINGS_STYLE_GROUP);
-    QString type = settings->value(
+    const QString type = settings->value(
         SETTINGS_STYLE_TYPE,
         QVariant(SETTINGS_STYLE_TYPE_LIGHT)
         ).toString();
@@ -126,25 +126,25 @@ CodeEditorStyle CodeEditorStyle::loadSettings(QSettings *settings)
         theStyle.keywordColor = settings->value(
             SETTINGS_STYLE_KEYWORDFG,
             QVariant(defaultStyleLight.keywordColor)).value<QColor>();
-        QVariant defKeyWWt(static_cast<int>(defaultStyleLight.keywordWeight));
+        const QVariant defKeyWWt(static_cast<int>(defaultStyleLight.keywordWeight));
         theStyle.keywordWeight = static_cast<QFont::Weight>(
             settings->value(SETTINGS_STYLE_KEYWORDWT, defKeyWWt).toInt());
         theStyle.classColor = settings->value(
             SETTINGS_STYLE_CLASSFG,
             QVariant(defaultStyleLight.classColor)).value<QColor>();
-        QVariant defClsWt(static_cast<int>(defaultStyleLight.classWeight));
+        const QVariant defClsWt(static_cast<int>(defaultStyleLight.classWeight));
         theStyle.classWeight = static_cast<QFont::Weight>(
             settings->value(SETTINGS_STYLE_CLASSWT, defClsWt).toInt());
         theStyle.quoteColor = settings->value(
             SETTINGS_STYLE_QUOTEFG,
             QVariant(defaultStyleLight.quoteColor)).value<QColor>();
-        QVariant defQteWt(static_cast<int>(defaultStyleLight.quoteWeight));
+        const QVariant defQteWt(static_cast<int>(defaultStyleLight.quoteWeight));
         theStyle.quoteWeight = static_cast<QFont::Weight>(
             settings->value(SETTINGS_STYLE_QUOTEWT, defQteWt).toInt());
         theStyle.commentColor = settings->value(
             SETTINGS_STYLE_COMMENTFG,
             QVariant(defaultStyleLight.commentColor)).value<QColor>();
-        QVariant defCmtWt(static_cast<int>(defaultStyleLight.commentWeight));
+        const QVariant defCmtWt(static_cast<int>(defaultStyleLight.commentWeight));
         theStyle.commentWeight = static_cast<QFont::Weight>(
             settings->value(SETTINGS_STYLE_COMMENTWT, defCmtWt).toInt());
         theStyle.symbolFGColor = settings->value(
@@ -153,7 +153,7 @@ CodeEditorStyle CodeEditorStyle::loadSettings(QSettings *settings)
         theStyle.symbolBGColor = settings->value(
             SETTINGS_STYLE_SYMBOLBG,
             QVariant(defaultStyleLight.symbolBGColor)).value<QColor>();
-        QVariant defSymWt(static_cast<int>(defaultStyleLight.symbolWeight));
+        const QVariant defSymWt(static_cast<int>(defaultStyleLight.symbolWeight));
         theStyle.symbolWeight = static_cast<QFont::Weight>(
             settings->value(SETTINGS_STYLE_SYMBOLWT, defSymWt).toInt());
     }
@@ -174,8 +174,8 @@ void CodeEditorStyle::saveSettings(QSettings *settings,
     }
 
     settings->beginGroup(SETTINGS_STYLE_GROUP);
-    bool isDefaultLight = (defaultStyleLight == theStyle);
-    bool isDefaultDark = (defaultStyleDark == theStyle);
+    const bool isDefaultLight = (defaultStyleLight == theStyle);
+    const bool isDefaultDark = (defaultStyleDark == theStyle);
     if (isDefaultLight && !isDefaultDark) {
         settings->setValue(SETTINGS_STYLE_TYPE,
                            SETTINGS_STYLE_TYPE_LIGHT);

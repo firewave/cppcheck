@@ -687,10 +687,10 @@ void TemplateSimplifier::addInstantiation(Token *token, const std::string &scope
 {
     simplifyTemplateArgs(token->tokAt(2), token->next()->findClosingBracket());
 
-    TokenAndName instantiation(token, scope);
+    const TokenAndName instantiation(token, scope);
 
     // check if instantiation already exists before adding it
-    std::list<TokenAndName>::iterator it = std::find(mTemplateInstantiations.begin(),
+    const std::list<TokenAndName>::iterator it = std::find(mTemplateInstantiations.begin(),
                                                      mTemplateInstantiations.end(),
                                                      instantiation);
 
@@ -769,7 +769,7 @@ void TemplateSimplifier::getTemplateInstantiations()
                 // Don't ignore user specialization but don't consider it an instantiation.
                 // Instantiations in return type, function parameters, and executable code
                 // are not ignored.
-                unsigned int pos = getTemplateNamePosition(tok);
+                const unsigned int pos = getTemplateNamePosition(tok);
                 if (pos > 0)
                     skip = tok->tokAt(pos);
             } else {
@@ -845,7 +845,7 @@ void TemplateSimplifier::getTemplateInstantiations()
                         size_t argMatch = 0;
                         for (size_t i = 0; i < declarationParams.size(); ++i) {
                             // fixme: only type deducton from literals is supported
-                            bool isArgLiteral = Token::Match(instantiationArgs[i], "%num%|%str%|%char%|%bool% ,|)");
+                            const bool isArgLiteral = Token::Match(instantiationArgs[i], "%num%|%str%|%char%|%bool% ,|)");
                             if (isArgLiteral && Token::Match(declarationParams[i], "const| %type% &| %name%| ,|)")) {
                                 match++;
 
@@ -880,10 +880,10 @@ void TemplateSimplifier::getTemplateInstantiations()
                                 tok->insertToken("const");
                                 break;
                             case Token::eNumber: {
-                                MathLib::value num(arg->str());
+                                const MathLib::value num(arg->str());
                                 if (num.isFloat()) {
                                     // MathLib::getSuffix doesn't work for floating point numbers
-                                    char suffix = arg->str().back();
+                                    const char suffix = arg->str().back();
                                     if (suffix == 'f' || suffix == 'F')
                                         tok->insertToken("float");
                                     else if (suffix == 'l' || suffix == 'L') {
@@ -892,7 +892,7 @@ void TemplateSimplifier::getTemplateInstantiations()
                                     } else
                                         tok->insertToken("double");
                                 } else if (num.isInt()) {
-                                    std::string suffix = MathLib::getSuffix(tok->strAt(3));
+                                    const std::string suffix = MathLib::getSuffix(tok->strAt(3));
                                     if (suffix.find("LL") != std::string::npos) {
                                         tok->insertToken("long");
                                         tok->next()->isLong(true);
@@ -952,9 +952,9 @@ void TemplateSimplifier::getTemplateInstantiations()
                         // full name doesn't match so try with using namespaces if available
                         bool found = false;
                         for (const auto & nameSpace :  tok->scopeInfo()->usingNamespaces) {
-                            std::string fullNameSpace = scopeName + (scopeName.empty()?"":" :: ") +
+                            const std::string fullNameSpace = scopeName + (scopeName.empty()?"":" :: ") +
                                                         nameSpace + (qualification.empty()?"":" :: ") + qualification;
-                            std::string newFullName = fullNameSpace + " :: " + tok->str();
+                            const std::string newFullName = fullNameSpace + " :: " + tok->str();
                             const std::list<TokenAndName>::const_iterator it1 = std::find_if(mTemplateDeclarations.begin(), mTemplateDeclarations.end(), FindFullName(newFullName));
                             if (it1 != mTemplateDeclarations.end()) {
                                 // insert using namespace into token stream
@@ -1197,7 +1197,7 @@ void TemplateSimplifier::useDefaultArgumentValues(TokenAndName &declaration)
             if (Token::Match(tok2, "(|{|["))
                 tok2 = tok2->link();
             else if (Token::Match(tok2, "%type% <") && (tok2->strAt(2) == ">" || templateParameters(tok2->next()))) {
-                std::list<TokenAndName>::iterator ti = std::find_if(mTemplateInstantiations.begin(),
+                const std::list<TokenAndName>::iterator ti = std::find_if(mTemplateInstantiations.begin(),
                                                                     mTemplateInstantiations.end(),
                                                                     FindToken(tok2));
                 if (ti != mTemplateInstantiations.end())
@@ -1216,7 +1216,7 @@ void TemplateSimplifier::useDefaultArgumentValues(TokenAndName &declaration)
             continue;
 
         // don't strip args from uninstantiated templates
-        std::list<TokenAndName>::iterator ti2 = std::find_if(mTemplateInstantiations.begin(),
+        const std::list<TokenAndName>::iterator ti2 = std::find_if(mTemplateInstantiations.begin(),
                                                              mTemplateInstantiations.end(),
                                                              FindName(declaration.name()));
 
@@ -1234,7 +1234,7 @@ void TemplateSimplifier::useDefaultArgumentValues(TokenAndName &declaration)
 void TemplateSimplifier::simplifyTemplateAliases()
 {
     for (std::list<TokenAndName>::iterator it1 = mTemplateDeclarations.begin(); it1 != mTemplateDeclarations.end();) {
-        TokenAndName &aliasDeclaration = *it1;
+        const TokenAndName &aliasDeclaration = *it1;
 
         if (!aliasDeclaration.isAlias()) {
             ++it1;
@@ -1251,7 +1251,7 @@ void TemplateSimplifier::simplifyTemplateAliases()
         // Look for alias usages..
         bool found = false;
         for (std::list<TokenAndName>::iterator it2 = mTemplateInstantiations.begin(); it2 != mTemplateInstantiations.end();) {
-            TokenAndName &aliasUsage = *it2;
+            const TokenAndName &aliasUsage = *it2;
             if (!aliasUsage.token() || aliasUsage.fullName() != aliasDeclaration.fullName()) {
                 ++it2;
                 continue;
@@ -1510,7 +1510,7 @@ void TemplateSimplifier::addNamespace(const TokenAndName &templateDeclaration, c
     bool inTemplate = false;
     int level = 0;
     while ((end = templateDeclaration.scope().find(" ", start)) != std::string::npos) {
-        std::string token = templateDeclaration.scope().substr(start, end - start);
+        const std::string token = templateDeclaration.scope().substr(start, end - start);
         // done if scopes overlap
         if (token == tokStart->str() && tok->strAt(-1) != "::")
             break;
@@ -1537,7 +1537,7 @@ void TemplateSimplifier::addNamespace(const TokenAndName &templateDeclaration, c
         start = end + 1;
     }
     // don't add if it already exists
-    std::string token = templateDeclaration.scope().substr(start, end - start);
+    const std::string token = templateDeclaration.scope().substr(start, end - start);
     if (token != tokStart->str() || tok->strAt(-1) != "::") {
         if (insert) {
             if (!inTemplate)
@@ -1618,7 +1618,7 @@ void TemplateSimplifier::expandTemplate(
             end = temp2->linkAt(1)->next();
         } else {
             if (it != mTemplateForwardDeclarationsMap.end()) {
-                std::list<TokenAndName>::iterator it1 = std::find_if(mTemplateForwardDeclarations.begin(),
+                const std::list<TokenAndName>::iterator it1 = std::find_if(mTemplateForwardDeclarations.begin(),
                                                                      mTemplateForwardDeclarations.end(),
                                                                      FindToken(it->second));
                 if (it1 != mTemplateForwardDeclarations.end())
@@ -1808,7 +1808,7 @@ void TemplateSimplifier::expandTemplate(
                     if (Token::Match(start, "[|{|(")) {
                         links[start->link()] = dst->previous();
                     } else if (Token::Match(start, "]|}|)")) {
-                        std::map<const Token *, Token *>::iterator link = links.find(start);
+                        const std::map<const Token *, Token *>::iterator link = links.find(start);
                         // make sure link is valid
                         if (link != links.end()) {
                             Token::createMutualLinks(link->second, dst->previous());
@@ -2006,7 +2006,7 @@ void TemplateSimplifier::expandTemplate(
             while (tok3 && tok3->str() != "::")
                 tok3 = tok3->next();
 
-            std::list<TokenAndName>::iterator it = std::find_if(mTemplateDeclarations.begin(),
+            const std::list<TokenAndName>::iterator it = std::find_if(mTemplateDeclarations.begin(),
                                                                 mTemplateDeclarations.end(),
                                                                 FindToken(startOfTemplateDeclaration));
             if (it != mTemplateDeclarations.end())
@@ -2183,7 +2183,7 @@ void TemplateSimplifier::expandTemplate(
                 if (prev->strAt(-1) != "::") {
                     // adjust for current scope
                     std::string token_scope = tok3->scopeInfo()->name;
-                    std::string::size_type end = token_scope.find_last_of(" :: ");
+                    const std::string::size_type end = token_scope.find_last_of(" :: ");
                     if (end != std::string::npos) {
                         token_scope.resize(end);
                         if (scope.empty())
@@ -2648,7 +2648,7 @@ bool TemplateSimplifier::simplifyCalculations(Token* frontToken, Token *backToke
                 tok->str("bool");
             else if (MathLib::isFloat(tok->str())) {
                 // MathLib::getSuffix doesn't work for floating point numbers
-                char suffix = tok->str().back();
+                const char suffix = tok->str().back();
                 if (suffix == 'f' || suffix == 'F')
                     tok->str("float");
                 else if (suffix == 'l' || suffix == 'L') {
@@ -2657,7 +2657,7 @@ bool TemplateSimplifier::simplifyCalculations(Token* frontToken, Token *backToke
                 } else
                     tok->str("double");
             } else if (MathLib::isInt(tok->str())) {
-                std::string suffix = MathLib::getSuffix(tok->str());
+                const std::string suffix = MathLib::getSuffix(tok->str());
                 if (suffix.find("LL") != std::string::npos) {
                     tok->str("long");
                     tok->isLong(true);
@@ -3133,12 +3133,12 @@ bool TemplateSimplifier::simplifyTemplateInstantiations(
         // New type..
         mTypesUsedInTemplateInstantiation.clear();
         std::list<std::string> typeStringsUsedInTemplateInstantiation;
-        std::string typeForNewName = getNewName(tok2, typeStringsUsedInTemplateInstantiation);
+        const std::string typeForNewName = getNewName(tok2, typeStringsUsedInTemplateInstantiation);
 
         if ((typeForNewName.empty() && !templateDeclaration.isVariadic()) ||
             (!typeParametersInDeclaration.empty() && !instantiateMatch(tok2, typeParametersInDeclaration.size(), templateDeclaration.isVariadic(), nullptr))) {
             if (printDebug && mErrorLogger) {
-                std::list<const Token *> callstack(1, tok2);
+                const std::list<const Token *> callstack(1, tok2);
                 mErrorLogger->reportErr(ErrorMessage(callstack, &mTokenList, Severity::debug, "debug",
                                                      "Failed to instantiate template \"" + instantiation.name() + "\". The checking continues anyway.", Certainty::normal));
             }
@@ -3202,11 +3202,11 @@ bool TemplateSimplifier::simplifyTemplateInstantiations(
         // New type..
         mTypesUsedInTemplateInstantiation.clear();
         std::list<std::string> typeStringsUsedInTemplateInstantiation;
-        std::string typeForNewName = getNewName(tok2, typeStringsUsedInTemplateInstantiation);
+        const std::string typeForNewName = getNewName(tok2, typeStringsUsedInTemplateInstantiation);
 
         if (typeForNewName.empty()) {
             if (printDebug && mErrorLogger) {
-                std::list<const Token *> callstack(1, tok2);
+                const std::list<const Token *> callstack(1, tok2);
                 mErrorLogger->reportErr(ErrorMessage(callstack, &mTokenList, Severity::debug, "debug",
                                                      "Failed to instantiate template \"" + templateDeclaration.name() + "\". The checking continues anyway.", Certainty::normal));
             }
@@ -3702,7 +3702,7 @@ void TemplateSimplifier::simplifyTemplates(
         // explicit(bool)
         for (Token *tok = mTokenList.front(); tok; tok = tok->next()) {
             if (Token::simpleMatch(tok, "explicit (")) {
-                bool isFalse = Token::simpleMatch(tok->tokAt(2), "false )");
+                const bool isFalse = Token::simpleMatch(tok->tokAt(2), "false )");
                 Token::eraseTokens(tok, tok->linkAt(1)->next());
                 if (isFalse)
                     tok->deleteThis();
@@ -3736,7 +3736,7 @@ void TemplateSimplifier::simplifyTemplates(
             mTemplateNamePos.clear();
         }
 
-        bool hasTemplates = getTemplateDeclarations();
+        const bool hasTemplates = getTemplateDeclarations();
 
         if (passCount == 0)
             codeWithTemplates = hasTemplates;
@@ -3746,7 +3746,7 @@ void TemplateSimplifier::simplifyTemplates(
             return;
 
         if (mSettings->debugtemplate && mSettings->debugnormal) {
-            std::string title("Template Simplifier pass " + std::to_string(passCount + 1));
+            const std::string title("Template Simplifier pass " + std::to_string(passCount + 1));
             mTokenList.front()->printOut(title.c_str(), mTokenList.getFiles());
         }
 

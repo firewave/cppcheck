@@ -287,7 +287,7 @@ private:
             settings.userDefines = arg + 2;
         if (arg && std::strncmp(arg,"-U",2)==0)
             settings.userUndefs.insert(arg+2);
-        Preprocessor preprocessor(settings, this);
+        const Preprocessor preprocessor(settings, this);
         std::vector<std::string> files;
         std::istringstream istr(filedata);
         simplecpp::TokenList tokens(istr,files);
@@ -1282,7 +1282,7 @@ private:
                                 "DBG(\"[0x%lx-0x%lx)\", pstart, pend);\n";
 
         // Preprocess..
-        std::string actual = OurPreprocessor::expandMacros(filedata);
+        const std::string actual = OurPreprocessor::expandMacros(filedata);
 
         ASSERT_EQUALS("\nprintf ( \"[0x%lx-0x%lx)\" , pstart , pend ) ;", actual);
     }
@@ -1344,7 +1344,7 @@ private:
                                 "STRINGIFY(abc)\n";
 
         // expand macros..
-        std::string actual = OurPreprocessor::expandMacros(filedata);
+        const std::string actual = OurPreprocessor::expandMacros(filedata);
 
         ASSERT_EQUALS("\n\"abc\"", actual);
     }
@@ -1354,7 +1354,7 @@ private:
                                 "A(abc);\n";
 
         // expand macros..
-        std::string actual = OurPreprocessor::expandMacros(filedata);
+        const std::string actual = OurPreprocessor::expandMacros(filedata);
 
         ASSERT_EQUALS("\ng ( \"abc\" ) ;", actual);
     }
@@ -1364,7 +1364,7 @@ private:
                                 "A( abc);\n";
 
         // expand macros..
-        std::string actual = OurPreprocessor::expandMacros(filedata);
+        const std::string actual = OurPreprocessor::expandMacros(filedata);
 
         ASSERT_EQUALS("\ng ( \"abc\" ) ;", actual);
     }
@@ -1376,7 +1376,7 @@ private:
                                 ") 2\n";
 
         // expand macros..
-        std::string actual = OurPreprocessor::expandMacros(filedata);
+        const std::string actual = OurPreprocessor::expandMacros(filedata);
 
         ASSERT_EQUALS("\n1 \"abc\"\n\n2", actual);
     }
@@ -1991,7 +1991,7 @@ private:
         const std::string src("#if defined X || Y\n"
                               "Fred & Wilma\n"
                               "#endif\n");
-        std::string actual = preprocessor0.getcode(src, "X=1", "test.c");
+        const std::string actual = preprocessor0.getcode(src, "X=1", "test.c");
 
         ASSERT_EQUALS("\nFred & Wilma", actual);
     }
@@ -2001,12 +2001,12 @@ private:
                               "Fred & Wilma\n"
                               "#endif\n");
         {
-            std::string actual = preprocessor0.getcode(src, "X=1", "test.c");
+            const std::string actual = preprocessor0.getcode(src, "X=1", "test.c");
             ASSERT_EQUALS("", actual);
         }
 
         {
-            std::string actual = preprocessor0.getcode(src, "X=1;Y=2", "test.c");
+            const std::string actual = preprocessor0.getcode(src, "X=1;Y=2", "test.c");
             ASSERT_EQUALS("\nFred & Wilma", actual);
         }
     }
@@ -2272,7 +2272,7 @@ private:
     void validateCfg1() {
         Preprocessor preprocessor(settings0, this);
 
-        std::vector<std::string> files(1, "test.c");
+        const std::vector<std::string> files(1, "test.c");
         simplecpp::MacroUsage macroUsage(files, false);
         macroUsage.useLocation.fileIndex = 0;
         macroUsage.useLocation.line = 1;
@@ -2440,10 +2440,10 @@ private:
         settings.checks.enable(Checks::missingInclude);
         Preprocessor preprocessor(settings, this);
 
-        ScopedFile header("header.h", "");
-        ScopedFile header2("header2.h", "");
+        const ScopedFile header("header.h", "");
+        const ScopedFile header2("header2.h", "");
 
-        std::string code("#include \"missing.h\"\n"
+        const std::string code("#include \"missing.h\"\n"
                          "#include <header.h>\n"
                          "#include <missing2.h>\n"
                          "#include \"header2.h\"");
@@ -2469,10 +2469,10 @@ private:
         // needs to be reported regardless of enabled checks
         Preprocessor preprocessor(settings, this);
 
-        ScopedFile header("header.h", "");
-        ScopedFile header2("header2.h", "");
+        const ScopedFile header("header.h", "");
+        const ScopedFile header2("header2.h", "");
 
-        std::string code("#include \"missing.h\"\n"
+        const std::string code("#include \"missing.h\"\n"
                          "#include <header.h>\n"
                          "#include <missing2.h>\n"
                          "#include \"header2.h\"");

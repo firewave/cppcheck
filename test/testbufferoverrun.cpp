@@ -4746,7 +4746,7 @@ private:
 
     void getErrorMessages() {
         // Ticket #2292: segmentation fault when using --errorlist
-        CheckBufferOverrun c;
+        const CheckBufferOverrun c;
         c.getErrorMessages(this, nullptr);
     }
 

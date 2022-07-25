@@ -505,7 +505,7 @@ static std::string arithmeticTypeString(const Token *tok)
 
 void CheckNullPointer::pointerArithmeticError(const Token* tok, const ValueFlow::Value *value, bool inconclusive)
 {
-    std::string arithmetic = arithmeticTypeString(tok);
+    const std::string arithmetic = arithmeticTypeString(tok);
     std::string errmsg;
     if (tok && tok->str()[0] == '-') {
         errmsg = "Overflow in pointer arithmetic, NULL pointer is subtracted.";
@@ -523,7 +523,7 @@ void CheckNullPointer::pointerArithmeticError(const Token* tok, const ValueFlow:
 
 void CheckNullPointer::redundantConditionWarning(const Token* tok, const ValueFlow::Value *value, const Token *condition, bool inconclusive)
 {
-    std::string arithmetic = arithmeticTypeString(tok);
+    const std::string arithmetic = arithmeticTypeString(tok);
     std::string errmsg;
     if (tok && tok->str()[0] == '-') {
         errmsg = ValueFlow::eitherTheConditionIsRedundant(condition) + " or there is overflow in pointer " + arithmetic + ".";

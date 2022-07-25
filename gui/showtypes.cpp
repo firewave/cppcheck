@@ -92,7 +92,7 @@ ShowTypes::ShowType ShowTypes::VariantToShowType(const QVariant &data)
 
 void ShowTypes::load()
 {
-    QSettings settings;
+    const QSettings settings;
     mVisible[ShowStyle] = settings.value(SETTINGS_SHOW_STYLE, true).toBool();
     mVisible[ShowErrors] = settings.value(SETTINGS_SHOW_ERRORS, true).toBool();
     mVisible[ShowWarnings] = settings.value(SETTINGS_SHOW_WARNINGS, true).toBool();

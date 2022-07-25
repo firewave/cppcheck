@@ -1483,7 +1483,7 @@ void CheckOther::checkConstVariable()
                         castToNonConst = true; // safe guess
                         break;
                     }
-                    bool isConst = 0 != (tok->valueType()->constness & (1 << tok->valueType()->pointer));
+                    const bool isConst = 0 != (tok->valueType()->constness & (1 << tok->valueType()->pointer));
                     if (!isConst) {
                         castToNonConst = true;
                         break;
@@ -1920,7 +1920,7 @@ void CheckOther::checkIncompleteStatement()
         if (mTokenizer->isCPP() && tok->str() == "&" && !(tok->astOperand1()->valueType() && tok->astOperand1()->valueType()->isIntegral()))
             // Possible archive
             continue;
-        bool inconclusive = tok->isConstOp();
+        const bool inconclusive = tok->isConstOp();
         if (mSettings->certainty.isEnabled(Certainty::inconclusive) || !inconclusive)
             constStatementError(tok, tok->isNumber() ? "numeric" : "string", inconclusive);
     }
@@ -2248,7 +2248,7 @@ void CheckOther::invalidFreeError(const Token *tok, const std::string &allocatio
     std::string alloc = allocation;
     if (alloc != "new")
         alloc += "()";
-    std::string deallocated = (alloc == "new") ? "deleted" : "freed";
+    const std::string deallocated = (alloc == "new") ? "deleted" : "freed";
     reportError(tok, Severity::error, "invalidFree", "Mismatching address is " + deallocated + ". The address you get from " + alloc + " must be " + deallocated + " without offset.", CWE(0U), inconclusive ? Certainty::inconclusive : Certainty::normal);
 }
 
@@ -2484,7 +2484,7 @@ void CheckOther::duplicateExpressionError(const Token *tok1, const Token *tok2, 
     const char *id = "duplicateExpression";
     if (expr1 != expr2 && (!opTok || !opTok->isArithmeticalOp())) {
         id = "knownConditionTrueFalse";
-        std::string exprMsg = "The comparison \'" + expr1 + " " + op +  " " + expr2 + "\' is always ";
+        const std::string exprMsg = "The comparison \'" + expr1 + " " + op +  " " + expr2 + "\' is always ";
         if (Token::Match(opTok, "==|>=|<="))
             msg = exprMsg + "true";
         else if (Token::Match(opTok, "!=|>|<"))
@@ -3199,7 +3199,7 @@ void CheckOther::checkAccessOfMovedVariable()
 {
     if (!mTokenizer->isCPP() || mSettings->standards.cpp < Standards::CPP11 || !mSettings->severity.isEnabled(Severity::warning))
         return;
-    CheckUninitVar checkUninitVar(mTokenizer, mSettings, mErrorLogger);
+    const CheckUninitVar checkUninitVar(mTokenizer, mSettings, mErrorLogger);
     const bool reportInconclusive = mSettings->certainty.isEnabled(Certainty::inconclusive);
     const SymbolDatabase *symbolDatabase = mTokenizer->getSymbolDatabase();
     for (const Scope * scope : symbolDatabase->functionScopes) {
@@ -3364,7 +3364,7 @@ void CheckOther::checkFuncArgNamesDifferent()
 void CheckOther::funcArgNamesDifferent(const std::string & functionName, nonneg int index,
                                        const Token* declaration, const Token* definition)
 {
-    std::list<const Token *> tokens = { declaration,definition };
+    const std::list<const Token *> tokens = { declaration,definition };
     reportError(tokens, Severity::style, "funcArgNamesDifferent",
                 "$symbol:" + functionName + "\n"
                 "Function '$symbol' argument " + MathLib::toString(index + 1) + " names different: declaration '" +
@@ -3377,7 +3377,7 @@ void CheckOther::funcArgOrderDifferent(const std::string & functionName,
                                        const std::vector<const Token *> & declarations,
                                        const std::vector<const Token *> & definitions)
 {
-    std::list<const Token *> tokens = {
+    const std::list<const Token *> tokens = {
         declarations.size() ? declarations[0] ? declarations[0] : declaration : nullptr,
         definitions.size() ? definitions[0] ? definitions[0] : definition : nullptr
     };
@@ -3595,8 +3595,8 @@ void CheckOther::checkComparePointers()
             const Token *tok2 = tok->astOperand2();
             if (!astIsPointer(tok1) || !astIsPointer(tok2))
                 continue;
-            ValueFlow::Value v1 = getLifetimeObjValue(tok1);
-            ValueFlow::Value v2 = getLifetimeObjValue(tok2);
+            const ValueFlow::Value v1 = getLifetimeObjValue(tok1);
+            const ValueFlow::Value v2 = getLifetimeObjValue(tok2);
             if (!v1.isLocalLifetimeValue() || !v2.isLocalLifetimeValue())
                 continue;
             const Variable *var1 = v1.tokvalue->variable();

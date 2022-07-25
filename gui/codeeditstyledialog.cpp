@@ -120,8 +120,8 @@ StyleEditDialog::StyleEditDialog(const CodeEditorStyle& newStyle,
     hboxEdit->addLayout(flEditControls);
     // CodeEditor to display Style
     mSampleEditor = new CodeEditor(this);
-    QFont sampleFont("Monospace");
-    QFontMetrics fm(sampleFont);
+    const QFont sampleFont("Monospace");
+    const QFontMetrics fm(sampleFont);
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 11, 0))
     mSampleEditor->setMinimumWidth(fm.horizontalAdvance(QString(40, 'W')));
 #else

@@ -81,7 +81,7 @@ private:
     std::streambuf *_oldCerr;
 };
 
-#define REDIRECT RedirectOutputError redir; do {} while (false)
+#define REDIRECT RedirectOutputError redir /*NOLINT(misc-const-correctness)*/
 #define GET_REDIRECT_OUTPUT redir.getOutput()
 #define CLEAR_REDIRECT_OUTPUT redir.clearOutput()
 #define GET_REDIRECT_ERROUT redir.getErrout()
