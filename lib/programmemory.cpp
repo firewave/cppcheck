@@ -192,7 +192,7 @@ void ProgramMemory::replace(ProgramMemory pm)
 
 void ProgramMemory::insert(const ProgramMemory &pm)
 {
-    for (auto&& p : pm)
+    for (const auto& p : pm)
         mValues.insert(p);
 }
 
