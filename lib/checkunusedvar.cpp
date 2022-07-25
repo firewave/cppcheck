@@ -1558,7 +1558,7 @@ bool CheckUnusedVar::isRecordTypeWithoutSideEffects(const Type* type)
     // a type that has no side effects (no constructors and no members with constructors)
     /** @todo false negative: check constructors for side effects */
     const std::pair<std::map<const Type *,bool>::iterator,bool> found=mIsRecordTypeWithoutSideEffectsMap.insert(
-        std::pair<const Type *,bool>(type,false));         //Initialize with side effects for possible recursions
+        std::make_pair(type,false));        //Initialize with side effects for possible recursions
     bool & withoutSideEffects = found.first->second;
     if (!found.second)
         return withoutSideEffects;
@@ -1651,7 +1651,7 @@ bool CheckUnusedVar::isEmptyType(const Type* type)
     // a type that has no variables and no constructor
 
     const std::pair<std::map<const Type *,bool>::iterator,bool> found=mIsEmptyTypeMap.insert(
-        std::pair<const Type *,bool>(type,false));
+        std::make_pair(type,false));
     bool & emptyType=found.first->second;
     if (!found.second)
         return emptyType;

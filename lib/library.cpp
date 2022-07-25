@@ -580,11 +580,11 @@ Library::Error Library::load(const tinyxml2::XMLDocument &doc)
                     if (!typeName)
                         continue;
                     if (checkTypeName == "check")
-                        mTypeChecks[std::pair<std::string,std::string>(checkName, typeName)] = TypeCheck::check;
+                        mTypeChecks[std::make_pair(checkName, typeName)] = TypeCheck::check;
                     else if (checkTypeName == "suppress")
-                        mTypeChecks[std::pair<std::string,std::string>(checkName, typeName)] = TypeCheck::suppress;
+                        mTypeChecks[std::make_pair(checkName, typeName)] = TypeCheck::suppress;
                     else if (checkTypeName == "checkFiniteLifetime")
-                        mTypeChecks[std::pair<std::string,std::string>(checkName, typeName)] = TypeCheck::checkFiniteLifetime;
+                        mTypeChecks[std::make_pair(checkName, typeName)] = TypeCheck::checkFiniteLifetime;
                 }
             }
         }
@@ -1797,7 +1797,7 @@ const Library::Container * getLibraryContainer(const Token * tok)
 
 Library::TypeCheck Library::getTypeCheck(std::string check,  std::string typeName) const
 {
-    auto it = mTypeChecks.find(std::pair<std::string, std::string>(std::move(check), std::move(typeName)));
+    auto it = mTypeChecks.find(std::make_pair(std::move(check), std::move(typeName)));
     return it == mTypeChecks.end() ? TypeCheck::def : it->second;
 }
 

@@ -1500,7 +1500,7 @@ std::pair<const Token *, const Token *> Token::findExpressionStartEndTokens() co
     if (succeeds(top, end))
         throw InternalError(end, "Cannot find end of expression");
 
-    return std::pair<const Token *, const Token *>(start,end);
+    return std::make_pair(start,end);
 }
 
 bool Token::isCalculation() const
