@@ -72,7 +72,7 @@ static std::string generateExpression2_Expr(const uint8_t *data, size_t dataSize
     ++depth;
     const int type = (depth > 3) ? 0 : getValue(data, dataSize, 3);
     const char binop[] = "=<>+-*/%&|^";
-    const char *unop[] = {"++","--","()","~"}; //FP
+    const char * const unop[] = {"++","--","()","~"}; //FP
 
     switch (type) {
     case 0:
@@ -91,7 +91,7 @@ static std::string generateExpression2_Expr(const uint8_t *data, size_t dataSize
         return ret;
     }
     case 2: {
-        const char *u = unop[getValue(data,dataSize,sizeof(unop)/sizeof(*unop))];
+        const char * const u = unop[getValue(data,dataSize,sizeof(unop)/sizeof(*unop))];
         if (u == std::string("()"))
             return "(" + generateExpression2_Expr(data, dataSize, numberOfGlobalConstants, depth) + ")";
         else if (u == std::string("++") || u == std::string("--"))
@@ -108,7 +108,7 @@ static std::string generateExpression2_Expr(const uint8_t *data, size_t dataSize
 
 static std::string generateExpression2_Cond(const uint8_t *data, size_t dataSize, uint8_t numberOfGlobalConstants)
 {
-    const char *comp[] = {"==", "!=", "<", "<=", ">", ">="};
+    const char * const comp[] = {"==", "!=", "<", "<=", ">", ">="};
     const int i = getValue(data, dataSize, 6);
     const std::string lhs = generateExpression2_Expr(data, dataSize, numberOfGlobalConstants);
     const std::string rhs = generateExpression2_Expr(data, dataSize, numberOfGlobalConstants);

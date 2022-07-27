@@ -34,12 +34,12 @@
 
 std::string Summaries::create(const Tokenizer *tokenizer, const std::string &cfg)
 {
-    const SymbolDatabase *symbolDatabase = tokenizer->getSymbolDatabase();
-    const Settings *settings = tokenizer->getSettings();
+    const SymbolDatabase * const symbolDatabase = tokenizer->getSymbolDatabase();
+    const Settings * const settings = tokenizer->getSettings();
 
     std::ostringstream ostr;
-    for (const Scope *scope : symbolDatabase->functionScopes) {
-        const Function *f = scope->function;
+    for (const Scope * const scope : symbolDatabase->functionScopes) {
+        const Function * const f = scope->function;
         if (!f)
             continue;
 

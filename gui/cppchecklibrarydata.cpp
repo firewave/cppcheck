@@ -140,7 +140,7 @@ static CppcheckLibraryData::TypeChecks loadTypeChecks(QXmlStreamReader &xmlReade
         const QString elementName = xmlReader.name().toString();
         if (elementName == "suppress" || elementName == "check") {
             const QPair<QString, QString> entry(elementName, xmlReader.readElementText());
-            typeChecks.append(std::move(entry));
+            typeChecks.append(entry);
         }
     }
     return typeChecks;

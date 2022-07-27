@@ -57,7 +57,7 @@ private:
     }
 
     void findLambdaEndTokenTest() {
-        const Token* nullTok = nullptr;
+        const Token * const nullTok = nullptr;
         ASSERT(nullptr == (::findLambdaEndToken)(nullTok));
         ASSERT_EQUALS(false, findLambdaEndToken("void f() { }"));
         ASSERT_EQUALS(true, findLambdaEndToken("[]{ }"));
@@ -264,7 +264,7 @@ private:
         Tokenizer tokenizer(&settings, this);
         std::istringstream istr(code);
         ASSERT_LOC(tokenizer.tokenize(istr, "test.cpp"), file, line);
-        const Token * tok = Token::findsimplematch(tokenizer.tokens(), parentPattern, strlen(parentPattern));
+        const Token * const tok = Token::findsimplematch(tokenizer.tokens(), parentPattern, strlen(parentPattern));
         return Token::simpleMatch((::nextAfterAstRightmostLeaf)(tok), rightPattern, strlen(rightPattern));
     }
 

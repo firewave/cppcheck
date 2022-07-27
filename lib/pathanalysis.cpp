@@ -92,7 +92,7 @@ PathAnalysis::Progress PathAnalysis::forwardRange(const Token* startToken, const
             forwardRecursive(tok, info, f);
             return Progress::Break;
             // Evaluate RHS of assignment before LHS
-        } else if (const Token* assignTok = assignExpr(tok)) {
+        } else if (const Token * const assignTok = assignExpr(tok)) {
             if (forwardRecursive(assignTok->astOperand2(), info, f) == Progress::Break)
                 return Progress::Break;
             if (forwardRecursive(assignTok->astOperand1(), info, f) == Progress::Break)
@@ -101,14 +101,14 @@ PathAnalysis::Progress PathAnalysis::forwardRange(const Token* startToken, const
             if (!tok)
                 return Progress::Break;
         } else if (Token::simpleMatch(tok, "}") && Token::simpleMatch(tok->link()->previous(), ") {") && Token::Match(tok->link()->linkAt(-1)->previous(), "if|while|for (")) {
-            const Token * blockStart = tok->link()->linkAt(-1)->previous();
-            const Token * condTok = getCondTok(blockStart);
+            const Token * const blockStart = tok->link()->linkAt(-1)->previous();
+            const Token * const condTok = getCondTok(blockStart);
             if (!condTok)
                 continue;
             info.errorPath.emplace_back(condTok, "Assuming condition is true.");
             // Traverse a loop a second time
             if (Token::Match(blockStart, "for|while (")) {
-                const Token* endCond = blockStart->linkAt(1);
+                const Token * const endCond = blockStart->linkAt(1);
                 bool traverseLoop = true;
                 // Only traverse simple for loops
                 if (Token::simpleMatch(blockStart, "for") && !Token::Match(endCond->tokAt(-3), "; ++|--|%var% %var%|++|-- ) {"))
@@ -125,9 +125,9 @@ PathAnalysis::Progress PathAnalysis::forwardRange(const Token* startToken, const
                 tok = tok->linkAt(2);
             }
         } else if (Token::Match(tok, "if|while|for (") && Token::simpleMatch(tok->next()->link(), ") {")) {
-            const Token * endCond = tok->next()->link();
-            const Token * endBlock = endCond->next()->link();
-            const Token * condTok = getCondTok(tok);
+            const Token * const endCond = tok->next()->link();
+            const Token * const endBlock = endCond->next()->link();
+            const Token * const condTok = getCondTok(tok);
             if (!condTok)
                 continue;
             // Traverse condition
@@ -175,10 +175,10 @@ PathAnalysis::Progress PathAnalysis::forwardRange(const Token* startToken, const
 
 void PathAnalysis::forward(const std::function<Progress(const Info&)>& f) const
 {
-    const Scope * endScope = findOuterScope(start->scope());
+    const Scope * const endScope = findOuterScope(start->scope());
     if (!endScope)
         return;
-    const Token * endToken = endScope->bodyEnd;
+    const Token * const endToken = endScope->bodyEnd;
     const Info info{start, ErrorPath{}, true};
     forwardRange(start, endToken, info, f);
 }

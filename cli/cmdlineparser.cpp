@@ -287,7 +287,7 @@ bool CmdLineParser::parseFromArgs(int argc, const char* const argv[])
             else if (std::strcmp(argv[i], "--doc") == 0) {
                 std::ostringstream doc;
                 // Get documentation..
-                for (const Check * it : Check::instances()) {
+                for (const Check * const it : Check::instances()) {
                     const std::string& name(it->name());
                     const std::string info(it->classInfo());
                     if (!name.empty() && !info.empty())
@@ -718,26 +718,26 @@ bool CmdLineParser::parseFromArgs(int argc, const char* const argv[])
                     for (; node && strcmp(node->Value(), "rule") == 0; node = node->NextSiblingElement()) {
                         Settings::Rule rule;
 
-                        tinyxml2::XMLElement *tokenlist = node->FirstChildElement("tokenlist");
+                        tinyxml2::XMLElement * const tokenlist = node->FirstChildElement("tokenlist");
                         if (tokenlist)
                             rule.tokenlist = tokenlist->GetText();
 
-                        tinyxml2::XMLElement *pattern = node->FirstChildElement("pattern");
+                        tinyxml2::XMLElement * const pattern = node->FirstChildElement("pattern");
                         if (pattern) {
                             rule.pattern = pattern->GetText();
                         }
 
                         tinyxml2::XMLElement *message = node->FirstChildElement("message");
                         if (message) {
-                            tinyxml2::XMLElement *severity = message->FirstChildElement("severity");
+                            tinyxml2::XMLElement * const severity = message->FirstChildElement("severity");
                             if (severity)
                                 rule.severity = Severity::fromString(severity->GetText());
 
-                            tinyxml2::XMLElement *id = message->FirstChildElement("id");
+                            tinyxml2::XMLElement * const id = message->FirstChildElement("id");
                             if (id)
                                 rule.id = id->GetText();
 
-                            tinyxml2::XMLElement *summary = message->FirstChildElement("summary");
+                            tinyxml2::XMLElement * const summary = message->FirstChildElement("summary");
                             if (summary)
                                 rule.summary = summary->GetText() ? summary->GetText() : "";
                         }
@@ -822,7 +822,7 @@ bool CmdLineParser::parseFromArgs(int argc, const char* const argv[])
             }
 
             else if (std::strncmp(argv[i], "--suppress-xml=", 15) == 0) {
-                const char * filename = argv[i] + 15;
+                const char * const filename = argv[i] + 15;
                 const std::string errmsg(mSettings->nomsg.parseXmlFile(filename));
                 if (!errmsg.empty()) {
                     printError(errmsg);

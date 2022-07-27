@@ -295,7 +295,7 @@ void MainWindow::loadSettings()
                mSettings->value(SETTINGS_WINDOW_HEIGHT, 600).toInt());
     }
 
-    ShowTypes *types = mUI->mResults->getShowTypes();
+    ShowTypes * const types = mUI->mResults->getShowTypes();
     mUI->mActionShowStyle->setChecked(types->isShown(ShowTypes::ShowStyle));
     mUI->mActionShowErrors->setChecked(types->isShown(ShowTypes::ShowErrors));
     mUI->mActionShowWarnings->setChecked(types->isShown(ShowTypes::ShowWarnings));
@@ -1743,7 +1743,7 @@ void MainWindow::enableProjectOpenActions(bool enable)
 
 void MainWindow::openRecentProject()
 {
-    QAction *action = qobject_cast<QAction *>(sender());
+    QAction * const action = qobject_cast<QAction *>(sender());
     if (!action)
         return;
     const QString project = action->data().toString();
@@ -1776,7 +1776,7 @@ void MainWindow::openRecentProject()
 
 void MainWindow::updateMRUMenuItems()
 {
-    for (QAction* recentProjectAct : mRecentProjectActs) {
+    for (QAction * const recentProjectAct : mRecentProjectActs) {
         if (recentProjectAct != nullptr)
             mUI->mMenuFile->removeAction(recentProjectAct);
     }
@@ -1832,7 +1832,7 @@ void MainWindow::removeProjectMRU(const QString &project)
 
 void MainWindow::selectPlatform()
 {
-    QAction *action = qobject_cast<QAction *>(sender());
+    QAction * const action = qobject_cast<QAction *>(sender());
     if (action) {
         const Settings::PlatformType platform = (Settings::PlatformType) action->data().toInt();
         mSettings->setValue(SETTINGS_CHECKED_PLATFORM, platform);

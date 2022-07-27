@@ -118,7 +118,7 @@ ErrorMessage::ErrorMessage(const std::list<const Token*>& callstack, const Token
     : id(id), incomplete(false), severity(severity), cwe(cwe.id), certainty(certainty)
 {
     // Format callstack
-    for (const Token *tok: callstack) {
+    for (const Token * const tok: callstack) {
         // --errorlist can provide null values here
         if (!tok)
             continue;
@@ -139,7 +139,7 @@ ErrorMessage::ErrorMessage(const ErrorPath &errorPath, const TokenList *tokenLis
 {
     // Format callstack
     for (const ErrorPathItem& e: errorPath) {
-        const Token *tok = e.first;
+        const Token * const tok = e.first;
         std::string info = e.second;
 
         if (info.compare(0,8,"$symbol:") == 0 && info.find("\n") < info.size()) {
@@ -192,13 +192,13 @@ ErrorMessage::ErrorMessage(const tinyxml2::XMLElement * const errmsg)
 
     for (const tinyxml2::XMLElement *e = errmsg->FirstChildElement(); e; e = e->NextSiblingElement()) {
         if (std::strcmp(e->Name(),"location")==0) {
-            const char *strfile = e->Attribute("file");
-            const char *strinfo = e->Attribute("info");
-            const char *strline = e->Attribute("line");
-            const char *strcolumn = e->Attribute("column");
+            const char * const strfile = e->Attribute("file");
+            const char * const strinfo = e->Attribute("info");
+            const char * const strline = e->Attribute("line");
+            const char * const strcolumn = e->Attribute("column");
 
-            const char *file = strfile ? strfile : unknown;
-            const char *info = strinfo ? strinfo : "";
+            const char * const file = strfile ? strfile : unknown;
+            const char * const info = strinfo ? strinfo : "";
             const int line = strline ? std::atoi(strline) : 0;
             const int column = strcolumn ? std::atoi(strcolumn) : 0;
             callStack.emplace_front(file, info, line, column);

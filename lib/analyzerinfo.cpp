@@ -83,7 +83,7 @@ static bool skipAnalysis(const std::string &analyzerInfoFile, std::size_t hash, 
     if (rootNode == nullptr)
         return false;
 
-    const char *attr = rootNode->Attribute("hash");
+    const char * const attr = rootNode->Attribute("hash");
     if (!attr || attr != std::to_string(hash))
         return false;
 

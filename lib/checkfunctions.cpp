@@ -55,8 +55,8 @@ void CheckFunctions::checkProhibitedFunctions()
 {
     const bool checkAlloca = mSettings->severity.isEnabled(Severity::warning) && ((mSettings->standards.c >= Standards::C99 && mTokenizer->isC()) || mSettings->standards.cpp >= Standards::CPP11);
 
-    const SymbolDatabase *symbolDatabase = mTokenizer->getSymbolDatabase();
-    for (const Scope *scope : symbolDatabase->functionScopes) {
+    const SymbolDatabase * const symbolDatabase = mTokenizer->getSymbolDatabase();
+    for (const Scope * const scope : symbolDatabase->functionScopes) {
         for (const Token* tok = scope->bodyStart; tok != scope->bodyEnd; tok = tok->next()) {
             if (!Token::Match(tok, "%name% (") && tok->varId() == 0)
                 continue;
@@ -81,7 +81,7 @@ void CheckFunctions::checkProhibitedFunctions()
                 if (tok->function() && tok->function()->hasBody())
                     continue;
 
-                const Library::WarnInfo* wi = mSettings->library.getWarnInfo(tok);
+                const Library::WarnInfo * const wi = mSettings->library.getWarnInfo(tok);
                 if (wi) {
                     if (mSettings->severity.isEnabled(wi->severity) && mSettings->standards.c >= wi->standards.c && mSettings->standards.cpp >= wi->standards.cpp) {
                         const std::string daca = mSettings->daca ? "prohibited" : "";
@@ -98,8 +98,8 @@ void CheckFunctions::checkProhibitedFunctions()
 //---------------------------------------------------------------------------
 void CheckFunctions::invalidFunctionUsage()
 {
-    const SymbolDatabase* symbolDatabase = mTokenizer->getSymbolDatabase();
-    for (const Scope *scope : symbolDatabase->functionScopes) {
+    const SymbolDatabase * const symbolDatabase = mTokenizer->getSymbolDatabase();
+    for (const Scope * const scope : symbolDatabase->functionScopes) {
         for (const Token* tok = scope->bodyStart->next(); tok != scope->bodyEnd; tok = tok->next()) {
             if (!Token::Match(tok, "%name% ( !!)"))
                 continue;
@@ -109,7 +109,7 @@ void CheckFunctions::invalidFunctionUsage()
                 const Token * const argtok = arguments[argnr-1];
 
                 // check <valid>...</valid>
-                const ValueFlow::Value *invalidValue = argtok->getInvalidValue(functionToken,argnr,mSettings);
+                const ValueFlow::Value * const invalidValue = argtok->getInvalidValue(functionToken,argnr,mSettings);
                 if (invalidValue) {
                     invalidFunctionArgError(argtok, functionToken->next()->astOperand1()->expressionString(), argnr, invalidValue, mSettings->library.validarg(functionToken, argnr));
                 }
@@ -128,8 +128,8 @@ void CheckFunctions::invalidFunctionUsage()
                 // check <strz>
                 if (mSettings->library.isargstrz(functionToken, argnr)) {
                     if (Token::Match(argtok, "& %var% !![") && argtok->next() && argtok->next()->valueType()) {
-                        const ValueType * valueType = argtok->next()->valueType();
-                        const Variable * variable = argtok->next()->variable();
+                        const ValueType * const valueType = argtok->next()->valueType();
+                        const Variable * const variable = argtok->next()->variable();
                         if ((valueType->type == ValueType::Type::CHAR || valueType->type == ValueType::Type::WCHAR_T || (valueType->type == ValueType::Type::RECORD && Token::Match(argtok, "& %var% . %var% ,|)"))) &&
                             !variable->isArray() &&
                             (variable->isConst() || !variable->isGlobal()) &&
@@ -172,7 +172,7 @@ void CheckFunctions::invalidFunctionUsage()
                                 invalidFunctionArgStrError(argtok, functionToken->str(), argnr);
                             }
                         } else if (count > -1 && Token::Match(varTok, "= %str%")) {
-                            const Token* strTok = varTok->getValueTokenMinStrSize(mSettings);
+                            const Token * const strTok = varTok->getValueTokenMinStrSize(mSettings);
                             if (strTok) {
                                 const int strSize = Token::getStrArraySize(strTok);
                                 if (strSize > count && strTok->str().find('\0') == std::string::npos)
@@ -239,8 +239,8 @@ void CheckFunctions::checkIgnoredReturnValue()
     if (!mSettings->severity.isEnabled(Severity::warning) && !mSettings->severity.isEnabled(Severity::style))
         return;
 
-    const SymbolDatabase *symbolDatabase = mTokenizer->getSymbolDatabase();
-    for (const Scope *scope : symbolDatabase->functionScopes) {
+    const SymbolDatabase * const symbolDatabase = mTokenizer->getSymbolDatabase();
+    for (const Scope * const scope : symbolDatabase->functionScopes) {
         for (const Token* tok = scope->bodyStart->next(); tok != scope->bodyEnd; tok = tok->next()) {
             // skip c++11 initialization, ({...})
             if (Token::Match(tok, "%var%|(|,|return {"))
@@ -299,9 +299,9 @@ static const Token *checkMissingReturnScope(const Token *tok, const Library &lib
 
 void CheckFunctions::checkMissingReturn()
 {
-    const SymbolDatabase *symbolDatabase = mTokenizer->getSymbolDatabase();
-    for (const Scope *scope : symbolDatabase->functionScopes) {
-        const Function *function = scope->function;
+    const SymbolDatabase * const symbolDatabase = mTokenizer->getSymbolDatabase();
+    for (const Scope * const scope : symbolDatabase->functionScopes) {
+        const Function * const function = scope->function;
         if (!function || !function->hasBody())
             continue;
         if (function->name() == "main" && !(mSettings->standards.c < Standards::C99 && mTokenizer->isC()))
@@ -312,7 +312,7 @@ void CheckFunctions::checkMissingReturn()
             continue;
         if (Function::returnsVoid(function, true))
             continue;
-        const Token *errorToken = checkMissingReturnScope(scope->bodyEnd, mSettings->library);
+        const Token * const errorToken = checkMissingReturnScope(scope->bodyEnd, mSettings->library);
         if (errorToken)
             missingReturnError(errorToken);
     }
@@ -322,7 +322,7 @@ static bool isForwardJump(const Token *gotoToken)
 {
     if (!Token::Match(gotoToken, "goto %name% ;"))
         return false;
-    for (const Token *prev = gotoToken; gotoToken; gotoToken = gotoToken->previous()) {
+    for (const Token * const prev = gotoToken; gotoToken; gotoToken = gotoToken->previous()) {
         if (Token::Match(prev, "%name% :") && prev->str() == gotoToken->next()->str())
             return true;
         if (prev->str() == "{" && prev->scope()->type == Scope::eFunction)
@@ -371,12 +371,12 @@ static const Token *checkMissingReturnScope(const Token *tok, const Library &lib
                 if (!hasDefault)
                     return tok->link();
             } else if (tok->scope()->type == Scope::ScopeType::eIf) {
-                const Token *condition = tok->scope()->classDef->next()->astOperand2();
+                const Token * const condition = tok->scope()->classDef->next()->astOperand2();
                 if (condition && condition->hasKnownIntValue() && condition->getKnownIntValue() == 1)
                     return checkMissingReturnScope(tok, library);
                 return tok;
             } else if (tok->scope()->type == Scope::ScopeType::eElse) {
-                const Token *errorToken = checkMissingReturnScope(tok, library);
+                const Token * const errorToken = checkMissingReturnScope(tok, library);
                 if (errorToken)
                     return errorToken;
                 tok = tok->link();
@@ -419,8 +419,8 @@ void CheckFunctions::checkMathFunctions()
     const bool styleC99 = mSettings->severity.isEnabled(Severity::style) && mSettings->standards.c != Standards::C89 && mSettings->standards.cpp != Standards::CPP03;
     const bool printWarnings = mSettings->severity.isEnabled(Severity::warning);
 
-    const SymbolDatabase *symbolDatabase = mTokenizer->getSymbolDatabase();
-    for (const Scope *scope : symbolDatabase->functionScopes) {
+    const SymbolDatabase * const symbolDatabase = mTokenizer->getSymbolDatabase();
+    for (const Scope * const scope : symbolDatabase->functionScopes) {
         for (const Token* tok = scope->bodyStart->next(); tok != scope->bodyEnd; tok = tok->next()) {
             if (tok->varId())
                 continue;
@@ -444,7 +444,7 @@ void CheckFunctions::checkMathFunctions()
                 }
                 // fmod ( x , y) If y is zero, then either a range error will occur or the function will return zero (implementation-defined).
                 else if (Token::Match(tok, "fmod|fmodf|fmodl (")) {
-                    const Token* nextArg = tok->tokAt(2)->nextArgument();
+                    const Token * const nextArg = tok->tokAt(2)->nextArgument();
                     if (nextArg && MathLib::isNullValue(nextArg->str()))
                         mathfunctionCallWarning(tok, 2);
                 }
@@ -461,7 +461,7 @@ void CheckFunctions::checkMathFunctions()
                 } else if (Token::simpleMatch(tok, "exp (") && Token::Match(tok->linkAt(1), ") - %num%") && Tokenizer::isOneNumber(tok->linkAt(1)->strAt(2)) && tok->linkAt(1)->next()->astOperand1() == tok->next()) {
                     mathfunctionCallWarning(tok, "exp(x) - 1", "expm1(x)");
                 } else if (Token::simpleMatch(tok, "log (") && tok->next()->astOperand2()) {
-                    const Token* plus = tok->next()->astOperand2();
+                    const Token * const plus = tok->next()->astOperand2();
                     if (plus->str() == "+" && ((plus->astOperand1() && Tokenizer::isOneNumber(plus->astOperand1()->str())) || (plus->astOperand2() && Tokenizer::isOneNumber(plus->astOperand2()->str()))))
                         mathfunctionCallWarning(tok, "log(1 + x)", "log1p(x)");
                 }
@@ -501,14 +501,14 @@ void CheckFunctions::memsetZeroBytes()
     if (!mSettings->severity.isEnabled(Severity::warning))
         return;
 
-    const SymbolDatabase *symbolDatabase = mTokenizer->getSymbolDatabase();
-    for (const Scope *scope : symbolDatabase->functionScopes) {
+    const SymbolDatabase * const symbolDatabase = mTokenizer->getSymbolDatabase();
+    for (const Scope * const scope : symbolDatabase->functionScopes) {
         for (const Token* tok = scope->bodyStart->next(); tok != scope->bodyEnd; tok = tok->next()) {
             if (Token::Match(tok, "memset|wmemset (") && (numberOfArguments(tok)==3)) {
                 const std::vector<const Token *> &arguments = getArguments(tok);
                 if (WRONG_DATA(arguments.size() != 3U, tok))
                     continue;
-                const Token* lastParamTok = arguments[2];
+                const Token * const lastParamTok = arguments[2];
                 if (MathLib::isNullValue(lastParamTok->str()))
                     memsetZeroBytesError(tok);
             }
@@ -540,8 +540,8 @@ void CheckFunctions::memsetInvalid2ndParam()
     if (!printWarning && !printPortability)
         return;
 
-    const SymbolDatabase *symbolDatabase = mTokenizer->getSymbolDatabase();
-    for (const Scope *scope : symbolDatabase->functionScopes) {
+    const SymbolDatabase * const symbolDatabase = mTokenizer->getSymbolDatabase();
+    for (const Scope * const scope : symbolDatabase->functionScopes) {
         for (const Token* tok = scope->bodyStart->next(); tok && (tok != scope->bodyEnd); tok = tok->next()) {
             if (!Token::simpleMatch(tok, "memset ("))
                 continue;
@@ -654,16 +654,16 @@ void CheckFunctions::returnLocalStdMove()
     if (!mSettings->severity.isEnabled(Severity::performance))
         return;
 
-    const SymbolDatabase *symbolDatabase = mTokenizer->getSymbolDatabase();
-    for (const Scope *scope : symbolDatabase->functionScopes) {
+    const SymbolDatabase * const symbolDatabase = mTokenizer->getSymbolDatabase();
+    for (const Scope * const scope : symbolDatabase->functionScopes) {
         // Expect return by-value
         if (Function::returnsReference(scope->function, true))
             continue;
         const auto rets = Function::findReturns(scope->function);
-        for (const Token* ret : rets) {
+        for (const Token * const ret : rets) {
             if (!Token::simpleMatch(ret->tokAt(-3), "std :: move ("))
                 continue;
-            const Token* retval = ret->astOperand2();
+            const Token * const retval = ret->astOperand2();
             // NRVO
             if (retval->variable() && retval->variable()->isLocal() && !retval->variable()->isVolatile())
                 copyElisionError(retval);

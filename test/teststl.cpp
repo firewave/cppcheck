@@ -3548,7 +3548,7 @@ private:
     }
 
     void size2() {
-        const char* code = "struct Fred {\n"
+        const char * const code = "struct Fred {\n"
                            "    std::list<int> x;\n"
                            "};\n"
                            "struct Wilma {\n"

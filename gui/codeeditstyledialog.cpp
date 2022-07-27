@@ -146,7 +146,7 @@ StyleEditDialog::StyleEditDialog(const CodeEditorStyle& newStyle,
     vboxMain->addLayout(hboxDefaultControls);
     vboxMain->addStretch(2);
     // dialog controls
-    QDialogButtonBox *dBtnBox = new QDialogButtonBox(
+    QDialogButtonBox * const dBtnBox = new QDialogButtonBox(
         QDialogButtonBox::Cancel |
         QDialogButtonBox::Ok |
         QDialogButtonBox::Reset);

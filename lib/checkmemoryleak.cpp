@@ -148,7 +148,7 @@ CheckMemoryLeak::AllocType CheckMemoryLeak::getAllocationType(const Token *tok2,
         tok2 = tok2->tokAt(2);
 
     // User function
-    const Function* func = tok2->function();
+    const Function * const func = tok2->function();
     if (func == nullptr)
         return No;
 
@@ -179,7 +179,7 @@ CheckMemoryLeak::AllocType CheckMemoryLeak::getReallocationType(const Token *tok
     if (!Token::Match(tok2, "%name% ("))
         return No;
 
-    const Library::AllocFunc *f = mSettings_->library.getReallocFuncInfo(tok2);
+    const Library::AllocFunc * const f = mSettings_->library.getReallocFuncInfo(tok2);
     if (!(f && f->reallocArg > 0 && f->reallocArg <= numberOfArguments(tok2)))
         return No;
     const auto args = getArguments(tok2);
@@ -263,9 +263,9 @@ CheckMemoryLeak::AllocType CheckMemoryLeak::getDeallocationType(const Token *tok
 bool CheckMemoryLeak::isReopenStandardStream(const Token *tok) const
 {
     if (getReallocationType(tok, 0) == File) {
-        const Library::AllocFunc *f = mSettings_->library.getReallocFuncInfo(tok);
+        const Library::AllocFunc * const f = mSettings_->library.getReallocFuncInfo(tok);
         if (f && f->reallocArg > 0 && f->reallocArg <= numberOfArguments(tok)) {
-            const Token* arg = getArguments(tok).at(f->reallocArg - 1);
+            const Token * const arg = getArguments(tok).at(f->reallocArg - 1);
             if (Token::Match(arg, "stdin|stdout|stderr"))
                 return true;
         }
@@ -355,7 +355,7 @@ CheckMemoryLeak::AllocType CheckMemoryLeak::functionReturnType(const Function* f
     // Get return pointer..
     int varid = 0;
     for (const Token *tok2 = func->functionScope->bodyStart; tok2 != func->functionScope->bodyEnd; tok2 = tok2->next()) {
-        if (const Token *endOfLambda = findLambdaEndToken(tok2))
+        if (const Token * const endOfLambda = findLambdaEndToken(tok2))
             tok2 = endOfLambda;
         if (tok2->str() == "{" && !tok2->scope()->isExecutable())
             tok2 = tok2->link();
@@ -382,7 +382,7 @@ CheckMemoryLeak::AllocType CheckMemoryLeak::functionReturnType(const Function* f
     // If variable is not local then alloctype shall be "No"
     // Todo: there can be false negatives about mismatching allocation/deallocation.
     //       => Generate "alloc ; use ;" if variable is not local?
-    const Variable *var = mTokenizer_->getSymbolDatabase()->getVariableFromVarId(varid);
+    const Variable * const var = mTokenizer_->getSymbolDatabase()->getVariableFromVarId(varid);
     if (!var || !var->isLocal() || var->isStatic())
         return No;
 
@@ -420,7 +420,7 @@ static bool notvar(const Token *tok, nonneg int varid)
         return notvar(tok->astOperand1(),varid) || notvar(tok->astOperand2(),varid);
     if (tok->str() == "(" && Token::Match(tok->astOperand1(), "UNLIKELY|LIKELY"))
         return notvar(tok->astOperand2(), varid);
-    const Token *vartok = astIsVariableComparison(tok, "==", "0");
+    const Token * const vartok = astIsVariableComparison(tok, "==", "0");
     return vartok && (vartok->varId() == varid);
 }
 
@@ -434,7 +434,7 @@ static bool ifvar(const Token *tok, nonneg int varid, const std::string &comp, c
     if (!condition || condition->str() == "&&")
         return false;
 
-    const Token *vartok = astIsVariableComparison(condition, comp, rhs);
+    const Token * const vartok = astIsVariableComparison(condition, comp, rhs);
     return (vartok && vartok->varId() == varid);
 }
 
@@ -453,15 +453,15 @@ bool CheckMemoryLeakInFunction::test_white_list(const std::string &funcname, con
 
 static bool isNoArgument(const SymbolDatabase* symbolDatabase, nonneg int varid)
 {
-    const Variable* var = symbolDatabase->getVariableFromVarId(varid);
+    const Variable * const var = symbolDatabase->getVariableFromVarId(varid);
     return var && !var->isArgument();
 }
 
 void CheckMemoryLeakInFunction::checkReallocUsage()
 {
     // only check functions
-    const SymbolDatabase *symbolDatabase = mTokenizer->getSymbolDatabase();
-    for (const Scope * scope : symbolDatabase->functionScopes) {
+    const SymbolDatabase * const symbolDatabase = mTokenizer->getSymbolDatabase();
+    for (const Scope * const scope : symbolDatabase->functionScopes) {
 
         // Search for the "var = realloc(var, 100" pattern within this function
         for (const Token *tok = scope->bodyStart->next(); tok != scope->bodyEnd; tok = tok->next()) {
@@ -477,7 +477,7 @@ void CheckMemoryLeakInFunction::checkReallocUsage()
                 const Token *const reallocTok = parTok->astOperand1();
                 if (!reallocTok)
                     continue;
-                const Library::AllocFunc* f = mSettings->library.getReallocFuncInfo(reallocTok);
+                const Library::AllocFunc * const f = mSettings->library.getReallocFuncInfo(reallocTok);
                 if (!(f && f->arg == -1 && mSettings->library.isnotnoreturn(reallocTok)))
                     continue;
 
@@ -509,11 +509,11 @@ void CheckMemoryLeakInFunction::checkReallocUsage()
                     continue;
                 }
 
-                const Token* tokEndRealloc = reallocTok->linkAt(1);
+                const Token * const tokEndRealloc = reallocTok->linkAt(1);
                 // Check that the allocation isn't followed immediately by an 'if (!var) { error(); }' that might handle failure
                 if (Token::simpleMatch(tokEndRealloc->next(), "; if (") &&
                     notvar(tokEndRealloc->tokAt(3)->astOperand2(), tok->varId())) {
-                    const Token* tokEndBrace = tokEndRealloc->linkAt(3)->linkAt(1);
+                    const Token * const tokEndBrace = tokEndRealloc->linkAt(3)->linkAt(1);
                     if (tokEndBrace && mTokenizer->isScopeNoReturn(tokEndBrace))
                         continue;
                 }
@@ -533,14 +533,14 @@ void CheckMemoryLeakInFunction::checkReallocUsage()
 
 void CheckMemoryLeakInClass::check()
 {
-    const SymbolDatabase *symbolDatabase = mTokenizer->getSymbolDatabase();
+    const SymbolDatabase * const symbolDatabase = mTokenizer->getSymbolDatabase();
 
     // only check classes and structures
-    for (const Scope * scope : symbolDatabase->classAndStructScopes) {
+    for (const Scope * const scope : symbolDatabase->classAndStructScopes) {
         for (const Variable &var : scope->varlist) {
             if (!var.isStatic() && (var.isPointer() || var.isPointerArray())) {
                 // allocation but no deallocation of private variables in public function..
-                const Token *tok = var.typeStartToken();
+                const Token * const tok = var.typeStartToken();
                 // Either it is of standard type or a non-derived type
                 if (tok->isStandardType() || (var.type() && var.type()->derivedFrom.empty())) {
                     if (var.isPrivate())
@@ -581,7 +581,7 @@ void CheckMemoryLeakInClass::variable(const Scope *scope, const Token *tokVarnam
         if (!func.functionScope) // defaulted destructor
             continue;
         bool body = false;
-        const Token *end = func.functionScope->bodyEnd;
+        const Token * const end = func.functionScope->bodyEnd;
         for (const Token *tok = func.arg->link(); tok != end; tok = tok->next()) {
             if (tok == func.functionScope->bodyStart)
                 body = true;
@@ -697,7 +697,7 @@ void CheckMemoryLeakInClass::checkPublicFunctions(const Scope *scope, const Toke
     for (const Function &func : scope->functionList) {
         if ((func.type == Function::eFunction || func.type == Function::eOperatorEqual) &&
             func.access == AccessControl::Public && func.hasBody()) {
-            const Token *tok2 = func.functionScope->bodyStart->next();
+            const Token * const tok2 = func.functionScope->bodyStart->next();
             if (Token::Match(tok2, "%varid% =", varid)) {
                 const CheckMemoryLeak::AllocType alloc = getAllocationType(tok2->tokAt(2), varid);
                 if (alloc != CheckMemoryLeak::No)
@@ -723,8 +723,8 @@ void CheckMemoryLeakStructMember::check()
     if (mSettings->clang)
         return;
 
-    const SymbolDatabase* symbolDatabase = mTokenizer->getSymbolDatabase();
-    for (const Variable* var : symbolDatabase->variableList()) {
+    const SymbolDatabase * const symbolDatabase = mTokenizer->getSymbolDatabase();
+    for (const Variable * const var : symbolDatabase->variableList()) {
         if (!var || (!var->isLocal() && !(var->isArgument() && var->scope())) || var->isStatic())
             continue;
         if (var->isReference() || (var->valueType() && var->valueType()->pointer > 1))
@@ -964,10 +964,10 @@ void CheckMemoryLeakStructMember::checkStructVariable(const Variable * const var
 
 void CheckMemoryLeakNoVar::check()
 {
-    const SymbolDatabase *symbolDatabase = mTokenizer->getSymbolDatabase();
+    const SymbolDatabase * const symbolDatabase = mTokenizer->getSymbolDatabase();
 
     // only check functions
-    for (const Scope * scope : symbolDatabase->functionScopes) {
+    for (const Scope * const scope : symbolDatabase->functionScopes) {
 
         // Checks if a call to an allocation function like malloc() is made and its return value is not assigned.
         checkForUnusedReturnValue(scope);
@@ -1070,13 +1070,13 @@ void CheckMemoryLeakNoVar::checkForUnusedReturnValue(const Scope *scope)
 
         bool warn = true;
         if (isNew) {
-            const Token* typeTok = tok->next();
+            const Token * const typeTok = tok->next();
             warn = typeTok && (typeTok->isStandardType() || mSettings->library.detectContainer(typeTok));
         }
 
         if (!parent && warn) {
             // Check if we are in a C++11 constructor
-            const Token * closingBrace = Token::findmatch(tok, "}|;");
+            const Token * const closingBrace = Token::findmatch(tok, "}|;");
             if (closingBrace->str() == "}" && Token::Match(closingBrace->link()->tokAt(-1), "%name%") && (!isNew && precedes(tok, closingBrace->link())))
                 continue;
             returnValueNotUsedError(tok, tok->str());
@@ -1111,13 +1111,13 @@ void CheckMemoryLeakNoVar::checkForUnsafeArgAlloc(const Scope *scope)
 
     for (const Token *tok = scope->bodyStart; tok != scope->bodyEnd; tok = tok->next()) {
         if (Token::Match(tok, "%name% (")) {
-            const Token *endParamToken = tok->next()->link();
+            const Token * const endParamToken = tok->next()->link();
             const Token* pointerType = nullptr;
             const Token* functionCalled = nullptr;
 
             // Scan through the arguments to the function call
             for (const Token *tok2 = tok->tokAt(2); tok2 && tok2 != endParamToken; tok2 = tok2->nextArgument()) {
-                const Function *func = tok2->function();
+                const Function * const func = tok2->function();
                 const bool isNothrow = func && (func->isAttributeNothrow() || func->isThrow());
 
                 if (Token::Match(tok2, "shared_ptr|unique_ptr <") && Token::Match(tok2->next()->link(), "> ( new %name%")) {

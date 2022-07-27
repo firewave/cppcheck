@@ -202,7 +202,7 @@ void TokenList::clangSetOrigFiles()
 void TokenList::deleteTokens(Token *tok)
 {
     while (tok) {
-        Token *next = tok->next();
+        Token * const next = tok->next();
         delete tok;
         tok = next;
     }
@@ -655,7 +655,7 @@ static bool iscpp11init_impl(const Token * const tok)
         for (const Token *tok2 = nameToken->next(); tok2 != endtok; tok2 = tok2->next()) {
             if (tok2->str() == ";")
                 return false;
-            const Token * lambdaEnd = findLambdaEndScope(tok2);
+            const Token * const lambdaEnd = findLambdaEndScope(tok2);
             if (lambdaEnd)
                 tok2 = lambdaEnd;
         }
@@ -855,7 +855,7 @@ static void compileTerm(Token *&tok, AST_state& state)
             if (Token::simpleMatch(tok, "{ }"))
                 tok = tok->tokAt(2);
             else {
-                Token *tok1 = tok;
+                Token * const tok1 = tok;
                 state.inArrayAssignment++;
                 compileUnaryOp(tok, state, compileExpression);
                 state.inArrayAssignment--;
@@ -979,7 +979,7 @@ static void compilePrecedence2(Token *&tok, AST_state& state)
                 compileUnaryOp(tok, state, compileExpression);
             tok = tok2->link()->next();
         } else if (tok->str() == "(" && (!iscast(tok, state.cpp) || Token::Match(tok->previous(), "if|while|for|switch|catch"))) {
-            Token* tok2 = tok;
+            Token * const tok2 = tok;
             tok = tok->next();
             const bool opPrevTopSquare = !state.op.empty() && state.op.top() && state.op.top()->str() == "[";
             const std::size_t oldOpSize = state.op.size();
@@ -1001,7 +1001,7 @@ static void compilePrecedence2(Token *&tok, AST_state& state)
         } else if (iscast(tok, state.cpp) && Token::simpleMatch(tok->link(), ") {") && Token::simpleMatch(tok->link()->linkAt(1), "} [")) {
             Token *cast = tok;
             tok = tok->link()->next();
-            Token *tok1 = tok;
+            Token * const tok1 = tok;
             compileUnaryOp(tok, state, compileExpression);
             cast->astOperand1(tok1);
             tok = tok1->link()->next();
@@ -1233,7 +1233,7 @@ static void compileLogicAnd(Token *&tok, AST_state& state)
     while (tok) {
         if (tok->str() == "&&" && !isQualifier(tok)) {
             if (!tok->astOperand1()) {
-                Token* tok2 = tok->next();
+                Token * const tok2 = tok->next();
                 if (!tok2)
                     break;
                 if (state.cpp && Token::Match(tok2, ",|)")) {
@@ -1262,7 +1262,7 @@ static void compileAssignTernary(Token *&tok, AST_state& state)
     while (tok) {
         if (tok->isAssignmentOp()) {
             state.assign++;
-            const Token *tok1 = tok->next();
+            const Token * const tok1 = tok->next();
             compileBinOp(tok, state, compileAssignTernary);
             if (Token::simpleMatch(tok1, "{") && tok == tok1->link() && tok->next())
                 tok = tok->next();
@@ -1335,7 +1335,7 @@ static bool isLambdaCaptureList(const Token * tok)
         return true;
     if (!tok->astOperand1() || tok->astOperand1()->str() != "(")
         return false;
-    const Token * params = tok->astOperand1();
+    const Token * const params = tok->astOperand1();
     if (!params->astOperand1() || params->astOperand1()->str() != "{")
         return false;
     return true;
@@ -1438,13 +1438,13 @@ static Token * createAstAtToken(Token *tok, bool cpp)
                     decl = decl->next();
                 }
                 if (state1.op.size() > 1) {
-                    Token *lastName = state1.op.top();
+                    Token * const lastName = state1.op.top();
                     state1.op.pop();
                     state1.op.top()->astOperand2(lastName);
                 }
                 decl = decl->next();
 
-                Token *colon = decl;
+                Token * const colon = decl;
                 compileExpression(decl, state1);
 
                 tok->next()->astOperand1(tok);
@@ -1850,7 +1850,7 @@ void TokenList::simplifyPlatformTypes()
         if (platformtype) {
             // check for namespace
             if (tok->strAt(-1) == "::") {
-                const Token * tok1 = tok->tokAt(-2);
+                const Token * const tok1 = tok->tokAt(-2);
                 // skip when non-global namespace defined
                 if (tok1 && tok1->tokType() == Token::eName)
                     continue;
@@ -1946,7 +1946,7 @@ void TokenList::simplifyStdType()
                 typeSpec->isUnsigned(typeSpec->isUnsigned() || isUnsigned);
 
                 // Remove specifiers
-                const Token* tok3 = tok->previous();
+                const Token * const tok3 = tok->previous();
                 tok2 = tok2->previous();
                 while (tok3 != tok2) {
                     if (tok2 != typeSpec &&

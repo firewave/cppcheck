@@ -52,7 +52,7 @@ std::size_t ExprIdToken::Hash::operator()(ExprIdToken etok) const
 void ProgramMemory::setValue(const Token* expr, const ValueFlow::Value& value) {
     mValues[expr] = value;
     ValueFlow::Value subvalue = value;
-    const Token* subexpr = solveExprValue(
+    const Token * const subexpr = solveExprValue(
         expr,
         [&](const Token* tok) -> std::vector<MathLib::bigint> {
         if (tok->hasKnownIntValue())
@@ -79,7 +79,7 @@ const ValueFlow::Value* ProgramMemory::getValue(nonneg int exprid, bool impossib
 // cppcheck-suppress unusedFunction
 bool ProgramMemory::getIntValue(nonneg int exprid, MathLib::bigint* result) const
 {
-    const ValueFlow::Value* value = getValue(exprid);
+    const ValueFlow::Value * const value = getValue(exprid);
     if (value && value->isIntValue()) {
         *result = value->intvalue;
         return true;
@@ -97,7 +97,7 @@ void ProgramMemory::setIntValue(const Token* expr, MathLib::bigint value, bool i
 
 bool ProgramMemory::getTokValue(nonneg int exprid, const Token** result) const
 {
-    const ValueFlow::Value* value = getValue(exprid);
+    const ValueFlow::Value * const value = getValue(exprid);
     if (value && value->isTokValue()) {
         *result = value->tokvalue;
         return true;
@@ -108,7 +108,7 @@ bool ProgramMemory::getTokValue(nonneg int exprid, const Token** result) const
 // cppcheck-suppress unusedFunction
 bool ProgramMemory::getContainerSizeValue(nonneg int exprid, MathLib::bigint* result) const
 {
-    const ValueFlow::Value* value = getValue(exprid);
+    const ValueFlow::Value * const value = getValue(exprid);
     if (value && value->isContainerSizeValue()) {
         *result = value->intvalue;
         return true;
@@ -117,7 +117,7 @@ bool ProgramMemory::getContainerSizeValue(nonneg int exprid, MathLib::bigint* re
 }
 bool ProgramMemory::getContainerEmptyValue(nonneg int exprid, MathLib::bigint* result) const
 {
-    const ValueFlow::Value* value = getValue(exprid, true);
+    const ValueFlow::Value * const value = getValue(exprid, true);
     if (value && value->isContainerSizeValue()) {
         if (value->isImpossible() && value->intvalue == 0) {
             *result = false;
@@ -242,7 +242,7 @@ static bool isBasicForLoop(const Token* tok)
         return isBasicForLoop(tok->link());
     if (!Token::simpleMatch(tok->previous(), ") {"))
         return false;
-    const Token* start = tok->linkAt(-1);
+    const Token * const start = tok->linkAt(-1);
     if (!start)
         return false;
     if (!Token::simpleMatch(start->previous(), "for ("))
@@ -267,7 +267,7 @@ void programMemoryParseCondition(ProgramMemory& pm, const Token* tok, const Toke
     if (Token::Match(tok, "==|>=|<=|<|>|!=")) {
         ValueFlow::Value truevalue;
         ValueFlow::Value falsevalue;
-        const Token* vartok = parseCompareInt(tok, truevalue, falsevalue, eval);
+        const Token * const vartok = parseCompareInt(tok, truevalue, falsevalue, eval);
         if (!vartok)
             return;
         if (vartok->exprId() == 0)
@@ -279,7 +279,7 @@ void programMemoryParseCondition(ProgramMemory& pm, const Token* tok, const Toke
         const bool impossible = (tok->str() == "==" && !then) || (tok->str() == "!=" && then);
         const ValueFlow::Value& v = then ? truevalue : falsevalue;
         pm.setValue(vartok, impossible ? asImpossible(v) : v);
-        const Token* containerTok = settings->library.getContainerFromYield(vartok, Library::Container::Yield::SIZE);
+        const Token * const containerTok = settings->library.getContainerFromYield(vartok, Library::Container::Yield::SIZE);
         if (containerTok)
             pm.setContainerSizeValue(containerTok, v.intvalue, !impossible);
     } else if (Token::simpleMatch(tok, "!")) {
@@ -303,7 +303,7 @@ void programMemoryParseCondition(ProgramMemory& pm, const Token* tok, const Toke
         if (endTok && isExpressionChanged(tok, tok->next(), endTok, settings, true))
             return;
         pm.setIntValue(tok, 0, then);
-        const Token* containerTok = settings->library.getContainerFromYield(tok, Library::Container::Yield::EMPTY);
+        const Token * const containerTok = settings->library.getContainerFromYield(tok, Library::Container::Yield::EMPTY);
         if (containerTok)
             pm.setContainerSizeValue(containerTok, 0, then);
     }
@@ -318,7 +318,7 @@ static void fillProgramMemoryFromConditions(ProgramMemory& pm, const Scope* scop
     assert(scope != scope->nestedIn);
     fillProgramMemoryFromConditions(pm, scope->nestedIn, endTok, settings);
     if (scope->type == Scope::eIf || scope->type == Scope::eWhile || scope->type == Scope::eElse || scope->type == Scope::eFor) {
-        const Token* condTok = getCondTokFromEnd(scope->bodyEnd);
+        const Token * const condTok = getCondTokFromEnd(scope->bodyEnd);
         if (!condTok)
             return;
         MathLib::bigint result = 0;
@@ -341,8 +341,8 @@ static void fillProgramMemoryFromAssignments(ProgramMemory& pm, const Token* tok
         if ((Token::simpleMatch(tok2, "=") || Token::Match(tok2->previous(), "%var% (|{")) && tok2->astOperand1() &&
             tok2->astOperand2()) {
             bool setvar = false;
-            const Token* vartok = tok2->astOperand1();
-            const Token* valuetok = tok2->astOperand2();
+            const Token * const vartok = tok2->astOperand1();
+            const Token * const valuetok = tok2->astOperand2();
             for (const auto& p:vars) {
                 if (p.first != vartok->exprId())
                     continue;
@@ -363,7 +363,7 @@ static void fillProgramMemoryFromAssignments(ProgramMemory& pm, const Token* tok
 
         if (tok2->str() == "{") {
             if (indentlevel <= 0) {
-                const Token* cond = getCondTokFromEnd(tok2->link());
+                const Token * const cond = getCondTokFromEnd(tok2->link());
                 // Keep progressing with anonymous/do scopes and always true branches
                 if (!Token::Match(tok2->previous(), "do|; {") && !conditionIsTrue(cond, state) &&
                     (cond || !isBasicForLoop(tok2)))
@@ -374,7 +374,7 @@ static void fillProgramMemoryFromAssignments(ProgramMemory& pm, const Token* tok
                 tok2 = tok2->linkAt(-2)->previous();
         }
         if (tok2->str() == "}") {
-            const Token *cond = getCondTokFromEnd(tok2);
+            const Token * const cond = getCondTokFromEnd(tok2);
             const bool inElse = Token::simpleMatch(tok2->link()->previous(), "else {");
             if (cond) {
                 if (conditionIsFalse(cond, state)) {
@@ -460,7 +460,7 @@ void ProgramMemoryState::assume(const Token* tok, bool b, bool isEmpty)
     else
         programMemoryParseCondition(pm, tok, nullptr, settings, b);
     const Token* origin = tok;
-    const Token* top = tok->astTop();
+    const Token * const top = tok->astTop();
     if (top && Token::Match(top->previous(), "for|while ("))
         origin = top->link();
     replace(pm, origin);
@@ -469,8 +469,8 @@ void ProgramMemoryState::assume(const Token* tok, bool b, bool isEmpty)
 void ProgramMemoryState::removeModifiedVars(const Token* tok)
 {
     state.erase_if([&](const ExprIdToken& e) {
-        const Token* start = origins[e.getExpressionId()];
-        const Token* expr = e.tok;
+        const Token * const start = origins[e.getExpressionId()];
+        const Token * const expr = e.tok;
         if (!expr || isExpressionChanged(expr, start, tok, settings, true)) {
             origins.erase(e.getExpressionId());
             return true;
@@ -1158,7 +1158,7 @@ static ValueFlow::Value executeImpl(const Token* expr, ProgramMemory& pm, const 
     } else if (expr->isBoolean()) {
         return ValueFlow::Value{ expr->str() == "true" };
     } else if (Token::Match(expr->tokAt(-2), ". %name% (") && astIsContainer(expr->tokAt(-2)->astOperand1())) {
-        const Token* containerTok = expr->tokAt(-2)->astOperand1();
+        const Token * const containerTok = expr->tokAt(-2)->astOperand1();
         const Library::Container::Yield yield = containerTok->valueType()->container->getYield(expr->strAt(-1));
         if (yield == Library::Container::Yield::SIZE) {
             ValueFlow::Value v = execute(containerTok, pm);
@@ -1285,7 +1285,7 @@ static ValueFlow::Value executeImpl(const Token* expr, ProgramMemory& pm, const 
         const ValueFlow::Value cond = execute(expr->astOperand1(), pm);
         if (!cond.isIntValue())
             return unknown;
-        const Token* child = expr->astOperand2();
+        const Token * const child = expr->astOperand2();
         if (cond.intvalue == 0)
             return execute(child->astOperand2(), pm);
         else
@@ -1306,8 +1306,8 @@ static ValueFlow::Value executeImpl(const Token* expr, ProgramMemory& pm, const 
     }
 
     if (Token::Match(expr->previous(), ">|%name% {|(")) {
-        const Token* ftok = expr->previous();
-        const Function* f = ftok->function();
+        const Token * const ftok = expr->previous();
+        const Function * const f = ftok->function();
         // TODO: Evaluate inline functions as well
         if (!f && settings && expr->str() == "(") {
             std::vector<const Token*> tokArgs = getArguments(expr);

@@ -63,11 +63,11 @@ static const struct CWE CWE561(561U);   // Dead Code
 void CheckUnusedFunctions::parseTokens(const Tokenizer &tokenizer, const char FileName[], const Settings *settings)
 {
     const bool doMarkup = settings->library.markupFile(FileName);
-    const SymbolDatabase* symbolDatabase = tokenizer.getSymbolDatabase();
+    const SymbolDatabase * const symbolDatabase = tokenizer.getSymbolDatabase();
 
     // Function declarations..
-    for (const Scope* scope : symbolDatabase->functionScopes) {
-        const Function* func = scope->function;
+    for (const Scope * const scope : symbolDatabase->functionScopes) {
+        const Function * const func = scope->function;
         if (!func || !func->token || scope->bodyStart->fileIndex() != 0)
             continue;
 
@@ -148,7 +148,7 @@ void CheckUnusedFunctions::parseTokens(const Tokenizer &tokenizer, const char Fi
             const Token * propToken = tok->next();
             while (propToken && propToken->str() != ")") {
                 if (settings->library.isexportedprefix(tok->str(), propToken->str())) {
-                    const Token* nextPropToken = propToken->next();
+                    const Token * const nextPropToken = propToken->next();
                     const std::string& value = nextPropToken->str();
                     if (mFunctions.find(value) != mFunctions.end()) {
                         mFunctions[value].usedOtherFile = true;
@@ -156,7 +156,7 @@ void CheckUnusedFunctions::parseTokens(const Tokenizer &tokenizer, const char Fi
                     mFunctionCalls.insert(value);
                 }
                 if (settings->library.isexportedsuffix(tok->str(), propToken->str())) {
-                    const Token* prevPropToken = propToken->previous();
+                    const Token * const prevPropToken = propToken->previous();
                     const std::string& value = prevPropToken->str();
                     if (value != ")" && mFunctions.find(value) != mFunctions.end()) {
                         mFunctions[value].usedOtherFile = true;
@@ -429,18 +429,18 @@ void CheckUnusedFunctions::analyseWholeProgram(ErrorLogger * const errorLogger, 
         for (const tinyxml2::XMLElement *e = rootNode->FirstChildElement(); e; e = e->NextSiblingElement()) {
             if (std::strcmp(e->Name(), "FileInfo") != 0)
                 continue;
-            const char *checkattr = e->Attribute("check");
+            const char * const checkattr = e->Attribute("check");
             if (checkattr == nullptr || std::strcmp(checkattr,"CheckUnusedFunctions") != 0)
                 continue;
             for (const tinyxml2::XMLElement *e2 = e->FirstChildElement(); e2; e2 = e2->NextSiblingElement()) {
-                const char* functionName = e2->Attribute("functionName");
+                const char * const functionName = e2->Attribute("functionName");
                 if (functionName == nullptr)
                     continue;
                 if (std::strcmp(e2->Name(),"functioncall") == 0) {
                     calls.insert(functionName);
                     continue;
                 } else if (std::strcmp(e2->Name(),"functiondecl") == 0) {
-                    const char* lineNumber = e2->Attribute("lineNumber");
+                    const char * const lineNumber = e2->Attribute("lineNumber");
                     if (lineNumber)
                         decls[functionName] = Location(sourcefile, std::atoi(lineNumber));
                 }

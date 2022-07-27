@@ -142,7 +142,7 @@ struct Interval {
     static Interval fromValues(const std::list<ValueFlow::Value>& values, Predicate predicate)
     {
         Interval result;
-        const ValueFlow::Value* minValue = getCompareValue(values, predicate, std::less<MathLib::bigint>{});
+        const ValueFlow::Value * const minValue = getCompareValue(values, predicate, std::less<MathLib::bigint>{});
         if (minValue) {
             if (minValue->isImpossible() && minValue->bound == ValueFlow::Value::Bound::Upper)
                 result.setMinValue(minValue->intvalue + 1, minValue);
@@ -151,7 +151,7 @@ struct Interval {
             if (minValue->isKnown())
                 return Interval::fromInt(minValue->intvalue, minValue);
         }
-        const ValueFlow::Value* maxValue = getCompareValue(values, predicate, std::greater<MathLib::bigint>{});
+        const ValueFlow::Value * const maxValue = getCompareValue(values, predicate, std::greater<MathLib::bigint>{});
         if (maxValue) {
             if (maxValue->isImpossible() && maxValue->bound == ValueFlow::Value::Bound::Lower)
                 result.setMaxValue(maxValue->intvalue - 1, maxValue);
@@ -260,7 +260,7 @@ std::string toString(const Interval& i) {
 static void addToErrorPath(ValueFlow::Value& value, const std::vector<const ValueFlow::Value*>& refs)
 {
     std::unordered_set<const Token*> locations;
-    for (const ValueFlow::Value* ref : refs) {
+    for (const ValueFlow::Value * const ref : refs) {
         if (ref->condition && !value.condition)
             value.condition = ref->condition;
         std::copy_if(ref->errorPath.begin(),
@@ -276,7 +276,7 @@ static void setValueKind(ValueFlow::Value& value, const std::vector<const ValueF
 {
     bool isPossible = false;
     bool isInconclusive = false;
-    for (const ValueFlow::Value* ref : refs) {
+    for (const ValueFlow::Value * const ref : refs) {
         if (ref->isPossible())
             isPossible = true;
         if (ref->isInconclusive())

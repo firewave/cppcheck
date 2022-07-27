@@ -373,7 +373,7 @@ void ResultsView::readErrorsXml(const QString &filename)
 
 void ResultsView::updateDetails(const QModelIndex &index)
 {
-    QStandardItemModel *model = qobject_cast<QStandardItemModel*>(mUI->mTree->model());
+    QStandardItemModel * const model = qobject_cast<QStandardItemModel*>(mUI->mTree->model());
     QStandardItem *item = model->itemFromIndex(index);
 
     if (!item) {
@@ -453,7 +453,7 @@ void ResultsView::logClear()
 
 void ResultsView::logCopyEntry()
 {
-    const QListWidgetItem * item = mUI->mListLog->currentItem();
+    const QListWidgetItem * const item = mUI->mListLog->currentItem();
     if (nullptr != item) {
         QClipboard *clipboard = QApplication::clipboard();
         clipboard->setText(item->text());
@@ -464,7 +464,7 @@ void ResultsView::logCopyComplete()
 {
     QString logText;
     for (int i=0; i < mUI->mListLog->count(); ++i) {
-        const QListWidgetItem * item = mUI->mListLog->item(i);
+        const QListWidgetItem * const item = mUI->mListLog->item(i);
         if (nullptr != item) {
             logText += item->text();
         }

@@ -1056,7 +1056,7 @@ private:
     Tokenizer tokenizer(&settings, this); \
     std::istringstream istr(AST); \
     clangimport::parseClangAstDump(&tokenizer, istr); \
-    const SymbolDatabase *db = tokenizer.getSymbolDatabase(); \
+    const SymbolDatabase * const db = tokenizer.getSymbolDatabase(); \
     ASSERT(db)
 
     void tokenIndex() {
@@ -1065,7 +1065,7 @@ private:
         ASSERT_EQUALS("void foo ( ) { }", parse(clang));
 
         GET_SYMBOL_DB(clang);
-        const Token *tok = tokenizer.tokens();
+        const Token * const tok = tokenizer.tokens();
         ASSERT_EQUALS(tok->index() + 1, tok->next()->index());
     }
 
@@ -1087,11 +1087,11 @@ private:
         const Scope &enumScope = db->scopeList.back();
         ASSERT_EQUALS(Scope::ScopeType::eEnum, enumScope.type);
         ASSERT_EQUALS("abc", enumScope.className);
-        const Type *enumType = enumScope.definedType;
+        const Type * const enumType = enumScope.definedType;
         ASSERT_EQUALS("abc", enumType->name());
 
         // Variable
-        const Token *vartok = Token::findsimplematch(tokenizer.tokens(), "x");
+        const Token * const vartok = Token::findsimplematch(tokenizer.tokens(), "x");
         ASSERT(vartok);
         ASSERT(vartok->variable());
         ASSERT(vartok->variable()->valueType());
@@ -1108,8 +1108,8 @@ private:
 
         // There is a function foo that has 2 arguments
         ASSERT_EQUALS(1, db->functionScopes.size());
-        const Scope *scope = db->functionScopes[0];
-        const Function *func = scope->function;
+        const Scope * const scope = db->functionScopes[0];
+        const Function * const func = scope->function;
         ASSERT_EQUALS(2, func->argCount());
         ASSERT_EQUALS("x", func->getArgumentVar(0)->name());
         ASSERT_EQUALS("y", func->getArgumentVar(1)->name());
@@ -1127,8 +1127,8 @@ private:
 
         // There is a function foo that has 2 arguments
         ASSERT_EQUALS(1, db->functionScopes.size());
-        const Scope *scope = db->functionScopes[0];
-        const Function *func = scope->function;
+        const Scope * const scope = db->functionScopes[0];
+        const Function * const func = scope->function;
         ASSERT_EQUALS(2, func->argCount());
         ASSERT_EQUALS(0, (long long)func->getArgumentVar(0)->nameToken());
         ASSERT_EQUALS(0, (long long)func->getArgumentVar(1)->nameToken());
@@ -1144,8 +1144,8 @@ private:
 
         // There is a function foo that has 2 arguments
         ASSERT_EQUALS(1, db->functionScopes.size());
-        const Scope *scope = db->functionScopes[0];
-        const Function *func = scope->function;
+        const Scope * const scope = db->functionScopes[0];
+        const Function * const func = scope->function;
         ASSERT_EQUALS(2, func->argCount());
         ASSERT_EQUALS(false, func->getArgumentVar(0)->isReference());
         ASSERT_EQUALS(true, func->getArgumentVar(1)->isReference());
@@ -1173,7 +1173,7 @@ private:
                              "      `-VarDecl 0x1593fb8 <col:3, col:14> col:8 ref 'int &' cinit\n"
                              "        `-DeclRefExpr 0x1594020 <col:14> 'int' lvalue Var 0x1593ef0 'x' 'int'";
         GET_SYMBOL_DB(clang);
-        const Variable *refVar = db->variableList().back();
+        const Variable * const refVar = db->variableList().back();
         ASSERT(refVar->isReference());
     }
 
@@ -1194,7 +1194,7 @@ private:
         ASSERT_EQUALS("void foo ( ) { int x@1 ; int && ref@2 = x@1 + 1 ; }", parse(clang));
 
         GET_SYMBOL_DB(clang);
-        const Variable *refVar = db->variableList().back();
+        const Variable * const refVar = db->variableList().back();
         ASSERT(refVar->isReference());
         ASSERT(refVar->isRValueReference());
     }
@@ -1206,7 +1206,7 @@ private:
         ASSERT_EQUALS("void foo ( int * & p@1 ) ;", parse(clang));
 
         GET_SYMBOL_DB(clang);
-        const Variable *p = db->variableList().back();
+        const Variable * const p = db->variableList().back();
         ASSERT(p->isPointer());
         ASSERT(p->isReference());
     }
@@ -1224,7 +1224,7 @@ private:
 
         GET_SYMBOL_DB(clang);
 
-        const Token *tok = Token::findsimplematch(tokenizer.tokens(), "i + 1");
+        const Token * const tok = Token::findsimplematch(tokenizer.tokens(), "i + 1");
         ASSERT(!!tok);
         ASSERT(!!tok->valueType());
         ASSERT_EQUALS("signed long", tok->valueType()->str());
@@ -1246,7 +1246,7 @@ private:
 
         GET_SYMBOL_DB(clang);
 
-        const Token *tok = Token::findsimplematch(tokenizer.tokens(), "i");
+        const Token * const tok = Token::findsimplematch(tokenizer.tokens(), "i");
         ASSERT(!!tok);
         ASSERT(!!tok->variable());
         ASSERT_EQUALS(Scope::ScopeType::eFor, tok->variable()->scope()->type);
@@ -1298,7 +1298,7 @@ private:
 
         GET_SYMBOL_DB(clang);
 
-        const Token *tok = Token::findsimplematch(tokenizer.tokens(), "e");
+        const Token * const tok = Token::findsimplematch(tokenizer.tokens(), "e");
         ASSERT(!!tok);
         ASSERT(!!tok->valueType());
         ASSERT_EQUALS("bool", tok->valueType()->str());
@@ -1311,7 +1311,7 @@ private:
 
         GET_SYMBOL_DB(clang);
 
-        const Token *tok = Token::findsimplematch(tokenizer.tokens(), "\"hello\"");
+        const Token * const tok = Token::findsimplematch(tokenizer.tokens(), "\"hello\"");
         ASSERT(!!tok);
         ASSERT(!!tok->valueType());
         ASSERT_EQUALS("const signed char *", tok->valueType()->str());

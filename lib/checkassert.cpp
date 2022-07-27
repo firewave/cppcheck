@@ -48,7 +48,7 @@ void CheckAssert::assertWithSideEffects()
         if (!Token::simpleMatch(tok, "assert ("))
             continue;
 
-        const Token *endTok = tok->next()->link();
+        const Token * const endTok = tok->next()->link();
         for (const Token* tmp = tok->next(); tmp != endTok; tmp = tmp->next()) {
             if (Token::simpleMatch(tmp, "sizeof ("))
                 tmp = tmp->linkAt(1);
@@ -58,19 +58,19 @@ void CheckAssert::assertWithSideEffects()
             if (tmp->tokType() != Token::eFunction)
                 continue;
 
-            const Function* f = tmp->function();
+            const Function * const f = tmp->function();
             if (f->nestedIn->isClassOrStruct() && !f->isStatic() && !f->isConst()) {
                 sideEffectInAssertError(tmp, f->name()); // Non-const member function called
                 continue;
             }
-            const Scope* scope = f->functionScope;
+            const Scope * const scope = f->functionScope;
             if (!scope) continue;
 
             for (const Token *tok2 = scope->bodyStart; tok2 != scope->bodyEnd; tok2 = tok2->next()) {
                 if (!tok2->isAssignmentOp() && tok2->tokType() != Token::eIncDecOp)
                     continue;
 
-                const Variable* var = tok2->previous()->variable();
+                const Variable * const var = tok2->previous()->variable();
                 if (!var || var->isLocal() || (var->isArgument() && !var->isReference() && !var->isPointer()))
                     continue; // See ticket #4937. Assigning function arguments not passed by reference is ok.
                 if (var->isArgument() && var->isPointer() && tok2->strAt(-2) != "*")
@@ -126,7 +126,7 @@ void CheckAssert::checkVariableAssignment(const Token* assignTok, const Scope *a
     if (!assignTok->isAssignmentOp() && assignTok->tokType() != Token::eIncDecOp)
         return;
 
-    const Variable* var = assignTok->astOperand1()->variable();
+    const Variable * const var = assignTok->astOperand1()->variable();
     if (!var)
         return;
 

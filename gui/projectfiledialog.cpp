@@ -48,7 +48,7 @@ static QStringList getPaths(const QListWidget *list)
     const int count = list->count();
     QStringList paths;
     for (int i = 0; i < count; i++) {
-        QListWidgetItem *item = list->item(i);
+        QListWidgetItem * const item = list->item(i);
         paths << QDir::fromNativeSeparators(item->text());
     }
     return paths;
@@ -517,7 +517,7 @@ QStringList ProjectFileDialog::getProjectConfigurations() const
 {
     QStringList configs;
     for (int row = 0; row < mUI->mListVsConfigs->count(); ++row) {
-        QListWidgetItem *item = mUI->mListVsConfigs->item(row);
+        QListWidgetItem * const item = mUI->mListVsConfigs->item(row);
         if (item->checkState() == Qt::Checked)
             configs << item->text();
     }
@@ -626,7 +626,7 @@ QStringList ProjectFileDialog::getLibraries() const
 {
     QStringList libraries;
     for (int row = 0; row < mUI->mLibraries->count(); ++row) {
-        QListWidgetItem *item = mUI->mLibraries->item(row);
+        QListWidgetItem * const item = mUI->mLibraries->item(row);
         if (item->checkState() == Qt::Checked)
             libraries << item->text();
     }
@@ -739,14 +739,14 @@ void ProjectFileDialog::addCheckPath()
 
 void ProjectFileDialog::editCheckPath()
 {
-    QListWidgetItem *item = mUI->mListCheckPaths->currentItem();
+    QListWidgetItem * const item = mUI->mListCheckPaths->currentItem();
     mUI->mListCheckPaths->editItem(item);
 }
 
 void ProjectFileDialog::removeCheckPath()
 {
     const int row = mUI->mListCheckPaths->currentRow();
-    QListWidgetItem *item = mUI->mListCheckPaths->takeItem(row);
+    QListWidgetItem * const item = mUI->mListCheckPaths->takeItem(row);
     delete item;
 }
 
@@ -760,13 +760,13 @@ void ProjectFileDialog::addIncludeDir()
 void ProjectFileDialog::removeIncludeDir()
 {
     const int row = mUI->mListIncludeDirs->currentRow();
-    QListWidgetItem *item = mUI->mListIncludeDirs->takeItem(row);
+    QListWidgetItem * const item = mUI->mListIncludeDirs->takeItem(row);
     delete item;
 }
 
 void ProjectFileDialog::editIncludeDir()
 {
-    QListWidgetItem *item = mUI->mListIncludeDirs->currentItem();
+    QListWidgetItem * const item = mUI->mListIncludeDirs->currentItem();
     mUI->mListIncludeDirs->editItem(item);
 }
 
@@ -787,21 +787,21 @@ void ProjectFileDialog::addExcludeFile()
 
 void ProjectFileDialog::editExcludePath()
 {
-    QListWidgetItem *item = mUI->mListExcludedPaths->currentItem();
+    QListWidgetItem * const item = mUI->mListExcludedPaths->currentItem();
     mUI->mListExcludedPaths->editItem(item);
 }
 
 void ProjectFileDialog::removeExcludePath()
 {
     const int row = mUI->mListExcludedPaths->currentRow();
-    QListWidgetItem *item = mUI->mListExcludedPaths->takeItem(row);
+    QListWidgetItem * const item = mUI->mListExcludedPaths->takeItem(row);
     delete item;
 }
 
 void ProjectFileDialog::moveIncludePathUp()
 {
     int row = mUI->mListIncludeDirs->currentRow();
-    QListWidgetItem *item = mUI->mListIncludeDirs->takeItem(row);
+    QListWidgetItem * const item = mUI->mListIncludeDirs->takeItem(row);
     row = row > 0 ? row - 1 : 0;
     mUI->mListIncludeDirs->insertItem(row, item);
     mUI->mListIncludeDirs->setCurrentItem(item);
@@ -810,7 +810,7 @@ void ProjectFileDialog::moveIncludePathUp()
 void ProjectFileDialog::moveIncludePathDown()
 {
     int row = mUI->mListIncludeDirs->currentRow();
-    QListWidgetItem *item = mUI->mListIncludeDirs->takeItem(row);
+    QListWidgetItem * const item = mUI->mListIncludeDirs->takeItem(row);
     const int count = mUI->mListIncludeDirs->count();
     row = row < count ? row + 1 : count;
     mUI->mListIncludeDirs->insertItem(row, item);
@@ -828,7 +828,7 @@ void ProjectFileDialog::addSuppression()
 void ProjectFileDialog::removeSuppression()
 {
     const int row = mUI->mListSuppressions->currentRow();
-    QListWidgetItem *item = mUI->mListSuppressions->takeItem(row);
+    QListWidgetItem * const item = mUI->mListSuppressions->takeItem(row);
     if (!item)
         return;
 
@@ -841,7 +841,7 @@ void ProjectFileDialog::removeSuppression()
 void ProjectFileDialog::editSuppression(const QModelIndex &)
 {
     const int row = mUI->mListSuppressions->currentRow();
-    QListWidgetItem *item = mUI->mListSuppressions->item(row);
+    QListWidgetItem * const item = mUI->mListSuppressions->item(row);
     const int suppressionIndex = getSuppressionIndex(item->text());
     if (suppressionIndex >= 0) { // TODO what if suppression is not found?
         NewSuppressionDialog dlg;

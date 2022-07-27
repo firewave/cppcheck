@@ -215,7 +215,7 @@ void Preprocessor::setDirectives(const simplecpp::TokenList &tokens)
         list.push_back(it->second);
     }
 
-    for (const simplecpp::TokenList *tokenList : list) {
+    for (const simplecpp::TokenList * const tokenList : list) {
         for (const simplecpp::Token *tok = tokenList->cfront(); tok; tok = tok->next) {
             if ((tok->op != '#') || (tok->previous && tok->previous->location.line == tok->location.line))
                 continue;
@@ -243,9 +243,9 @@ static std::string readcondition(const simplecpp::Token *iftok, const std::set<s
     if (!sameline(iftok,cond))
         return "";
 
-    const simplecpp::Token *next1 = cond->next;
-    const simplecpp::Token *next2 = next1 ? next1->next : nullptr;
-    const simplecpp::Token *next3 = next2 ? next2->next : nullptr;
+    const simplecpp::Token * const next1 = cond->next;
+    const simplecpp::Token * const next2 = next1 ? next1->next : nullptr;
+    const simplecpp::Token * const next3 = next2 ? next2->next : nullptr;
 
     unsigned int len = 1;
     if (sameline(iftok,next1))
@@ -395,13 +395,13 @@ static void getConfigs(const simplecpp::TokenList &tokens, std::set<std::string>
     for (const simplecpp::Token *tok = tokens.cfront(); tok; tok = tok->next) {
         if (tok->op != '#' || sameline(tok->previous, tok))
             continue;
-        const simplecpp::Token *cmdtok = tok->next;
+        const simplecpp::Token * const cmdtok = tok->next;
         if (!sameline(tok, cmdtok))
             continue;
         if (cmdtok->str() == "ifdef" || cmdtok->str() == "ifndef" || cmdtok->str() == "if") {
             std::string config;
             if (cmdtok->str() == "ifdef" || cmdtok->str() == "ifndef") {
-                const simplecpp::Token *expr1 = cmdtok->next;
+                const simplecpp::Token * const expr1 = cmdtok->next;
                 if (sameline(tok,expr1) && expr1->name && !sameline(tok,expr1->next))
                     config = expr1->str();
                 if (defined.find(config) != defined.end())

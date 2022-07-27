@@ -65,7 +65,7 @@ void CheckIO::checkCoutCerrMisusage()
         return;
 
     const SymbolDatabase * const symbolDatabase = mTokenizer->getSymbolDatabase();
-    for (const Scope * scope : symbolDatabase->functionScopes) {
+    for (const Scope * const scope : symbolDatabase->functionScopes) {
         for (const Token *tok = scope->bodyStart; tok && tok != scope->bodyEnd; tok = tok->next()) {
             if (Token::Match(tok, "std :: cout|cerr !!.") && tok->next()->astParent() && tok->next()->astParent()->astOperand1() == tok->next()) {
                 const Token* tok2 = tok->next();
@@ -126,8 +126,8 @@ void CheckIO::checkFileUsage()
 
     std::map<int, Filepointer> filepointers;
 
-    const SymbolDatabase* symbolDatabase = mTokenizer->getSymbolDatabase();
-    for (const Variable* var : symbolDatabase->variableList()) {
+    const SymbolDatabase * const symbolDatabase = mTokenizer->getSymbolDatabase();
+    for (const Variable * const var : symbolDatabase->variableList()) {
         if (!var || !var->declarationId() || var->isArray() || !Token::simpleMatch(var->typeStartToken(), "FILE *"))
             continue;
 
@@ -142,7 +142,7 @@ void CheckIO::checkFileUsage()
         }
     }
 
-    for (const Scope * scope : symbolDatabase->functionScopes) {
+    for (const Scope * const scope : symbolDatabase->functionScopes) {
         int indent = 0;
         for (const Token *tok = scope->bodyStart; tok != scope->bodyEnd; tok = tok->next()) {
             if (tok->str() == "{")
@@ -184,7 +184,7 @@ void CheckIO::checkFileUsage()
                      (windows && (tok->str() == "_wfopen" || tok->str() == "_wfreopen"))) &&
                     tok->strAt(-1) == "=") {
                     if (tok->str() != "tmpfile") {
-                        const Token* modeTok = tok->tokAt(2)->nextArgument();
+                        const Token * const modeTok = tok->tokAt(2)->nextArgument();
                         if (modeTok && modeTok->tokType() == Token::eString)
                             mode = modeTok->strValue();
                     } else
@@ -194,7 +194,7 @@ void CheckIO::checkFileUsage()
                     if (Token::Match(tok, "fopen ( %str% ,"))
                         fileNameTok = tok->tokAt(2);
                 } else if (windows && Token::Match(tok, "fopen_s|freopen_s|_wfopen_s|_wfreopen_s ( & %name%")) {
-                    const Token* modeTok = tok->tokAt(2)->nextArgument()->nextArgument();
+                    const Token * const modeTok = tok->tokAt(2)->nextArgument()->nextArgument();
                     if (modeTok && modeTok->tokType() == Token::eString)
                         mode = modeTok->strValue();
                     fileTok = tok->tokAt(3);
@@ -243,7 +243,7 @@ void CheckIO::checkFileUsage()
                     if (scope->functionOf && scope->functionOf->isClassOrStruct() && !scope->function->isStatic() && ((tok->strAt(-1) != "::" && tok->strAt(-1) != ".") || tok->strAt(-2) == "this")) {
                         if (!tok->function() || (tok->function()->nestedIn && tok->function()->nestedIn->isClassOrStruct())) {
                             for (std::pair<const int, Filepointer>& filepointer : filepointers) {
-                                const Variable* var = symbolDatabase->getVariableFromVarId(filepointer.first);
+                                const Variable * const var = symbolDatabase->getVariableFromVarId(filepointer.first);
                                 if (!var || !(var->isLocal() || var->isGlobal() || var->isStatic())) {
                                     filepointer.second.mode = OpenMode::UNKNOWN_OM;
                                     filepointer.second.mode_indent = 0;
@@ -403,13 +403,13 @@ void CheckIO::invalidScanf()
         return;
 
     const SymbolDatabase * const symbolDatabase = mTokenizer->getSymbolDatabase();
-    for (const Scope * scope : symbolDatabase->functionScopes) {
+    for (const Scope * const scope : symbolDatabase->functionScopes) {
         for (const Token *tok = scope->bodyStart->next(); tok != scope->bodyEnd; tok = tok->next()) {
             const Token *formatToken = nullptr;
             if (Token::Match(tok, "scanf|vscanf ( %str% ,"))
                 formatToken = tok->tokAt(2);
             else if (Token::Match(tok, "sscanf|vsscanf|fscanf|vfscanf (")) {
-                const Token* nextArg = tok->tokAt(2)->nextArgument();
+                const Token * const nextArg = tok->tokAt(2)->nextArgument();
                 if (nextArg && nextArg->tokType() == Token::eString)
                     formatToken = nextArg;
                 else
@@ -515,10 +515,10 @@ static inline bool typesMatch(const std::string& iToTest, const std::string& iTy
 
 void CheckIO::checkWrongPrintfScanfArguments()
 {
-    const SymbolDatabase *symbolDatabase = mTokenizer->getSymbolDatabase();
+    const SymbolDatabase * const symbolDatabase = mTokenizer->getSymbolDatabase();
     const bool isWindows = mSettings->isWindowsPlatform();
 
-    for (const Scope * scope : symbolDatabase->functionScopes) {
+    for (const Scope * const scope : symbolDatabase->functionScopes) {
         for (const Token *tok = scope->bodyStart->next(); tok != scope->bodyEnd; tok = tok->next()) {
             if (!tok->isName()) continue;
 
@@ -1346,7 +1346,7 @@ CheckIO::ArgumentInfo::ArgumentInfo(const Token * arg, const Settings *settings,
             top = top->next();
         while (top->astParent() && top->astParent()->str() != "," && top->astParent() != arg->previous())
             top = top->astParent();
-        const ValueType *valuetype = top->argumentType();
+        const ValueType * const valuetype = top->argumentType();
         if (valuetype && valuetype->type >= ValueType::Type::BOOL) {
             typeToken = tempToken = new Token();
             if (valuetype->pointer && valuetype->constness & 1) {
@@ -1424,7 +1424,7 @@ CheckIO::ArgumentInfo::ArgumentInfo(const Token * arg, const Settings *settings,
                 if (tok1->previous()->str() == "]") {
                     varTok = tok1->linkAt(-1)->previous();
                     if (varTok->str() == ")" && varTok->link()->previous()->tokType() == Token::eFunction) {
-                        const Function * function = varTok->link()->previous()->function();
+                        const Function * const function = varTok->link()->previous()->function();
                         if (function && function->retType && function->retType->isEnumType()) {
                             if (function->retType->classScope->enumType)
                                 typeToken = function->retType->classScope->enumType;
@@ -1445,7 +1445,7 @@ CheckIO::ArgumentInfo::ArgumentInfo(const Token * arg, const Settings *settings,
                         return;
                     }
                 } else if (tok1->previous()->str() == ")" && tok1->linkAt(-1)->previous()->tokType() == Token::eFunction) {
-                    const Function * function = tok1->linkAt(-1)->previous()->function();
+                    const Function * const function = tok1->linkAt(-1)->previous()->function();
                     if (function && function->retType && function->retType->isEnumType()) {
                         if (function->retType->classScope->enumType)
                             typeToken = function->retType->classScope->enumType;
@@ -1587,7 +1587,7 @@ bool CheckIO::ArgumentInfo::isStdVectorOrString()
     } else if (variableInfo->type() && !variableInfo->type()->derivedFrom.empty()) {
         const std::vector<Type::BaseInfo>& derivedFrom = variableInfo->type()->derivedFrom;
         for (const Type::BaseInfo & i : derivedFrom) {
-            const Token* nameTok = i.nameTok;
+            const Token * const nameTok = i.nameTok;
             if (Token::Match(nameTok, "std :: vector|array <")) {
                 typeToken = nameTok->tokAt(4);
                 _template = true;
@@ -1605,7 +1605,7 @@ bool CheckIO::ArgumentInfo::isStdVectorOrString()
             }
         }
     } else if (variableInfo->type()) {
-        const Scope * classScope = variableInfo->type()->classScope;
+        const Scope * const classScope = variableInfo->type()->classScope;
         if (classScope) {
             for (const Function &func : classScope->functionList) {
                 if (func.name() == "operator[]") {
@@ -1634,7 +1634,7 @@ bool CheckIO::ArgumentInfo::isStdContainer(const Token *tok)
     if (!isCPP)
         return false;
     if (tok && tok->variable()) {
-        const Variable* variable = tok->variable();
+        const Variable * const variable = tok->variable();
         if (variable->isStlType(stl_container)) {
             typeToken = variable->typeStartToken()->tokAt(4);
             return true;
@@ -1643,7 +1643,7 @@ bool CheckIO::ArgumentInfo::isStdContainer(const Token *tok)
             return true;
         } else if (variable->type() && !variable->type()->derivedFrom.empty()) {
             for (const Type::BaseInfo &baseInfo : variable->type()->derivedFrom) {
-                const Token* nameTok = baseInfo.nameTok;
+                const Token * const nameTok = baseInfo.nameTok;
                 if (Token::Match(nameTok, "std :: vector|array|bitset|deque|list|forward_list|map|multimap|multiset|priority_queue|queue|set|stack|hash_map|hash_multimap|hash_set|unordered_map|unordered_multimap|unordered_set|unordered_multiset <")) {
                     typeToken = nameTok->tokAt(4);
                     return true;

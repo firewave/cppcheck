@@ -300,7 +300,7 @@ static void print_stacktrace(FILE* output, bool demangling, int maxdepth, bool l
         fputs("Callstack (symbols only):\n", output);
         backtrace_symbols_fd(callstackArray+offset, maxdepth, fd);
     } else {
-        char **symbolStringList = backtrace_symbols(callstackArray, currentdepth);
+        char ** const symbolStringList = backtrace_symbols(callstackArray, currentdepth);
         if (symbolStringList) {
             fputs("Callstack:\n", output);
             char demangle_buffer[2048]= {0};
@@ -430,7 +430,7 @@ static void CppcheckSignalHandler(int signo, siginfo_t * info, void * context)
     bool unexpectedSignal=true; // unexpected indicates program failure
     bool terminate=true; // exit process/thread
     const bool isAddressOnStack = IsAddressOnStack(info->si_addr);
-    FILE* output = CppCheckExecutor::getExceptionOutput();
+    FILE * const output = CppCheckExecutor::getExceptionOutput();
     switch (signo) {
     case SIGABRT:
         fputs("Internal error: cppcheck received signal ", output);
@@ -844,7 +844,7 @@ int CppCheckExecutor::check_wrapper(CppCheck& cppcheck)
 #elif defined(USE_UNIX_SIGNAL_HANDLING)
     // determine stack vs. heap
     char stackVariable;
-    char *heapVariable=(char*)malloc(1);
+    char * const heapVariable=(char*)malloc(1);
     bStackBelowHeap = &stackVariable < heapVariable;
     free(heapVariable);
 

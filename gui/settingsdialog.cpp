@@ -190,7 +190,7 @@ void SettingsDialog::saveSettingValues() const
     settings.setValue(SETTINGS_VS_INCLUDE_PATHS, mUI->mEditVsIncludePaths->text());
 #endif
 
-    const QListWidgetItem *currentLang = mUI->mListLanguages->currentItem();
+    const QListWidgetItem * const currentLang = mUI->mListLanguages->currentItem();
     if (currentLang) {
         const QString langcode = currentLang->data(mLangCodeRole).toString();
         settings.setValue(SETTINGS_LANGUAGE, langcode);
@@ -239,7 +239,7 @@ void SettingsDialog::addApplication()
 
 void SettingsDialog::removeApplication()
 {
-    for (QListWidgetItem *item : mUI->mListWidget->selectedItems()) {
+    for (QListWidgetItem * const item : mUI->mListWidget->selectedItems()) {
         const int removeIndex = mUI->mListWidget->row(item);
         const int currentDefault = mTempApplications->getDefaultApplication();
         mTempApplications->removeApplication(removeIndex);

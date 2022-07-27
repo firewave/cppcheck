@@ -209,7 +209,7 @@ bool cppcheck::Platform::loadFromXmlDocument(const tinyxml2::XMLDocument *doc)
     bool error = false;
     for (const tinyxml2::XMLElement *node = rootnode->FirstChildElement(); node; node = node->NextSiblingElement()) {
         if (std::strcmp(node->Name(), "default-sign") == 0) {
-            const char* str = node->GetText();
+            const char * const str = node->GetText();
             if (str)
                 defaultSign = *str;
             else

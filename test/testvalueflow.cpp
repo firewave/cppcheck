@@ -364,7 +364,7 @@ private:
             std::ostringstream ostr;
             for (const ValueFlow::Value &v : tok->values()) {
                 for (const ValueFlow::Value::ErrorPathItem &ep : v.errorPath) {
-                    const Token *eptok = ep.first;
+                    const Token * const eptok = ep.first;
                     const std::string &msg = ep.second;
                     ostr << eptok->linenr() << ',' << msg << '\n';
                 }
@@ -493,7 +493,7 @@ private:
         std::istringstream istr(code);
         errout.str("");
         ASSERT_LOC(tokenizer.tokenize(istr, "test.cpp"), file, line);
-        const Token *tok = Token::findmatch(tokenizer.tokens(), tokstr);
+        const Token * const tok = Token::findmatch(tokenizer.tokens(), tokstr);
         return tok ? tok->values() : std::list<ValueFlow::Value>();
     }
 
@@ -512,7 +512,7 @@ private:
         std::istringstream istr(code);
         errout.str("");
         ASSERT_LOC(tokenizer.tokenize(istr, "test.cpp"), file, line);
-        const Token *tok = Token::findmatch(tokenizer.tokens(), tokstr);
+        const Token * const tok = Token::findmatch(tokenizer.tokens(), tokstr);
         if (!tok)
             return result;
         for (const ValueFlow::Value& value:tok->values()) {
@@ -4889,7 +4889,7 @@ private:
     }
 
     void valueFlowSizeofForwardDeclaredEnum() {
-        const char *code = "enum E; sz=sizeof(E);";
+        const char * const code = "enum E; sz=sizeof(E);";
         valueOfTok(code, "="); // Don't crash (#7775)
     }
 
@@ -4988,7 +4988,7 @@ private:
     }
 
     void valueFlowInlineAssembly() {
-        const char* code = "void f() {\n"
+        const char * const code = "void f() {\n"
                            "    int x = 42;\n"
                            "    asm(\"\");\n"
                            "    a = x;\n"
@@ -6926,7 +6926,7 @@ private:
     }
 
     void valueFlowUnknownMixedOperators() {
-        const char *code= "int f(int a, int b, bool x) {\n"
+        const char * const code= "int f(int a, int b, bool x) {\n"
                           "  if (a == 1 && (!(b == 2 && x))) {\n"
                           "  } else {\n"
                           "    if (x) {\n"

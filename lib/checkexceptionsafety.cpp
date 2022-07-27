@@ -46,8 +46,8 @@ void CheckExceptionSafety::destructors()
     const SymbolDatabase* const symbolDatabase = mTokenizer->getSymbolDatabase();
 
     // Perform check..
-    for (const Scope * scope : symbolDatabase->functionScopes) {
-        const Function * function = scope->function;
+    for (const Scope * const scope : symbolDatabase->functionScopes) {
+        const Function * const function = scope->function;
         if (!function)
             continue;
         // only looking for destructors
@@ -95,7 +95,7 @@ void CheckExceptionSafety::deallocThrow()
 
     // Deallocate a global/member pointer and then throw exception
     // the pointer will be a dead pointer
-    for (const Scope * scope : symbolDatabase->functionScopes) {
+    for (const Scope * const scope : symbolDatabase->functionScopes) {
         for (const Token *tok = scope->bodyStart->next(); tok != scope->bodyEnd; tok = tok->next()) {
             // only looking for delete now
             if (tok->str() != "delete")
@@ -111,7 +111,7 @@ void CheckExceptionSafety::deallocThrow()
                 continue;
 
             // we only look for global variables
-            const Variable *var = tok->variable();
+            const Variable * const var = tok->variable();
             if (!var || !(var->isGlobal() || var->isStatic()))
                 continue;
 
@@ -213,7 +213,7 @@ void CheckExceptionSafety::checkCatchExceptionByValue()
 
         // Find a pass-by-value declaration in the catch(), excluding basic types
         // e.g. catch (std::exception err)
-        const Variable *var = scope.bodyStart->tokAt(-2)->variable();
+        const Variable * const var = scope.bodyStart->tokAt(-2)->variable();
         if (var && var->isClass() && !var->isPointer() && !var->isReference())
             catchExceptionByValueError(scope.classDef);
     }
@@ -244,7 +244,7 @@ static const Token * functionThrowsRecursive(const Function * function, std::set
         if (tok->str() == "throw") {
             return tok;
         } else if (tok->function()) {
-            const Function * called = tok->function();
+            const Function * const called = tok->function();
             // check if called function has an exception specification
             if (called->isThrow() && called->throwArg) {
                 return tok;
@@ -276,29 +276,29 @@ void CheckExceptionSafety::nothrowThrows()
 {
     const SymbolDatabase* const symbolDatabase = mTokenizer->getSymbolDatabase();
 
-    for (const Scope * scope : symbolDatabase->functionScopes) {
-        const Function* function = scope->function;
+    for (const Scope * const scope : symbolDatabase->functionScopes) {
+        const Function * const function = scope->function;
         if (!function)
             continue;
 
         // check noexcept and noexcept(true) functions
         if (function->isNoExcept() &&
             (!function->noexceptArg || function->noexceptArg->str() == "true")) {
-            const Token *throws = functionThrows(function);
+            const Token * const throws = functionThrows(function);
             if (throws)
                 noexceptThrowError(throws);
         }
 
         // check throw() functions
         else if (function->isThrow() && !function->throwArg) {
-            const Token *throws = functionThrows(function);
+            const Token * const throws = functionThrows(function);
             if (throws)
                 noexceptThrowError(throws);
         }
 
         // check __attribute__((nothrow)) or __declspec(nothrow) functions
         else if (function->isAttributeNothrow()) {
-            const Token *throws = functionThrows(function);
+            const Token * const throws = functionThrows(function);
             if (throws)
                 noexceptThrowError(throws);
         }
@@ -320,7 +320,7 @@ void CheckExceptionSafety::unhandledExceptionSpecification()
 
     const SymbolDatabase* const symbolDatabase = mTokenizer->getSymbolDatabase();
 
-    for (const Scope * scope : symbolDatabase->functionScopes) {
+    for (const Scope * const scope : symbolDatabase->functionScopes) {
         // only check functions without exception epecification
         if (scope->function && !scope->function->isThrow() &&
             scope->className != "main" && scope->className != "wmain" &&
@@ -330,7 +330,7 @@ void CheckExceptionSafety::unhandledExceptionSpecification()
                 if (tok->str() == "try") {
                     break;
                 } else if (tok->function()) {
-                    const Function * called = tok->function();
+                    const Function * const called = tok->function();
                     // check if called function has an exception specification
                     if (called->isThrow() && called->throwArg) {
                         unhandledExceptionSpecificationError(tok, called->tokenDef, scope->function->name());
@@ -358,8 +358,8 @@ void CheckExceptionSafety::unhandledExceptionSpecificationError(const Token * co
 void CheckExceptionSafety::rethrowNoCurrentException()
 {
     const SymbolDatabase* const symbolDatabase = mTokenizer->getSymbolDatabase();
-    for (const Scope * scope : symbolDatabase->functionScopes) {
-        const Function* function = scope->function;
+    for (const Scope * const scope : symbolDatabase->functionScopes) {
+        const Function * const function = scope->function;
         if (!function)
             continue;
 

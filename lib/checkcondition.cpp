@@ -95,7 +95,7 @@ void CheckCondition::assignIf()
             continue;
 
         if (Token::Match(tok->tokAt(-2), "[;{}] %var% =")) {
-            const Variable *var = tok->previous()->variable();
+            const Variable * const var = tok->previous()->variable();
             if (var == nullptr)
                 continue;
 
@@ -145,7 +145,7 @@ static bool isParameterChanged(const Token *partok)
     ftok = ftok ? ftok->previous() : nullptr;
     if (!(ftok && ftok->function()))
         return true;
-    const Variable *par = ftok->function()->getArgumentVar(argumentNumber);
+    const Variable * const par = ftok->function()->getArgumentVar(argumentNumber);
     if (!par)
         return true;
     if (par->isConst())
@@ -196,8 +196,8 @@ bool CheckCondition::assignIfParseScope(const Token * const assignTok,
                 continue;
             if (tok2->str() == "while") {
                 // is variable changed in loop?
-                const Token *bodyStart = tok2->linkAt(1)->next();
-                const Token *bodyEnd   = bodyStart ? bodyStart->link() : nullptr;
+                const Token * const bodyStart = tok2->linkAt(1)->next();
+                const Token * const bodyEnd   = bodyStart ? bodyStart->link() : nullptr;
                 if (!bodyEnd || bodyEnd->str() != "}" || isVariableChanged(bodyStart, bodyEnd, varid, !islocal, mSettings, mTokenizer->isCPP()))
                     continue;
             }
@@ -209,7 +209,7 @@ bool CheckCondition::assignIfParseScope(const Token * const assignTok,
                     return true;
                 }
                 if (Token::Match(tok2,"&&|%oror%|( %varid% ==|!= %num% &&|%oror%|)", varid)) {
-                    const Token *vartok = tok2->next();
+                    const Token * const vartok = tok2->next();
                     const MathLib::bigint num2 = MathLib::toLongNumber(vartok->strAt(2));
                     if ((num & num2) != ((bitop=='&') ? num2 : num)) {
                         const std::string& op(vartok->strAt(1));
@@ -280,7 +280,7 @@ static bool inBooleanFunction(const Token *tok)
     while (scope && scope->isLocal())
         scope = scope->nestedIn;
     if (scope && scope->type == Scope::eFunction) {
-        const Function *func = scope->function;
+        const Function * const func = scope->function;
         if (func) {
             const Token *ret = func->retDef;
             while (Token::Match(ret, "static|const"))
@@ -298,7 +298,7 @@ void CheckCondition::checkBadBitmaskCheck()
 
     for (const Token *tok = mTokenizer->tokens(); tok; tok = tok->next()) {
         if (tok->str() == "|" && tok->astOperand1() && tok->astOperand2() && tok->astParent()) {
-            const Token* parent = tok->astParent();
+            const Token * const parent = tok->astParent();
             const bool isBoolean = Token::Match(parent, "&&|%oror%") ||
                                    (parent->str() == "?" && parent->astOperand1() == tok) ||
                                    (parent->str() == "=" && parent->astOperand2() == tok && parent->astOperand1() && parent->astOperand1()->variable() && Token::Match(parent->astOperand1()->variable()->typeStartToken(), "bool|_Bool")) ||
@@ -458,7 +458,7 @@ void CheckCondition::duplicateCondition()
         const Token* tok2 = scope.classDef->next();
         if (!tok2)
             continue;
-        const Token* cond1 = tok2->astOperand2();
+        const Token * const cond1 = tok2->astOperand2();
         if (!cond1)
             continue;
         if (cond1->hasKnownIntValue())
@@ -470,7 +470,7 @@ void CheckCondition::duplicateCondition()
         tok2 = tok2->linkAt(1);
         if (!Token::simpleMatch(tok2, "} if ("))
             continue;
-        const Token *cond2 = tok2->tokAt(2)->astOperand2();
+        const Token * const cond2 = tok2->tokAt(2)->astOperand2();
         if (!cond2)
             continue;
 
@@ -584,7 +584,7 @@ void CheckCondition::multiCondition2()
     if (!mSettings->severity.isEnabled(Severity::warning))
         return;
 
-    const SymbolDatabase *symbolDatabase = mTokenizer->getSymbolDatabase();
+    const SymbolDatabase * const symbolDatabase = mTokenizer->getSymbolDatabase();
 
     for (const Scope &scope : symbolDatabase->scopeList) {
         const Token *condTok = nullptr;
@@ -621,7 +621,7 @@ void CheckCondition::multiCondition2()
 
             if (cond->varId()) {
                 vars.insert(cond->varId());
-                const Variable *var = cond->variable();
+                const Variable * const var = cond->variable();
                 if (!nonlocal && var) {
                     if (!(var->isLocal() || var->isArgument()))
                         nonlocal = true;
@@ -645,7 +645,7 @@ void CheckCondition::multiCondition2()
         visitAstNodes(condTok,
                       [&varsInCond](const Token *cond) {
             if (cond->variable()) {
-                const Variable *var = cond->variable();
+                const Variable * const var = cond->variable();
                 if (std::find(varsInCond.begin(), varsInCond.end(), var) == varsInCond.end())
                     varsInCond.push_back(var);
             }
@@ -672,8 +672,8 @@ void CheckCondition::multiCondition2()
                 if (isExpressionChangedAt(cond1, tok, 0, false, mSettings, mTokenizer->isCPP()))
                     break;
                 if (Token::Match(tok, "if|return")) {
-                    const Token * condStartToken = tok->str() == "if" ? tok->next() : tok;
-                    const Token * condEndToken = tok->str() == "if" ? condStartToken->link() : Token::findsimplematch(condStartToken, ";");
+                    const Token * const condStartToken = tok->str() == "if" ? tok->next() : tok;
+                    const Token * const condEndToken = tok->str() == "if" ? condStartToken->link() : Token::findsimplematch(condStartToken, ";");
                     // Does condition modify tracked variables?
                     if (isExpressionChanged(cond1, condStartToken, condEndToken, mSettings, mTokenizer->isCPP()))
                         break;
@@ -731,7 +731,7 @@ void CheckCondition::multiCondition2()
                 // bailout if loop is seen.
                 // TODO: handle loops better.
                 if (Token::Match(tok, "for|while|do")) {
-                    const Token *tok1 = tok->next();
+                    const Token * const tok1 = tok->next();
                     const Token *tok2;
                     if (Token::simpleMatch(tok, "do {")) {
                         if (!Token::simpleMatch(tok->linkAt(1), "} while ("))
@@ -785,7 +785,7 @@ void CheckCondition::multiCondition2()
                     if (tok->variable() &&
                         !tok->variable()->isConst() &&
                         Token::Match(tok, "%name% . %name% (")) {
-                        const Function* function = tok->tokAt(2)->function();
+                        const Function * const function = tok->tokAt(2)->function();
                         if (!function || !function->isConst())
                             break;
                     }
@@ -803,7 +803,7 @@ static std::string innerSmtString(const Token * tok)
         return "if";
     if (!tok->astTop())
         return "if";
-    const Token * top = tok->astTop();
+    const Token * const top = tok->astTop();
     if (top->str() == "(" && top->astOperand1())
         return top->astOperand1()->str();
     return top->str();
@@ -959,8 +959,8 @@ static bool parseComparison(const Token *comp, bool *not1, std::string *op, std:
     if (!comp)
         return false;
 
-    const Token* op1 = comp->astOperand1();
-    const Token* op2 = comp->astOperand2();
+    const Token * const op1 = comp->astOperand1();
+    const Token * const op2 = comp->astOperand2();
     if (!comp->isComparisonOp() || !op1 || !op2) {
         *op = "!=";
         *value = "0";
@@ -1048,8 +1048,8 @@ void CheckCondition::checkIncorrectLogicOperator()
         return;
     const bool printInconclusive = mSettings->certainty.isEnabled(Certainty::inconclusive);
 
-    const SymbolDatabase *symbolDatabase = mTokenizer->getSymbolDatabase();
-    for (const Scope * scope : symbolDatabase->functionScopes) {
+    const SymbolDatabase * const symbolDatabase = mTokenizer->getSymbolDatabase();
+    for (const Scope * const scope : symbolDatabase->functionScopes) {
 
         for (const Token* tok = scope->bodyStart->next(); tok != scope->bodyEnd; tok = tok->next()) {
             if (!Token::Match(tok, "%oror%|&&") || !tok->astOperand1() || !tok->astOperand2())
@@ -1063,7 +1063,7 @@ void CheckCondition::checkIncorrectLogicOperator()
             if (printStyle &&
                 ((tok->str() == "||" && tok->astOperand2()->str() == "&&") ||
                  (tok->str() == "&&" && tok->astOperand2()->str() == "||"))) {
-                const Token* tok2 = tok->astOperand2()->astOperand1();
+                const Token * const tok2 = tok->astOperand2()->astOperand1();
                 if (isOppositeCond(true, mTokenizer->isCPP(), tok->astOperand1(), tok2, mSettings->library, true, false)) {
                     std::string expr1(tok->astOperand1()->expressionString());
                     std::string expr2(tok->astOperand2()->astOperand1()->expressionString());
@@ -1129,7 +1129,7 @@ void CheckCondition::checkIncorrectLogicOperator()
                 comp1 = comp1->astOperand2();
 
             // Comparison #2 (RHS)
-            const Token *comp2 = tok->astOperand2();
+            const Token * const comp2 = tok->astOperand2();
 
             bool inconclusive = false;
             bool parseable = true;
@@ -1282,8 +1282,8 @@ void CheckCondition::checkModuloAlwaysTrueFalse()
     if (!mSettings->severity.isEnabled(Severity::warning))
         return;
 
-    const SymbolDatabase *symbolDatabase = mTokenizer->getSymbolDatabase();
-    for (const Scope * scope : symbolDatabase->functionScopes) {
+    const SymbolDatabase * const symbolDatabase = mTokenizer->getSymbolDatabase();
+    for (const Scope * const scope : symbolDatabase->functionScopes) {
         for (const Token* tok = scope->bodyStart->next(); tok != scope->bodyEnd; tok = tok->next()) {
             if (!tok->isComparisonOp())
                 continue;
@@ -1336,8 +1336,8 @@ void CheckCondition::clarifyCondition()
 
     const bool isC = mTokenizer->isC();
 
-    const SymbolDatabase *symbolDatabase = mTokenizer->getSymbolDatabase();
-    for (const Scope * scope : symbolDatabase->functionScopes) {
+    const SymbolDatabase * const symbolDatabase = mTokenizer->getSymbolDatabase();
+    for (const Scope * const scope : symbolDatabase->functionScopes) {
         for (const Token* tok = scope->bodyStart->next(); tok != scope->bodyEnd; tok = tok->next()) {
             if (Token::Match(tok, "( %name% [=&|^]")) {
                 for (const Token *tok2 = tok->tokAt(3); tok2; tok2 = tok2->next()) {
@@ -1359,8 +1359,8 @@ void CheckCondition::clarifyCondition()
                     continue;
 
                 // using boolean result in bitwise operation ! x [&|^]
-                const ValueType* vt1 = tok->astOperand1() ? tok->astOperand1()->valueType() : nullptr;
-                const ValueType* vt2 = tok->astOperand2() ? tok->astOperand2()->valueType() : nullptr;
+                const ValueType * const vt1 = tok->astOperand1() ? tok->astOperand1()->valueType() : nullptr;
+                const ValueType * const vt2 = tok->astOperand2() ? tok->astOperand2()->valueType() : nullptr;
                 if (vt1 && vt1->type == ValueType::BOOL && !Token::Match(tok->astOperand1(), "%name%|(|[|::|.") && countPar(tok->astOperand1(), tok) == 0)
                     clarifyConditionError(tok, false, true);
                 else if (vt2 && vt2->type == ValueType::BOOL && !Token::Match(tok->astOperand2(), "%name%|(|[|::|.") && countPar(tok, tok->astOperand2()) == 0)
@@ -1398,15 +1398,15 @@ void CheckCondition::alwaysTrueFalse()
     if (!mSettings->severity.isEnabled(Severity::style))
         return;
 
-    const SymbolDatabase *symbolDatabase = mTokenizer->getSymbolDatabase();
-    for (const Scope * scope : symbolDatabase->functionScopes) {
+    const SymbolDatabase * const symbolDatabase = mTokenizer->getSymbolDatabase();
+    for (const Scope * const scope : symbolDatabase->functionScopes) {
         for (const Token* tok = scope->bodyStart->next(); tok != scope->bodyEnd; tok = tok->next()) {
             if (Token::simpleMatch(tok, "<") && tok->link()) // don't write false positives when templates are used
                 continue;
             if (!tok->hasKnownIntValue())
                 continue;
             if (Token::Match(tok->previous(), "%name% (") && tok->previous()->function()) {
-                const Function* f = tok->previous()->function();
+                const Function * const f = tok->previous()->function();
                 if (f->functionScope && Token::Match(f->functionScope->bodyStart, "{ return true|false ;"))
                     continue;
             }
@@ -1464,7 +1464,7 @@ void CheckCondition::alwaysTrueFalse()
             if (!(constIfWhileExpression || constValExpr || compExpr || ternaryExpression || returnExpression))
                 continue;
 
-            const Token* expr1 = tok->astOperand1(), *expr2 = tok->astOperand2();
+            const Token * const expr1 = tok->astOperand1(), *expr2 = tok->astOperand2(); // FP
             const bool isUnknown = (expr1 && expr1->valueType() && expr1->valueType()->type == ValueType::UNKNOWN_TYPE) ||
                                    (expr2 && expr2->valueType() && expr2->valueType()->type == ValueType::UNKNOWN_TYPE);
             if (isUnknown)
@@ -1554,8 +1554,8 @@ void CheckCondition::checkInvalidTestForOverflow()
         if (!Token::Match(tok, "<|<=|>=|>") || !tok->isBinaryOp())
             continue;
 
-        const Token *lhsTokens[2] = {tok->astOperand1(), tok->astOperand2()}; // FP
-        for (const Token *lhs: lhsTokens) {
+        const Token * const lhsTokens[2] = {tok->astOperand1(), tok->astOperand2()}; // FP
+        for (const Token * const lhs: lhsTokens) {
             std::string cmp = tok->str();
             if (lhs == tok->astOperand2())
                 cmp[0] = (cmp[0] == '<') ? '>' : '<';
@@ -1568,8 +1568,8 @@ void CheckCondition::checkInvalidTestForOverflow()
             if (!isSignedInteger && !isPointer)
                 continue;
 
-            const Token *exprTokens[2] = {lhs->astOperand1(), lhs->astOperand2()}; // FP
-            for (const Token *expr: exprTokens) {
+            const Token * const exprTokens[2] = {lhs->astOperand1(), lhs->astOperand2()}; // FP
+            for (const Token * const expr: exprTokens) {
                 if (lhs->str() == "-" && expr == lhs->astOperand2())
                     continue; // TODO?
 
@@ -1639,8 +1639,8 @@ void CheckCondition::checkPointerAdditionResultNotNull()
     if (!mSettings->severity.isEnabled(Severity::warning))
         return;
 
-    const SymbolDatabase *symbolDatabase = mTokenizer->getSymbolDatabase();
-    for (const Scope * scope : symbolDatabase->functionScopes) {
+    const SymbolDatabase * const symbolDatabase = mTokenizer->getSymbolDatabase();
+    for (const Scope * const scope : symbolDatabase->functionScopes) {
 
         for (const Token* tok = scope->bodyStart; tok != scope->bodyEnd; tok = tok->next()) {
             if (!tok->isComparisonOp() || !tok->astOperand1() || !tok->astOperand2())
@@ -1684,22 +1684,22 @@ void CheckCondition::checkDuplicateConditionalAssign()
     if (!mSettings->severity.isEnabled(Severity::style))
         return;
 
-    const SymbolDatabase *symbolDatabase = mTokenizer->getSymbolDatabase();
-    for (const Scope *scope : symbolDatabase->functionScopes) {
+    const SymbolDatabase * const symbolDatabase = mTokenizer->getSymbolDatabase();
+    for (const Scope * const scope : symbolDatabase->functionScopes) {
         for (const Token *tok = scope->bodyStart; tok != scope->bodyEnd; tok = tok->next()) {
             if (!Token::simpleMatch(tok, "if ("))
                 continue;
             if (!Token::simpleMatch(tok->next()->link(), ") {"))
                 continue;
-            const Token *blockTok = tok->next()->link()->next();
-            const Token *condTok = tok->next()->astOperand2();
+            const Token * const blockTok = tok->next()->link()->next();
+            const Token * const condTok = tok->next()->astOperand2();
             if (!Token::Match(condTok, "==|!="))
                 continue;
             if (condTok->str() == "!=" && Token::simpleMatch(blockTok->link(), "} else {"))
                 continue;
             if (!blockTok->next())
                 continue;
-            const Token *assignTok = blockTok->next()->astTop();
+            const Token * const assignTok = blockTok->next()->astTop();
             if (!Token::simpleMatch(assignTok, "="))
                 continue;
             if (nextAfterAstRightmostLeaf(assignTok) != blockTok->link()->previous())
@@ -1741,8 +1741,8 @@ void CheckCondition::checkAssignmentInCondition()
     if (!mSettings->severity.isEnabled(Severity::style))
         return;
 
-    const SymbolDatabase *symbolDatabase = mTokenizer->getSymbolDatabase();
-    for (const Scope * scope : symbolDatabase->functionScopes) {
+    const SymbolDatabase * const symbolDatabase = mTokenizer->getSymbolDatabase();
+    for (const Scope * const scope : symbolDatabase->functionScopes) {
         for (const Token* tok = scope->bodyStart; tok != scope->bodyEnd; tok = tok->next()) {
             if (tok->str() != "=")
                 continue;
@@ -1790,8 +1790,8 @@ void CheckCondition::checkCompareValueOutOfTypeRange()
         mSettings->platformType == cppcheck::Platform::PlatformType::Unspecified)
         return;
 
-    const SymbolDatabase *symbolDatabase = mTokenizer->getSymbolDatabase();
-    for (const Scope * scope : symbolDatabase->functionScopes) {
+    const SymbolDatabase * const symbolDatabase = mTokenizer->getSymbolDatabase();
+    for (const Scope * const scope : symbolDatabase->functionScopes) {
         for (const Token* tok = scope->bodyStart; tok != scope->bodyEnd; tok = tok->next()) {
             if (!tok->isComparisonOp() || !tok->isBinaryOp())
                 continue;

@@ -202,14 +202,14 @@ static bool getDimensionsEtc(const Token * const arrayToken, const Settings *set
                 return ChildrenToVisit::op1_and_op2;
             });
         }
-    } else if (const Token *stringLiteral = array->getValueTokenMinStrSize(settings)) {
+    } else if (const Token * const stringLiteral = array->getValueTokenMinStrSize(settings)) {
         Dimension dim;
         dim.tok = nullptr;
         dim.num = Token::getStrArraySize(stringLiteral);
         dim.known = array->hasKnownValue();
         dimensions->emplace_back(dim);
     } else if (array->valueType() && array->valueType()->pointer >= 1 && (array->valueType()->isIntegral() || array->valueType()->isFloat())) {
-        const ValueFlow::Value *value = getBufferSizeValue(array);
+        const ValueFlow::Value * const value = getBufferSizeValue(array);
         if (!value)
             return false;
         if (path)
@@ -344,8 +344,8 @@ void CheckBufferOverrun::arrayIndex()
         // Negative index
         bool neg = false;
         std::vector<ValueFlow::Value> negativeIndexes;
-        for (const Token * indexToken : indexTokens) {
-            const ValueFlow::Value *negativeValue = indexToken->getValueLE(-1, mSettings);
+        for (const Token * const indexToken : indexTokens) {
+            const ValueFlow::Value * const negativeValue = indexToken->getValueLE(-1, mSettings);
             if (negativeValue) {
                 negativeIndexes.emplace_back(*negativeValue);
                 neg = true;
@@ -500,7 +500,7 @@ void CheckBufferOverrun::pointerArithmetic()
                     pointerArithmeticError(tok, indexToken, &indexValues.front());
             }
 
-            if (const ValueFlow::Value *neg = indexToken->getValueLE(-1, mSettings))
+            if (const ValueFlow::Value * const neg = indexToken->getValueLE(-1, mSettings))
                 pointerArithmeticError(tok, indexToken, neg);
         } else if (tok->str() == "-") {
             if (arrayToken->variable() && arrayToken->variable()->isArgument())
@@ -510,7 +510,7 @@ void CheckBufferOverrun::pointerArithmetic()
             while (Token::Match(array, ".|::"))
                 array = array->astOperand2();
             if (array->variable() && array->variable()->isArray()) {
-                const ValueFlow::Value *v = indexToken->getValueGE(1, mSettings);
+                const ValueFlow::Value * const v = indexToken->getValueGE(1, mSettings);
                 if (v)
                     pointerArithmeticError(tok, indexToken, v);
             }
@@ -546,10 +546,10 @@ ValueFlow::Value CheckBufferOverrun::getBufferSize(const Token *bufTok) const
 {
     if (!bufTok->valueType())
         return ValueFlow::Value(-1);
-    const Variable *var = bufTok->variable();
+    const Variable * const var = bufTok->variable();
 
     if (!var || var->dimensions().empty()) {
-        const ValueFlow::Value *value = getBufferSizeValue(bufTok);
+        const ValueFlow::Value * const value = getBufferSizeValue(bufTok);
         if (value)
             return *value;
     }
@@ -588,7 +588,7 @@ static bool checkBufferSize(const Token *ftok, const Library::ArgumentChecks::Mi
         if (settings->library.isargformatstr(ftok, minsize.arg)) {
             return getMinFormatStringOutputLength(args, minsize.arg) < bufferSize;
         } else if (arg) {
-            const Token *strtoken = arg->getValueTokenMaxStrLength();
+            const Token * const strtoken = arg->getValueTokenMaxStrLength();
             if (strtoken)
                 return Token::getStrLength(strtoken) < bufferSize;
         }
@@ -620,8 +620,8 @@ static bool checkBufferSize(const Token *ftok, const Library::ArgumentChecks::Mi
 
 void CheckBufferOverrun::bufferOverflow()
 {
-    const SymbolDatabase *symbolDatabase = mTokenizer->getSymbolDatabase();
-    for (const Scope * scope : symbolDatabase->functionScopes) {
+    const SymbolDatabase * const symbolDatabase = mTokenizer->getSymbolDatabase();
+    for (const Scope * const scope : symbolDatabase->functionScopes) {
         for (const Token *tok = scope->bodyStart; tok != scope->bodyEnd; tok = tok->next()) {
             if (!Token::Match(tok, "%name% (") || Token::simpleMatch(tok, ") {"))
                 continue;
@@ -631,7 +631,7 @@ void CheckBufferOverrun::bufferOverflow()
             for (int argnr = 0; argnr < args.size(); ++argnr) {
                 if (!args[argnr]->valueType() || args[argnr]->valueType()->pointer == 0)
                     continue;
-                const std::vector<Library::ArgumentChecks::MinSize> *minsizes = mSettings->library.argminsizes(tok, argnr + 1);
+                const std::vector<Library::ArgumentChecks::MinSize> * const minsizes = mSettings->library.argminsizes(tok, argnr + 1);
                 if (!minsizes || minsizes->empty())
                     continue;
                 // Get buffer size..
@@ -655,7 +655,7 @@ void CheckBufferOverrun::bufferOverflow()
                         tok2 = tok2->astParent();
                     while (Token::Match(tok2, "[|."))
                         tok2 = tok2->astOperand1();
-                    const Variable *var = tok2 ? tok2->variable() : nullptr;
+                    const Variable * const var = tok2 ? tok2->variable() : nullptr;
                     if (var) {
                         if (var->isPointer())
                             continue;
@@ -685,7 +685,7 @@ void CheckBufferOverrun::arrayIndexThenCheck()
     if (!mSettings->severity.isEnabled(Severity::portability))
         return;
 
-    const SymbolDatabase *symbolDatabase = mTokenizer->getSymbolDatabase();
+    const SymbolDatabase * const symbolDatabase = mTokenizer->getSymbolDatabase();
     for (const Scope * const scope : symbolDatabase->functionScopes) {
         for (const Token *tok = scope->bodyStart; tok && tok != scope->bodyEnd; tok = tok->next()) {
             if (Token::simpleMatch(tok, "sizeof (")) {
@@ -740,7 +740,7 @@ void CheckBufferOverrun::stringNotZeroTerminated()
     // this is currently 'inconclusive'. See TestBufferOverrun::terminateStrncpy3
     if (!mSettings->severity.isEnabled(Severity::warning) || !mSettings->certainty.isEnabled(Certainty::inconclusive))
         return;
-    const SymbolDatabase *symbolDatabase = mTokenizer->getSymbolDatabase();
+    const SymbolDatabase * const symbolDatabase = mTokenizer->getSymbolDatabase();
     for (const Scope * const scope : symbolDatabase->functionScopes) {
         for (const Token *tok = scope->bodyStart; tok && tok != scope->bodyEnd; tok = tok->next()) {
             if (!Token::simpleMatch(tok, "strncpy ("))
@@ -748,7 +748,7 @@ void CheckBufferOverrun::stringNotZeroTerminated()
             const std::vector<const Token *> args = getArguments(tok);
             if (args.size() != 3)
                 continue;
-            const Token *sizeToken = args[2];
+            const Token * const sizeToken = args[2];
             if (!sizeToken->hasKnownIntValue())
                 continue;
             const ValueFlow::Value &bufferSize = getBufferSize(args[0]);
@@ -762,7 +762,7 @@ void CheckBufferOverrun::stringNotZeroTerminated()
                 if (it != contValues.end() && it->intvalue < sizeToken->getKnownIntValue())
                     continue;
             } else {
-                const Token* srcValue = args[1]->getValueTokenMaxStrLength();
+                const Token * const srcValue = args[1]->getValueTokenMaxStrLength();
                 if (srcValue && Token::getStrLength(srcValue) < sizeToken->getKnownIntValue())
                     continue;
             }
@@ -771,7 +771,7 @@ void CheckBufferOverrun::stringNotZeroTerminated()
             for (const Token *tok2 = tok->next()->link(); tok2 != scope->bodyEnd; tok2 = tok2->next()) {
                 if (!Token::simpleMatch(tok2, "] ="))
                     continue;
-                const Token *rhs = tok2->next()->astOperand2();
+                const Token * const rhs = tok2->next()->astOperand2();
                 if (!rhs || !rhs->hasKnownIntValue() || rhs->getKnownIntValue() != 0)
                     continue;
                 if (isSameExpression(mTokenizer->isCPP(), false, args[0], tok2->link()->astOperand1(), mSettings->library, false, false))
@@ -804,14 +804,14 @@ void CheckBufferOverrun::argumentSize()
     if (!mSettings->severity.isEnabled(Severity::warning))
         return;
 
-    const SymbolDatabase *symbolDatabase = mTokenizer->getSymbolDatabase();
+    const SymbolDatabase * const symbolDatabase = mTokenizer->getSymbolDatabase();
     for (const Scope * const scope : symbolDatabase->functionScopes) {
         for (const Token *tok = scope->bodyStart; tok != scope->bodyEnd; tok = tok->next()) {
             if (!tok->function() || !Token::Match(tok, "%name% ("))
                 continue;
 
             // If argument is '%type% a[num]' then check bounds against num
-            const Function *callfunc = tok->function();
+            const Function * const callfunc = tok->function();
             const std::vector<const Token *> callargs = getArguments(tok);
             for (nonneg int paramIndex = 0; paramIndex < callargs.size() && paramIndex < callfunc->argCount(); ++paramIndex) {
                 const Variable* const argument = callfunc->getArgumentVar(paramIndex);
@@ -876,7 +876,7 @@ std::string CheckBufferOverrun::MyFileInfo::toString() const
 
 bool CheckBufferOverrun::isCtuUnsafeBufferUsage(const Check *check, const Token *argtok, MathLib::bigint *offset, int type)
 {
-    const CheckBufferOverrun *c = dynamic_cast<const CheckBufferOverrun *>(check);
+    const CheckBufferOverrun * const c = dynamic_cast<const CheckBufferOverrun *>(check);
     if (!c)
         return false;
     if (!argtok->valueType() || argtok->valueType()->typeSize(*c->mSettings) == 0)
@@ -912,7 +912,7 @@ bool CheckBufferOverrun::isCtuUnsafePointerArith(const Check *check, const Token
 Check::FileInfo *CheckBufferOverrun::getFileInfo(const Tokenizer *tokenizer, const Settings *settings) const
 {
     CheckBufferOverrun checkBufferOverrun(tokenizer, settings, nullptr);
-    MyFileInfo *fileInfo = new MyFileInfo;
+    MyFileInfo * const fileInfo = new MyFileInfo;
     fileInfo->unsafeArrayIndex = CTU::getUnsafeUsage(tokenizer, settings, &checkBufferOverrun, isCtuUnsafeArrayIndex);
     fileInfo->unsafePointerArith = CTU::getUnsafeUsage(tokenizer, settings, &checkBufferOverrun, isCtuUnsafePointerArith);
     if (fileInfo->unsafeArrayIndex.empty() && fileInfo->unsafePointerArith.empty()) {
@@ -927,7 +927,7 @@ Check::FileInfo * CheckBufferOverrun::loadFileInfoFromXml(const tinyxml2::XMLEle
     const std::string arrayIndex("array-index");
     const std::string pointerArith("pointer-arith");
 
-    MyFileInfo *fileInfo = new MyFileInfo;
+    MyFileInfo * const fileInfo = new MyFileInfo;
     for (const tinyxml2::XMLElement *e = xmlElement->FirstChildElement(); e; e = e->NextSiblingElement()) {
         if (e->Name() == arrayIndex)
             fileInfo->unsafeArrayIndex = CTU::loadUnsafeUsageListFromXml(e);
@@ -953,8 +953,8 @@ bool CheckBufferOverrun::analyseWholeProgram(const CTU::FileInfo *ctu, const std
 
     const std::map<std::string, std::list<const CTU::FileInfo::CallBase *>> callsMap = ctu->getCallsMap();
 
-    for (Check::FileInfo *fi1 : fileInfo) {
-        const MyFileInfo *fi = dynamic_cast<MyFileInfo*>(fi1);
+    for (Check::FileInfo * const fi1 : fileInfo) {
+        const MyFileInfo * const fi = dynamic_cast<MyFileInfo*>(fi1);
         if (!fi)
             continue;
         for (const CTU::FileInfo::UnsafeUsage &unsafeUsage : fi->unsafeArrayIndex)
@@ -1009,13 +1009,13 @@ bool CheckBufferOverrun::analyseWholeProgram1(const std::map<std::string, std::l
 
 void CheckBufferOverrun::objectIndex()
 {
-    const SymbolDatabase *symbolDatabase = mTokenizer->getSymbolDatabase();
-    for (const Scope *functionScope : symbolDatabase->functionScopes) {
+    const SymbolDatabase * const symbolDatabase = mTokenizer->getSymbolDatabase();
+    for (const Scope * const functionScope : symbolDatabase->functionScopes) {
         for (const Token *tok = functionScope->bodyStart; tok != functionScope->bodyEnd; tok = tok->next()) {
             if (!Token::simpleMatch(tok, "["))
                 continue;
-            const Token *obj = tok->astOperand1();
-            const Token *idx = tok->astOperand2();
+            const Token * const obj = tok->astOperand1();
+            const Token * const idx = tok->astOperand2();
             if (!idx || !obj)
                 continue;
             if (idx->hasKnownIntValue()) {
@@ -1029,7 +1029,7 @@ void CheckBufferOverrun::objectIndex()
             for (const ValueFlow::Value& v:values) {
                 if (v.lifetimeKind != ValueFlow::Value::LifetimeKind::Address)
                     continue;
-                const Variable *var = v.tokvalue->variable();
+                const Variable * const var = v.tokvalue->variable();
                 if (!var)
                     continue;
                 if (var->isReference())
@@ -1119,27 +1119,27 @@ static bool isVLAIndex(const Token* tok)
 
 void CheckBufferOverrun::negativeArraySize()
 {
-    const SymbolDatabase* symbolDatabase = mTokenizer->getSymbolDatabase();
-    for (const Variable* var : symbolDatabase->variableList()) {
+    const SymbolDatabase * const symbolDatabase = mTokenizer->getSymbolDatabase();
+    for (const Variable * const var : symbolDatabase->variableList()) {
         if (!var || !var->isArray())
             continue;
         const Token* const nameToken = var->nameToken();
         if (!Token::Match(nameToken, "%var% [") || !nameToken->next()->astOperand2())
             continue;
-        const ValueFlow::Value* sz = nameToken->next()->astOperand2()->getValueLE(-1, mSettings);
+        const ValueFlow::Value * const sz = nameToken->next()->astOperand2()->getValueLE(-1, mSettings);
         // don't warn about constant negative index because that is a compiler error
         if (sz && isVLAIndex(nameToken->next()->astOperand2()))
             negativeArraySizeError(nameToken);
     }
 
-    for (const Scope* functionScope : symbolDatabase->functionScopes) {
+    for (const Scope * const functionScope : symbolDatabase->functionScopes) {
         for (const Token* tok = functionScope->bodyStart; tok != functionScope->bodyEnd; tok = tok->next()) {
             if (!tok->isKeyword() || tok->str() != "new" || !tok->astOperand1() || tok->astOperand1()->str() != "[")
                 continue;
-            const Token* valOperand = tok->astOperand1()->astOperand2();
+            const Token * const valOperand = tok->astOperand1()->astOperand2();
             if (!valOperand)
                 continue;
-            const ValueFlow::Value* sz = valOperand->getValueLE(-1, mSettings);
+            const ValueFlow::Value * const sz = valOperand->getValueLE(-1, mSettings);
             if (sz)
                 negativeMemoryAllocationSizeError(tok);
         }

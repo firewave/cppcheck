@@ -636,8 +636,8 @@ private:
         std::istringstream istr("a(); b();");
         tokenList.createTokens(istr);
 
-        const Library::WarnInfo* a = library.getWarnInfo(tokenList.front());
-        const Library::WarnInfo* b = library.getWarnInfo(tokenList.front()->tokAt(4));
+        const Library::WarnInfo * const a = library.getWarnInfo(tokenList.front());
+        const Library::WarnInfo * const b = library.getWarnInfo(tokenList.front()->tokAt(4));
 
         ASSERT_EQUALS(2, library.functionwarn.size());
         ASSERT(a && b);
@@ -669,9 +669,9 @@ private:
 
         ASSERT(Library::ismemory(library.getAllocFuncInfo("CreateX")));
         ASSERT_EQUALS(library.allocId("CreateX"), library.deallocId("DeleteX"));
-        const Library::AllocFunc* af = library.getAllocFuncInfo("CreateX");
+        const Library::AllocFunc * const af = library.getAllocFuncInfo("CreateX");
         ASSERT(af && af->arg == -1);
-        const Library::AllocFunc* df = library.getDeallocFuncInfo("DeleteX");
+        const Library::AllocFunc * const df = library.getDeallocFuncInfo("DeleteX");
         ASSERT(df && df->arg == 1);
     }
     void memory2() const {
@@ -710,9 +710,9 @@ private:
         ASSERT_EQUALS(true, Library::ErrorCode::OK == (readLibrary(library, xmldata)).errorcode);
         ASSERT(library.functions.empty());
 
-        const Library::AllocFunc* af = library.getAllocFuncInfo("CreateX");
+        const Library::AllocFunc * const af = library.getAllocFuncInfo("CreateX");
         ASSERT(af && af->arg == 5 && !af->initData);
-        const Library::AllocFunc* df = library.getDeallocFuncInfo("DeleteX");
+        const Library::AllocFunc * const df = library.getDeallocFuncInfo("DeleteX");
         ASSERT(df && df->arg == 2);
     }
 

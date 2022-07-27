@@ -167,7 +167,7 @@ void CheckType::checkIntegerOverflow()
             continue;
 
         // is result signed integer?
-        const ValueType *vt = tok->valueType();
+        const ValueType * const vt = tok->valueType();
         if (!vt || !vt->isIntegral() || vt->sign != ValueType::Sign::SIGNED)
             continue;
 
@@ -242,11 +242,11 @@ void CheckType::checkSignConversion()
             continue;
 
         // Check if an operand can be negative..
-        const Token * astOperands[] = { tok->astOperand1(), tok->astOperand2() }; // FP
-        for (const Token * tok1 : astOperands) {
+        const Token * const astOperands[] = { tok->astOperand1(), tok->astOperand2() }; // FP
+        for (const Token * const tok1 : astOperands) {
             if (!tok1)
                 continue;
-            const ValueFlow::Value* negativeValue =
+            const ValueFlow::Value * const negativeValue =
                 ValueFlow::findValue(tok1->values(), mSettings, [&](const ValueFlow::Value& v) {
                 return !v.isImpossible() && v.isIntValue() && (v.intvalue <= -1 || v.wideintvalue <= -1);
             });
@@ -304,8 +304,8 @@ void CheckType::checkLongCast()
                 continue;
         }
 
-        const ValueType *lhstype = tok->astOperand1() ? tok->astOperand1()->valueType() : nullptr;
-        const ValueType *rhstype = tok->astOperand2()->valueType();
+        const ValueType * const lhstype = tok->astOperand1() ? tok->astOperand1()->valueType() : nullptr;
+        const ValueType * const rhstype = tok->astOperand2()->valueType();
 
         if (!lhstype || !rhstype)
             continue;
@@ -322,8 +322,8 @@ void CheckType::checkLongCast()
     }
 
     // Return..
-    const SymbolDatabase *symbolDatabase = mTokenizer->getSymbolDatabase();
-    for (const Scope * scope : symbolDatabase->functionScopes) {
+    const SymbolDatabase * const symbolDatabase = mTokenizer->getSymbolDatabase();
+    for (const Scope * const scope : symbolDatabase->functionScopes) {
 
         // function must return long data
         const Token * def = scope->classDef;
@@ -343,7 +343,7 @@ void CheckType::checkLongCast()
         for (const Token *tok = scope->bodyStart; tok != scope->bodyEnd; tok = tok->next()) {
             if (tok->str() == "return") {
                 if (Token::Match(tok->astOperand1(), "<<|*")) {
-                    const ValueType *type = tok->astOperand1()->valueType();
+                    const ValueType * const type = tok->astOperand1()->valueType();
                     if (type && type->type == ValueType::Type::INT && type->pointer == 0U && type->originalTypeName.empty())
                         ret = tok;
                 }

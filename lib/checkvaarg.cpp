@@ -53,18 +53,18 @@ void CheckVaarg::va_start_argument()
     const bool printWarnings = mSettings->severity.isEnabled(Severity::warning);
 
     for (std::size_t i = 0; i < functions; ++i) {
-        const Scope* scope = symbolDatabase->functionScopes[i];
-        const Function* function = scope->function;
+        const Scope * const scope = symbolDatabase->functionScopes[i];
+        const Function * const function = scope->function;
         if (!function)
             continue;
         for (const Token* tok = scope->bodyStart->next(); tok != scope->bodyEnd; tok = tok->next()) {
             if (!tok->scope()->isExecutable())
                 tok = tok->scope()->bodyEnd;
             else if (Token::simpleMatch(tok, "va_start (")) {
-                const Token* param2 = tok->tokAt(2)->nextArgument();
+                const Token * const param2 = tok->tokAt(2)->nextArgument();
                 if (!param2)
                     continue;
-                const Variable* var = param2->variable();
+                const Variable * const var = param2->variable();
                 if (var && var->isReference())
                     referenceAs_va_start_error(param2, var->name());
                 if (var && var->index() + 2 < function->argCount() && printWarnings) {
@@ -100,7 +100,7 @@ void CheckVaarg::va_list_usage()
     if (mSettings->clang)
         return;
     const SymbolDatabase* const symbolDatabase = mTokenizer->getSymbolDatabase();
-    for (const Variable* var : symbolDatabase->variableList()) {
+    for (const Variable * const var : symbolDatabase->variableList()) {
         if (!var || var->isPointer() || var->isReference() || var->isArray() || !var->scope() || var->typeStartToken()->str() != "va_list")
             continue;
         if (!var->isLocal() && !var->isArgument()) // Check only local variables and arguments
@@ -112,7 +112,7 @@ void CheckVaarg::va_list_usage()
         const Token* tok = var->nameToken()->next();
         for (; tok && tok != var->scope()->bodyEnd; tok = tok->next()) {
             // Skip lambdas
-            const Token* tok2 = findLambdaEndToken(tok);
+            const Token * const tok2 = findLambdaEndToken(tok);
             if (tok2)
                 tok = tok2;
             if (Token::Match(tok, "va_start ( %varid%", var->declarationId())) {

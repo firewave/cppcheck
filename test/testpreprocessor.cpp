@@ -784,7 +784,7 @@ private:
     }
 
     void if_macro_eq_macro() {
-        const char *code = "#define A B\n"
+        const char * const code = "#define A B\n"
                            "#define B 1\n"
                            "#define C 1\n"
                            "#if A == C\n"
@@ -796,7 +796,7 @@ private:
     }
 
     void ticket_3675() {
-        const char* code = "#ifdef YYSTACKSIZE\n"
+        const char * const code = "#ifdef YYSTACKSIZE\n"
                            "#define YYMAXDEPTH YYSTACKSIZE\n"
                            "#else\n"
                            "#define YYSTACKSIZE YYMAXDEPTH\n"
@@ -810,7 +810,7 @@ private:
     }
 
     void ticket_3699() {
-        const char* code = "#define INLINE __forceinline\n"
+        const char * const code = "#define INLINE __forceinline\n"
                            "#define inline __forceinline\n"
                            "#define __forceinline inline\n"
                            "#if !defined(_WIN32)\n"
@@ -824,7 +824,7 @@ private:
     }
 
     void ticket_4922() { // #4922
-        const char* code = "__asm__ \n"
+        const char * const code = "__asm__ \n"
                            "{ int extern __value) 0; (double return (\"\" } extern\n"
                            "__typeof __finite (__finite) __finite __inline \"__GI___finite\");";
         std::map<std::string, std::string> actual;
@@ -2300,7 +2300,7 @@ private:
     }
 
     void if_sizeof() { // #4071
-        static const char* code = "#if sizeof(unsigned short) == 2\n"
+        static const char * const code = "#if sizeof(unsigned short) == 2\n"
                                   "Fred & Wilma\n"
                                   "#elif sizeof(unsigned short) == 4\n"
                                   "Fred & Wilma\n"

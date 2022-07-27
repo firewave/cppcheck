@@ -49,37 +49,37 @@ static const CWE CWE590(590U);  // Free of Memory not on the Heap
 
 static bool isPtrArg(const Token *tok)
 {
-    const Variable *var = tok->variable();
+    const Variable * const var = tok->variable();
     return (var && var->isArgument() && var->isPointer());
 }
 
 static bool isArrayArg(const Token *tok)
 {
-    const Variable *var = tok->variable();
+    const Variable * const var = tok->variable();
     return (var && var->isArgument() && var->isArray());
 }
 
 static bool isArrayVar(const Token *tok)
 {
-    const Variable *var = tok->variable();
+    const Variable * const var = tok->variable();
     return (var && var->isArray() && !var->isArgument());
 }
 
 static bool isRefPtrArg(const Token *tok)
 {
-    const Variable *var = tok->variable();
+    const Variable * const var = tok->variable();
     return (var && var->isArgument() && var->isReference() && var->isPointer());
 }
 
 static bool isNonReferenceArg(const Token *tok)
 {
-    const Variable *var = tok->variable();
+    const Variable * const var = tok->variable();
     return (var && var->isArgument() && !var->isReference() && (var->isPointer() || (var->valueType() && var->valueType()->type >= ValueType::Type::CONTAINER) || var->type()));
 }
 
 static bool isAutoVar(const Token *tok)
 {
-    const Variable *var = tok->variable();
+    const Variable * const var = tok->variable();
 
     if (!var || !var->isLocal() || var->isStatic())
         return false;
@@ -121,7 +121,7 @@ static bool isAutoVarArray(const Token *tok)
                tok->astOperand2()->valueType() &&
                tok->astOperand2()->valueType()->isIntegral();
 
-    const Variable *var = tok->variable();
+    const Variable * const var = tok->variable();
     if (!var)
         return false;
 
@@ -154,7 +154,7 @@ static bool checkRvalueExpression(const Token * const vartok)
     const Token * const next = vartok->next();
     // &a.b[0]
     if (Token::Match(vartok, "%name% . %var% [") && !var->isPointer()) {
-        const Variable *var2 = next->next()->variable();
+        const Variable * const var2 = next->next()->variable();
         return var2 && !var2->isPointer();
     }
 
@@ -208,8 +208,8 @@ void CheckAutoVariables::assignFunctionArg()
     if (!printStyle && !printWarning)
         return;
 
-    const SymbolDatabase *symbolDatabase = mTokenizer->getSymbolDatabase();
-    for (const Scope * scope : symbolDatabase->functionScopes) {
+    const SymbolDatabase * const symbolDatabase = mTokenizer->getSymbolDatabase();
+    for (const Scope * const scope : symbolDatabase->functionScopes) {
         for (const Token *tok = scope->bodyStart; tok && tok != scope->bodyEnd; tok = tok->next()) {
             // TODO: What happens if this is removed?
             if (tok->astParent())
@@ -233,11 +233,11 @@ void CheckAutoVariables::assignFunctionArg()
 void CheckAutoVariables::autoVariables()
 {
     const bool printInconclusive = mSettings->certainty.isEnabled(Certainty::inconclusive);
-    const SymbolDatabase *symbolDatabase = mTokenizer->getSymbolDatabase();
-    for (const Scope * scope : symbolDatabase->functionScopes) {
+    const SymbolDatabase * const symbolDatabase = mTokenizer->getSymbolDatabase();
+    for (const Scope * const scope : symbolDatabase->functionScopes) {
         for (const Token *tok = scope->bodyStart; tok && tok != scope->bodyEnd; tok = tok->next()) {
             // Skip lambda..
-            if (const Token *lambdaEndToken = findLambdaEndToken(tok)) {
+            if (const Token * const lambdaEndToken = findLambdaEndToken(tok)) {
                 tok = lambdaEndToken;
                 continue;
             }
@@ -257,7 +257,7 @@ void CheckAutoVariables::autoVariables()
                 }
                 tok = tok->tokAt(5);
             } else if (Token::Match(tok, "[;{}] * %var% = %var% ;")) {
-                const Variable * var1 = tok->tokAt(2)->variable();
+                const Variable * const var1 = tok->tokAt(2)->variable();
                 if (var1 && var1->isArgument() && Token::Match(var1->nameToken()->tokAt(-3), "%type% * *")) {
                     if (isAutoVarArray(tok->tokAt(4)))
                         checkAutoVariableAssignment(tok->next(), false);
@@ -319,7 +319,7 @@ bool CheckAutoVariables::checkAutoVariableAssignment(const Token *expr, bool inc
         }
 
         if (Token::simpleMatch(tok, "if (")) {
-            const Token *ifStart = tok->linkAt(1)->next();
+            const Token * const ifStart = tok->linkAt(1)->next();
             return checkAutoVariableAssignment(expr, inconclusive, ifStart) || checkAutoVariableAssignment(expr, inconclusive, ifStart->link()->next());
         }
         if (Token::simpleMatch(tok, "} else {"))
@@ -400,7 +400,7 @@ static bool isInScope(const Token * tok, const Scope * scope)
         return false;
     if (!scope)
         return false;
-    const Variable * var = tok->variable();
+    const Variable * const var = tok->variable();
     if (var && (var->isGlobal() || var->isStatic() || var->isExtern()))
         return false;
     if (tok->scope() && tok->scope()->isNestedIn(scope))
@@ -408,10 +408,10 @@ static bool isInScope(const Token * tok, const Scope * scope)
     if (!var)
         return false;
     if (var->isArgument() && !var->isReference()) {
-        const Scope * tokScope = tok->scope();
+        const Scope * const tokScope = tok->scope();
         if (!tokScope)
             return false;
-        for (const Scope * argScope:tokScope->nestedList) {
+        for (const Scope * const argScope:tokScope->nestedList) {
             if (argScope && argScope->isNestedIn(scope))
                 return true;
         }
@@ -425,7 +425,7 @@ static bool isDeadScope(const Token * tok, const Scope * scope)
         return false;
     if (!scope)
         return false;
-    const Variable * var = tok->variable();
+    const Variable * const var = tok->variable();
     if (var && (!var->isLocal() || var->isStatic() || var->isExtern()))
         return false;
     if (tok->scope() && tok->scope()->bodyEnd != scope->bodyEnd && precedes(tok->scope()->bodyEnd, scope->bodyEnd))
@@ -454,10 +454,10 @@ static bool isDeadTemporary(bool cpp, const Token* tok, const Token* expr, const
     if (expr) {
         if (!precedes(nextAfterAstRightmostLeaf(tok->astTop()), nextAfterAstRightmostLeaf(expr->astTop())))
             return false;
-        const Token* parent = tok->astParent();
+        const Token * const parent = tok->astParent();
         // Is in a for loop
         if (astIsRHS(tok) && Token::simpleMatch(parent, ":") && Token::simpleMatch(parent->astParent(), "(") && Token::simpleMatch(parent->astParent()->previous(), "for (")) {
-            const Token* braces = parent->astParent()->link()->next();
+            const Token * const braces = parent->astParent()->link()->next();
             if (precedes(braces, expr) && precedes(expr, braces->link()))
                 return false;
         }
@@ -475,7 +475,7 @@ static bool isEscapedReference(const Variable* var)
         return false;
     if (!Token::simpleMatch(var->declEndToken(), "="))
         return false;
-    const Token* vartok = var->declEndToken()->astOperand2();
+    const Token * const vartok = var->declEndToken()->astOperand2();
     return !isTemporary(true, vartok, nullptr, false);
 }
 
@@ -483,10 +483,10 @@ static bool isDanglingSubFunction(const Token* tokvalue, const Token* tok)
 {
     if (!tokvalue)
         return false;
-    const Variable* var = tokvalue->variable();
+    const Variable * const var = tokvalue->variable();
     if (!var->isLocal())
         return false;
-    Function* f = Scope::nestedInFunction(tok->scope());
+    Function * const f = Scope::nestedInFunction(tok->scope());
     if (!f)
         return false;
     const Token* parent = tokvalue->astParent();
@@ -513,7 +513,7 @@ static bool isAssignedToNonLocal(const Token* tok)
         return false;
     if (!astIsRHS(tok))
         return false;
-    const Variable* var = getParentVar(tok->astParent()->astOperand1());
+    const Variable * const var = getParentVar(tok->astParent()->astOperand1());
     if (!var)
         return false;
     return !var->isLocal() || var->isStatic();
@@ -524,7 +524,7 @@ void CheckAutoVariables::checkVarLifetimeScope(const Token * start, const Token 
     const bool printInconclusive = mSettings->certainty.isEnabled(Certainty::inconclusive);
     if (!start)
         return;
-    const Scope * scope = start->scope();
+    const Scope * const scope = start->scope();
     if (!scope)
         return;
     // If the scope is not set correctly then skip checking it
@@ -537,7 +537,7 @@ void CheckAutoVariables::checkVarLifetimeScope(const Token * start, const Token 
             for (const LifetimeToken& lt : getLifetimeTokens(tok, true)) {
                 if (!printInconclusive && lt.inconclusive)
                     continue;
-                const Variable* var = lt.token->variable();
+                const Variable * const var = lt.token->variable();
                 if (var && !var->isGlobal() && !var->isStatic() && !var->isReference() && !var->isRValueReference() &&
                     isInScope(var->nameToken(), tok->scope())) {
                     errorReturnReference(tok, lt.errorPath, lt.inconclusive);
@@ -553,7 +553,7 @@ void CheckAutoVariables::checkVarLifetimeScope(const Token * start, const Token 
                    tok->variable()->declarationId() == tok->varId() && tok->variable()->isStatic() &&
                    !tok->variable()->isArgument()) {
             ErrorPath errorPath;
-            const Variable *var = getLifetimeVariable(tok, errorPath);
+            const Variable * const var = getLifetimeVariable(tok, errorPath);
             if (var && isInScope(var->nameToken(), tok->scope())) {
                 errorDanglingReference(tok, var, errorPath);
                 continue;
@@ -563,7 +563,7 @@ void CheckAutoVariables::checkVarLifetimeScope(const Token * start, const Token 
             for (const LifetimeToken& lt : getLifetimeTokens(getParentLifetime(tok))) {
                 if (!printInconclusive && lt.inconclusive)
                     continue;
-                const Token * tokvalue = lt.token;
+                const Token * const tokvalue = lt.token;
                 if (isDeadTemporary(mTokenizer->isCPP(), tokvalue, tok, &mSettings->library)) {
                     errorDanglingTempReference(tok, lt.errorPath, lt.inconclusive);
                     break;
@@ -577,11 +577,11 @@ void CheckAutoVariables::checkVarLifetimeScope(const Token * start, const Token 
                 continue;
             if (!printInconclusive && val.isInconclusive())
                 continue;
-            const Token* parent = getParentLifetime(mTokenizer->isCPP(), val.tokvalue, &mSettings->library);
+            const Token * const parent = getParentLifetime(mTokenizer->isCPP(), val.tokvalue, &mSettings->library);
             if (!exprs.insert(parent).second)
                 continue;
             for (const LifetimeToken& lt : getLifetimeTokens(parent, escape || isAssignedToNonLocal(tok))) {
-                const Token * tokvalue = lt.token;
+                const Token * const tokvalue = lt.token;
                 if (val.isLocalLifetimeValue()) {
                     if (escape) {
                         if (getPointerDepth(tok) < getPointerDepth(tokvalue))
@@ -636,7 +636,7 @@ void CheckAutoVariables::checkVarLifetimeScope(const Token * start, const Token 
                 }
             }
         }
-        const Token *lambdaEndToken = findLambdaEndToken(tok);
+        const Token * const lambdaEndToken = findLambdaEndToken(tok);
         if (lambdaEndToken) {
             checkVarLifetimeScope(lambdaEndToken->link(), lambdaEndToken);
             tok = lambdaEndToken;
@@ -658,8 +658,8 @@ void CheckAutoVariables::checkVarLifetimeScope(const Token * start, const Token 
 
 void CheckAutoVariables::checkVarLifetime()
 {
-    const SymbolDatabase *symbolDatabase = mTokenizer->getSymbolDatabase();
-    for (const Scope * scope : symbolDatabase->functionScopes) {
+    const SymbolDatabase * const symbolDatabase = mTokenizer->getSymbolDatabase();
+    for (const Scope * const scope : symbolDatabase->functionScopes) {
         if (!scope->function)
             continue;
         checkVarLifetimeScope(scope->bodyStart, scope->bodyEnd);
@@ -741,7 +741,7 @@ void CheckAutoVariables::errorReturnTempReference(const Token* tok, ErrorPath er
 
 void CheckAutoVariables::errorInvalidDeallocation(const Token *tok, const ValueFlow::Value *val)
 {
-    const Variable *var = val ? val->tokvalue->variable() : (tok ? tok->variable() : nullptr);
+    const Variable * const var = val ? val->tokvalue->variable() : (tok ? tok->variable() : nullptr);
 
     std::string type = "an auto-variable";
     if (tok && tok->tokType() == Token::eString)

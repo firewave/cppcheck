@@ -47,8 +47,8 @@ void CheckSizeof::checkSizeofForNumericParameter()
     if (!mSettings->severity.isEnabled(Severity::warning))
         return;
 
-    const SymbolDatabase *symbolDatabase = mTokenizer->getSymbolDatabase();
-    for (const Scope * scope : symbolDatabase->functionScopes) {
+    const SymbolDatabase * const symbolDatabase = mTokenizer->getSymbolDatabase();
+    for (const Scope * const scope : symbolDatabase->functionScopes) {
         for (const Token* tok = scope->bodyStart->next(); tok != scope->bodyEnd; tok = tok->next()) {
             if (Token::Match(tok, "sizeof ( %num% )") ||
                 Token::Match(tok, "sizeof %num%")) {
@@ -74,8 +74,8 @@ void CheckSizeof::checkSizeofForArrayParameter()
 {
     if (!mSettings->severity.isEnabled(Severity::warning))
         return;
-    const SymbolDatabase *symbolDatabase = mTokenizer->getSymbolDatabase();
-    for (const Scope * scope : symbolDatabase->functionScopes) {
+    const SymbolDatabase * const symbolDatabase = mTokenizer->getSymbolDatabase();
+    for (const Scope * const scope : symbolDatabase->functionScopes) {
         for (const Token* tok = scope->bodyStart->next(); tok != scope->bodyEnd; tok = tok->next()) {
             if (Token::Match(tok, "sizeof ( %var% )") ||
                 Token::Match(tok, "sizeof %var% !![")) {
@@ -84,7 +84,7 @@ void CheckSizeof::checkSizeofForArrayParameter()
                     varTok = varTok->next();
                 }
 
-                const Variable *var = varTok->variable();
+                const Variable * const var = varTok->variable();
                 if (var && var->isArray() && var->isArgument() && !var->isReference())
                     sizeofForArrayParameterError(tok);
             }
@@ -113,8 +113,8 @@ void CheckSizeof::checkSizeofForPointerSize()
     if (!mSettings->severity.isEnabled(Severity::warning))
         return;
 
-    const SymbolDatabase *symbolDatabase = mTokenizer->getSymbolDatabase();
-    for (const Scope * scope : symbolDatabase->functionScopes) {
+    const SymbolDatabase * const symbolDatabase = mTokenizer->getSymbolDatabase();
+    for (const Scope * const scope : symbolDatabase->functionScopes) {
         for (const Token* tok = scope->bodyStart; tok != scope->bodyEnd; tok = tok->next()) {
             const Token* tokSize;
             const Token* tokFunc;
@@ -160,15 +160,15 @@ void CheckSizeof::checkSizeofForPointerSize()
                     if (Token::simpleMatch(tok2, "/ sizeof")) {
                         // Allow division with sizeof(char)
                         if (Token::simpleMatch(tok2->next(), "sizeof (")) {
-                            const Token *sztok = tok2->tokAt(2)->astOperand2();
-                            const ValueType *vt = ((sztok != nullptr) ? sztok->valueType() : nullptr);
+                            const Token * const sztok = tok2->tokAt(2)->astOperand2();
+                            const ValueType * const vt = ((sztok != nullptr) ? sztok->valueType() : nullptr);
                             if (vt && vt->type == ValueType::CHAR && vt->pointer == 0)
                                 continue;
                         }
                         auto hasMultiplication = [](const Token* parTok) -> bool {
                             while (parTok) { // Allow division if followed by multiplication
                                 if (parTok->isArithmeticalOp() && parTok->str() == "*") {
-                                    for (const Token* szTok : { parTok->astOperand1(), parTok->astOperand2() })
+                                    for (const Token * const szTok : { parTok->astOperand1(), parTok->astOperand2() })
                                         if (Token::simpleMatch(szTok, "(") && Token::simpleMatch(szTok->previous(), "sizeof"))
                                             return true;
                                 }
@@ -310,14 +310,14 @@ void CheckSizeof::sizeofCalculation()
         // ignore if the `sizeof` result is cast to void inside a macro, i.e. the calculation is
         // expected to be parsed but skipped, such as in a disabled custom ASSERT() macro
         if (tok->isExpandedMacro() && tok->previous()) {
-            const Token *cast_end = (tok->previous()->str() == "(") ? tok->previous() : tok;
+            const Token * const cast_end = (tok->previous()->str() == "(") ? tok->previous() : tok;
             if (Token::simpleMatch(cast_end->tokAt(-3), "( void )") ||
                 Token::simpleMatch(cast_end->tokAt(-4), "static_cast < void >")) {
                 continue;
             }
         }
 
-        const Token *argument = tok->next()->astOperand2();
+        const Token * const argument = tok->next()->astOperand2();
         if (!argument || !argument->isCalculation())
             continue;
 
@@ -351,18 +351,18 @@ void CheckSizeof::sizeofFunction()
             // ignore if the `sizeof` result is cast to void inside a macro, i.e. the calculation is
             // expected to be parsed but skipped, such as in a disabled custom ASSERT() macro
             if (tok->isExpandedMacro() && tok->previous()) {
-                const Token *cast_end = (tok->previous()->str() == "(") ? tok->previous() : tok;
+                const Token * const cast_end = (tok->previous()->str() == "(") ? tok->previous() : tok;
                 if (Token::simpleMatch(cast_end->tokAt(-3), "( void )") ||
                     Token::simpleMatch(cast_end->tokAt(-4), "static_cast < void >")) {
                     continue;
                 }
             }
 
-            if (const Token *argument = tok->next()->astOperand2()) {
-                const Token *checkToken = argument->previous();
+            if (const Token * const argument = tok->next()->astOperand2()) {
+                const Token * const checkToken = argument->previous();
                 if (checkToken->tokType() == Token::eName)
                     break;
-                const Function * fun = checkToken->function();
+                const Function * const fun = checkToken->function();
                 // Don't report error if the function is overloaded
                 if (fun && fun->nestedIn->functionMap.count(checkToken->str()) == 1) {
                     sizeofFunctionError(tok);
@@ -388,7 +388,7 @@ void CheckSizeof::suspiciousSizeofCalculation()
 
     for (const Token *tok = mTokenizer->tokens(); tok; tok = tok->next()) {
         if (Token::simpleMatch(tok, "sizeof (")) {
-            const Token* lPar = tok->astParent();
+            const Token * const lPar = tok->astParent();
             if (lPar && lPar->str() == "(") {
                 const Token* const rPar = lPar->link();
                 const Token* varTok = lPar->astOperand2();
@@ -398,7 +398,7 @@ void CheckSizeof::suspiciousSizeofCalculation()
                     varTok = varTok->astOperand1();
                 }
                 if (lPar->astParent() && lPar->astParent()->str() == "/") {
-                    const Variable* var = varTok ? varTok->variable() : nullptr;
+                    const Variable * const var = varTok ? varTok->variable() : nullptr;
                     if (var && var->isPointer() && !var->isArray() && !(var->valueType() && var->valueType()->pointer <= derefCount))
                         divideSizeofError(tok);
                 }
@@ -432,20 +432,20 @@ void CheckSizeof::sizeofVoid()
         if (Token::simpleMatch(tok, "sizeof ( void )")) {
             sizeofVoidError(tok);
         } else if (Token::simpleMatch(tok, "sizeof (") && tok->next()->astOperand2()) {
-            const ValueType *vt = tok->next()->astOperand2()->valueType();
+            const ValueType * const vt = tok->next()->astOperand2()->valueType();
             if (vt && vt->type == ValueType::Type::VOID && vt->pointer == 0U)
                 sizeofDereferencedVoidPointerError(tok, tok->strAt(3));
         } else if (tok->str() == "-") {
             // only warn for: 'void *' - 'integral'
-            const ValueType *vt1  = tok->astOperand1() ? tok->astOperand1()->valueType() : nullptr;
-            const ValueType *vt2  = tok->astOperand2() ? tok->astOperand2()->valueType() : nullptr;
+            const ValueType * const vt1  = tok->astOperand1() ? tok->astOperand1()->valueType() : nullptr;
+            const ValueType * const vt2  = tok->astOperand2() ? tok->astOperand2()->valueType() : nullptr;
             const bool op1IsvoidPointer = (vt1 && vt1->type == ValueType::Type::VOID && vt1->pointer == 1U);
             const bool op2IsIntegral    = (vt2 && vt2->isIntegral() && vt2->pointer == 0U);
             if (op1IsvoidPointer && op2IsIntegral)
                 arithOperationsOnVoidPointerError(tok, tok->astOperand1()->expressionString(), vt1->str());
         } else if (Token::Match(tok, "+|++|--|+=|-=")) { // Arithmetic operations on variable of type "void*"
-            const ValueType *vt1 = tok->astOperand1() ? tok->astOperand1()->valueType() : nullptr;
-            const ValueType *vt2 = tok->astOperand2() ? tok->astOperand2()->valueType() : nullptr;
+            const ValueType * const vt1 = tok->astOperand1() ? tok->astOperand1()->valueType() : nullptr;
+            const ValueType * const vt2 = tok->astOperand2() ? tok->astOperand2()->valueType() : nullptr;
 
             const bool voidpointer1 = (vt1 && vt1->type == ValueType::Type::VOID && vt1->pointer == 1U);
             const bool voidpointer2 = (vt2 && vt2->type == ValueType::Type::VOID && vt2->pointer == 1U);

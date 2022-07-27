@@ -48,15 +48,15 @@ void CheckPostfixOperator::postfixOperator()
     if (!mSettings->severity.isEnabled(Severity::performance))
         return;
 
-    const SymbolDatabase *symbolDatabase = mTokenizer->getSymbolDatabase();
+    const SymbolDatabase * const symbolDatabase = mTokenizer->getSymbolDatabase();
 
-    for (const Scope * scope : symbolDatabase->functionScopes) {
+    for (const Scope * const scope : symbolDatabase->functionScopes) {
         for (const Token* tok = scope->bodyStart->next(); tok != scope->bodyEnd; tok = tok->next()) {
-            const Variable *var = tok->variable();
+            const Variable * const var = tok->variable();
             if (!var || !Token::Match(tok, "%var% ++|--"))
                 continue;
 
-            const Token* parent = tok->next()->astParent();
+            const Token * const parent = tok->next()->astParent();
             if (!parent || parent->str() == ";" || (parent->str() == "," && (!parent->astParent() || parent->astParent()->str() != "("))) {
                 if (var->isPointer() || var->isArray())
                     continue;

@@ -3895,7 +3895,7 @@ private:
         Tokenizer tokenizer(&settings1,this);
         std::istringstream code("void f() { int a,b,c; x(a,b,c); }");
         ASSERT_EQUALS(true, tokenizer.tokenize(code, "test.c"));
-        const Token *xtok = Token::findsimplematch(tokenizer.tokens(), "x");
+        const Token * const xtok = Token::findsimplematch(tokenizer.tokens(), "x");
 
         // nothing bad..
         {
@@ -4237,7 +4237,7 @@ private:
         std::istringstream istr(code);
         ASSERT_LOC(tokenizer.tokenize(istr, "test.cpp"), file, line);
 
-        CTU::FileInfo *ctu = CTU::getFileInfo(&tokenizer);
+        CTU::FileInfo * const ctu = CTU::getFileInfo(&tokenizer);
 
         // Check code..
         std::list<Check::FileInfo*> fileInfo;

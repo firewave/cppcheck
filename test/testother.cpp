@@ -317,7 +317,7 @@ private:
         // Clear the error buffer..
         errout.str("");
 
-        Settings* settings = &_settings;
+        Settings * const settings = &_settings;
         settings->severity.enable(Severity::style);
         settings->severity.enable(Severity::warning);
         settings->severity.enable(Severity::portability);
@@ -7601,7 +7601,7 @@ private:
         ASSERT_EQUALS("", errout.str());
 
         // #5618
-        const char* code5618 = "class Token {\n"
+        const char * const code5618 = "class Token {\n"
                                "public:\n"
                                "    const std::string& str();\n"
                                "};\n"

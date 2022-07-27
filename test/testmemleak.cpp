@@ -109,7 +109,7 @@ private:
         ASSERT(tokenizer.tokenize(istr, "test.cpp"));
 
         // there is no allocation
-        const Token *tok = Token::findsimplematch(tokenizer.tokens(), "ret =");
+        const Token * const tok = Token::findsimplematch(tokenizer.tokens(), "ret =");
         const CheckMemoryLeak check(&tokenizer, nullptr, &settings);
         ASSERT_EQUALS(CheckMemoryLeak::No, check.getAllocationType(tok->tokAt(2), 1));
     }
@@ -135,7 +135,7 @@ private:
         // Clear the error buffer..
         errout.str("");
 
-        Settings *settings = &settings1;
+        Settings * const settings = &settings1;
 
         // Tokenize..
         Tokenizer tokenizer(settings, this);

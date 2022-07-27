@@ -164,7 +164,7 @@ QList<ErrorItem> XmlReportV2::read()
             // Read error element from inside result element
             if (insideResults && mXmlReader->name() == ErrorElementName) {
                 const ErrorItem item = readError(mXmlReader);
-                errors.append(std::move(item));
+                errors.append(item);
             }
             break;
 

@@ -190,12 +190,12 @@ bool ResultsTree::addErrorItem(const ErrorItem &item)
     line.message = item.message;
     line.severity = item.severity;
     line.sinceDate = item.sinceDate;
-    if (const ProjectFile *activeProject = ProjectFile::getActiveProject()) {
+    if (const ProjectFile * const activeProject = ProjectFile::getActiveProject()) {
         line.tags = activeProject->getWarningTags(item.hash);
     }
     //Create the base item for the error and ensure it has a proper
     //file item as a parent
-    QStandardItem* fileItem = ensureFileItem(loc.file, item.file0, hide);
+    QStandardItem * const fileItem = ensureFileItem(loc.file, item.file0, hide);
     QStandardItem* stditem = addBacktraceFiles(fileItem,
                                                line,
                                                hide,
@@ -389,7 +389,7 @@ void ResultsTree::clear(const QString &filename)
     const QString stripped = stripPath(filename, false);
 
     for (int i = 0; i < mModel.rowCount(); ++i) {
-        const QStandardItem *fileItem = mModel.item(i, 0);
+        const QStandardItem * const fileItem = mModel.item(i, 0);
         if (!fileItem)
             continue;
 
@@ -405,7 +405,7 @@ void ResultsTree::clear(const QString &filename)
 void ResultsTree::clearRecheckFile(const QString &filename)
 {
     for (int i = 0; i < mModel.rowCount(); ++i) {
-        const QStandardItem *fileItem = mModel.item(i, 0);
+        const QStandardItem * const fileItem = mModel.item(i, 0);
         if (!fileItem)
             continue;
 
@@ -507,7 +507,7 @@ void ResultsTree::refreshTree()
 
     for (int i = 0; i < filecount; i++) {
         //Get file i
-        QStandardItem *fileItem = mModel.item(i, 0);
+        QStandardItem * const fileItem = mModel.item(i, 0);
         if (!fileItem) {
             continue;
         }
@@ -520,7 +520,7 @@ void ResultsTree::refreshTree()
 
         for (int j = 0; j < errorcount; j++) {
             //Get the error itself
-            QStandardItem *child = fileItem->child(j, 0);
+            QStandardItem * const child = fileItem->child(j, 0);
             if (!child) {
                 continue;
             }
@@ -658,8 +658,8 @@ void ResultsTree::contextMenuEvent(QContextMenuEvent * e)
 
             //Create an action for the application
             QAction *recheckSelectedFiles   = new QAction(tr("Recheck"), &menu);
-            QAction *copy                   = new QAction(tr("Copy"), &menu);
-            QAction *hide                   = new QAction(tr("Hide"), &menu);
+            QAction * const copy                   = new QAction(tr("Copy"), &menu);
+            QAction * const hide                   = new QAction(tr("Hide"), &menu);
             QAction *hideallid              = new QAction(tr("Hide all with id"), &menu);
             QAction *opencontainingfolder   = new QAction(tr("Open containing folder"), &menu);
 
@@ -679,7 +679,7 @@ void ResultsTree::contextMenuEvent(QContextMenuEvent * e)
             menu.addAction(hide);
             menu.addAction(hideallid);
 
-            QAction *suppress = new QAction(tr("Suppress selected id(s)"), &menu);
+            QAction * const suppress = new QAction(tr("Suppress selected id(s)"), &menu);
             menu.addAction(suppress);
             connect(suppress, &QAction::triggered, this, &ResultsTree::suppressSelectedIds);
 
@@ -692,12 +692,12 @@ void ResultsTree::contextMenuEvent(QContextMenuEvent * e)
             connect(hideallid, SIGNAL(triggered()), this, SLOT(hideAllIdResult()));
             connect(opencontainingfolder, SIGNAL(triggered()), this, SLOT(openContainingFolder()));
 
-            const ProjectFile *currentProject = ProjectFile::getActiveProject();
+            const ProjectFile * const currentProject = ProjectFile::getActiveProject();
             if (currentProject && !currentProject->getTags().isEmpty()) {
                 menu.addSeparator();
                 QMenu *tagMenu = menu.addMenu(tr("Tag"));
                 {
-                    QAction *action = new QAction(tr("No tag"), tagMenu);
+                    QAction * const action = new QAction(tr("No tag"), tagMenu);
                     tagMenu->addAction(action);
                     connect(action, &QAction::triggered, [=]() {
                         tagSelectedItems(QString());
@@ -705,7 +705,7 @@ void ResultsTree::contextMenuEvent(QContextMenuEvent * e)
                 }
 
                 for (const QString& tagstr : currentProject->getTags()) {
-                    QAction *action = new QAction(tagstr, tagMenu);
+                    QAction * const action = new QAction(tagstr, tagMenu);
                     tagMenu->addAction(action);
                     connect(action, &QAction::triggered, [=]() {
                         tagSelectedItems(tagstr);
@@ -721,7 +721,7 @@ void ResultsTree::contextMenuEvent(QContextMenuEvent * e)
             mContextItem = mModel.itemFromIndex(index);
             if (mContextItem && mApplications->getApplicationCount() > 0 && mContextItem->parent()) {
                 //Disconnect all signals
-                for (QAction* action : actions) {
+                for (QAction * const action : actions) {
                     disconnect(action, SIGNAL(triggered()), signalMapper, SLOT(map()));
                 }
 
@@ -992,7 +992,7 @@ void ResultsTree::hideAllIdResult()
     const int filecount = mModel.rowCount();
     for (int i = 0; i < filecount; i++) {
         //Get file i
-        QStandardItem *file = mModel.item(i, 0);
+        QStandardItem * const file = mModel.item(i, 0);
         if (!file) {
             continue;
         }
@@ -1042,7 +1042,7 @@ void ResultsTree::suppressSelectedIds()
     for (int i = 0; i < mModel.rowCount(); i++) {
         QStandardItem * const file = mModel.item(i, 0);
         for (int j = 0; j < file->rowCount();) {
-            QStandardItem *errorItem = file->child(j, 0);
+            QStandardItem * const errorItem = file->child(j, 0);
             QVariantMap userdata = errorItem->data().toMap();
             if (selectedIds.contains(userdata[ERRORID].toString())) {
                 file->removeRow(j);
@@ -1076,7 +1076,7 @@ void ResultsTree::suppressHash()
 
     bool changed = false;
     ProjectFile *projectFile = ProjectFile::getActiveProject();
-    for (QStandardItem *item: selectedWarnings) {
+    for (QStandardItem * const item: selectedWarnings) {
         QStandardItem *fileItem = item->parent();
         const QVariantMap data = item->data().toMap();
         if (projectFile && data.contains(HASH)) {
@@ -1202,7 +1202,7 @@ void ResultsTree::saveErrors(Report *report, const QStandardItem *fileItem) cons
     }
 
     for (int i = 0; i < fileItem->rowCount(); i++) {
-        const QStandardItem *error = fileItem->child(i, 0);
+        const QStandardItem * const error = fileItem->child(i, 0);
 
         if (!error) {
             continue;
@@ -1240,7 +1240,7 @@ void ResultsTree::updateFromOldReport(const QString &filename)
 
     // Read current results..
     for (int i = 0; i < mModel.rowCount(); i++) {
-        QStandardItem *fileItem = mModel.item(i,0);
+        QStandardItem * const fileItem = mModel.item(i,0);
         for (int j = 0; j < fileItem->rowCount(); j++) {
             QStandardItem *error = fileItem->child(j,0);
             ErrorItem errorItem;
@@ -1298,7 +1298,7 @@ void ResultsTree::readErrorItem(const QStandardItem *error, ErrorItem *item) con
     }
 
     for (int j = 0; j < error->rowCount(); j++) {
-        const QStandardItem *child_error = error->child(j, 0);
+        const QStandardItem * const child_error = error->child(j, 0);
         //Get error's user data
         const QVariant child_userdata = child_error->data();
         //Convert it to QVariantMap

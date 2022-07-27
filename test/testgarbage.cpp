@@ -1231,7 +1231,7 @@ private:
     }
 
     void garbageCode152() { // happened in travis, originally from llvm clang code
-        const char* code = "template <bool foo = std::value &&>\n"
+        const char * const code = "template <bool foo = std::value &&>\n"
                            "static std::string foo(char *Bla) {\n"
                            "    while (Bla[1] && Bla[1] != ',') }\n";
         checkCode(code);

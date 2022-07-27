@@ -147,7 +147,7 @@ int ProcessExecutor::handleRead(int rpipe, unsigned int &result)
 
     // Don't rely on incoming data being null-terminated.
     // Allocate +1 element and null-terminate the buffer.
-    char *buf = new char[len + 1];
+    char * const buf = new char[len + 1];
     const ssize_t readIntoBuf = read(rpipe, buf, len);
     if (readIntoBuf <= 0) {
         std::cerr << "#### ThreadExecutor::handleRead error, type was:" << type << std::endl;

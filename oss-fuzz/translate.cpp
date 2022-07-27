@@ -23,7 +23,7 @@
 
 int main(int argc, char **argv)
 {
-    const char *filename = argc==2 ? argv[1] : nullptr;
+    const char * const filename = argc==2 ? argv[1] : nullptr;
 
     if (!filename) {
         std::cout << "Invalid args, no filename\n";

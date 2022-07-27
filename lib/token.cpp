@@ -263,7 +263,7 @@ std::string Token::strValue() const
 void Token::deleteNext(nonneg int count)
 {
     while (mNext && count > 0) {
-        Token *n = mNext;
+        Token * const n = mNext;
 
         // #8154 we are about to be unknown -> destroy the link to us
         if (n->mLink && n->mLink->mLink == n)
@@ -283,7 +283,7 @@ void Token::deleteNext(nonneg int count)
 void Token::deletePrevious(nonneg int count)
 {
     while (mPrevious && count > 0) {
-        Token *p = mPrevious;
+        Token * const p = mPrevious;
 
         // #8154 we are about to be unknown -> destroy the link to us
         if (p->mLink && p->mLink->mLink == p)
@@ -407,7 +407,7 @@ const Token *Token::tokAt(int index) const
 
 const Token *Token::linkAt(int index) const
 {
-    const Token *tok = this->tokAt(index);
+    const Token * const tok = this->tokAt(index);
     if (!tok) {
         throw InternalError(this, "Internal error. Token::linkAt called with index outside the tokens range.");
     }
@@ -416,7 +416,7 @@ const Token *Token::linkAt(int index) const
 
 const std::string &Token::strAt(int index) const
 {
-    const Token *tok = this->tokAt(index);
+    const Token * const tok = this->tokAt(index);
     return tok ? tok->mStr : emptyString;
 }
 
@@ -562,7 +562,7 @@ static int multiComparePercent(const Token *tok, const char*& haystack, nonneg i
 
 int Token::multiCompare(const Token *tok, const char *haystack, nonneg int varid)
 {
-    const char *needle = tok->str().c_str();
+    const char * const needle = tok->str().c_str();
     const char *needlePointer = needle;
     for (;;) {
         if (needlePointer == needle && haystack[0] == '%' && haystack[1] != '|' && haystack[1] != '\0' && haystack[1] != ' ') {
@@ -618,7 +618,7 @@ bool Token::simpleMatch(const Token *tok, const char pattern[], size_t pattern_l
     if (!tok)
         return false; // shortcut
     const char *current = pattern;
-    const char *end = pattern + pattern_len;
+    const char * const end = pattern + pattern_len;
     const char *next = static_cast<const char*>(std::memchr(pattern, ' ', pattern_len));
     if (!next)
         next = end;
@@ -855,7 +855,7 @@ Token* Token::nextArgumentBeforeCreateLinks2() const
         else if (tok->link() && Token::Match(tok, "(|{|["))
             tok = tok->link();
         else if (tok->str() == "<") {
-            const Token* temp = tok->findClosingBracket();
+            const Token * const temp = tok->findClosingBracket();
             if (temp)
                 tok = temp;
         } else if (Token::Match(tok, ")|;"))
@@ -1450,7 +1450,7 @@ std::pair<const Token *, const Token *> Token::findExpressionStartEndTokens() co
     while (end->astOperand1() && (end->astOperand2() || end->isUnaryPreOp())) {
         // lambda..
         if (end->str() == "[") {
-            const Token *lambdaEnd = findLambdaEndToken(end);
+            const Token * const lambdaEnd = findLambdaEndToken(end);
             if (lambdaEnd) {
                 end = lambdaEnd;
                 break;
@@ -1489,7 +1489,7 @@ bool Token::isCalculation() const
         std::stack<const Token *> operands;
         operands.push(this);
         while (!operands.empty()) {
-            const Token *op = operands.top();
+            const Token * const op = operands.top();
             operands.pop();
             if (op->isNumber() || op->varId() > 0)
                 return true;
@@ -2208,10 +2208,10 @@ const ::Type* Token::typeOf(const Token* tok, const Token** typeTok)
     } else if (tok->function()) {
         return tok->function()->retType;
     } else if (Token::simpleMatch(tok, "return")) {
-        const Scope *scope = tok->scope();
+        const Scope * const scope = tok->scope();
         if (!scope)
             return nullptr;
-        const Function *function = scope->function;
+        const Function * const function = scope->function;
         if (!function)
             return nullptr;
         return function->retType;
@@ -2225,7 +2225,7 @@ const ::Type* Token::typeOf(const Token* tok, const Token** typeTok)
         return Token::typeOf(tok->astOperand1(), typeTok);
     } else if (Token::simpleMatch(tok, "{")) {
         int argnr;
-        const Token* ftok = getTokenArgumentFunction(tok, argnr);
+        const Token * const ftok = getTokenArgumentFunction(tok, argnr);
         if (argnr < 0)
             return nullptr;
         if (!ftok)
@@ -2252,7 +2252,7 @@ std::pair<const Token*, const Token*> Token::typeDecl(const Token * tok)
     else if (tok->type()) {
         return {tok, tok->next()};
     } else if (tok->variable()) {
-        const Variable *var = tok->variable();
+        const Variable * const var = tok->variable();
         if (!var->typeStartToken() || !var->typeEndToken())
             return {};
         if (Token::simpleMatch(var->typeStartToken(), "auto")) {
@@ -2267,22 +2267,22 @@ std::pair<const Token*, const Token*> Token::typeDecl(const Token * tok)
         }
         return {var->typeStartToken(), var->typeEndToken()->next()};
     } else if (Token::simpleMatch(tok, "return")) {
-        const Scope* scope = tok->scope();
+        const Scope * const scope = tok->scope();
         if (!scope)
             return {};
-        const Function* function = scope->function;
+        const Function * const function = scope->function;
         if (!function)
             return {};
         return { function->retDef, function->returnDefEnd() };
     } else if (tok->previous() && tok->previous()->function()) {
-        const Function *function = tok->previous()->function();
+        const Function * const function = tok->previous()->function();
         return {function->retDef, function->returnDefEnd()};
     } else if (Token::simpleMatch(tok, "=")) {
         return Token::typeDecl(tok->astOperand1());
     } else if (Token::simpleMatch(tok, ".")) {
         return Token::typeDecl(tok->astOperand2());
     } else {
-        const ::Type * t = typeOf(tok);
+        const ::Type * const t = typeOf(tok);
         if (!t || !t->classDef)
             return {};
         return {t->classDef->next(), t->classDef->tokAt(2)};
@@ -2291,7 +2291,7 @@ std::pair<const Token*, const Token*> Token::typeDecl(const Token * tok)
 std::string Token::typeStr(const Token* tok)
 {
     if (tok->valueType()) {
-        const ValueType * vt = tok->valueType();
+        const ValueType * const vt = tok->valueType();
         std::string ret = vt->str();
         if (!ret.empty())
             return ret;
@@ -2419,7 +2419,7 @@ TokenImpl::~TokenImpl()
     delete mTemplateSimplifierPointers;
 
     while (mCppcheckAttributes) {
-        struct CppcheckAttributes *c = mCppcheckAttributes;
+        struct CppcheckAttributes * const c = mCppcheckAttributes;
         mCppcheckAttributes = mCppcheckAttributes->next;
         delete c;
     }

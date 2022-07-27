@@ -36,8 +36,8 @@ namespace {
 
 void CheckInternal::checkTokenMatchPatterns()
 {
-    const SymbolDatabase *symbolDatabase = mTokenizer->getSymbolDatabase();
-    for (const Scope *scope : symbolDatabase->functionScopes) {
+    const SymbolDatabase * const symbolDatabase = mTokenizer->getSymbolDatabase();
+    for (const Scope * const scope : symbolDatabase->functionScopes) {
         for (const Token* tok = scope->bodyStart->next(); tok != scope->bodyEnd; tok = tok->next()) {
             if (!Token::simpleMatch(tok, "Token :: Match (") && !Token::simpleMatch(tok, "Token :: findmatch ("))
                 continue;
@@ -45,7 +45,7 @@ void CheckInternal::checkTokenMatchPatterns()
             const std::string& funcname = tok->strAt(2);
 
             // Get pattern string
-            const Token *patternTok = tok->tokAt(4)->nextArgument();
+            const Token * const patternTok = tok->tokAt(4)->nextArgument();
             if (!patternTok || patternTok->tokType() != Token::eString)
                 continue;
 
@@ -93,7 +93,7 @@ void CheckInternal::checkRedundantTokCheck()
             // if (tok->previous() && Token::match(tok->previous(), "bla")) {}
             // the first tok->previous() check is redundant
             const Token *astOp1 = tok->astOperand1();
-            const Token *astOp2 = getArguments(tok->tokAt(3))[0];
+            const Token * const astOp2 = getArguments(tok->tokAt(3))[0];
             if (Token::simpleMatch(astOp1, "&&")) {
                 astOp1 = astOp1->astOperand2();
             }
@@ -108,8 +108,8 @@ void CheckInternal::checkRedundantTokCheck()
             }
             // the first tok condition is negated
             if (Token::simpleMatch(negTok, "!")) {
-                const Token *astOp1 = negTok->astOperand1();
-                const Token *astOp2 = getArguments(tok->tokAt(4))[0];
+                const Token * const astOp1 = negTok->astOperand1();
+                const Token * const astOp2 = getArguments(tok->tokAt(4))[0];
 
                 if (astOp1->expressionString() == astOp2->expressionString()) {
                     checkRedundantTokCheckError(astOp2);
@@ -128,8 +128,8 @@ void CheckInternal::checkRedundantTokCheckError(const Token* tok)
 
 void CheckInternal::checkTokenSimpleMatchPatterns()
 {
-    const SymbolDatabase *symbolDatabase = mTokenizer->getSymbolDatabase();
-    for (const Scope* scope : symbolDatabase->functionScopes) {
+    const SymbolDatabase * const symbolDatabase = mTokenizer->getSymbolDatabase();
+    for (const Scope * const scope : symbolDatabase->functionScopes) {
         for (const Token* tok = scope->bodyStart->next(); tok != scope->bodyEnd; tok = tok->next()) {
             if (!Token::simpleMatch(tok, "Token :: simpleMatch (") && !Token::simpleMatch(tok, "Token :: findsimplematch ("))
                 continue;
@@ -137,7 +137,7 @@ void CheckInternal::checkTokenSimpleMatchPatterns()
             const std::string& funcname = tok->strAt(2);
 
             // Get pattern string
-            const Token *patternTok = tok->tokAt(4)->nextArgument();
+            const Token * const patternTok = tok->tokAt(4)->nextArgument();
             if (!patternTok || patternTok->tokType() != Token::eString)
                 continue;
 
@@ -212,8 +212,8 @@ namespace {
 
 void CheckInternal::checkMissingPercentCharacter()
 {
-    const SymbolDatabase *symbolDatabase = mTokenizer->getSymbolDatabase();
-    for (const Scope* scope : symbolDatabase->functionScopes) {
+    const SymbolDatabase * const symbolDatabase = mTokenizer->getSymbolDatabase();
+    for (const Scope * const scope : symbolDatabase->functionScopes) {
         for (const Token* tok = scope->bodyStart->next(); tok != scope->bodyEnd; tok = tok->next()) {
             if (!Token::simpleMatch(tok, "Token :: Match (") && !Token::simpleMatch(tok, "Token :: findmatch ("))
                 continue;
@@ -221,7 +221,7 @@ void CheckInternal::checkMissingPercentCharacter()
             const std::string& funcname = tok->strAt(2);
 
             // Get pattern string
-            const Token *patternTok = tok->tokAt(4)->nextArgument();
+            const Token * const patternTok = tok->tokAt(4)->nextArgument();
             if (!patternTok || patternTok->tokType() != Token::eString)
                 continue;
 
@@ -254,14 +254,14 @@ void CheckInternal::checkMissingPercentCharacter()
 
 void CheckInternal::checkUnknownPattern()
 {
-    const SymbolDatabase *symbolDatabase = mTokenizer->getSymbolDatabase();
-    for (const Scope* scope : symbolDatabase->functionScopes) {
+    const SymbolDatabase * const symbolDatabase = mTokenizer->getSymbolDatabase();
+    for (const Scope * const scope : symbolDatabase->functionScopes) {
         for (const Token* tok = scope->bodyStart->next(); tok != scope->bodyEnd; tok = tok->next()) {
             if (!Token::simpleMatch(tok, "Token :: Match (") && !Token::simpleMatch(tok, "Token :: findmatch ("))
                 continue;
 
             // Get pattern string
-            const Token *patternTok = tok->tokAt(4)->nextArgument();
+            const Token * const patternTok = tok->tokAt(4)->nextArgument();
             if (!patternTok || patternTok->tokType() != Token::eString)
                 continue;
 
@@ -288,8 +288,8 @@ void CheckInternal::checkUnknownPattern()
 
 void CheckInternal::checkRedundantNextPrevious()
 {
-    const SymbolDatabase *symbolDatabase = mTokenizer->getSymbolDatabase();
-    for (const Scope* scope : symbolDatabase->functionScopes) {
+    const SymbolDatabase * const symbolDatabase = mTokenizer->getSymbolDatabase();
+    for (const Scope * const scope : symbolDatabase->functionScopes) {
         for (const Token* tok = scope->bodyStart->next(); tok != scope->bodyEnd; tok = tok->next()) {
             if (tok->str() != ".")
                 continue;
@@ -319,8 +319,8 @@ void CheckInternal::checkRedundantNextPrevious()
 
 void CheckInternal::checkExtraWhitespace()
 {
-    const SymbolDatabase *symbolDatabase = mTokenizer->getSymbolDatabase();
-    for (const Scope* scope : symbolDatabase->functionScopes) {
+    const SymbolDatabase * const symbolDatabase = mTokenizer->getSymbolDatabase();
+    for (const Scope * const scope : symbolDatabase->functionScopes) {
         for (const Token* tok = scope->bodyStart->next(); tok != scope->bodyEnd; tok = tok->next()) {
             if (!Token::Match(tok, "Token :: simpleMatch|findsimplematch|Match|findmatch ("))
                 continue;
@@ -328,7 +328,7 @@ void CheckInternal::checkExtraWhitespace()
             const std::string& funcname = tok->strAt(2);
 
             // Get pattern string
-            const Token *patternTok = tok->tokAt(4)->nextArgument();
+            const Token * const patternTok = tok->tokAt(4)->nextArgument();
             if (!patternTok || patternTok->tokType() != Token::eString)
                 continue;
 
@@ -345,8 +345,8 @@ void CheckInternal::checkExtraWhitespace()
 
 void CheckInternal::checkStlUsage()
 {
-    const SymbolDatabase *symbolDatabase = mTokenizer->getSymbolDatabase();
-    for (const Scope *scope : symbolDatabase->functionScopes) {
+    const SymbolDatabase * const symbolDatabase = mTokenizer->getSymbolDatabase();
+    for (const Scope * const scope : symbolDatabase->functionScopes) {
         for (const Token* tok = scope->bodyStart->next(); tok != scope->bodyEnd; tok = tok->next()) {
             if (Token::simpleMatch(tok, ". emplace ("))
                 reportError(tok, Severity::error, "internalStlUsage", "The 'emplace' function shall be avoided for now. It is not available e.g. in Slackware 14.0. 'emplace_back' is fine.");

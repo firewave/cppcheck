@@ -288,11 +288,11 @@ static std::string executeAddon(const AddonInfo &addonInfo,
         pythonExe = cmdFileName(defaultPythonExe);
     else {
 #ifdef _WIN32
-        const char *py_exes[] = { "python3.exe", "python.exe" }; // FP
+        const char * const py_exes[] = { "python3.exe", "python.exe" }; // FP
 #else
-        const char *py_exes[] = { "python3", "python" }; // FP
+        const char * const py_exes[] = { "python3", "python" }; // FP
 #endif
-        for (const char* py_exe : py_exes) {
+        for (const char * const py_exe : py_exes) {
             std::string out;
             if (executeCommand(py_exe, split("--version"), redirect, &out) && out.compare(0, 7, "Python ") == 0 && std::isdigit(out[7])) {
                 pythonExe = py_exe;
@@ -1040,8 +1040,8 @@ void CppCheck::checkNormalTokens(const Tokenizer &tokenizer)
         mAnalyzerInformation.setFileInfo("ctu", fi1->toString());
     }
 
-    for (const Check *check : Check::instances()) {
-        Check::FileInfo *fi = check->getFileInfo(&tokenizer, &mSettings);
+    for (const Check * const check : Check::instances()) {
+        Check::FileInfo * const fi = check->getFileInfo(&tokenizer, &mSettings);
         if (fi != nullptr) {
             mFileInfo.push_back(fi);
             mAnalyzerInformation.setFileInfo(check->name(), fi->toString());
@@ -1681,8 +1681,8 @@ bool CppCheck::analyseWholeProgram()
     CTU::maxCtuDepth = mSettings.maxCtuDepth;
     // Analyse the tokens
     CTU::FileInfo ctu;
-    for (const Check::FileInfo *fi : mFileInfo) {
-        const CTU::FileInfo *fi2 = dynamic_cast<const CTU::FileInfo *>(fi);
+    for (const Check::FileInfo * const fi : mFileInfo) {
+        const CTU::FileInfo * const fi2 = dynamic_cast<const CTU::FileInfo *>(fi);
         if (fi2) {
             ctu.functionCalls.insert(ctu.functionCalls.end(), fi2->functionCalls.begin(), fi2->functionCalls.end());
             ctu.nestedCalls.insert(ctu.nestedCalls.end(), fi2->nestedCalls.begin(), fi2->nestedCalls.end());
@@ -1729,14 +1729,14 @@ void CppCheck::analyseWholeProgram(const std::string &buildDir, const std::map<s
         for (const tinyxml2::XMLElement *e = rootNode->FirstChildElement(); e; e = e->NextSiblingElement()) {
             if (std::strcmp(e->Name(), "FileInfo") != 0)
                 continue;
-            const char *checkClassAttr = e->Attribute("check");
+            const char * const checkClassAttr = e->Attribute("check");
             if (!checkClassAttr)
                 continue;
             if (std::strcmp(checkClassAttr, "ctu") == 0) {
                 ctuFileInfo.loadFromXml(e);
                 continue;
             }
-            for (Check *check : Check::instances()) {
+            for (Check * const check : Check::instances()) {
                 if (checkClassAttr == check->name())
                     fileInfoList.push_back(check->loadFileInfoFromXml(e));
             }
@@ -1750,7 +1750,7 @@ void CppCheck::analyseWholeProgram(const std::string &buildDir, const std::map<s
     for (Check *check : Check::instances())
         check->analyseWholeProgram(&ctuFileInfo, fileInfoList, mSettings, *this);
 
-    for (Check::FileInfo *fi : fileInfoList)
+    for (Check::FileInfo * const fi : fileInfoList)
         delete fi;
 }
 

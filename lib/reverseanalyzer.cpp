@@ -162,7 +162,7 @@ struct ReverseTraversal {
                 parent = parent->astParent();
             if (!Token::Match(parent, "%oror%|&&|?"))
                 continue;
-            Token* condTok = parent->astOperand1();
+            Token * const condTok = parent->astOperand1();
             if (!condTok)
                 continue;
             bool checkThen, checkElse;
@@ -192,9 +192,9 @@ struct ReverseTraversal {
             i = tok->index();
             if (tok == start || (tok->str() == "{" && (tok->scope()->type == Scope::ScopeType::eFunction ||
                                                        tok->scope()->type == Scope::ScopeType::eLambda))) {
-                const Function* f = tok->scope()->function;
+                const Function * const f = tok->scope()->function;
                 if (f && f->isConstructor()) {
-                    if (const Token* initList = f->constructorMemberInitialization())
+                    if (const Token * const initList = f->constructorMemberInitialization())
                         traverse(tok->previous(), tok->tokAt(initList->index() - tok->index()));
                 }
                 break;
@@ -221,7 +221,7 @@ struct ReverseTraversal {
                     assignTop = assignTop->astParent();
                 }
                 // Is assignment in dead code
-                if (Token* parent = isDeadCode(assignTok)) {
+                if (Token * const parent = isDeadCode(assignTok)) {
                     tok = parent;
                     continue;
                 }
@@ -264,10 +264,10 @@ struct ReverseTraversal {
                 continue;
             }
             if (tok->str() == ")" && !isUnevaluated(tok)) {
-                if (Token* top = getTopFunction(tok->link())) {
+                if (Token * const top = getTopFunction(tok->link())) {
                     if (!updateRecursive(top))
                         break;
-                    Token* next = previousBeforeAstLeftmostLeaf(top);
+                    Token * const next = previousBeforeAstLeftmostLeaf(top);
                     if (next && precedes(next, tok))
                         tok = next->next();
                 }
@@ -329,7 +329,7 @@ struct ReverseTraversal {
                     if (action.isModified())
                         break;
                 }
-                Token* condTok = getCondTokFromEnd(tok->link());
+                Token * const condTok = getCondTokFromEnd(tok->link());
                 if (condTok) {
                     const Analyzer::Result r = valueFlowGenericForward(condTok, analyzer, settings);
                     if (r.action.isModified())
@@ -341,11 +341,11 @@ struct ReverseTraversal {
                     tok = tok->previous()->link();
                 continue;
             }
-            if (Token* next = isUnevaluated(tok)) {
+            if (Token * const next = isUnevaluated(tok)) {
                 tok = next;
                 continue;
             }
-            if (Token* parent = isDeadCode(tok)) {
+            if (Token * const parent = isDeadCode(tok)) {
                 tok = parent;
                 continue;
             }
@@ -376,7 +376,7 @@ struct ReverseTraversal {
 
     static Token* isUnevaluated(Token* tok) {
         if (Token::Match(tok, ")|>") && tok->link()) {
-            Token* start = tok->link();
+            Token * const start = tok->link();
             if (Token::Match(start->previous(), "sizeof|decltype ("))
                 return start->previous();
             if (Token::simpleMatch(start, "<"))

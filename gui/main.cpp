@@ -131,7 +131,7 @@ static void ShowVersion()
 #else
     std::string versionMessage("Cppcheck ");
     versionMessage += CppCheck::version();
-    const char * extraVersion = CppCheck::extraVersion();
+    const char * const extraVersion = CppCheck::extraVersion();
     if (*extraVersion != 0)
         versionMessage += std::string(" (") + extraVersion + ")";
 

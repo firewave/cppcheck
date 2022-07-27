@@ -46,10 +46,10 @@ void Check64BitPortability::pointerassignment()
     if (!mSettings->severity.isEnabled(Severity::portability))
         return;
 
-    const SymbolDatabase *symbolDatabase = mTokenizer->getSymbolDatabase();
+    const SymbolDatabase * const symbolDatabase = mTokenizer->getSymbolDatabase();
 
     // Check return values
-    for (const Scope * scope : symbolDatabase->functionScopes) {
+    for (const Scope * const scope : symbolDatabase->functionScopes) {
         if (scope->function == nullptr || !scope->function->hasBody()) // We only look for functions with a body
             continue;
 
@@ -87,13 +87,13 @@ void Check64BitPortability::pointerassignment()
     }
 
     // Check assignments
-    for (const Scope * scope : symbolDatabase->functionScopes) {
+    for (const Scope * const scope : symbolDatabase->functionScopes) {
         for (const Token *tok = scope->bodyStart; tok && tok != scope->bodyEnd; tok = tok->next()) {
             if (tok->str() != "=")
                 continue;
 
-            const ValueType *lhstype = tok->astOperand1() ? tok->astOperand1()->valueType() : nullptr;
-            const ValueType *rhstype = tok->astOperand2() ? tok->astOperand2()->valueType() : nullptr;
+            const ValueType * const lhstype = tok->astOperand1() ? tok->astOperand1()->valueType() : nullptr;
+            const ValueType * const rhstype = tok->astOperand2() ? tok->astOperand2()->valueType() : nullptr;
             if (!lhstype || !rhstype)
                 continue;
 

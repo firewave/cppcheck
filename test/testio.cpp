@@ -2087,7 +2087,7 @@ private:
         ASSERT_EQUALS("", errout.str());
 
         {
-            const char * code = "void g() {\n" // #5348
+            const char * const code = "void g() {\n" // #5348
                                 "    size_t s1;\n"
                                 "    ptrdiff_t s2;\n"
                                 "    ssize_t s3;\n"
@@ -2095,9 +2095,9 @@ private:
                                 "    scanf(\"%zd\", &s2);\n"
                                 "    scanf(\"%zd\", &s3);\n"
                                 "}\n";
-            const char* result("[test.cpp:5]: (portability) %zd in format string (no. 1) requires 'ssize_t *' but the argument type is 'size_t * {aka unsigned long *}'.\n"
+            const char * const result("[test.cpp:5]: (portability) %zd in format string (no. 1) requires 'ssize_t *' but the argument type is 'size_t * {aka unsigned long *}'.\n"
                                "[test.cpp:6]: (portability) %zd in format string (no. 1) requires 'ssize_t *' but the argument type is 'ptrdiff_t * {aka signed long *}'.\n");
-            const char* result_win64("[test.cpp:5]: (portability) %zd in format string (no. 1) requires 'ssize_t *' but the argument type is 'size_t * {aka unsigned long long *}'.\n"
+            const char * const result_win64("[test.cpp:5]: (portability) %zd in format string (no. 1) requires 'ssize_t *' but the argument type is 'size_t * {aka unsigned long long *}'.\n"
                                      "[test.cpp:6]: (portability) %zd in format string (no. 1) requires 'ssize_t *' but the argument type is 'ptrdiff_t * {aka signed long long *}'.\n");
 
             check(code, false, true, Settings::Unix32);

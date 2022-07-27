@@ -51,7 +51,7 @@ private:
         };
         int index = 0;
         const Token* expected = start;
-        for (const Token* t : range) {
+        for (const Token * const t : range) {
             if (expected != t) {
                 std::ostringstream message;
                 message << "Failed to match token " << tokenToString(expected) << " at position " << index << ". Got " << tokenToString(t) << " instead";
@@ -86,8 +86,8 @@ private:
         std::istringstream istr("void a(){} void main(){ if(true){a();} }");
         TokenList tokenList(nullptr);
         tokenList.createTokens(istr, "test.cpp");
-        const Token* start = tokenList.front()->tokAt(4);
-        const Token* end = start->tokAt(8);
+        const Token * const start = tokenList.front()->tokAt(4);
+        const Token * const end = start->tokAt(8);
         ASSERT_EQUALS("", testTokenRange(start->until(end), start, end));
     }
 
@@ -95,8 +95,8 @@ private:
         std::istringstream istr("void a(){} void main(){ if(true){a();} }");
         TokenList tokenList(nullptr);
         tokenList.createTokens(istr, "test.cpp");
-        const Token* start = tokenList.front()->tokAt(4);
-        const Token* end = tokenList.front()->tokAt(10);
+        const Token * const start = tokenList.front()->tokAt(4);
+        const Token * const end = tokenList.front()->tokAt(10);
         ASSERT_EQUALS("", testTokenRange(ConstTokenRange{ start, end }, start, end));
     }
 
@@ -106,11 +106,11 @@ private:
         std::istringstream sample("void a(){} void main(){ if(true){a();} }");
         ASSERT(tokenizer.tokenize(sample, "test.cpp"));
 
-        const SymbolDatabase* sd = tokenizer.getSymbolDatabase();
+        const SymbolDatabase * const sd = tokenizer.getSymbolDatabase();
         const Scope& scope = *std::next(sd->scopeList.begin(), 3); //The scope of the if block
 
         std::ostringstream contents;
-        for (const Token* t : ConstTokenRange{ scope.bodyStart->next(), scope.bodyEnd }) {
+        for (const Token * const t : ConstTokenRange{ scope.bodyStart->next(), scope.bodyEnd }) {
             contents << t->str();
         }
         ASSERT_EQUALS("a();", contents.str());

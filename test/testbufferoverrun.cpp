@@ -81,7 +81,7 @@ private:
         // Clear the error buffer..
         errout.str("");
 
-        Settings* settings = &settings0;
+        Settings * const settings = &settings0;
         settings->severity.enable(Severity::style);
         settings->severity.enable(Severity::warning);
         settings->severity.enable(Severity::portability);
@@ -4929,7 +4929,7 @@ private:
         std::istringstream istr(code);
         ASSERT_LOC(tokenizer.tokenize(istr, "test.cpp"), file, line);
 
-        CTU::FileInfo *ctu = CTU::getFileInfo(&tokenizer);
+        CTU::FileInfo * const ctu = CTU::getFileInfo(&tokenizer);
 
         // Check code..
         std::list<Check::FileInfo*> fileInfo;

@@ -8055,7 +8055,7 @@ private:
         // Check..
         const CheckClass checkClass(&tokenizer, &settings1, this);
 
-        Check::FileInfo * fileInfo = (checkClass.getFileInfo)(&tokenizer, &settings1);
+        Check::FileInfo * const fileInfo = (checkClass.getFileInfo)(&tokenizer, &settings1);
 
         delete fileInfo;
     }

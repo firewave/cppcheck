@@ -273,8 +273,8 @@ CodeEditor::CodeEditor(QWidget *parent) :
     QShortcut *copyText = new QShortcut(QKeySequence(Qt::CTRL | Qt::Key_C),this);
     QShortcut *allText = new QShortcut(QKeySequence(Qt::CTRL | Qt::Key_A),this);
 #else
-    QShortcut *copyText = new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_C),this);
-    QShortcut *allText = new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_A),this);
+    QShortcut * const copyText = new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_C),this);
+    QShortcut * const allText = new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_A),this);
 #endif
 
     connect(this, SIGNAL(blockCountChanged(int)), this, SLOT(updateLineNumberAreaWidth(int)));
