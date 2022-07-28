@@ -382,7 +382,7 @@ QChartView *StatsDialog::createChart(const QString &statsFile, const QString &to
     qreal maxY = 0;
     for (QAbstractSeries *s : chart->series()) {
         s->attachAxis(axisY);
-        if (QLineSeries * const ls = dynamic_cast<QLineSeries*>(s)) {
+        if (QLineSeries * const ls = dynamic_cast<QLineSeries*>(s)) { // FN
             for (const QPointF p : ls->points()) {
                 if (p.y() > maxY)
                     maxY = p.y();

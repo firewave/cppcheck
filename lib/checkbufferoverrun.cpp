@@ -954,7 +954,7 @@ bool CheckBufferOverrun::analyseWholeProgram(const CTU::FileInfo *ctu, const std
     const std::map<std::string, std::list<const CTU::FileInfo::CallBase *>> callsMap = ctu->getCallsMap();
 
     for (Check::FileInfo * const fi1 : fileInfo) {
-        const MyFileInfo * const fi = dynamic_cast<MyFileInfo*>(fi1);
+        const MyFileInfo * const fi = dynamic_cast<MyFileInfo*>(fi1); // cast
         if (!fi)
             continue;
         for (const CTU::FileInfo::UnsafeUsage &unsafeUsage : fi->unsafeArrayIndex)

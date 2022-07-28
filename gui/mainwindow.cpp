@@ -1743,7 +1743,7 @@ void MainWindow::enableProjectOpenActions(bool enable)
 
 void MainWindow::openRecentProject()
 {
-    QAction * const action = qobject_cast<QAction *>(sender());
+    QAction * const action = qobject_cast<QAction *>(sender()); // FN
     if (!action)
         return;
     const QString project = action->data().toString();
@@ -1832,7 +1832,7 @@ void MainWindow::removeProjectMRU(const QString &project)
 
 void MainWindow::selectPlatform()
 {
-    QAction * const action = qobject_cast<QAction *>(sender());
+    QAction * const action = qobject_cast<QAction *>(sender()); // FN
     if (action) {
         const Settings::PlatformType platform = (Settings::PlatformType) action->data().toInt();
         mSettings->setValue(SETTINGS_CHECKED_PLATFORM, platform);

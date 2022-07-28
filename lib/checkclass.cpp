@@ -3149,7 +3149,7 @@ bool CheckClass::analyseWholeProgram(const CTU::FileInfo *ctu, const std::list<C
     std::unordered_map<std::string, MyFileInfo::NameLoc> all;
 
     for (Check::FileInfo * const fi1 : fileInfo) {
-        const MyFileInfo * const fi = dynamic_cast<MyFileInfo*>(fi1);
+        const MyFileInfo * const fi = dynamic_cast<MyFileInfo*>(fi1); // cast
         if (!fi)
             continue;
         for (const MyFileInfo::NameLoc &nameLoc : fi->classDefinitions) {
