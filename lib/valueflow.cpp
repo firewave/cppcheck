@@ -2977,7 +2977,7 @@ struct SingleValueFlowAnalyzer : ValueFlowAnalyzer {
     }
 
     bool updateScope(const Token* endBlock, bool) const override {
-        const Scope* scope = endBlock->scope();
+        const Scope * const scope = endBlock->scope();
         if (!scope)
             return false;
         if (scope->type == Scope::eLambda) {
@@ -3207,7 +3207,7 @@ std::string lifetimeMessage(const Token *tok, const ValueFlow::Value *val, Error
     if (vartok) {
         if (!classVar)
             errorPath.emplace_back(vartok, "Variable created here.");
-        const Variable * var = vartok->variable();
+        const Variable * const var = vartok->variable();
         if (var) {
             std::string submessage;
             switch (val->lifetimeKind) {

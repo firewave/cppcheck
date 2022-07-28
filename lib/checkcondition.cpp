@@ -1464,7 +1464,7 @@ void CheckCondition::alwaysTrueFalse()
             if (!(constIfWhileExpression || constValExpr || compExpr || ternaryExpression || returnExpression))
                 continue;
 
-            const Token * const expr1 = tok->astOperand1(), *expr2 = tok->astOperand2(); // FP
+            const Token * const expr1 = tok->astOperand1(), * const expr2 = tok->astOperand2();
             const bool isUnknown = (expr1 && expr1->valueType() && expr1->valueType()->type == ValueType::UNKNOWN_TYPE) ||
                                    (expr2 && expr2->valueType() && expr2->valueType()->type == ValueType::UNKNOWN_TYPE);
             if (isUnknown)
