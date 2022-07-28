@@ -265,8 +265,8 @@ void programMemoryParseCondition(ProgramMemory& pm, const Token* tok, const Toke
         return std::vector<MathLib::bigint>{};
     };
     if (Token::Match(tok, "==|>=|<=|<|>|!=")) {
-        ValueFlow::Value truevalue;
-        ValueFlow::Value falsevalue;
+        ValueFlow::Value truevalue; // FN
+        ValueFlow::Value falsevalue; // FN
         const Token * const vartok = parseCompareInt(tok, truevalue, falsevalue, eval);
         if (!vartok)
             return;

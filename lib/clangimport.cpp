@@ -711,9 +711,9 @@ Token *clangimport::AstNode::createTokens(TokenList *tokenList)
 {
     if (nodeType == ArraySubscriptExpr) {
         Token * const array = getChild(0)->createTokens(tokenList);
-        Token *bracket1 = addtoken(tokenList, "[");
+        Token * bracket1 = addtoken(tokenList, "["); // FN
         Token * const index = children[1]->createTokens(tokenList);
-        Token *bracket2 = addtoken(tokenList, "]");
+        Token * bracket2 = addtoken(tokenList, "]"); // FN
         bracket1->astOperand1(array);
         bracket1->astOperand2(index);
         bracket1->link(bracket2);
@@ -722,7 +722,7 @@ Token *clangimport::AstNode::createTokens(TokenList *tokenList)
     }
     if (nodeType == BinaryOperator) {
         Token * const tok1 = getChild(0)->createTokens(tokenList);
-        Token *binop = addtoken(tokenList, unquote(mExtTokens.back()));
+        Token *binop = addtoken(tokenList, unquote(mExtTokens.back())); // FN
         Token * const tok2 = children[1]->createTokens(tokenList);
         binop->astOperand1(tok1);
         binop->astOperand2(tok2);
@@ -752,7 +752,7 @@ Token *clangimport::AstNode::createTokens(TokenList *tokenList)
     if (nodeType == CallExpr)
         return createTokensCall(tokenList);
     if (nodeType == CaseStmt) {
-        Token *caseToken = addtoken(tokenList, "case");
+        Token *caseToken = addtoken(tokenList, "case"); // FN
         Token * const exprToken = getChild(0)->createTokens(tokenList);
         caseToken->astOperand1(exprToken);
         addtoken(tokenList, ":");
@@ -772,9 +772,9 @@ Token *clangimport::AstNode::createTokens(TokenList *tokenList)
     }
     if (nodeType == ConditionalOperator) {
         Token * const expr1 = getChild(0)->createTokens(tokenList);
-        Token *tok1 = addtoken(tokenList, "?");
+        Token *tok1 = addtoken(tokenList, "?"); // FN
         Token * const expr2 = children[1]->createTokens(tokenList);
-        Token *tok2 = addtoken(tokenList, ":");
+        Token *tok2 = addtoken(tokenList, ":"); // FN
         Token * const expr3 = children[2]->createTokens(tokenList);
         tok2->astOperand1(expr2);
         tok2->astOperand2(expr3);
@@ -784,7 +784,7 @@ Token *clangimport::AstNode::createTokens(TokenList *tokenList)
     }
     if (nodeType == CompoundAssignOperator) {
         Token * const lhs = getChild(0)->createTokens(tokenList);
-        Token *assign = addtoken(tokenList, getSpelling());
+        Token *assign = addtoken(tokenList, getSpelling()); // FN
         Token * const rhs = children[1]->createTokens(tokenList);
         assign->astOperand1(lhs);
         assign->astOperand2(rhs);
@@ -823,8 +823,8 @@ Token *clangimport::AstNode::createTokens(TokenList *tokenList)
             return getChild(0)->createTokens(tokenList);
         addTypeTokens(tokenList, '\'' + getType() + '\'');
         Token * const type = tokenList->back();
-        Token *par1 = addtoken(tokenList, "(");
-        Token *par2 = addtoken(tokenList, ")");
+        Token *par1 = addtoken(tokenList, "("); // FN
+        Token *par2 = addtoken(tokenList, ")"); // FN
         par1->link(par2);
         par2->link(par1);
         par1->astOperand1(type);
@@ -845,7 +845,7 @@ Token *clangimport::AstNode::createTokens(TokenList *tokenList)
     }
     if (nodeType == CXXForRangeStmt) {
         Token * const forToken = addtoken(tokenList, "for");
-        Token *par1 = addtoken(tokenList, "(");
+        Token * par1 = addtoken(tokenList, "("); // FN
         AstNodePtr varDecl;
         if (children[6]->nodeType == DeclStmt)
             varDecl = getChild(6)->getChild(0);
@@ -854,7 +854,7 @@ Token *clangimport::AstNode::createTokens(TokenList *tokenList)
         varDecl->mExtTokens.pop_back();
         varDecl->children.clear();
         Token * const expr1 = varDecl->createTokens(tokenList);
-        Token *colon = addtoken(tokenList, ":");
+        Token * colon = addtoken(tokenList, ":"); // FN
         AstNodePtr range;
         for (int i = 0; i < 2; i++) {
             if (children[i] && children[i]->nodeType == DeclStmt && children[i]->getChild(0)->nodeType == VarDecl) {
@@ -865,7 +865,7 @@ Token *clangimport::AstNode::createTokens(TokenList *tokenList)
         if (!range)
             throw InternalError(tokenList->back(), "Failed to import CXXForRangeStmt. Range?");
         Token * const expr2 = range->createTokens(tokenList);
-        Token *par2 = addtoken(tokenList, ")");
+        Token *par2 = addtoken(tokenList, ")"); // FN
 
         par1->link(par2);
         par2->link(par1);
@@ -917,9 +917,9 @@ Token *clangimport::AstNode::createTokens(TokenList *tokenList)
     }
     if (nodeType == CXXStaticCastExpr || nodeType == CXXFunctionalCastExpr) {
         Token * const cast = addtoken(tokenList, getSpelling());
-        Token *par1 = addtoken(tokenList, "(");
+        Token *par1 = addtoken(tokenList, "("); // FN
         Token * const expr = getChild(0)->createTokens(tokenList);
-        Token *par2 = addtoken(tokenList, ")");
+        Token *par2 = addtoken(tokenList, ")"); // FN
         par1->link(par2);
         par2->link(par1);
         par1->astOperand1(cast);
@@ -960,9 +960,9 @@ Token *clangimport::AstNode::createTokens(TokenList *tokenList)
         addtoken(tokenList, "do");
         createScope(tokenList, Scope::ScopeType::eDo, getChild(0), tokenList->back());
         Token * const tok1 = addtoken(tokenList, "while");
-        Token *par1 = addtoken(tokenList, "(");
+        Token *par1 = addtoken(tokenList, "("); // FN
         Token * const expr = children[1]->createTokens(tokenList);
-        Token *par2 = addtoken(tokenList, ")");
+        Token *par2 = addtoken(tokenList, ")"); // FN
         par1->link(par2);
         par2->link(par1);
         par1->astOperand1(tok1);
@@ -1023,13 +1023,13 @@ Token *clangimport::AstNode::createTokens(TokenList *tokenList)
         return addtoken(tokenList, mExtTokens.back());
     if (nodeType == ForStmt) {
         Token * const forToken = addtoken(tokenList, "for");
-        Token *par1 = addtoken(tokenList, "(");
+        Token *par1 = addtoken(tokenList, "("); // FN
         Token * const expr1 = getChild(0) ? children[0]->createTokens(tokenList) : nullptr;
-        Token *sep1 = addtoken(tokenList, ";");
+        Token *sep1 = addtoken(tokenList, ";"); // FN
         Token * const expr2 = children[2] ? children[2]->createTokens(tokenList) : nullptr;
-        Token *sep2 = addtoken(tokenList, ";");
+        Token *sep2 = addtoken(tokenList, ";"); // FN
         Token * const expr3 = children[3] ? children[3]->createTokens(tokenList) : nullptr;
-        Token *par2 = addtoken(tokenList, ")");
+        Token *par2 = addtoken(tokenList, ")"); // FN
         par1->link(par2);
         par2->link(par1);
         par1->astOperand1(forToken);
@@ -1076,10 +1076,10 @@ Token *clangimport::AstNode::createTokens(TokenList *tokenList)
         }
 
         Token * const iftok = addtoken(tokenList, "if");
-        Token *par1 = addtoken(tokenList, "(");
+        Token *par1 = addtoken(tokenList, "("); // FN
         par1->astOperand1(iftok);
         par1->astOperand2(cond->createTokens(tokenList));
-        Token *par2 = addtoken(tokenList, ")");
+        Token *par2 = addtoken(tokenList, ")"); // FN
         par1->link(par2);
         par2->link(par1);
         createScope(tokenList, Scope::ScopeType::eIf, thenCode, iftok);
@@ -1097,14 +1097,14 @@ Token *clangimport::AstNode::createTokens(TokenList *tokenList)
     }
     if (nodeType == InitListExpr) {
         const Scope * const scope = tokenList->back()->scope();
-        Token *start = addtoken(tokenList, "{");
+        Token *start = addtoken(tokenList, "{"); // FN
         start->scope(scope);
         for (const AstNodePtr& child: children) {
             if (tokenList->back()->str() != "{")
                 addtoken(tokenList, ",");
             child->createTokens(tokenList);
         }
-        Token *end = addtoken(tokenList, "}");
+        Token *end = addtoken(tokenList, "}"); // FN
         end->scope(scope);
         start->link(end);
         end->link(start);
@@ -1126,7 +1126,7 @@ Token *clangimport::AstNode::createTokens(TokenList *tokenList)
         return getChild(0)->createTokens(tokenList);
     if (nodeType == MemberExpr) {
         Token * const s = getChild(0)->createTokens(tokenList);
-        Token *dot = addtoken(tokenList, ".");
+        Token *dot = addtoken(tokenList, "."); // FN
         std::string memberName = getSpelling();
         if (memberName.compare(0, 2, "->") == 0) {
             dot->originalName("->");
@@ -1157,9 +1157,9 @@ Token *clangimport::AstNode::createTokens(TokenList *tokenList)
     if (nodeType == NullStmt)
         return addtoken(tokenList, ";");
     if (nodeType == ParenExpr) {
-        Token *par1 = addtoken(tokenList, "(");
+        Token *par1 = addtoken(tokenList, "("); // FN
         Token * const expr = getChild(0)->createTokens(tokenList);
-        Token *par2 = addtoken(tokenList, ")");
+        Token *par2 = addtoken(tokenList, ")"); // FN
         par1->link(par2);
         par2->link(par1);
         return expr;
@@ -1196,9 +1196,9 @@ Token *clangimport::AstNode::createTokens(TokenList *tokenList)
         return addtoken(tokenList, mExtTokens.back());
     if (nodeType == SwitchStmt) {
         Token * const tok1 = addtoken(tokenList, "switch");
-        Token *par1 = addtoken(tokenList, "(");
+        Token *par1 = addtoken(tokenList, "("); // FN
         Token * const expr = children[children.size() - 2]->createTokens(tokenList);
-        Token *par2 = addtoken(tokenList, ")");
+        Token *par2 = addtoken(tokenList, ")"); // FN
         par1->link(par2);
         par2->link(par1);
         par1->astOperand1(tok1);
@@ -1221,7 +1221,7 @@ Token *clangimport::AstNode::createTokens(TokenList *tokenList)
     }
     if (nodeType == UnaryExprOrTypeTraitExpr) {
         Token * const tok1 = addtoken(tokenList, getSpelling());
-        Token *par1 = addtoken(tokenList, "(");
+        Token *par1 = addtoken(tokenList, "("); // FN
         if (children.empty())
             addTypeTokens(tokenList, mExtTokens.back());
         else {
@@ -1246,7 +1246,7 @@ Token *clangimport::AstNode::createTokens(TokenList *tokenList)
         const AstNodePtr cond = children[children.size() - 2];
         const AstNodePtr body = children.back();
         Token * const whiletok = addtoken(tokenList, "while");
-        Token *par1 = addtoken(tokenList, "(");
+        Token *par1 = addtoken(tokenList, "("); // FN
         par1->astOperand1(whiletok);
         par1->astOperand2(cond->createTokens(tokenList));
         Token *par2 = addtoken(tokenList, ")");
@@ -1265,7 +1265,7 @@ Token * clangimport::AstNode::createTokensCall(TokenList *tokenList)
     if (nodeType == CXXOperatorCallExpr) {
         firstParam = 2;
         Token * const obj = getChild(1)->createTokens(tokenList);
-        Token *dot = addtoken(tokenList, ".");
+        Token *dot = addtoken(tokenList, "."); // FN
         Token * const op = getChild(0)->createTokens(tokenList);
         dot->astOperand1(obj);
         dot->astOperand2(op);

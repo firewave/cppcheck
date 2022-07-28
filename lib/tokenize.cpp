@@ -5796,7 +5796,7 @@ Token *Tokenizer::simplifyAddBracesPair(Token *tok, bool commandWithCondition)
                Token::simpleMatch(tokStatement->linkAt(1), "} catch (")) {
         tokAfterCondition->previous()->insertToken("{");
         Token * const tokOpenBrace = tokAfterCondition->previous();
-        Token * tokEnd = tokStatement->linkAt(1)->linkAt(2)->linkAt(1);
+        Token * tokEnd = tokStatement->linkAt(1)->linkAt(2)->linkAt(1); // FN
         if (!tokEnd) {
             syntaxError(tokStatement);
         }
@@ -8428,7 +8428,7 @@ void Tokenizer::simplifyKeyword()
             else if (Token::Match(tok, ") noexcept :|{|;|const|override|final")) {
                 // Insertion is done in inverse order
                 // The brackets are linked together accordingly afterwards
-                Token * tokNoExcept = tok->next();
+                Token * tokNoExcept = tok->next(); // FN
                 tokNoExcept->insertToken(")");
                 Token * const braceEnd = tokNoExcept->next();
                 tokNoExcept->insertToken("true");

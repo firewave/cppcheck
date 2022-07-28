@@ -184,7 +184,7 @@ private:
  */
 void Variables::alias(nonneg int varid1, nonneg int varid2, bool replace)
 {
-    VariableUsage *var1 = find(varid1);
+    VariableUsage * var1 = find(varid1); // FN
     VariableUsage * const var2 = find(varid2);
 
     if (!var1 || !var2)
