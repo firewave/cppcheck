@@ -1554,7 +1554,7 @@ void CheckCondition::checkInvalidTestForOverflow()
         if (!Token::Match(tok, "<|<=|>=|>") || !tok->isBinaryOp())
             continue;
 
-        const Token * const lhsTokens[2] = {tok->astOperand1(), tok->astOperand2()}; // FP
+        const Token * const lhsTokens[2] = {tok->astOperand1(), tok->astOperand2()};
         for (const Token * const lhs: lhsTokens) {
             std::string cmp = tok->str();
             if (lhs == tok->astOperand2())
@@ -1568,7 +1568,7 @@ void CheckCondition::checkInvalidTestForOverflow()
             if (!isSignedInteger && !isPointer)
                 continue;
 
-            const Token * const exprTokens[2] = {lhs->astOperand1(), lhs->astOperand2()}; // FP
+            const Token * const exprTokens[2] = {lhs->astOperand1(), lhs->astOperand2()};
             for (const Token * const expr: exprTokens) {
                 if (lhs->str() == "-" && expr == lhs->astOperand2())
                     continue; // TODO?
