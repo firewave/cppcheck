@@ -1,3 +1,4 @@
 release notes for cppcheck-2.11
 
 - The platform type 'Unspecified' within .cppcheck projects has been deprecated and will be removed in Cppcheck 2.14. Please use 'unspecified' instead.
+- The platform types 'Win32A' and 'Win32W' has been deprecated and will be removed in a future version. Please use 'win32a' and 'win32w' respectively.

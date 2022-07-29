@@ -153,9 +153,9 @@ namespace cppcheck {
             case Native:
                 return "Native";
             case Win32A:
-                return "win32A";
+                return "win32a";
             case Win32W:
-                return "win32W";
+                return "win32w";
             case Win64:
                 return "win64";
             case Unix32:

@@ -132,7 +132,9 @@ private:
         TEST_CASE(stdunknown);
         TEST_CASE(platformWin64);
         TEST_CASE(platformWin32A);
+        TEST_CASE(platformWin32a);
         TEST_CASE(platformWin32W);
+        TEST_CASE(platformWin32w);
         TEST_CASE(platformUnix32);
         TEST_CASE(platformUnix32Unsigned);
         TEST_CASE(platformUnix64);
@@ -997,12 +999,30 @@ private:
         ASSERT(settings.platform(Settings::Unspecified));
         ASSERT(defParser.parseFromArgs(3, argv));
         ASSERT_EQUALS(Settings::Win32A, settings.platformType);
+        ASSERT_EQUALS("cppcheck: platform 'win32A' is deprecated. Please use 'win32a' instead.", GET_REDIRECT_OUTPUT);
+    }
+
+    void platformWin32a() {
+        REDIRECT;
+        const char * const argv[] = {"cppcheck", "--platform=win3a", "file.cpp"};
+        ASSERT(settings.platform(Settings::Unspecified));
+        ASSERT(defParser.parseFromArgs(3, argv));
+        ASSERT_EQUALS(Settings::Win32A, settings.platformType);
         ASSERT_EQUALS("", GET_REDIRECT_OUTPUT);
     }
 
     void platformWin32W() {
         REDIRECT;
         const char * const argv[] = {"cppcheck", "--platform=win32W", "file.cpp"};
+        ASSERT(settings.platform(Settings::Unspecified));
+        ASSERT(defParser.parseFromArgs(3, argv));
+        ASSERT_EQUALS(Settings::Win32W, settings.platformType);
+        ASSERT_EQUALS("cppcheck: platform 'win32W' is deprecated. Please use 'win32w' instead.", GET_REDIRECT_OUTPUT);
+    }
+
+    void platformWin32w() {
+        REDIRECT;
+        const char * const argv[] = {"cppcheck", "--platform=win32w", "file.cpp"};
         ASSERT(settings.platform(Settings::Unspecified));
         ASSERT(defParser.parseFromArgs(3, argv));
         ASSERT_EQUALS(Settings::Win32W, settings.platformType);
