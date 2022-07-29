@@ -35,7 +35,7 @@ class QAction;
  */
 struct Platform {
     QString mTitle;  /**< Text visible in the GUI. */
-    Settings::PlatformType mType; /**< Type in the core. */
+    QString mFile; /**< Name of the platform file. */
     QAction *mActMainWindow; /**< Pointer to main window action item. */
 };
 
@@ -47,10 +47,10 @@ class Platforms : public QObject {
 
 public:
     explicit Platforms(QObject *parent = nullptr);
-    void add(const QString &title, Settings::PlatformType platform);
+    void add(const QString &title, QString platformFile);
     int getCount() const;
     void init();
-    Platform& get(Settings::PlatformType platform);
+    Platform& get(const QString &platform);
 
     QList<Platform> mPlatforms;
 };

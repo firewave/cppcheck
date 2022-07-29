@@ -105,8 +105,6 @@ namespace cppcheck {
             Win32A,
             Win32W,
             Win64,
-            Unix32,
-            Unix64,
             PlatformFile
         };
 
@@ -153,10 +151,6 @@ namespace cppcheck {
                 return "win32W";
             case Win64:
                 return "win64";
-            case Unix32:
-                return "unix32";
-            case Unix64:
-                return "unix64";
             case PlatformFile:
                 return "platformFile";
             default:

@@ -213,7 +213,7 @@ MainWindow::MainWindow(TranslationHandler* th, QSettings* settings) :
         platform.mActMainWindow = action;
         mPlatforms.mPlatforms[i] = platform;
         action->setText(platform.mTitle);
-        action->setData(platform.mType);
+        action->setData(platform.mFile);
         action->setCheckable(true);
         action->setActionGroup(mPlatformActions);
         mUI->mMenuAnalyze->insertAction(mUI->mActionPlatforms, action);
@@ -239,11 +239,12 @@ MainWindow::MainWindow(TranslationHandler* th, QSettings* settings) :
     // For other platforms default to unspecified/default which means the
     // platform Cppcheck GUI was compiled on.
 #if defined(_WIN32)
-    const Settings::PlatformType defaultPlatform = Settings::Win32W;
+    // TODO: get rid of hard-coded platform
+    static const QString defaultPlatform = "win32";
 #else
-    const Settings::PlatformType defaultPlatform = Settings::Unspecified;
+    static const QString defaultPlatform = "";
 #endif
-    Platform &platform = mPlatforms.get((Settings::PlatformType)mSettings->value(SETTINGS_CHECKED_PLATFORM, defaultPlatform).toInt());
+    Platform &platform = mPlatforms.get(mSettings->value(SETTINGS_CHECKED_PLATFORM, defaultPlatform).toString());
     platform.mActMainWindow->setChecked(true);
 }
 

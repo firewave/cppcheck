@@ -571,22 +571,6 @@ bool CmdLineParser::parseFromArgs(int argc, const char* const argv[])
                     mSettings->platform(Settings::Win64);
                     platformFile = platform;
                 }
-                else if (platform == "unix32") {
-                    mSettings->platform(Settings::Unix32);
-                    platformFile = platform;
-                }
-                else if (platform == "unix32-unsigned") {
-                    mSettings->platform(Settings::Unix32);
-                    platformFile = platform;
-                }
-                else if (platform == "unix64") {
-                    mSettings->platform(Settings::Unix64);
-                    platformFile = platform;
-                }
-                else if (platform == "unix64-unsigned") {
-                    mSettings->platform(Settings::Unix64);
-                    platformFile = platform;
-                }
                 else if (platform == "native")
                     mSettings->platform(Settings::Native);
                 else if (platform == "unspecified")
@@ -651,22 +635,6 @@ bool CmdLineParser::parseFromArgs(int argc, const char* const argv[])
                     }
                     else if (platform == "win64") {
                         mSettings->platform(Settings::Win64);
-                        platformFile = platform;
-                    }
-                    else if (platform == "unix32") {
-                        mSettings->platform(Settings::Unix32);
-                        platformFile = platform;
-                    }
-                    else if (platform == "unix32-unsigned") {
-                        mSettings->platform(Settings::Unix32);
-                        platformFile = platform;
-                    }
-                    else if (platform == "unix64") {
-                        mSettings->platform(Settings::Unix64);
-                        platformFile = platform;
-                    }
-                    else if (platform == "unix64-unsigned") {
-                        mSettings->platform(Settings::Unix64);
                         platformFile = platform;
                     }
                     else if (platform == "native")

@@ -24,23 +24,24 @@ Platforms::Platforms(QObject *parent)
     init();
 }
 
-void Platforms::add(const QString &title, Settings::PlatformType platform)
+void Platforms::add(const QString &title, QString platformFile)
 {
     Platform plat;
     plat.mTitle = title;
-    plat.mType = platform;
+    plat.mFile = std::move(platformFile);
     plat.mActMainWindow = nullptr;
     mPlatforms << plat;
 }
 
 void Platforms::init()
 {
-    add(tr("Native"), Settings::Native);
-    add(tr("Unix 32-bit"), Settings::Unix32);
-    add(tr("Unix 64-bit"), Settings::Unix64);
-    add(tr("Windows 32-bit ANSI"), Settings::Win32A);
-    add(tr("Windows 32-bit Unicode"), Settings::Win32W);
-    add(tr("Windows 64-bit"), Settings::Win64);
+    // TODO: enumerate platform files instead
+    add(tr("Native"), "");
+    add(tr("Unix 32-bit"), "unix32");
+    add(tr("Unix 64-bit"), "unix64");
+    add(tr("Windows 32-bit ANSI"), "win32");
+    add(tr("Windows 32-bit Unicode"), "win32");
+    add(tr("Windows 64-bit"), "win64");
 }
 
 int Platforms::getCount() const
@@ -48,11 +49,11 @@ int Platforms::getCount() const
     return mPlatforms.count();
 }
 
-Platform& Platforms::get(Settings::PlatformType platform)
+Platform& Platforms::get(const QString &platform)
 {
     QList<Platform>::iterator iter = mPlatforms.begin();
     while (iter != mPlatforms.end()) {
-        if ((*iter).mType == platform) {
+        if ((*iter).mFile == platform) {
             return *iter;
         }
         ++iter;

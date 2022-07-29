@@ -71,8 +71,6 @@ bool cppcheck::Platform::platform(cppcheck::Platform::PlatformType type)
     case Win32W:
     case Win32A:
     case Win64:
-    case Unix32:
-    case Unix64:
         platformType = type;
         // read from platform file
         return true;
