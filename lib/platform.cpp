@@ -206,6 +206,7 @@ bool cppcheck::Platform::loadFromXmlDocument(const tinyxml2::XMLDocument *doc)
     if (!rootnode || std::strcmp(rootnode->Name(), "platform") != 0)
         return false;
 
+    // TODO: warn about missing fields
     bool error = false;
     for (const tinyxml2::XMLElement *node = rootnode->FirstChildElement(); node; node = node->NextSiblingElement()) {
         if (std::strcmp(node->Name(), "default-sign") == 0) {
