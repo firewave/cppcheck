@@ -106,6 +106,11 @@ private:
         TEST_CASE(stdcpp11);
         TEST_CASE(stdunknown);
         TEST_CASE(platform);
+        TEST_CASE(platform2);
+        TEST_CASE(platform3);
+        TEST_CASE(platform4);
+        TEST_CASE(platform5);
+        TEST_CASE(platform6);
         TEST_CASE(plistEmpty);
         TEST_CASE(plistDoesNotExist);
         TEST_CASE(suppressionsOld); // TODO: Create and test real suppression file
@@ -731,9 +736,49 @@ private:
     void platform() {
         REDIRECT;
         const char * const argv[] = {"cppcheck", "--platform=win64", "file.cpp"};
-        settings.platform(Settings::Unspecified);
+        ASSERT(settings.platform(Settings::Unspecified));
         ASSERT(defParser.parseFromArgs(3, argv));
         ASSERT(settings.platformType == Settings::Win64);
+    }
+
+    void platform2() {
+        REDIRECT;
+        const char * const argv[] = {"cppcheck", "--platform=win32A", "file.cpp"};
+        ASSERT(settings.platform(Settings::Unspecified));
+        ASSERT(defParser.parseFromArgs(3, argv));
+        ASSERT(settings.platformType == Settings::Win32A);
+    }
+
+    void platform3() {
+        REDIRECT;
+        const char * const argv[] = {"cppcheck", "--platform=win32W", "file.cpp"};
+        ASSERT(settings.platform(Settings::Unspecified));
+        ASSERT(defParser.parseFromArgs(3, argv));
+        ASSERT(settings.platformType == Settings::Win32W);
+    }
+
+    void platform4() {
+        REDIRECT;
+        const char * const argv[] = {"cppcheck", "--platform=unix32", "file.cpp"};
+        ASSERT(settings.platform(Settings::Unspecified));
+        ASSERT(defParser.parseFromArgs(3, argv));
+        ASSERT(settings.platformType == Settings::Unix32);
+    }
+
+    void platform5() {
+        REDIRECT;
+        const char * const argv[] = {"cppcheck", "--platform=unix64", "file.cpp"};
+        ASSERT(settings.platform(Settings::Unspecified));
+        ASSERT(defParser.parseFromArgs(3, argv));
+        ASSERT(settings.platformType == Settings::Unix64);
+    }
+
+    void platform6() {
+        REDIRECT;
+        const char * const argv[] = {"cppcheck", "--platform=win128", "file.cpp"};
+        ASSERT(settings.platform(Settings::Unspecified));
+        ASSERT(!defParser.parseFromArgs(3, argv));
+        ASSERT_EQUALS("cppcheck: error: unrecognized platform: \"win128\".\n", GET_REDIRECT_OUTPUT);
     }
 
     void plistEmpty() {

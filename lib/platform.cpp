@@ -70,86 +70,14 @@ bool cppcheck::Platform::platform(cppcheck::Platform::PlatformType type)
         return true;
     case Win32W:
     case Win32A:
-        platformType = type;
-        sizeof_bool = 1; // 4 in Visual C++ 4.2
-        sizeof_short = 2;
-        sizeof_int = 4;
-        sizeof_long = 4;
-        sizeof_long_long = 8;
-        sizeof_float = 4;
-        sizeof_double = 8;
-        sizeof_long_double = 8;
-        sizeof_wchar_t = 2;
-        sizeof_size_t = 4;
-        sizeof_pointer = 4;
-        defaultSign = '\0';
-        char_bit = 8;
-        short_bit = char_bit * sizeof_short;
-        int_bit = char_bit * sizeof_int;
-        long_bit = char_bit * sizeof_long;
-        long_long_bit = char_bit * sizeof_long_long;
-        return true;
     case Win64:
-        platformType = type;
-        sizeof_bool = 1;
-        sizeof_short = 2;
-        sizeof_int = 4;
-        sizeof_long = 4;
-        sizeof_long_long = 8;
-        sizeof_float = 4;
-        sizeof_double = 8;
-        sizeof_long_double = 8;
-        sizeof_wchar_t = 2;
-        sizeof_size_t = 8;
-        sizeof_pointer = 8;
-        defaultSign = '\0';
-        char_bit = 8;
-        short_bit = char_bit * sizeof_short;
-        int_bit = char_bit * sizeof_int;
-        long_bit = char_bit * sizeof_long;
-        long_long_bit = char_bit * sizeof_long_long;
-        return true;
     case Unix32:
-        platformType = type;
-        sizeof_bool = 1;
-        sizeof_short = 2;
-        sizeof_int = 4;
-        sizeof_long = 4;
-        sizeof_long_long = 8;
-        sizeof_float = 4;
-        sizeof_double = 8;
-        sizeof_long_double = 12;
-        sizeof_wchar_t = 4;
-        sizeof_size_t = 4;
-        sizeof_pointer = 4;
-        defaultSign = '\0';
-        char_bit = 8;
-        short_bit = char_bit * sizeof_short;
-        int_bit = char_bit * sizeof_int;
-        long_bit = char_bit * sizeof_long;
-        long_long_bit = char_bit * sizeof_long_long;
-        return true;
     case Unix64:
         platformType = type;
-        sizeof_bool = 1;
-        sizeof_short = 2;
-        sizeof_int = 4;
-        sizeof_long = 8;
-        sizeof_long_long = 8;
-        sizeof_float = 4;
-        sizeof_double = 8;
-        sizeof_long_double = 16;
-        sizeof_wchar_t = 4;
-        sizeof_size_t = 8;
-        sizeof_pointer = 8;
-        defaultSign = '\0';
-        char_bit = 8;
-        short_bit = char_bit * sizeof_short;
-        int_bit = char_bit * sizeof_int;
-        long_bit = char_bit * sizeof_long;
-        long_long_bit = char_bit * sizeof_long_long;
+        // read from platform file
         return true;
     case PlatformFile:
+        platformType = type;
         // sizes are not set.
         return false;
     }
@@ -249,6 +177,5 @@ bool cppcheck::Platform::loadFromXmlDocument(const tinyxml2::XMLDocument *doc)
     long_bit = char_bit * sizeof_long;
     long_long_bit = char_bit * sizeof_long_long;
 
-    platformType = PlatformFile;
     return !error;
 }

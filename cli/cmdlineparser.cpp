@@ -557,21 +557,38 @@ bool CmdLineParser::parseFromArgs(int argc, const char* const argv[])
             else if (std::strncmp(argv[i], "--platform=", 11) == 0) {
                 const std::string platform(11+argv[i]);
 
-                if (platform == "win32A")
+                std::string platformFile;
+
+                if (platform == "win32A") {
                     mSettings->platform(Settings::Win32A);
-                else if (platform == "win32W")
+                    platformFile = "win32";
+                }
+                else if (platform == "win32W") {
                     mSettings->platform(Settings::Win32W);
-                else if (platform == "win64")
+                    platformFile = "win32";
+                }
+                else if (platform == "win64") {
                     mSettings->platform(Settings::Win64);
-                else if (platform == "unix32")
+                    platformFile = platform;
+                }
+                else if (platform == "unix32") {
                     mSettings->platform(Settings::Unix32);
-                else if (platform == "unix64")
+                    platformFile = platform;
+                }
+                else if (platform == "unix64") {
                     mSettings->platform(Settings::Unix64);
+                    platformFile = platform;
+                }
                 else if (platform == "native")
                     mSettings->platform(Settings::Native);
                 else if (platform == "unspecified")
                     mSettings->platform(Settings::Unspecified);
-                else if (!mSettings->loadPlatformFile(argv[0], platform)) {
+                else {
+                    mSettings->platform(Settings::PlatformFile);
+                    platformFile = platform;
+                }
+
+                if (!platformFile.empty() && !mSettings->loadPlatformFile(argv[0], platformFile)) {
                     std::string message("unrecognized platform: \"");
                     message += platform;
                     message += "\".";
@@ -614,21 +631,38 @@ bool CmdLineParser::parseFromArgs(int argc, const char* const argv[])
 
                     const std::string platform(mSettings->project.guiProject.platform);
 
-                    if (platform == "win32A")
+                    std::string platformFile;
+
+                    if (platform == "win32A") {
                         mSettings->platform(Settings::Win32A);
-                    else if (platform == "win32W")
+                        platformFile = "win32";
+                    }
+                    else if (platform == "win32W") {
                         mSettings->platform(Settings::Win32W);
-                    else if (platform == "win64")
+                        platformFile = "win32";
+                    }
+                    else if (platform == "win64") {
                         mSettings->platform(Settings::Win64);
-                    else if (platform == "unix32")
+                        platformFile = platform;
+                    }
+                    else if (platform == "unix32") {
                         mSettings->platform(Settings::Unix32);
-                    else if (platform == "unix64")
+                        platformFile = platform;
+                    }
+                    else if (platform == "unix64") {
                         mSettings->platform(Settings::Unix64);
+                        platformFile = platform;
+                    }
                     else if (platform == "native")
                         mSettings->platform(Settings::Native);
                     else if (platform == "unspecified" || platform == "Unspecified" || platform.empty())
                         ;
-                    else if (!mSettings->loadPlatformFile(projectFile.c_str(), platform) && !mSettings->loadPlatformFile(argv[0], platform)) {
+                    else {
+                        mSettings->platform(Settings::PlatformFile);
+                        platformFile = platform;
+                    }
+
+                    if (!platformFile.empty() && !mSettings->loadPlatformFile(projectFile.c_str(), platform) && !mSettings->loadPlatformFile(argv[0], platform)) {
                         std::string message("unrecognized platform: \"");
                         message += platform;
                         message += "\".";
