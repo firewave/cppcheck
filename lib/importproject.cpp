@@ -217,7 +217,7 @@ ImportProject::Type ImportProject::import(const std::string &filename, Settings 
             setRelativePaths(filename);
             return ImportProject::Type::BORLAND;
         }
-    } else if (settings && endsWith(filename, ".cppcheck")) {
+    } else if (endsWith(filename, ".cppcheck")) {
         if (importCppcheckGuiProject(fin, settings)) {
             setRelativePaths(filename);
             return ImportProject::Type::CPPCHECK_GUI;
@@ -1115,6 +1115,11 @@ static std::string istream_to_string(std::istream &istr)
 
 bool ImportProject::importCppcheckGuiProject(std::istream &istr, Settings *settings)
 {
+    if (!settings) {
+        printError(std::string("Cppcheck GUI project cannot be loaded since no Settings object was provided"));
+        return false;
+    }
+
     tinyxml2::XMLDocument doc;
     const std::string xmldata = istream_to_string(istr);
     const tinyxml2::XMLError error = doc.Parse(xmldata.data(), xmldata.size());
