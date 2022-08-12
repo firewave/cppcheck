@@ -176,7 +176,7 @@ while True:
         current_cppcheck_dir = os.path.join(work_path, 'tree-'+ver)
         try:
             print('Fetching Cppcheck-{}..'.format(ver))
-            try_retry(checkout_cppcheck_version, fargs=(repo_path, ver, current_cppcheck_dir))
+            has_changes = try_retry(checkout_cppcheck_version, fargs=(repo_path, ver, current_cppcheck_dir))
         except KeyboardInterrupt as e:
             # Passthrough for user abort
             raise e
@@ -184,7 +184,7 @@ while True:
             print('Failed to update Cppcheck, retry later')
             sys.exit(1)
         if ver == 'main':
-            if not compile_cppcheck(current_cppcheck_dir, jobs):
+            if has_changes and not compile_cppcheck(current_cppcheck_dir, jobs):
                 print('Failed to compile Cppcheck-{}, retry later'.format(ver))
                 sys.exit(1)
         else:

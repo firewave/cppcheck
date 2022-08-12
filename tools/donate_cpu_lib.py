@@ -125,7 +125,7 @@ def checkout_cppcheck_version(repo_path, version, cppcheck_path):
 
         # It is possible to pull branches, not tags
         if version != 'main':
-            return
+            return True
 
         print('Fetching {}'.format(version))
         subprocess.check_call(['git', 'fetch', '--depth=1', 'origin', 'main'], cwd=cppcheck_path)
@@ -135,7 +135,7 @@ def checkout_cppcheck_version(repo_path, version, cppcheck_path):
         print('Found {} commits to pull'.format(commit_count))
         if commit_count == "0":
             # nothing to pull
-            return
+            return False
 
         print('Pulling {}'.format(version))
         subprocess.check_call(['git', 'pull'], cwd=cppcheck_path)
@@ -147,6 +147,8 @@ def checkout_cppcheck_version(repo_path, version, cppcheck_path):
             subprocess.check_call(['git', 'fetch', '--depth=1', 'origin', refspec], cwd=repo_path)
         print('Adding worktree \'{}\' for {}'.format(cppcheck_path, version))
         subprocess.check_call(['git', 'worktree', 'add', cppcheck_path,  version], cwd=repo_path)
+
+    return True
 
 
 def get_cppcheck_info(cppcheck_path):
