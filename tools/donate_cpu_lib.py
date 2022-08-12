@@ -187,9 +187,20 @@ def compile_cppcheck(cppcheck_path, jobs):
                 # TODO: MinGW is not detected by Makefile - so work around it for now
                 rdynamic = 'RDYNAMIC=-lshlwapi'
             subprocess.check_call([__make_cmd, jobs, 'MATCHCOMPILER=yes', 'CXXFLAGS=-O2 -g -w', rdynamic], cwd=cppcheck_path, env=build_env)
-            subprocess.check_call([os.path.join(cppcheck_path, 'cppcheck'), '--version'], cwd=cppcheck_path)
-    except:
+    except Exception as e:
+        print('Compilation failed: {}'.format(e))
         return False
+
+    try:
+        if __make_cmd == 'msbuild.exe':
+            subprocess.check_call([os.path.join(cppcheck_path, 'bin', 'cppcheck.exe'), '--version'], cwd=os.path.join(cppcheck_path, 'bin'))
+        else:
+            subprocess.check_call([os.path.join(cppcheck_path, 'cppcheck'), '--version'], cwd=cppcheck_path)
+    except Exception as e:
+        print('Running Cppcheck failed: {}'.format(e))
+        # TODO: remove binary
+        return False
+
     return True
 
 
