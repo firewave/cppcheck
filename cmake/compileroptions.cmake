@@ -28,7 +28,9 @@ if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR CMAKE_CXX_COMPILER_ID MATCHES "Clang
     if (WARNINGS_ARE_ERRORS)
         add_compile_options(-Werror)
     endif()
-    add_compile_options(-pedantic)
+    if (NOT MSVC) # not clang-cl
+        add_compile_options(-pedantic)
+    endif()
     add_compile_options(-Wall)
     add_compile_options(-Wextra)
     add_compile_options(-Wcast-qual)                # Cast for removing type qualifiers
@@ -71,8 +73,10 @@ elseif (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
             endif()
         endif()
 
-        # use force DWARF 4 debug format since not all tools might be able to handle DWARF 5 yet - e.g. valgrind on ubuntu 20.04
-        add_compile_options(-gdwarf-4)
+        if (NOT MSVC) # not clang-cl
+            # use force DWARF 4 debug format since not all tools might be able to handle DWARF 5 yet - e.g. valgrind on ubuntu 20.04
+            add_compile_options(-gdwarf-4)
+        endif()
     endif()
 
     if (USE_LIBCXX)
@@ -123,6 +127,11 @@ elseif (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
     # warnings we are currently not interested in
    add_compile_options(-Wno-four-char-constants)
    add_compile_options(-Wno-weak-vtables)
+
+    if (MSVC) # clang-cl
+        add_compile_options(-Wno-reserved-macro-identifier) # _CRTDBG_MAP_ALLOC
+        add_compile_options(-Wno-nonportable-system-include-path) # #include <windows.h> / #include <Shlwapi.h>
+    endif()
 
    if(ENABLE_COVERAGE OR ENABLE_COVERAGE_XML)
       message(FATAL_ERROR "Do not use clang to generate code coverage. Use GCC instead.")
@@ -182,7 +191,10 @@ if (MSVC)
     add_compile_options(/wd4805) # warning C4805: '==' : unsafe mix of type 'bool' and type 'long long' in operation
 
     # C/C++ - All Options
-    add_compile_options(/Zc:throwingNew /Zc:__cplusplus) # Additional Options
+    if (NOT CMAKE_CXX_COMPILER_ID MATCHES "Clang") # not clang-cl
+        add_compile_options(/Zc:throwingNew) # Additional Options
+    endif()
+    add_compile_options(/Zc:__cplusplus) # Additional Options
 
     # Linker - General
     add_link_options($<$<CONFIG:Debug>:/INCREMENTAL>) # Enable Incremental Linking - Yes

@@ -1,3 +1,4 @@
+# TODO: handle clang-cl - does not generate compilation database
 if (NOT CMAKE_DISABLE_PRECOMPILE_HEADERS)
     # clang-tidy and clang need to have the same version when precompiled headers are being used
     if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")

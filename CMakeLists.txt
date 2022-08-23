@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.12)
-project(Cppcheck)
+project(Cppcheck CXX)
 
 include(cmake/cxx11.cmake)
 use_cxx11()
