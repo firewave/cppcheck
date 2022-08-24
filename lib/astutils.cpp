@@ -1122,7 +1122,7 @@ std::vector<ReferenceToken> followAllReferences(const Token* tok,
                 if (returnTok == tok)
                     continue;
                 for (const ReferenceToken& rt :
-                     followAllReferences(returnTok, temporary, inconclusive, errors, depth - returns.size())) {
+                     followAllReferences(returnTok, temporary, inconclusive, errors, static_cast<int>(depth - returns.size()))) {
                     const Variable* argvar = rt.token->variable();
                     if (!argvar)
                         return {{tok, std::move(errors)}};
@@ -1138,7 +1138,7 @@ std::vector<ReferenceToken> followAllReferences(const Token* tok,
                         er.emplace_back(returnTok, "Return reference.");
                         er.emplace_back(tok->previous(), "Called function passing '" + argTok->expressionString() + "'.");
                         std::vector<ReferenceToken> refs =
-                            followAllReferences(argTok, temporary, inconclusive, std::move(er), depth - returns.size());
+                            followAllReferences(argTok, temporary, inconclusive, std::move(er), static_cast<int>(depth - returns.size()));
                         result.insert(refs.begin(), refs.end());
                         if (!inconclusive && result.size() > 1)
                             return {{tok, std::move(errors)}};
@@ -2688,7 +2688,7 @@ int getArgumentPos(const Variable* var, const Function* f)
     });
     if (arg_it == f->argumentList.end())
         return -1;
-    return std::distance(f->argumentList.begin(), arg_it);
+    return static_cast<int>(std::distance(f->argumentList.begin(), arg_it));
 }
 
 bool isIteratorPair(std::vector<const Token*> args)

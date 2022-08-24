@@ -172,7 +172,7 @@ void ThreadHandler::threadDone()
     if (mRunningThreadCount == 0) {
         emit done();
 
-        mScanDuration = mTimer.elapsed();
+        mScanDuration = static_cast<int>(mTimer.elapsed());
 
         // Set date/time used by the recheck
         if (!mCheckStartTime.isNull()) {

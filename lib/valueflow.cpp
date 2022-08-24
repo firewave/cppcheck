@@ -651,7 +651,7 @@ static ValueFlow::Value truncateImplicitConversion(Token* parent, const ValueFlo
         sign = vt2->sign;
     else if (n1 > n2)
         sign = vt1->sign;
-    ValueFlow::Value v = castValue(value, sign, std::max(n1, n2) * 8);
+    ValueFlow::Value v = castValue(value, sign, static_cast<int>(std::max(n1, n2) * 8));
     v.wideintvalue = value.intvalue;
     return v;
 }
@@ -1282,8 +1282,8 @@ static Token * valueFlowSetConstantValue(Token *tok, const Settings *settings, b
                 // find the number of elements
                 size_t count = 1;
                 for (size_t i = 0; i < var->dimensions().size(); ++i) {
-                    if (var->dimensionKnown(i))
-                        count *= var->dimension(i);
+                    if (var->dimensionKnown(static_cast<int>(i)))
+                        count *= var->dimension(static_cast<int>(i));
                     else
                         count = 0;
                 }
@@ -3382,7 +3382,7 @@ static std::vector<LifetimeToken> getLifetimeTokens(const Token* tok,
             for (const Token* returnTok : returns) {
                 if (returnTok == tok)
                     continue;
-                for (LifetimeToken& lt : getLifetimeTokens(returnTok, escape, errorPath, pred, depth - returns.size())) {
+                for (LifetimeToken& lt : getLifetimeTokens(returnTok, escape, errorPath, pred, static_cast<int>(depth - returns.size()))) {
                     const Token* argvarTok = lt.token;
                     const Variable* argvar = argvarTok->variable();
                     if (!argvar)
@@ -3408,7 +3408,7 @@ static std::vector<LifetimeToken> getLifetimeTokens(const Token* tok,
                     }
                     if (argTok) {
                         std::vector<LifetimeToken> arglts = LifetimeToken::setInconclusive(
-                            getLifetimeTokens(argTok, escape, std::move(lt.errorPath), pred, depth - returns.size()),
+                            getLifetimeTokens(argTok, escape, std::move(lt.errorPath), pred, static_cast<int>(depth - returns.size())),
                             returns.size() > 1);
                         result.insert(result.end(), arglts.begin(), arglts.end());
                     }
@@ -4075,7 +4075,7 @@ static void valueFlowLifetimeUserConstructor(Token* tok,
         return;
     std::unordered_map<const Token*, const Variable*> argToParam;
     for (std::size_t i = 0; i < args.size(); i++)
-        argToParam[args[i]] = constructor->getArgumentVar(i);
+        argToParam[args[i]] = constructor->getArgumentVar(static_cast<int>(i));
     if (const Token* initList = constructor->constructorMemberInitialization()) {
         std::unordered_map<const Variable*, LifetimeCapture> paramCapture;
         for (const Token* tok2 : astFlatten(initList->astOperand2(), ",")) {
@@ -7265,7 +7265,7 @@ static void valueFlowFunctionDefaultParameter(TokenList* tokenlist, SymbolDataba
         if (!function)
             continue;
         for (std::size_t arg = function->minArgCount(); arg < function->argCount(); arg++) {
-            const Variable* var = function->getArgumentVar(arg);
+            const Variable* var = function->getArgumentVar(static_cast<int>(arg));
             if (var && var->hasDefault() && Token::Match(var->nameToken(), "%var% = %num%|%str% [,)]")) {
                 const std::list<ValueFlow::Value> &values = var->nameToken()->tokAt(2)->values();
                 std::list<ValueFlow::Value> argvalues;
@@ -7336,7 +7336,7 @@ static void valueFlowFunctionReturn(TokenList *tokenlist, ErrorLogger *errorLogg
 
         ProgramMemory programMemory;
         for (std::size_t i = 0; i < parvalues.size(); ++i) {
-            const Variable * const arg = function->getArgumentVar(i);
+            const Variable * const arg = function->getArgumentVar(static_cast<int>(i));
             if (!arg || !Token::Match(arg->typeStartToken(), "%type% %name% ,|)")) {
                 if (tokenlist->getSettings()->debugwarnings)
                     bailout(tokenlist, errorLogger, tok, "function return; unhandled argument type");
@@ -7430,7 +7430,7 @@ static void valueFlowUninit(TokenList* tokenlist, SymbolDatabase* /*symbolDataba
         uninitValue.valueType = ValueFlow::Value::ValueType::UNINIT;
         uninitValue.tokvalue = tok;
         if (var->isArray())
-            uninitValue.indirect = var->dimensions().size();
+            uninitValue.indirect = static_cast<int>(var->dimensions().size());
 
         bool partial = false;
 
@@ -8106,9 +8106,9 @@ static void valueFlowContainerSize(TokenList* tokenlist,
             if (var->dimensions().size() == 1) {
                 const Dimension& dim = var->dimensions().front();
                 if (dim.known) {
-                    size = dim.num;
+                    size = static_cast<int>(dim.num);
                 } else if (dim.tok && dim.tok->hasKnownIntValue()) {
-                    size = dim.tok->values().front().intvalue;
+                    size = static_cast<int>(dim.tok->values().front().intvalue);
                 }
             }
             if (size < 0)

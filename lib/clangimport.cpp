@@ -397,7 +397,7 @@ std::string clangimport::AstNode::getSpelling() const
         return (nameIndex < mExtTokens.size()) ? unquote(mExtTokens[nameIndex]) : "";
     }
 
-    int typeIndex = mExtTokens.size() - 1;
+    int typeIndex = static_cast<int>(mExtTokens.size() - 1);
     if (nodeType == FunctionDecl || nodeType == CXXConstructorDecl || nodeType == CXXMethodDecl) {
         while (typeIndex >= 0 && mExtTokens[typeIndex][0] != '\'')
             typeIndex--;
@@ -511,7 +511,7 @@ void clangimport::AstNode::setLocations(TokenList *tokenList, int file, int line
                 std::string::size_type sep1 = windowsPath ? ext.find(':', 4) : colon;
                 std::string::size_type sep2 = ext.find(':', sep1 + 1);
                 file = tokenList->appendFileIfNew(ext.substr(1, sep1 - 1));
-                line = MathLib::toLongNumber(ext.substr(sep1 + 1, sep2 - sep1 - 1));
+                line = static_cast<int>(MathLib::toLongNumber(ext.substr(sep1 + 1, sep2 - sep1 - 1)));
             }
         }
     }
@@ -732,7 +732,7 @@ Token *clangimport::AstNode::createTokens(TokenList *tokenList)
     if (nodeType == BreakStmt)
         return addtoken(tokenList, "break");
     if (nodeType == CharacterLiteral) {
-        int c = MathLib::toLongNumber(mExtTokens.back());
+        int c = static_cast<int>(MathLib::toLongNumber(mExtTokens.back()));
         if (c == 0)
             return addtoken(tokenList, "\'\\0\'");
         if (c == '\r')
@@ -940,7 +940,7 @@ Token *clangimport::AstNode::createTokens(TokenList *tokenList)
         return t;
     }
     if (nodeType == DeclRefExpr) {
-        int addrIndex = mExtTokens.size() - 1;
+        int addrIndex = static_cast<int>(mExtTokens.size() - 1);
         while (addrIndex > 1 && mExtTokens[addrIndex].compare(0,2,"0x") != 0)
             --addrIndex;
         const std::string addr = mExtTokens[addrIndex];
@@ -982,7 +982,7 @@ Token *clangimport::AstNode::createTokens(TokenList *tokenList)
         return nameToken;
     }
     if (nodeType == EnumDecl) {
-        int colIndex = mExtTokens.size() - 1;
+        int colIndex = static_cast<int>(mExtTokens.size() - 1);
         while (colIndex > 0 && mExtTokens[colIndex].compare(0,4,"col:") != 0 && mExtTokens[colIndex].compare(0,5,"line:") != 0)
             --colIndex;
         if (colIndex == 0)
@@ -992,7 +992,7 @@ Token *clangimport::AstNode::createTokens(TokenList *tokenList)
         Token *enumtok = addtoken(tokenList, "enum");
         Token *nametok = nullptr;
         {
-            int nameIndex = mExtTokens.size() - 1;
+            int nameIndex = static_cast<int>(mExtTokens.size() - 1);
             while (nameIndex > colIndex && mExtTokens[nameIndex][0] == '\'')
                 --nameIndex;
             if (nameIndex > colIndex)
@@ -1474,7 +1474,7 @@ Token * clangimport::AstNode::createTokensVarDecl(TokenList *tokenList)
     const std::string addr = mExtTokens.front();
     if (contains(mExtTokens, "static"))
         addtoken(tokenList, "static");
-    int typeIndex = mExtTokens.size() - 1;
+    int typeIndex = static_cast<int>(mExtTokens.size() - 1);
     while (typeIndex > 1 && std::isalpha(mExtTokens[typeIndex][0]))
         typeIndex--;
     const std::string type = mExtTokens[typeIndex];
@@ -1544,7 +1544,7 @@ static void setValues(Tokenizer *tokenizer, SymbolDatabase *symbolDatabase)
     for (Token *tok = const_cast<Token*>(tokenizer->tokens()); tok; tok = tok->next()) {
         if (Token::simpleMatch(tok, "sizeof (")) {
             ValueType vt = ValueType::parseDecl(tok->tokAt(2), settings, tokenizer->isCPP());
-            int sz = vt.typeSize(*settings, true);
+            int sz = static_cast<int>(vt.typeSize(*settings, true));
             if (sz <= 0)
                 continue;
             long long mul = 1;
@@ -1582,7 +1582,7 @@ void clangimport::parseClangAstDump(Tokenizer *tokenizer, std::istream &f)
         if (pos1 == std::string::npos)
             continue;
         if (!tree.empty() && line.substr(pos1) == "-<<<NULL>>>") {
-            const int level = (pos1 - 1) / 2;
+            const int level = static_cast<int>((pos1 - 1) / 2);
             tree[level - 1]->children.push_back(nullptr);
             continue;
         }
@@ -1600,7 +1600,7 @@ void clangimport::parseClangAstDump(Tokenizer *tokenizer, std::istream &f)
             continue;
         }
 
-        const int level = (pos1 - 1) / 2;
+        const int level = static_cast<int>((pos1 - 1) / 2);
         if (level == 0 || level > tree.size())
             continue;
 

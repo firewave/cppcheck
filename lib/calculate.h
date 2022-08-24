@@ -74,13 +74,13 @@ R calculate(const std::string& s, const T& x, const T& y, bool* error = nullptr)
                 *error = true;
             return R{};
         }
-        return wrap(MathLib::bigint(x) % MathLib::bigint(y));
+        return wrap(static_cast<T>(MathLib::bigint(x) % MathLib::bigint(y)));
     case '&':
-        return wrap(MathLib::bigint(x) & MathLib::bigint(y));
+        return wrap(static_cast<T>(MathLib::bigint(x) & MathLib::bigint(y)));
     case '|':
-        return wrap(MathLib::bigint(x) | MathLib::bigint(y));
+        return wrap(static_cast<T>(MathLib::bigint(x) | MathLib::bigint(y)));
     case '^':
-        return wrap(MathLib::bigint(x) ^ MathLib::bigint(y));
+        return wrap(static_cast<T>(MathLib::bigint(x) ^ MathLib::bigint(y)));
     case '>':
         return wrap(x > y);
     case '<':
@@ -91,14 +91,14 @@ R calculate(const std::string& s, const T& x, const T& y, bool* error = nullptr)
                 *error = true;
             return R{};
         }
-        return wrap(MathLib::bigint(x) << MathLib::bigint(y));
+        return wrap(static_cast<T>(MathLib::bigint(x) << MathLib::bigint(y)));
     case '>>':
         if (y >= maxBitsSignedShift || y < 0 || x < 0) {
             if (error)
                 *error = true;
             return R{};
         }
-        return wrap(MathLib::bigint(x) >> MathLib::bigint(y));
+        return wrap(static_cast<T>(MathLib::bigint(x) >> MathLib::bigint(y)));
     case '&&':
         return wrap(!isZero(x) && !isZero(y));
     case '||':

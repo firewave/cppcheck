@@ -766,10 +766,10 @@ public:
     std::string fullName() const;
 
     nonneg int argCount() const {
-        return argumentList.size();
+        return static_cast<int>(argumentList.size());
     }
     nonneg int minArgCount() const {
-        return argumentList.size() - initArgCount;
+        return static_cast<int>(argumentList.size() - initArgCount);
     }
     const Variable* getArgumentVar(nonneg int num) const;
     nonneg int initializedArgCount() const {

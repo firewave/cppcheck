@@ -446,7 +446,7 @@ void MainWindow::doAnalyzeProject(ImportProject p, const bool checkLibrary, cons
     mUI->mResults->clear(true);
     mThread->clearFiles();
 
-    mUI->mResults->checkingStarted(p.fileSettings.size());
+    mUI->mResults->checkingStarted(static_cast<int>(p.fileSettings.size()));
 
     QDir inf(mCurrentDirectory);
     const QString checkPath = inf.canonicalPath();

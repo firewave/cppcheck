@@ -1079,7 +1079,7 @@ void Tokenizer::simplifyTypedef()
             bool inMemberFunc = false;
             int memberScope = 0;
             bool globalScope = false;
-            int classLevel = spaceInfo.size();
+            int classLevel = static_cast<int>(spaceInfo.size());
             bool inTypeDef = false;
             bool inEnumClass = false;
             std::string removed;
@@ -1288,7 +1288,7 @@ void Tokenizer::simplifyTypedef()
                         }
                     } else {
                         if (tok2->strAt(-1) == "::") {
-                            int relativeSpaceInfoSize = spaceInfo.size();
+                            int relativeSpaceInfoSize = static_cast<int>(spaceInfo.size());
                             Token * tokBeforeType = tok2->previous();
                             while (relativeSpaceInfoSize > 1 &&
                                    tokBeforeType && tokBeforeType->str() == "::" &&

@@ -1132,7 +1132,7 @@ const Token* CheckUninitVar::isVariableUsage(bool cpp, const Token *vartok, cons
     }
     const Token *derefValue = nullptr; // dereferenced value expression
     if (alloc != NO_ALLOC) {
-        const int arrayDim = (vartok->variable() && vartok->variable()->isArray()) ? vartok->variable()->dimensions().size() : 1;
+        const int arrayDim = (vartok->variable() && vartok->variable()->isArray()) ? static_cast<int>(vartok->variable()->dimensions().size()) : 1;
         int deref = 0;
         derefValue = valueExpr;
         while (Token::Match(derefValue->astParent(), "+|-|*|[|.") ||

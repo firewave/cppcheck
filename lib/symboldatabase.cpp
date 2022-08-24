@@ -1501,7 +1501,7 @@ void SymbolDatabase::createSymbolDatabaseExprIds()
     for (const Variable *var : mVariableList) {
         if (!var)
             continue;
-        base = std::max<MathLib::bigint>(base, var->declarationId());
+        base = static_cast<int>(std::max<MathLib::bigint>(base, var->declarationId()));
     }
     nonneg int id = base + 1;
     // Find incomplete vars that are used in constant context
@@ -1925,7 +1925,7 @@ namespace {
             const Function* const function = scope->function;
             if (function) {
                 for (std::size_t arg=0; arg < function->argCount(); ++arg) {
-                    if (var==function->getArgumentVar(arg))
+                    if (var==function->getArgumentVar(static_cast<int>(arg)))
                         return function;
                 }
             }
@@ -3626,7 +3626,7 @@ void SymbolDatabase::printVariable(const Variable *var, const char *indent) cons
 
     std::cout << indent << "mDimensions:";
     for (std::size_t i = 0; i < var->dimensions().size(); i++) {
-        std::cout << " " << var->dimension(i);
+        std::cout << " " << var->dimension(static_cast<int>(i));
         if (!var->dimensions()[i].known)
             std::cout << "?";
     }
@@ -4379,7 +4379,7 @@ void Scope::addVariable(const Token *token_, const Token *start_, const Token *e
 {
     // keep possible size_t -> int truncation outside emplace_back() to have a single line
     // C4267 VC++ warning instead of several dozens lines
-    const int varIndex = varlist.size();
+    const int varIndex = static_cast<int>(varlist.size());
     varlist.emplace_back(token_, start_, end_, varIndex, access_, type_, scope_, settings);
 }
 
@@ -5207,7 +5207,7 @@ const Function* Scope::findFunction(const Token *tok, bool requireConst) const
     }
 
     // check in base classes
-    findFunctionInBase(tok->str(), args, matches);
+    findFunctionInBase(tok->str(), static_cast<int>(args), matches);
 
     // Non-call => Do not match parameters
     if (!isCall) {
@@ -5254,7 +5254,7 @@ const Function* Scope::findFunction(const Token *tok, bool requireConst) const
             if (func->isVariadic() && j > (func->argCount() - 1)) {
                 break;
             }
-            const Variable *funcarg = func->getArgumentVar(j);
+            const Variable *funcarg = func->getArgumentVar(static_cast<int>(j));
 
             if (!arguments[j]->valueType()) {
                 const Token *vartok = arguments[j];
@@ -5945,7 +5945,7 @@ void SymbolDatabase::setValueType(Token* tok, const Variable& var, SourceLocatio
         valuetype.setDebugPath(tok, loc);
     if (var.nameToken())
         valuetype.bits = var.nameToken()->bits();
-    valuetype.pointer = var.dimensions().size();
+    valuetype.pointer = static_cast<int>(var.dimensions().size());
     valuetype.typeScope = var.typeScope();
     if (var.valueType()) {
         valuetype.container = var.valueType()->container;

@@ -3170,7 +3170,7 @@ private:
         ASSERT_EQUALS(4U, db->variableList().size() - 1);
         ASSERT_EQUALS(2U, db->scopeList.size());
         for (std::size_t i = 1U; i < db->variableList().size(); i++)
-            ASSERT(db->getVariableFromVarId(i) != nullptr);
+            ASSERT(db->getVariableFromVarId(static_cast<int>(i)) != nullptr);
     }
 
     void symboldatabase45() {
@@ -3191,7 +3191,7 @@ private:
         ASSERT(db != nullptr);
         ASSERT_EQUALS(4U, db->variableList().size() - 1);
         for (std::size_t i = 1U; i < db->variableList().size(); i++)
-            ASSERT(db->getVariableFromVarId(i) != nullptr);
+            ASSERT(db->getVariableFromVarId(static_cast<int>(i)) != nullptr);
 
         ASSERT_EQUALS(4U, db->scopeList.size());
         std::list<Scope>::const_iterator scope = db->scopeList.begin();

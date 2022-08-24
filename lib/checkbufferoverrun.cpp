@@ -120,7 +120,7 @@ static int getMinFormatStringOutputLength(const std::vector<const Token*> &param
                 i_d_x_f_found = true;
                 parameterLength = 1;
                 if (inputArgNr < parameters.size() && parameters[inputArgNr]->hasKnownIntValue())
-                    parameterLength = MathLib::toString(parameters[inputArgNr]->getKnownIntValue()).length();
+                    parameterLength = static_cast<int>(MathLib::toString(parameters[inputArgNr]->getKnownIntValue()).length());
 
                 handleNextParameter = true;
                 break;
@@ -218,7 +218,7 @@ static bool getDimensionsEtc(const Token * const arrayToken, const Settings *set
         Dimension dim;
         dim.known = value->isKnown();
         dim.tok = nullptr;
-        const int typeSize = array->valueType()->typeSize(*settings, array->valueType()->pointer > 1);
+        const int typeSize = static_cast<int>(array->valueType()->typeSize(*settings, array->valueType()->pointer > 1));
         if (typeSize == 0)
             return false;
         dim.num = value->intvalue / typeSize;

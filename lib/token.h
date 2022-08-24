@@ -440,7 +440,7 @@ public:
     bool isUnaryPreOp() const;
 
     unsigned int flags() const {
-        return mFlags;
+        return static_cast<unsigned int>(mFlags);
     }
     void flags(const unsigned int flags_) {
         mFlags = flags_;

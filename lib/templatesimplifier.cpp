@@ -1066,7 +1066,7 @@ void TemplateSimplifier::useDefaultArgumentValues(TokenAndName &declaration)
 
         // map type parameter name to index
         if (Token::Match(tok, "typename|class|%type% %name% ,|>"))
-            typeParameterNames[tok->strAt(1)] = templatepar - 1;
+            typeParameterNames[tok->strAt(1)] = static_cast<decltype(typeParameterNames)::mapped_type>(templatepar - 1);
 
         // next template parameter
         if (tok->str() == "," && (1 == templateParmDepth)) { // Ticket #5823: Properly count parameters

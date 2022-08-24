@@ -192,7 +192,7 @@ int TokenList::appendFileIfNew(const std::string &fileName)
     if (mFiles.size() == 1) { // Update only useful if first file added to _files
         determineCppC();
     }
-    return mFiles.size() - 1;
+    return static_cast<int>(mFiles.size() - 1);
 }
 
 void TokenList::clangSetOrigFiles()

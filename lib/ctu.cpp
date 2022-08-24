@@ -192,10 +192,10 @@ bool CTU::FileInfo::CallBase::loadBaseFromXml(const tinyxml2::XMLElement *xmlEle
     bool error = false;
     callId = readAttrString(xmlElement, ATTR_CALL_ID, &error);
     callFunctionName = readAttrString(xmlElement, ATTR_CALL_FUNCNAME, &error);
-    callArgNr = readAttrInt(xmlElement, ATTR_CALL_ARGNR, &error);
+    callArgNr = static_cast<int>(readAttrInt(xmlElement, ATTR_CALL_ARGNR, &error));
     location.fileName = readAttrString(xmlElement, ATTR_LOC_FILENAME, &error);
-    location.lineNumber = readAttrInt(xmlElement, ATTR_LOC_LINENR, &error);
-    location.column = readAttrInt(xmlElement, ATTR_LOC_COLUMN, &error);
+    location.lineNumber = static_cast<int>(readAttrInt(xmlElement, ATTR_LOC_LINENR, &error));
+    location.column = static_cast<int>(readAttrInt(xmlElement, ATTR_LOC_COLUMN, &error));
     return !error;
 }
 
@@ -214,8 +214,8 @@ bool CTU::FileInfo::FunctionCall::loadFromXml(const tinyxml2::XMLElement *xmlEle
             continue;
         ErrorMessage::FileLocation loc;
         loc.setfile(readAttrString(e2, ATTR_LOC_FILENAME, &error));
-        loc.line = readAttrInt(e2, ATTR_LOC_LINENR, &error);
-        loc.column = readAttrInt(e2, ATTR_LOC_COLUMN, &error);
+        loc.line = static_cast<int>(readAttrInt(e2, ATTR_LOC_LINENR, &error));
+        loc.column = static_cast<unsigned int>(readAttrInt(e2, ATTR_LOC_COLUMN, &error));
         loc.setinfo(readAttrString(e2, ATTR_INFO, &error));
     }
     return !error;
@@ -227,7 +227,7 @@ bool CTU::FileInfo::NestedCall::loadFromXml(const tinyxml2::XMLElement *xmlEleme
         return false;
     bool error = false;
     myId = readAttrString(xmlElement, ATTR_MY_ID, &error);
-    myArgNr = readAttrInt(xmlElement, ATTR_MY_ARGNR, &error);
+    myArgNr = static_cast<int>(readAttrInt(xmlElement, ATTR_MY_ARGNR, &error));
     return !error;
 }
 
@@ -265,11 +265,11 @@ std::list<CTU::FileInfo::UnsafeUsage> CTU::loadUnsafeUsageListFromXml(const tiny
         bool error = false;
         FileInfo::UnsafeUsage unsafeUsage;
         unsafeUsage.myId = readAttrString(e, ATTR_MY_ID, &error);
-        unsafeUsage.myArgNr = readAttrInt(e, ATTR_MY_ARGNR, &error);
+        unsafeUsage.myArgNr = static_cast<int>(readAttrInt(e, ATTR_MY_ARGNR, &error));
         unsafeUsage.myArgumentName = readAttrString(e, ATTR_MY_ARGNAME, &error);
         unsafeUsage.location.fileName = readAttrString(e, ATTR_LOC_FILENAME, &error);
-        unsafeUsage.location.lineNumber = readAttrInt(e, ATTR_LOC_LINENR, &error);
-        unsafeUsage.location.column = readAttrInt(e, ATTR_LOC_COLUMN, &error);
+        unsafeUsage.location.lineNumber = static_cast<int>(readAttrInt(e, ATTR_LOC_LINENR, &error));
+        unsafeUsage.location.column = static_cast<int>(readAttrInt(e, ATTR_LOC_COLUMN, &error));
         unsafeUsage.value = readAttrInt(e, ATTR_VALUE, &error);
 
         if (!error)

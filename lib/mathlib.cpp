@@ -425,11 +425,11 @@ static double myStod(const std::string& str, std::string::const_iterator from, s
     const std::size_t decimalsep = str.find('.', it-str.begin());
     int distance;
     if (std::string::npos == decimalsep) {
-        distance = to - it;
+        distance = static_cast<int>(to - it);
     } else if (decimalsep > (to - str.begin()))
         return 0.; // error handling??
     else
-        distance = int(decimalsep)-(from - str.begin());
+        distance = static_cast<int>(int(decimalsep)-(from - str.begin()));
     auto digitval = [&](char c) {
         if ((10 < base) && (c > '9'))
             return 10 + std::tolower(c) - 'a';

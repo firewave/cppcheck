@@ -150,7 +150,7 @@ void CheckFunctions::invalidFunctionUsage()
                         {
                             const Token* const countTok = varTok->astOperand1()->astOperand2();
                             if (countTok && countTok->hasKnownIntValue())
-                                count = countTok->getKnownIntValue();
+                                count = static_cast<int>(countTok->getKnownIntValue());
                         }
                         if (Token::simpleMatch(varTok, "= {")) {
                             varTok = varTok->tokAt(1);
