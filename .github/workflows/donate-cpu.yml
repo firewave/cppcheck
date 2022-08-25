@@ -1,0 +1,85 @@
+# Syntax reference https://help.github.com/en/actions/reference/workflow-syntax-for-github-actions
+# Environment reference https://help.github.com/en/actions/reference/virtual-environments-for-github-hosted-runners
+name: donate-cpu
+
+on:
+  push:
+    paths:
+      - 'tools/donate-cpu.py'
+      - 'tools/donate_cpu_lib.py'
+
+  pull_request:
+    paths:
+      - 'tools/donate-cpu.py'
+      - 'tools/donate_cpu_lib.py'
+
+jobs:
+  make:
+
+    runs-on: ubuntu-22.04
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.10
+
+      - name: Install missing software
+        run: |
+          python -m pip install psutil
+
+      - name: Run donate-cpu
+        run: |
+          python tools/donate-cpu.py -j$(nproc) --no-upload --package=ftp://ftp.de.debian.org/debian/pool/main/c/chaos-marmosets/chaos-marmosets_0.1.1.orig.tar.xz
+
+  mingw32-make:
+
+    runs-on: windows-2019
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.10
+
+      - name: Set up MinGW
+        uses: egor-tensin/setup-mingw@v2
+        with:
+          platform: x64
+
+      - name: Install missing software
+        run: |
+          python -m pip install psutil
+
+      - name: Run donate-cpu
+        run: |
+          python tools/donate-cpu.py -j2 --no-upload --package=ftp://ftp.de.debian.org/debian/pool/main/c/chaos-marmosets/chaos-marmosets_0.1.1.orig.tar.xz
+
+  msbuild:
+
+    runs-on: windows-2022
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.10
+
+      - name: Set up Visual Studio environment
+        uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: x64
+
+      - name: Install missing software
+        run: |
+          python -m pip install psutil
+
+      - name: Run donate-cpu
+        run: |
+          python tools/donate-cpu.py -j2 --no-upload --package=ftp://ftp.de.debian.org/debian/pool/main/c/chaos-marmosets/chaos-marmosets_0.1.1.orig.tar.xz
