@@ -2,16 +2,7 @@
 # Environment reference https://help.github.com/en/actions/reference/virtual-environments-for-github-hosted-runners
 name: donate-cpu
 
-on:
-  push:
-    paths:
-      - 'tools/donate-cpu.py'
-      - 'tools/donate_cpu_lib.py'
-
-  pull_request:
-    paths:
-      - 'tools/donate-cpu.py'
-      - 'tools/donate_cpu_lib.py'
+on: [push, pull_request]
 
 jobs:
   make:
