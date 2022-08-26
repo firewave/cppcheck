@@ -85,6 +85,7 @@ jobs:
       - name: Download wget
         run: |
           curl -fsSL https://eternallybored.org/misc/wget/1.21.3/64/wget.exe -o wget.exe || exit /b !errorlevel!
+          
 
       - name: Run donate-cpu
         run: |
