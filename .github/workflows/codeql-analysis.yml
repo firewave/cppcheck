@@ -6,6 +6,10 @@ permissions:
   contents: read
   security-events: write
 
+concurrency:
+  group: ${{ github.repository }}-${{ github.head_ref }}-${{ github.workflow }}
+  cancel-in-progress: true
+
 jobs:
   analyze:
     name: Analyze

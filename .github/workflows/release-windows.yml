@@ -15,6 +15,10 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: ${{ github.repository }}-${{ github.head_ref }}-${{ github.workflow }}
+  cancel-in-progress: true
+
 defaults:
   run:
     shell: cmd

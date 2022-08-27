@@ -8,6 +8,10 @@ on: workflow_dispatch
 permissions:
   contents: read
 
+concurrency:
+  group: ${{ github.repository }}-${{ github.head_ref }}-${{ github.workflow }}
+  cancel-in-progress: true
+
 jobs:
   build:
 
