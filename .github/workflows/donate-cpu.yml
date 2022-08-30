@@ -12,6 +12,12 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
+      - name: ccache
+        uses: hendrikmuhs/ccache-action@v1.2
+        if: contains(matrix.os, 'ubuntu')
+        with:
+          key: ${{ github.workflow }}-${{ github.job }}-${{ matrix.os }}
+
       - name: Set up Python
         uses: actions/setup-python@v2
         with:
@@ -28,4 +34,5 @@ jobs:
 
       - name: Run donate-cpu
         run: |
+          export PATH="/usr/lib/ccache:/usr/local/opt/ccache/libexec:$PATH"
           python tools/donate-cpu.py -j$(nproc) --no-upload --package=ftp://ftp.de.debian.org/debian/pool/main/c/chaos-marmosets/chaos-marmosets_0.1.1.orig.tar.xz
