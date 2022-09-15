@@ -111,7 +111,9 @@ private:
         TEST_CASE(platformWin32A);
         TEST_CASE(platformWin32W);
         TEST_CASE(platformUnix32);
+        TEST_CASE(platformUnix32Unsigned);
         TEST_CASE(platformUnix64);
+        TEST_CASE(platformUnix64Unsigned);
         TEST_CASE(platformNative);
         TEST_CASE(platformUnspecified);
         TEST_CASE(platformPlatformFile);
@@ -778,9 +780,25 @@ private:
         ASSERT(settings.platformType == Settings::Unix32);
     }
 
+    void platformUnix32Unsigned() {
+        REDIRECT;
+        const char * const argv[] = {"cppcheck", "--platform=unix32-unsigned", "file.cpp"};
+        ASSERT(settings.platform(Settings::Unspecified));
+        ASSERT(defParser.parseFromArgs(3, argv));
+        ASSERT(settings.platformType == Settings::Unix32);
+    }
+
     void platformUnix64() {
         REDIRECT;
         const char * const argv[] = {"cppcheck", "--platform=unix64", "file.cpp"};
+        ASSERT(settings.platform(Settings::Unspecified));
+        ASSERT(defParser.parseFromArgs(3, argv));
+        ASSERT(settings.platformType == Settings::Unix64);
+    }
+
+    void platformUnix64Unsigned() {
+        REDIRECT;
+        const char * const argv[] = {"cppcheck", "--platform=unix64-unsigned", "file.cpp"};
         ASSERT(settings.platform(Settings::Unspecified));
         ASSERT(defParser.parseFromArgs(3, argv));
         ASSERT(settings.platformType == Settings::Unix64);
