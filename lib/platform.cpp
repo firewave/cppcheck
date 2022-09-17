@@ -21,6 +21,7 @@
 #include "path.h"
 
 #include <cstring>
+#include <iostream>
 #include <limits>
 #include <vector>
 
@@ -178,6 +179,9 @@ bool cppcheck::Platform::loadPlatformFile(const char exename[], const std::strin
 #endif
         bool success = false;
         for (const std::string & f : filenames) {
+            //if (mSettings->verbose) {
+                std::cout << "trying to load platform file '" << f << "'" << std::endl;
+            //}
             if (doc.LoadFile(f.c_str()) == tinyxml2::XML_SUCCESS) {
                 success = true;
                 break;

@@ -60,7 +60,7 @@ jobs:
 
       - name: Run test
         run: |
-          make -j$(nproc) check HAVE_RULES=yes
+          make -j$(nproc) test HAVE_RULES=yes
 
       # the script uses sed parameters not supported by MacOS
       - name: Run extra tests
