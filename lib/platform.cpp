@@ -162,6 +162,7 @@ bool cppcheck::Platform::loadPlatformFile(const char exename[], const std::strin
     // open file..
     tinyxml2::XMLDocument doc;
     if (doc.LoadFile(filename.c_str()) != tinyxml2::XML_SUCCESS) {
+        std::cout << doc.ErrorStr() << std::endl;
         std::vector<std::string> filenames;
         filenames.push_back(filename + ".xml");
         filenames.push_back("platforms/" + filename);
@@ -187,6 +188,7 @@ bool cppcheck::Platform::loadPlatformFile(const char exename[], const std::strin
                 success = true;
                 break;
             }
+            std::cout << doc.ErrorStr() << std::endl;
         }
         if (!success)
             return false;
