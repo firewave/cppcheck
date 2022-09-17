@@ -337,8 +337,8 @@ testrunner: $(TESTOBJ) $(LIBOBJ) $(EXTOBJ) cli/executor.o cli/processexecutor.o 
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -o $@ $^ $(LIBS) $(LDFLAGS) $(RDYNAMIC)
 
 test:	all
-    pwd
-    ls -l
+	pwd
+	ls -l
 	./testrunner TestCmdlineParser
 
 check:	all
