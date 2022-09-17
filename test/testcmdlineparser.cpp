@@ -753,7 +753,7 @@ private:
         const char * const argv[] = {"cppcheck", "--platform=win64", "file.cpp"};
         ASSERT(settings.platform(Settings::Unspecified));
         ASSERT(defParser.parseFromArgs(3, argv));
-        ASSERT(settings.platformType == Settings::Win64);
+        ASSERT_EQUALS(Settings::Win64, settings.platformType);
     }
 
     void platformWin32A() {
@@ -761,7 +761,7 @@ private:
         const char * const argv[] = {"cppcheck", "--platform=win32A", "file.cpp"};
         ASSERT(settings.platform(Settings::Unspecified));
         ASSERT(defParser.parseFromArgs(3, argv));
-        ASSERT(settings.platformType == Settings::Win32A);
+        ASSERT_EQUALS(Settings::Win32A, settings.platformType);
     }
 
     void platformWin32W() {
@@ -769,7 +769,7 @@ private:
         const char * const argv[] = {"cppcheck", "--platform=win32W", "file.cpp"};
         ASSERT(settings.platform(Settings::Unspecified));
         ASSERT(defParser.parseFromArgs(3, argv));
-        ASSERT(settings.platformType == Settings::Win32W);
+        ASSERT_EQUALS(Settings::Win32W, settings.platformType);
     }
 
     void platformUnix32() {
@@ -777,7 +777,7 @@ private:
         const char * const argv[] = {"cppcheck", "--platform=unix32", "file.cpp"};
         ASSERT(settings.platform(Settings::Unspecified));
         ASSERT(defParser.parseFromArgs(3, argv));
-        ASSERT(settings.platformType == Settings::Unix32);
+        ASSERT_EQUALS(Settings::Unix32, settings.platformType);
     }
 
     void platformUnix32Unsigned() {
@@ -785,7 +785,7 @@ private:
         const char * const argv[] = {"cppcheck", "--platform=unix32-unsigned", "file.cpp"};
         ASSERT(settings.platform(Settings::Unspecified));
         ASSERT(defParser.parseFromArgs(3, argv));
-        ASSERT(settings.platformType == Settings::Unix32);
+        ASSERT_EQUALS(Settings::Unix32, settings.platformType);
     }
 
     void platformUnix64() {
@@ -793,7 +793,7 @@ private:
         const char * const argv[] = {"cppcheck", "--platform=unix64", "file.cpp"};
         ASSERT(settings.platform(Settings::Unspecified));
         ASSERT(defParser.parseFromArgs(3, argv));
-        ASSERT(settings.platformType == Settings::Unix64);
+        ASSERT_EQUALS(Settings::Unix64, settings.platformType);
     }
 
     void platformUnix64Unsigned() {
@@ -801,7 +801,7 @@ private:
         const char * const argv[] = {"cppcheck", "--platform=unix64-unsigned", "file.cpp"};
         ASSERT(settings.platform(Settings::Unspecified));
         ASSERT(defParser.parseFromArgs(3, argv));
-        ASSERT(settings.platformType == Settings::Unix64);
+        ASSERT_EQUALS(Settings::Unix64, settings.platformType);
     }
 
     void platformNative() {
@@ -809,7 +809,7 @@ private:
         const char * const argv[] = {"cppcheck", "--platform=native", "file.cpp"};
         ASSERT(settings.platform(Settings::Unspecified));
         ASSERT(defParser.parseFromArgs(3, argv));
-        ASSERT(settings.platformType == Settings::Native);
+        ASSERT_EQUALS(Settings::Native, settings.platformType);
     }
 
     void platformUnspecified() {
@@ -817,7 +817,7 @@ private:
         const char * const argv[] = {"cppcheck", "--platform=unspecified", "file.cpp"};
         ASSERT(settings.platform(Settings::Native));
         ASSERT(defParser.parseFromArgs(3, argv));
-        ASSERT(settings.platformType == Settings::Unspecified);
+        ASSERT_EQUALS(Settings::Unspecified, settings.platformType);
     }
 
     void platformPlatformFile() {
@@ -825,7 +825,7 @@ private:
         const char * const argv[] = {"cppcheck", "--platform=avr8", "file.cpp"};
         ASSERT(settings.platform(Settings::Unspecified));
         ASSERT(defParser.parseFromArgs(3, argv));
-        ASSERT(settings.platformType == Settings::PlatformFile);
+        ASSERT_EQUALS(Settings::PlatformFile, settings.platformType);
     }
 
     void platformUnknown() {
