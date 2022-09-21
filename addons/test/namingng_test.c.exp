@@ -1,0 +1,6 @@
+[namingng_test.c:12] ( style ) naming.py: Variable badui32 violates naming convention
+[namingng_test.c:15] ( style ) naming.py: Variable a violates naming convention
+[namingng_test.c:33] ( style ) naming.py: Variable badui32 violates naming convention
+[namingng_test.c:24] ( style ) naming.py: Function ui16bad_underscore violates naming convention
+[namingng_test.c:29] ( style ) naming.py: Function u32Bad violates naming convention
+[namingng_test.c:41] ( style ) naming.py: Function Badui16 violates naming convention
