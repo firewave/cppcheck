@@ -1,3 +1,6 @@
+// To test:
+// ~/cppcheck/cppcheck --dump namingng_test.c && python3 ../namingng.py --configfile ../naming.json --verify namingng_test.c.dump
+
 #include <stddef.h>
 #include <stdint.h>
 
