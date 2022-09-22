@@ -2195,14 +2195,14 @@ static void valueFlowReverse(const TokenList& tokenlist,
                              Token* tok,
                              const Token* const varToken,
                              ValueFlow::Value val,
-                             const ValueFlow::Value& val2,
+                             ValueFlow::Value val2,
                              ErrorLogger* errorLogger,
                              const Settings& settings,
                              SourceLocation loc = SourceLocation::current())
 {
     std::list<ValueFlow::Value> values = {std::move(val)};
     if (val2.varId != 0)
-        values.push_back(val2);
+        values.push_back(std::move(val2));
     valueFlowReverse(tok, nullptr, varToken, std::move(values), tokenlist, errorLogger, settings, loc);
 }
 

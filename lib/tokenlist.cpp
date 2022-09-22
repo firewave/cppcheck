@@ -124,7 +124,7 @@ void TokenList::deleteTokens(Token *tok)
 // add a token.
 //---------------------------------------------------------------------------
 
-void TokenList::addtoken(const std::string& str, const nonneg int lineno, const nonneg int column, const nonneg int fileno, bool split)
+void TokenList::addtoken(std::string str, const nonneg int lineno, const nonneg int column, const nonneg int fileno, bool split)
 {
     if (str.empty())
         return;
@@ -145,11 +145,11 @@ void TokenList::addtoken(const std::string& str, const nonneg int lineno, const 
     }
 
     if (mTokensFrontBack.back) {
-        mTokensFrontBack.back->insertToken(str);
+        mTokensFrontBack.back->insertToken(std::move(str));
     } else {
         mTokensFrontBack.front = new Token(&mTokensFrontBack);
         mTokensFrontBack.back = mTokensFrontBack.front;
-        mTokensFrontBack.back->str(str);
+        mTokensFrontBack.back->str(std::move(str));
     }
 
     mTokensFrontBack.back->linenr(lineno);
@@ -157,17 +157,17 @@ void TokenList::addtoken(const std::string& str, const nonneg int lineno, const 
     mTokensFrontBack.back->fileIndex(fileno);
 }
 
-void TokenList::addtoken(const std::string& str, const Token *locationTok)
+void TokenList::addtoken(std::string str, const Token *locationTok)
 {
     if (str.empty())
         return;
 
     if (mTokensFrontBack.back) {
-        mTokensFrontBack.back->insertToken(str);
+        mTokensFrontBack.back->insertToken(std::move(str));
     } else {
         mTokensFrontBack.front = new Token(&mTokensFrontBack);
         mTokensFrontBack.back = mTokensFrontBack.front;
-        mTokensFrontBack.back->str(str);
+        mTokensFrontBack.back->str(std::move(str));
     }
 
     mTokensFrontBack.back->linenr(locationTok->linenr());
@@ -353,11 +353,11 @@ void TokenList::createTokens(simplecpp::TokenList&& tokenList)
             str = '0' + str;
 
         if (mTokensFrontBack.back) {
-            mTokensFrontBack.back->insertToken(str);
+            mTokensFrontBack.back->insertToken(std::move(str));
         } else {
             mTokensFrontBack.front = new Token(&mTokensFrontBack);
             mTokensFrontBack.back = mTokensFrontBack.front;
-            mTokensFrontBack.back->str(str);
+            mTokensFrontBack.back->str(std::move(str));
         }
 
         mTokensFrontBack.back->fileIndex(tok->location.fileIndex);

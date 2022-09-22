@@ -173,9 +173,8 @@ public:
 
     ConstTokenRange until(const Token * t) const;
 
-    template<typename T>
-    void str(T&& s) {
-        mStr = s;
+    void str(std::string s) {
+        mStr = std::move(s);
         mImpl->mVarId = 0;
 
         update_property_info();
@@ -850,11 +849,11 @@ public:
      * @param prepend Insert the new token before this token when it's not
      * the first one on the tokens list.
      */
-    Token* insertToken(const std::string& tokenStr, const std::string& originalNameStr = emptyString, const std::string& macroNameStr = emptyString, bool prepend = false);
+    Token* insertToken(std::string tokenStr, const std::string& originalNameStr = emptyString, const std::string& macroNameStr = emptyString, bool prepend = false);
 
-    Token* insertTokenBefore(const std::string& tokenStr, const std::string& originalNameStr = emptyString, const std::string& macroNameStr = emptyString)
+    Token* insertTokenBefore(std::string tokenStr, const std::string& originalNameStr = emptyString, const std::string& macroNameStr = emptyString)
     {
-        return insertToken(tokenStr, originalNameStr, macroNameStr, true);
+        return insertToken(std::move(tokenStr), originalNameStr, macroNameStr, true);
     }
 
     Token* previous() {

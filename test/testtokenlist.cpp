@@ -42,18 +42,18 @@ private:
 
     // inspired by #5895
     void testaddtoken1() const {
-        const std::string code = "0x89504e470d0a1a0a";
+        std::string code = "0x89504e470d0a1a0a";
         TokenList tokenlist(&settings);
-        tokenlist.addtoken(code, 1, 1, false);
+        tokenlist.addtoken(std::move(code), 1, 1, false);
         ASSERT_EQUALS("0x89504e470d0a1a0a", tokenlist.front()->str());
     }
 
     void testaddtoken2() const {
-        const std::string code = "0xF0000000";
+        std::string code = "0xF0000000";
         /*const*/ Settings settings1;
         settings1.platform.int_bit = 32;
         TokenList tokenlist(&settings1);
-        tokenlist.addtoken(code, 1, 1, false);
+        tokenlist.addtoken(std::move(code), 1, 1, false);
         ASSERT_EQUALS("0xF0000000", tokenlist.front()->str());
     }
 

@@ -461,7 +461,7 @@ static Token *splitDefinitionFromTypedef(Token *tok, nonneg int *unnamedCount)
     }
     tok1->insertToken(tok->next()->str()); // struct, union or enum
     tok1 = tok1->next();
-    tok1->insertToken(name);
+    tok1->insertToken(std::move(name));
     tok->deleteThis();
     tok = tok3;
 
@@ -2948,7 +2948,7 @@ bool Tokenizer::simplifyUsing()
                     newName = "Unnamed" + std::to_string(mUnnamedCount++);
                 TokenList::copyTokens(structEnd->next(), tok, start);
                 structEnd->tokAt(5)->insertToken(newName, emptyString);
-                start->insertToken(newName, emptyString);
+                start->insertToken(std::move(newName), emptyString);
             } else
                 TokenList::copyTokens(structEnd->next(), tok, start->next());
 
@@ -3662,11 +3662,11 @@ void Tokenizer::simplifyArrayAccessSyntax()
     // 0[a] -> a[0]
     for (Token *tok = list.front(); tok; tok = tok->next()) {
         if (tok->isNumber() && Token::Match(tok, "%num% [ %name% ]")) {
-            const std::string number(tok->str());
+            std::string number(tok->str());
             Token* indexTok = tok->tokAt(2);
             tok->str(indexTok->str());
             tok->varId(indexTok->varId());
-            indexTok->str(number);
+            indexTok->str(std::move(number));
         }
     }
 }
@@ -7340,7 +7340,7 @@ void Tokenizer::simplifyStaticConst()
 {
     // This function will simplify the token list so that the qualifiers "extern", "static"
     // and "const" appear in the same order as in the array below.
-    const std::string qualifiers[] = {"extern", "static", "const"};
+    std::string qualifiers[] = {"extern", "static", "const"};
 
     // Move 'const' before all other qualifiers and types and then
     // move 'static' before all other qualifiers and types, ...
@@ -7389,14 +7389,14 @@ void Tokenizer::simplifyStaticConst()
             // Move the qualifier to the left-most position in the declaration
             tok->deleteNext();
             if (!leftTok) {
-                list.front()->insertToken(qualifiers[i]);
+                list.front()->insertToken(std::move(qualifiers[i]));
                 list.front()->swapWithNext();
                 tok = list.front();
             } else if (leftTok->next()) {
-                leftTok->next()->insertTokenBefore(qualifiers[i]);
+                leftTok->next()->insertTokenBefore(std::move(qualifiers[i]));
                 tok = leftTok->next();
             } else {
-                leftTok->insertToken(qualifiers[i]);
+                leftTok->insertToken(std::move(qualifiers[i]));
                 tok = leftTok;
             }
         }
