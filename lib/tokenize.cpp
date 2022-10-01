@@ -3372,7 +3372,7 @@ void Tokenizer::calculateScopes()
 
     std::string nextScopeNameAddition;
     std::shared_ptr<ScopeInfo2> primaryScope = std::make_shared<ScopeInfo2>("", nullptr);
-    list.front()->scopeInfo(primaryScope);
+    list.front()->scopeInfo(std::move(primaryScope));
 
     for (Token* tok = list.front(); tok; tok = tok->next()) {
         if (tok == list.front() || !tok->scopeInfo()) {
@@ -3450,7 +3450,7 @@ void Tokenizer::calculateScopes()
 
                 if (tok->link())
                     tok->link()->scopeInfo(tok->scopeInfo());
-                tok->scopeInfo(newScopeInfo);
+                tok->scopeInfo(std::move(newScopeInfo));
             }
         }
     }

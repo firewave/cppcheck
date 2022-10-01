@@ -1126,7 +1126,7 @@ Token* Token::insertToken(const std::string& tokenStr, const std::string& origin
                 newScopeInfo->name.append(nextScopeNameAddition);
                 nextScopeNameAddition = "";
 
-                newToken->scopeInfo(newScopeInfo);
+                newToken->scopeInfo(std::move(newScopeInfo));
             } else if (newToken->str() == "}") {
                 Token* matchingTok = newToken->previous();
                 int depth = 0;

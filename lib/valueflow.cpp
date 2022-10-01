@@ -129,7 +129,7 @@ static void bailoutInternal(const std::string& type, TokenList *tokenlist, Error
     if (function.find("operator") != std::string::npos)
         function = "(valueFlow)";
     std::list<ErrorMessage::FileLocation> callstack(1, ErrorMessage::FileLocation(tok, tokenlist));
-    ErrorMessage errmsg(callstack, tokenlist->getSourceFilePath(), Severity::debug,
+    ErrorMessage errmsg(std::move(callstack), tokenlist->getSourceFilePath(), Severity::debug,
                         Path::stripDirectoryPart(file) + ":" + MathLib::toString(line) + ":" + function + " bailout: " + what, type, Certainty::normal);
     errorLogger->reportErr(errmsg);
 }
@@ -4793,7 +4793,7 @@ static void valueFlowLifetime(TokenList *tokenlist, SymbolDatabase* /*db*/, Erro
             value.lifetimeScope = ValueFlow::Value::LifetimeScope::Local;
             value.lifetimeKind = ValueFlow::Value::LifetimeKind::SubObject;
             value.tokvalue = tok;
-            value.errorPath = errorPath;
+            value.errorPath = std::move(errorPath);
             setTokenValue(ptok, value, tokenlist->getSettings());
             valueFlowForwardLifetime(ptok, tokenlist, errorLogger, settings);
         }
