@@ -2080,7 +2080,7 @@ void MainWindow::enableProjectOpenActions(bool enable)
 
 void MainWindow::openRecentProject()
 {
-    auto *action = qobject_cast<QAction *>(sender());
+    const auto *action = qobject_cast<const QAction *>(sender());
     if (!action)
         return;
     const QString project = action->data().toString();
@@ -2169,7 +2169,7 @@ void MainWindow::removeProjectMRU(const QString &project)
 
 void MainWindow::selectPlatform()
 {
-    auto *action = qobject_cast<QAction *>(sender());
+    const auto *action = qobject_cast<const QAction *>(sender());
     if (action) {
         const Platform::Type platform = (Platform::Type) action->data().toInt();
         mSettings->setValue(SETTINGS_CHECKED_PLATFORM, platform);
