@@ -1045,7 +1045,7 @@ static void compilePrecedence2(Token *&tok, AST_state& state)
             }
             tok = tok->link()->next();
         } else if (iscast(tok, state.cpp) && Token::simpleMatch(tok->link(), ") {") && Token::simpleMatch(tok->link()->linkAt(1), "} [")) {
-            Token *cast = tok;
+            Token *cast = tok; // FN
             tok = tok->link()->next();
             Token *tok1 = tok;
             compileUnaryOp(tok, state, compileExpression);
