@@ -386,7 +386,7 @@ namespace {
         bool checkBranch(Branch& branch) const {
             Analyzer::Action a = analyzeScope(branch.endBlock);
             branch.action = a;
-            std::vector<ForwardTraversal> ft1 = tryForkUpdateScope(branch.endBlock, a.isModified());
+            std::vector<ForwardTraversal> ft1 = tryForkUpdateScope(branch.endBlock, a.isModified()); // FN
             const bool bail = hasGoto(branch.endBlock);
             if (!a.isModified() && !bail) {
                 if (ft1.empty()) {
@@ -822,7 +822,7 @@ namespace {
                         return Break();
                     tok = endBlock;
                 } else if (Token::simpleMatch(tok, "do {")) {
-                    Token* endBlock = tok->linkAt(1);
+                    Token* endBlock = tok->linkAt(1); // FN
                     Token* condTok = Token::simpleMatch(endBlock, "} while (") ? endBlock->tokAt(2)->astOperand2() : nullptr;
                     if (updateLoop(end, endBlock, condTok) == Progress::Break)
                         return Break();
