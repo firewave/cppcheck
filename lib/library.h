@@ -69,8 +69,7 @@ public:
     public:
         Error() : errorcode(ErrorCode::OK) {}
         explicit Error(ErrorCode e) : errorcode(e) {}
-        template<typename T>
-        Error(ErrorCode e, T&& r) : errorcode(e), reason(r) {}
+        Error(ErrorCode e, std::string r) : errorcode(e), reason(std::move(r)) {}
         ErrorCode errorcode;
         std::string reason;
     };

@@ -253,7 +253,7 @@ void ProjectFile::readRootPath(const QXmlStreamReader &reader)
     QXmlStreamAttributes attribs = reader.attributes();
     QString name = attribs.value(QString(), CppcheckXml::RootPathNameAttrib).toString();
     if (!name.isEmpty())
-        mRootPath = name;
+        mRootPath = std::move(name);
 }
 
 void ProjectFile::readBuildDir(QXmlStreamReader &reader)
