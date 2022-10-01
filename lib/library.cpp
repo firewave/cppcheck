@@ -656,7 +656,7 @@ Library::Error Library::load(const tinyxml2::XMLDocument &doc)
                             std::string actionName = action_ptr;
                             action = Container::actionFrom(actionName);
                             if (action == Container::Action::NO_ACTION)
-                                return Error(ErrorCode::BAD_ATTRIBUTE_VALUE, actionName);
+                                return Error(ErrorCode::BAD_ATTRIBUTE_VALUE, std::move(actionName));
                         }
 
                         const char* const yield_ptr = functionNode->Attribute("yields");
@@ -665,7 +665,7 @@ Library::Error Library::load(const tinyxml2::XMLDocument &doc)
                             std::string yieldName = yield_ptr;
                             yield = Container::yieldFrom(yieldName);
                             if (yield == Container::Yield::NO_YIELD)
-                                return Error(ErrorCode::BAD_ATTRIBUTE_VALUE, yieldName);
+                                return Error(ErrorCode::BAD_ATTRIBUTE_VALUE, std::move(yieldName));
                         }
 
                         const char* const returnType = functionNode->Attribute("returnType");
@@ -851,7 +851,7 @@ Library::Error Library::load(const tinyxml2::XMLDocument &doc)
             if (++i != unknown_elements.end())
                 str += ", ";
         }
-        return Error(ErrorCode::UNKNOWN_ELEMENT, str);
+        return Error(ErrorCode::UNKNOWN_ELEMENT, std::move(str));
     }
     return Error(ErrorCode::OK);
 }
@@ -1089,7 +1089,7 @@ Library::Error Library::loadFunction(const tinyxml2::XMLElement * const node, co
                 std::string actionName = action_ptr;
                 action = Container::actionFrom(actionName);
                 if (action == Container::Action::NO_ACTION)
-                    return Error(ErrorCode::BAD_ATTRIBUTE_VALUE, actionName);
+                    return Error(ErrorCode::BAD_ATTRIBUTE_VALUE, std::move(actionName));
             }
             func.containerAction = action;
 
@@ -1099,7 +1099,7 @@ Library::Error Library::loadFunction(const tinyxml2::XMLElement * const node, co
                 std::string yieldName = yield_ptr;
                 yield = Container::yieldFrom(yieldName);
                 if (yield == Container::Yield::NO_YIELD)
-                    return Error(ErrorCode::BAD_ATTRIBUTE_VALUE, yieldName);
+                    return Error(ErrorCode::BAD_ATTRIBUTE_VALUE, std::move(yieldName));
             }
             func.containerYield = yield;
 
