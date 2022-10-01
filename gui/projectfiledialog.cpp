@@ -818,7 +818,8 @@ void ProjectFileDialog::addSingleSuppression(const SuppressionList::Suppression 
 void ProjectFileDialog::setSuppressions(const QList<SuppressionList::Suppression> &suppressions)
 {
     mUI->mListSuppressions->clear();
-    QList<SuppressionList::Suppression> new_suppressions = suppressions;
+    // needs to be a copy since it reference mSuppressions
+    const QList<SuppressionList::Suppression> new_suppressions = suppressions;
     mSuppressions.clear();
     for (const SuppressionList::Suppression &suppression : new_suppressions) {
         addSingleSuppression(suppression);
