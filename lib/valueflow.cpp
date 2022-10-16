@@ -3905,8 +3905,8 @@ static void valueFlowForwardLifetime(Token * tok, TokenList *tokenlist, ErrorLog
 struct LifetimeStore {
     const Token *argtok;
     std::string message;
-    ValueFlow::Value::LifetimeKind type;
     ErrorPath errorPath;
+    ValueFlow::Value::LifetimeKind type;
     bool inconclusive;
     bool forward;
 
@@ -3918,7 +3918,7 @@ struct LifetimeStore {
     };
 
     LifetimeStore()
-        : argtok(nullptr), message(), type(), errorPath(), inconclusive(false), forward(true), mContext(nullptr)
+        : argtok(nullptr), message(), errorPath(), type(), inconclusive(false), forward(true), mContext(nullptr)
     {}
 
     LifetimeStore(const Token* argtok,
@@ -3927,8 +3927,8 @@ struct LifetimeStore {
                   bool inconclusive = false)
         : argtok(argtok),
         message(std::move(message)),
-        type(type),
         errorPath(),
+        type(type),
         inconclusive(inconclusive),
         forward(true),
         mContext(nullptr)
