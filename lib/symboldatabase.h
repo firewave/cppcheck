@@ -1052,7 +1052,6 @@ public:
     nonneg int numConstructors;
     nonneg int numCopyOrMoveConstructors;
     std::vector<UsingInfo> usingList;
-    ScopeType type;
     Type* definedType;
     std::map<std::string, Type*> definedTypesMap;
     std::vector<const Token *> bodyStartList;
@@ -1065,6 +1064,7 @@ public:
     const Token * enumType;
     bool enumClass;
 
+    ScopeType type;
     std::vector<Enumerator> enumeratorList;
 
     void setBodyStartEnd(const Token *start) {
