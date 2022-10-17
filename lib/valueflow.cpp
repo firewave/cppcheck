@@ -8949,11 +8949,9 @@ void ValueFlow::setValues(TokenList *tokenlist, SymbolDatabase* symboldatabase, 
         n--;
     }
 
-    if (std::time(nullptr) < stopTime)
-        valueFlowDynamicBufferSize(tokenlist, symboldatabase, settings);
+    valueFlowDynamicBufferSize(tokenlist, symboldatabase, settings);
 
-    if (std::time(nullptr) < stopTime)
-        valueFlowDebug(tokenlist, errorLogger);
+    valueFlowDebug(tokenlist, errorLogger);
 }
 
 ValueFlow::Value ValueFlow::Value::unknown()
