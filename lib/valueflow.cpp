@@ -8863,6 +8863,9 @@ static std::uint64_t getValueFlowStopTime(const Settings* settings) {
     return ~0ULL;
 }
 
+#define BREAK_ON_TIME \
+    if (std::time(nullptr) < stopTime) break
+
 void ValueFlow::setValues(TokenList *tokenlist, SymbolDatabase* symboldatabase, ErrorLogger *errorLogger, const Settings *settings)
 {
     for (Token *tok = tokenlist->front(); tok; tok = tok->next())
@@ -8891,62 +8894,74 @@ void ValueFlow::setValues(TokenList *tokenlist, SymbolDatabase* symboldatabase, 
     while (n > 0 && values != getTotalValues(tokenlist)) {
         values = getTotalValues(tokenlist);
 
-        if (std::time(nullptr) < stopTime)
-            valueFlowImpossibleValues(tokenlist, settings);
-        if (std::time(nullptr) < stopTime)
-            valueFlowSymbolicOperators(tokenlist, symboldatabase);
-        if (std::time(nullptr) < stopTime)
-            valueFlowCondition(SymbolicConditionHandler{}, tokenlist, symboldatabase, errorLogger, settings);
-        if (std::time(nullptr) < stopTime)
-            valueFlowSymbolicInfer(tokenlist, symboldatabase);
-        if (std::time(nullptr) < stopTime)
-            valueFlowArrayBool(tokenlist);
-        if (std::time(nullptr) < stopTime)
-            valueFlowArrayElement(tokenlist, settings);
-        if (std::time(nullptr) < stopTime)
-            valueFlowRightShift(tokenlist, settings);
-        if (std::time(nullptr) < stopTime)
-            valueFlowAfterAssign(tokenlist, symboldatabase, errorLogger, settings);
-        if (std::time(nullptr) < stopTime)
-            valueFlowAfterSwap(tokenlist, symboldatabase, errorLogger, settings);
-        if (std::time(nullptr) < stopTime)
-            valueFlowCondition(SimpleConditionHandler{}, tokenlist, symboldatabase, errorLogger, settings);
-        if (std::time(nullptr) < stopTime)
-            valueFlowInferCondition(tokenlist, settings);
-        if (std::time(nullptr) < stopTime)
-            valueFlowSwitchVariable(tokenlist, symboldatabase, errorLogger, settings);
-        if (std::time(nullptr) < stopTime)
-            valueFlowForLoop(tokenlist, symboldatabase, errorLogger, settings);
-        if (std::time(nullptr) < stopTime)
-            valueFlowSubFunction(tokenlist, symboldatabase, errorLogger, settings);
-        if (std::time(nullptr) < stopTime)
-            valueFlowFunctionReturn(tokenlist, errorLogger);
-        if (std::time(nullptr) < stopTime)
-            valueFlowLifetime(tokenlist, symboldatabase, errorLogger, settings);
-        if (std::time(nullptr) < stopTime)
-            valueFlowFunctionDefaultParameter(tokenlist, symboldatabase);
-        if (std::time(nullptr) < stopTime)
-            valueFlowUninit(tokenlist, symboldatabase, settings);
+        valueFlowImpossibleValues(tokenlist, settings);
+        BREAK_ON_TIME;
+        valueFlowSymbolicOperators(tokenlist, symboldatabase);
+        BREAK_ON_TIME;
+        valueFlowCondition(SymbolicConditionHandler{}, tokenlist, symboldatabase, errorLogger, settings);
+        BREAK_ON_TIME;
+        valueFlowSymbolicInfer(tokenlist, symboldatabase);
+        BREAK_ON_TIME;
+        valueFlowArrayBool(tokenlist);
+        BREAK_ON_TIME;
+        valueFlowArrayElement(tokenlist, settings);
+        BREAK_ON_TIME;
+        valueFlowRightShift(tokenlist, settings);
+        BREAK_ON_TIME;
+        valueFlowAfterAssign(tokenlist, symboldatabase, errorLogger, settings);
+        BREAK_ON_TIME;
+        valueFlowAfterSwap(tokenlist, symboldatabase, errorLogger, settings);
+        BREAK_ON_TIME;
+        valueFlowCondition(SimpleConditionHandler{}, tokenlist, symboldatabase, errorLogger, settings);
+        BREAK_ON_TIME;
+        valueFlowInferCondition(tokenlist, settings);
+        BREAK_ON_TIME;
+        valueFlowSwitchVariable(tokenlist, symboldatabase, errorLogger, settings);
+        BREAK_ON_TIME;
+        valueFlowForLoop(tokenlist, symboldatabase, errorLogger, settings);
+        BREAK_ON_TIME;
+        valueFlowSubFunction(tokenlist, symboldatabase, errorLogger, settings);
+        BREAK_ON_TIME;
+        valueFlowFunctionReturn(tokenlist, errorLogger);
+        BREAK_ON_TIME;
+        valueFlowLifetime(tokenlist, symboldatabase, errorLogger, settings);
+        BREAK_ON_TIME;
+        valueFlowFunctionDefaultParameter(tokenlist, symboldatabase);
+        BREAK_ON_TIME;
+        valueFlowUninit(tokenlist, symboldatabase, settings);
+        BREAK_ON_TIME;
 
         if (tokenlist->isCPP()) {
-            if (std::time(nullptr) < stopTime)
-                valueFlowAfterMove(tokenlist, symboldatabase, settings);
-            if (std::time(nullptr) < stopTime)
-                valueFlowSmartPointer(tokenlist, errorLogger, settings);
-            if (std::time(nullptr) < stopTime)
-                valueFlowIterators(tokenlist, settings);
-            if (std::time(nullptr) < stopTime)
-                valueFlowCondition(IteratorConditionHandler{}, tokenlist, symboldatabase, errorLogger, settings);
-            if (std::time(nullptr) < stopTime)
-                valueFlowIteratorInfer(tokenlist, settings);
-            if (std::time(nullptr) < stopTime)
-                valueFlowContainerSize(tokenlist, symboldatabase, errorLogger, settings);
-            if (std::time(nullptr) < stopTime)
-                valueFlowCondition(ContainerConditionHandler{}, tokenlist, symboldatabase, errorLogger, settings);
+            valueFlowAfterMove(tokenlist, symboldatabase, settings);
+            BREAK_ON_TIME;
+            valueFlowSmartPointer(tokenlist, errorLogger, settings);
+            BREAK_ON_TIME;
+            valueFlowIterators(tokenlist, settings);
+            BREAK_ON_TIME;
+            valueFlowCondition(IteratorConditionHandler{}, tokenlist, symboldatabase, errorLogger, settings);
+            BREAK_ON_TIME;
+            valueFlowIteratorInfer(tokenlist, settings);
+            BREAK_ON_TIME;
+            valueFlowContainerSize(tokenlist, symboldatabase, errorLogger, settings);
+            BREAK_ON_TIME;
+            valueFlowCondition(ContainerConditionHandler{}, tokenlist, symboldatabase, errorLogger, settings);
+            BREAK_ON_TIME;
         }
-        if (std::time(nullptr) < stopTime)
-            valueFlowSafeFunctions(tokenlist, symboldatabase, settings);
-        n--;
+        valueFlowSafeFunctions(tokenlist, symboldatabase, settings);
+        BREAK_ON_TIME;
+        --n;
+    }
+
+    if (settings->debugwarnings) {
+        if (n != 0) {
+            ErrorMessage errmsg({},
+                                emptyString,
+                                Severity::debug,
+                                "ValueFlow maximum time exceeded",
+                                "debug",
+                                Certainty::normal);
+            errorLogger->reportErr(errmsg);
+        }
     }
 
     valueFlowDynamicBufferSize(tokenlist, symboldatabase, settings);
