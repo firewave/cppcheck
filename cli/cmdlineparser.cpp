@@ -904,6 +904,14 @@ bool CmdLineParser::parseFromArgs(int argc, const char* const argv[])
                 }
             }
 
+            else if (std::strncmp(argv[i], "--valueflow-max-iterations=", 27) == 0)
+                try {
+                    mSettings->valueFlowMaxIterations = std::stoi(argv[i] + 27);
+                } catch (const std::invalid_argument&) {
+                    printError("argument to '--valueflow-max-iteration' is invalid.");
+                    return false;
+                }
+
             else if (std::strcmp(argv[i], "-v") == 0 || std::strcmp(argv[i], "--verbose") == 0)
                 mSettings->verbose = true;
 

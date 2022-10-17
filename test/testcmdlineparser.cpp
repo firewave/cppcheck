@@ -153,6 +153,10 @@ private:
         TEST_CASE(clang);
         TEST_CASE(clang2);
         TEST_CASE(clangInvalid);
+        TEST_CASE(valueFlowMaxIterations);
+        TEST_CASE(valueFlowMaxIterations2);
+        TEST_CASE(valueFlowMaxIterationsInvalid);
+        TEST_CASE(valueFlowMaxIterationsInvalid2);
 
         // TODO
         // Disabling these tests since they use relative paths to the
@@ -1276,6 +1280,38 @@ private:
         const char * const argv[] = {"cppcheck", "--clang-foo"};
         ASSERT_EQUALS(false, defParser.parseFromArgs(2, argv));
         ASSERT_EQUALS("cppcheck: error: unrecognized command line option: \"--clang-foo\".\n", GET_REDIRECT_OUTPUT);
+    }
+
+    void valueFlowMaxIterations() {
+        REDIRECT;
+        const char * const argv[] = {"cppcheck", "--valueflow-max-iterations=1"};
+        settings.valueFlowMaxIterations = -1;
+        ASSERT(defParser.parseFromArgs(2, argv));
+        ASSERT_EQUALS(1, settings.valueFlowMaxIterations);
+        ASSERT_EQUALS("", GET_REDIRECT_OUTPUT);
+    }
+
+    void valueFlowMaxIterations2() {
+        REDIRECT;
+        const char * const argv[] = {"cppcheck", "--valueflow-max-iterations=-1"};
+        settings.valueFlowMaxIterations = -1;
+        ASSERT(defParser.parseFromArgs(2, argv));
+        ASSERT_EQUALS(-1, settings.valueFlowMaxIterations);
+        ASSERT_EQUALS("", GET_REDIRECT_OUTPUT);
+    }
+
+    void valueFlowMaxIterationsInvalid() {
+        REDIRECT;
+        const char * const argv[] = {"cppcheck", "--valueflow-max-iterations"};
+        ASSERT(!defParser.parseFromArgs(2, argv));
+        ASSERT_EQUALS("cppcheck: error: unrecognized command line option: \"--valueflow-max-iterations\".\n", GET_REDIRECT_OUTPUT);
+    }
+
+    void valueFlowMaxIterationsInvalid2() {
+        REDIRECT;
+        const char * const argv[] = {"cppcheck", "--valueflow-max-iterations=seven"};
+        ASSERT(!defParser.parseFromArgs(2, argv));
+        ASSERT_EQUALS("cppcheck: error: argument to '--valueflow-max-iteration' is invalid.\n", GET_REDIRECT_OUTPUT);
     }
 
     /*

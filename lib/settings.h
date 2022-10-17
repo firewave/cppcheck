@@ -350,6 +350,9 @@ public:
     /** @brief forced includes given by the user */
     std::list<std::string> userIncludes;
 
+    /** @brief Experimental: --valueflow-max-iterations=T */
+    int valueFlowMaxIterations;
+
     /** @brief Is --verbose given? */
     bool verbose;
 

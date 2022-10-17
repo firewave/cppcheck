@@ -8890,7 +8890,7 @@ void ValueFlow::setValues(TokenList *tokenlist, SymbolDatabase* symboldatabase, 
     const std::uint64_t stopTime = getValueFlowStopTime(settings);
 
     std::size_t values = 0;
-    std::size_t n = 4;
+    int n = settings->valueFlowMaxIterations;
     while (n > 0 && values != getTotalValues(tokenlist)) {
         values = getTotalValues(tokenlist);
 
@@ -8953,6 +8953,15 @@ void ValueFlow::setValues(TokenList *tokenlist, SymbolDatabase* symboldatabase, 
     }
 
     if (settings->debugwarnings) {
+        if (n == 0 && values != getTotalValues(tokenlist)) {
+            ErrorMessage errmsg({},
+                                emptyString,
+                                Severity::debug,
+                                "ValueFlow maximum iterations exceeded",
+                                "debug",
+                                Certainty::normal);
+            errorLogger->reportErr(errmsg);
+        }
         if (n != 0) {
             ErrorMessage errmsg({},
                                 emptyString,
