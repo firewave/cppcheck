@@ -37,6 +37,9 @@ CheckOptions:
     endif()
 
     add_executable(cppcheck-gui ${cppcheck-gui-deps} ${cppcheck-gui_SOURCES})
+    if (CMAKE_VERIFY_INTERFACE_HEADER_SETS)
+        target_sources(cppcheck-gui PUBLIC FILE_SET HEADERS TYPE HEADERS FILES ${hdrs})
+    endif()
     set_target_properties(cppcheck-gui PROPERTIES AUTOMOC ON)
     target_include_directories(cppcheck-gui PRIVATE ${PROJECT_SOURCE_DIR}/lib/)
     if(USE_BUNDLED_TINYXML2)

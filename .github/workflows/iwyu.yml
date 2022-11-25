@@ -28,7 +28,7 @@ jobs:
 
       - name: Prepare CMake
         run: |
-          cmake -S . -B cmake.output -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Release -DHAVE_RULES=On -DBUILD_TESTS=On -DBUILD_GUI=On -DBUILD_TESTS=On -DBUILD_GUI=On -DWITH_QCHART=On -DENABLE_CHECK_INTERNAL=On -DCMAKE_GLOBAL_AUTOGEN_TARGET=On -DCMAKE_DISABLE_PRECOMPILE_HEADERS=On -DCPPCHK_GLIBCXX_DEBUG=Off -DUSE_MATCHCOMPILER=Off
+          cmake -S . -B cmake.output -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Release -DHAVE_RULES=On -DBUILD_TESTS=On -DBUILD_GUI=On -DBUILD_TESTS=On -DBUILD_GUI=On -DWITH_QCHART=On -DENABLE_CHECK_INTERNAL=On -DCMAKE_GLOBAL_AUTOGEN_TARGET=On -DCMAKE_DISABLE_PRECOMPILE_HEADERS=On -DCPPCHK_GLIBCXX_DEBUG=Off -DUSE_MATCHCOMPILER=Off -DCMAKE_VERIFY_INTERFACE_HEADER_SETS=On
 
       - name: Prepare CMake dependencies
         run: |
@@ -51,6 +51,11 @@ jobs:
         run: |
           # do not fail for now so the output is being saved
           iwyu_tool -p cmake.output -j $(nproc) -- -w > iwyu.log || true
+
+      - uses: actions/upload-artifact@v3
+        with:
+          name: Compilation Database
+          path: ./cmake.output/compile_commands.json
 
       - uses: actions/upload-artifact@v3
         with:
