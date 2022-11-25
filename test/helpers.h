@@ -27,7 +27,7 @@
 #include "tokenlist.h"
 
 #include <cstdio>
-#include <fstream>
+#include <fstream> // IWYU pragma: keep
 #include <list>
 #include <sstream> // IWYU pragma: keep
 #include <string>
