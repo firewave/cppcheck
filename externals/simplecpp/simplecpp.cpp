@@ -2293,69 +2293,74 @@ namespace simplecpp {
         if (path.empty())
             return path;
 
-        std::string::size_type pos;
-
         // replace backslash separators
         std::replace(path.begin(), path.end(), '\\', '/');
 
-        const bool unc(path.compare(0,2,"//") == 0);
+        if (path.find('/') != std::string::npos) {
+            const bool unc(path.compare(0,2,"//") == 0);
 
-        // replace "//" with "/"
-        pos = 0;
-        while ((pos = path.find("//",pos)) != std::string::npos) {
-            path.erase(pos,1);
+            // replace "//" with "/"
+            std::string::size_type pos = unc ? 2 : 0;
+            while ((pos = path.find("//",pos)) != std::string::npos) {
+                path.erase(pos,1);
+            }
+
+            // remove "./"
+            pos = 0;
+            while ((pos = path.find("./",pos)) != std::string::npos) {
+                if (pos == 0 || path[pos - 1U] == '/')
+                    path.erase(pos,2);
+                else
+                    pos += 2;
+            }
+
+            // remove trailing dot if path ends with "/."
+            if (endsWith(path,"/."))
+                path.erase(path.size()-1);
+
+            // simplify ".."
+            pos = 1; // don't simplify ".." if path starts with that
+            while ((pos = path.find("/..", pos)) != std::string::npos) {
+                // not end of path, then string must be "/../"
+                if (pos + 3 < path.size() && path[pos + 3] != '/') {
+                    ++pos;
+                    continue;
+                }
+                // get previous subpath
+                std::string::size_type pos1 = path.rfind('/', pos - 1U);
+                if (pos1 == std::string::npos) {
+                    pos1 = 0;
+                } else {
+                    pos1 += 1U;
+                }
+                const std::string previousSubPath = path.substr(pos1, pos - pos1);
+                if (previousSubPath == "..") {
+                    // don't simplify
+                    ++pos;
+                } else {
+                    // remove previous subpath and ".."
+                    path.erase(pos1, pos - pos1 + 4);
+                    if (path.empty())
+                        path = ".";
+                    // update pos
+                    pos = (pos1 == 0) ? 1 : (pos1 - 1);
+                }
+            }
+
+            // Remove trailing '/'?
+            //if (path.size() > 1 && endsWith(path, "/"))
+            //    path.erase(path.size()-1);
+
+            if (unc)
+                path = '/' + path;
         }
 
-        // remove "./"
-        pos = 0;
-        while ((pos = path.find("./",pos)) != std::string::npos) {
-            if (pos == 0 || path[pos - 1U] == '/')
-                path.erase(pos,2);
-            else
-                pos += 2;
-        }
-
-        // remove trailing dot if path ends with "/."
-        if (endsWith(path,"/."))
-            path.erase(path.size()-1);
-
-        // simplify ".."
-        pos = 1; // don't simplify ".." if path starts with that
-        while ((pos = path.find("/..", pos)) != std::string::npos) {
-            // not end of path, then string must be "/../"
-            if (pos + 3 < path.size() && path[pos + 3] != '/') {
-                ++pos;
-                continue;
-            }
-            // get previous subpath
-            std::string::size_type pos1 = path.rfind('/', pos - 1U);
-            if (pos1 == std::string::npos) {
-                pos1 = 0;
-            } else {
-                pos1 += 1U;
-            }
-            const std::string previousSubPath = path.substr(pos1, pos - pos1);
-            if (previousSubPath == "..") {
-                // don't simplify
-                ++pos;
-            } else {
-                // remove previous subpath and ".."
-                path.erase(pos1, pos - pos1 + 4);
-                if (path.empty())
-                    path = ".";
-                // update pos
-                pos = (pos1 == 0) ? 1 : (pos1 - 1);
-            }
-        }
-
-        // Remove trailing '/'?
-        //if (path.size() > 1 && endsWith(path, "/"))
-        //    path.erase(path.size()-1);
-
-        if (unc)
-            path = '/' + path;
-
+#ifdef SIMPLECPP_WINDOWS
         return path.find_first_of("*?") == std::string::npos ? realFilename(path) : path;
+#else
+        // realFilename() does nothing so no need to call find_first_of()
+        return path;
+#endif
     }
 }
 
