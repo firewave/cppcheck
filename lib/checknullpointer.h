@@ -48,20 +48,11 @@ namespace tinyxml2 {
 
 class CPPCHECKLIB CheckNullPointer : public Check {
 public:
+    friend class TestNullPointer;
+    friend class TestFixture;
+
     /** @brief This constructor is used when registering the CheckNullPointer */
     CheckNullPointer() : Check(myName()) {}
-
-    /** @brief This constructor is used when running checks. */
-    CheckNullPointer(const Tokenizer *tokenizer, const Settings *settings, ErrorLogger *errorLogger)
-        : Check(myName(), tokenizer, settings, errorLogger) {}
-
-    /** @brief Run checks against the normal token list */
-    void runChecks(const Tokenizer *tokenizer, const Settings *settings, ErrorLogger *errorLogger) override {
-        CheckNullPointer checkNullPointer(tokenizer, settings, errorLogger);
-        checkNullPointer.nullPointer();
-        checkNullPointer.arithmetic();
-        checkNullPointer.nullConstantDereference();
-    }
 
     /**
      * @brief parse a function call and extract information about variable usage
@@ -85,6 +76,19 @@ public:
     bool isPointerDeRef(const Token *tok, bool &unknown) const;
 
     static bool isPointerDeRef(const Token *tok, bool &unknown, const Settings *settings);
+
+private:
+    /** @brief This constructor is used when running checks. */
+    CheckNullPointer(const Tokenizer *tokenizer, const Settings *settings, ErrorLogger *errorLogger)
+        : Check(myName(), tokenizer, settings, errorLogger) {}
+
+    /** @brief Run checks against the normal token list */
+    void runChecks(const Tokenizer *tokenizer, const Settings *settings, ErrorLogger *errorLogger) override {
+        CheckNullPointer checkNullPointer(tokenizer, settings, errorLogger);
+        checkNullPointer.nullPointer();
+        checkNullPointer.arithmetic();
+        checkNullPointer.nullConstantDereference();
+    }
 
     /** @brief possible null pointer dereference */
     void nullPointer();

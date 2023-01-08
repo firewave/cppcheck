@@ -45,6 +45,8 @@ namespace CTU {
 
 class CPPCHECKLIB CheckUnusedFunctions : public Check {
 public:
+    friend class TestUnusedFunctions;
+
     /** @brief This constructor is used when registering the CheckUnusedFunctions */
     CheckUnusedFunctions() : Check(myName()) {}
 
@@ -62,23 +64,25 @@ public:
     // * What functions are declared
     void parseTokens(const Tokenizer &tokenizer, const char FileName[], const Settings *settings);
 
-    // Return true if an error is reported.
-    bool check(ErrorLogger * const errorLogger, const Settings& settings) const;
-
-    /** @brief Parse current TU and extract file info */
-    Check::FileInfo *getFileInfo(const Tokenizer *tokenizer, const Settings *settings) const override;
-
-    /** @brief Analyse all file infos for all TU */
-    bool analyseWholeProgram(const CTU::FileInfo *ctu, const std::list<Check::FileInfo*> &fileInfo, const Settings& settings, ErrorLogger &errorLogger) override;
-
-    static CheckUnusedFunctions instance;
-
     std::string analyzerInfo() const;
 
     /** @brief Combine and analyze all analyzerInfos for all TUs */
     static void analyseWholeProgram(const Settings &settings, ErrorLogger * const errorLogger, const std::string &buildDir);
 
 private:
+    // Return true if an error is reported.
+    bool check(ErrorLogger * const errorLogger, const Settings& settings) const;
+
+public:
+    /** @brief Parse current TU and extract file info */
+    Check::FileInfo *getFileInfo(const Tokenizer *tokenizer, const Settings *settings) const override;
+
+private:
+
+    /** @brief Analyse all file infos for all TU */
+    bool analyseWholeProgram(const CTU::FileInfo *ctu, const std::list<Check::FileInfo*> &fileInfo, const Settings& settings, ErrorLogger &errorLogger) override;
+
+    static CheckUnusedFunctions instance;
 
     void getErrorMessages(ErrorLogger *errorLogger, const Settings * /*settings*/) const override {
         CheckUnusedFunctions::unusedFunctionError(errorLogger, emptyString, 0, "funcName");

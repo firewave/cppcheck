@@ -40,9 +40,12 @@ class Tokenizer;
 
 class CPPCHECKLIB CheckString : public Check {
 public:
+    friend class TestFixture;
+
     /** @brief This constructor is used when registering the CheckClass */
     CheckString() : Check(myName()) {}
 
+private:
     /** @brief This constructor is used when running checks. */
     CheckString(const Tokenizer *tokenizer, const Settings *settings, ErrorLogger *errorLogger)
         : Check(myName(), tokenizer, settings, errorLogger) {}
@@ -82,7 +85,6 @@ public:
     /** @brief %Check for overlapping source and destination passed to sprintf() */
     void sprintfOverlappingData();
 
-private:
     void stringLiteralWriteError(const Token *tok, const Token *strValue);
     void sprintfOverlappingDataError(const Token *funcTok, const Token *tok, const std::string &varname);
     void strPlusCharError(const Token *tok);

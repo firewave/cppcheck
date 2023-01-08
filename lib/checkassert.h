@@ -42,8 +42,11 @@ class Tokenizer;
 
 class CPPCHECKLIB CheckAssert : public Check {
 public:
+    friend class TestFixture;
+
     CheckAssert() : Check(myName()) {}
 
+private:
     CheckAssert(const Tokenizer *tokenizer, const Settings *settings, ErrorLogger *errorLogger)
         : Check(myName(), tokenizer, settings, errorLogger) {}
 
@@ -55,11 +58,9 @@ public:
 
     void assertWithSideEffects();
 
-protected:
     void checkVariableAssignment(const Token* assignTok, const Scope *assertionScope);
     static bool inSameScope(const Token* returnTok, const Token* assignTok);
 
-private:
     void sideEffectInAssertError(const Token *tok, const std::string& functionName);
     void assignmentInAssertError(const Token *tok, const std::string &varname);
 

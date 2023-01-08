@@ -163,11 +163,17 @@ public:
  * -# finally, check if the simplified token list contain any leaks.
  */
 
-class CPPCHECKLIB CheckMemoryLeakInFunction : private Check, public CheckMemoryLeak {
+class CPPCHECKLIB CheckMemoryLeakInFunction : public Check, public CheckMemoryLeak {
 public:
+    friend class TestMemleakInFunction;
+
     /** @brief This constructor is used when registering this class */
     CheckMemoryLeakInFunction() : Check(myName()), CheckMemoryLeak(nullptr, nullptr, nullptr) {}
 
+    /** @brief Unit testing : testing the white list */
+    static bool test_white_list(const std::string &funcname, const Settings *settings, bool cpp);
+
+private:
     /** @brief This constructor is used when running checks */
     CheckMemoryLeakInFunction(const Tokenizer *tokenizer, const Settings *settings, ErrorLogger *errorLogger)
         : Check(myName(), tokenizer, settings, errorLogger), CheckMemoryLeak(tokenizer, errorLogger, settings) {}
@@ -182,7 +188,6 @@ public:
      */
     void checkReallocUsage() const;
 
-private:
     /** Report all possible errors (for the --errorlist) */
     void getErrorMessages(ErrorLogger *e, const Settings *settings) const override {
         CheckMemoryLeakInFunction c(nullptr, settings, e);
@@ -217,10 +222,13 @@ private:
  * @brief %Check class variables, variables that are allocated in the constructor should be deallocated in the destructor
  */
 
-class CPPCHECKLIB CheckMemoryLeakInClass : private Check, private CheckMemoryLeak {
+class CPPCHECKLIB CheckMemoryLeakInClass : public Check, private CheckMemoryLeak {
 public:
+    friend class TestMemleakInClass;
+
     CheckMemoryLeakInClass() : Check(myName()), CheckMemoryLeak(nullptr, nullptr, nullptr) {}
 
+private:
     CheckMemoryLeakInClass(const Tokenizer *tokenizer, const Settings *settings, ErrorLogger *errorLogger)
         : Check(myName(), tokenizer, settings, errorLogger), CheckMemoryLeak(tokenizer, errorLogger, settings) {}
 
@@ -234,7 +242,6 @@ public:
 
     void check();
 
-private:
     void variable(const Scope *scope, const Token *tokVarname);
 
     /** Public functions: possible double-allocation */
@@ -262,10 +269,13 @@ private:
 
 /** @brief detect simple memory leaks for struct members */
 
-class CPPCHECKLIB CheckMemoryLeakStructMember : private Check, private CheckMemoryLeak {
+class CPPCHECKLIB CheckMemoryLeakStructMember : public Check, private CheckMemoryLeak {
 public:
+    friend class TestMemleakStructMember;
+
     CheckMemoryLeakStructMember() : Check(myName()), CheckMemoryLeak(nullptr, nullptr, nullptr) {}
 
+private:
     CheckMemoryLeakStructMember(const Tokenizer *tokenizer, const Settings *settings, ErrorLogger *errorLogger)
         : Check(myName(), tokenizer, settings, errorLogger), CheckMemoryLeak(tokenizer, errorLogger, settings) {}
 
@@ -275,8 +285,6 @@ public:
     }
 
     void check() const;
-
-private:
 
     /** Is local variable allocated with malloc? */
     bool isMalloc(const Variable *variable) const;
@@ -298,10 +306,13 @@ private:
 
 /** @brief detect simple memory leaks (address not taken) */
 
-class CPPCHECKLIB CheckMemoryLeakNoVar : private Check, private CheckMemoryLeak {
+class CPPCHECKLIB CheckMemoryLeakNoVar : public Check, private CheckMemoryLeak {
 public:
+    friend class TestMemleakNoVar;
+
     CheckMemoryLeakNoVar() : Check(myName()), CheckMemoryLeak(nullptr, nullptr, nullptr) {}
 
+private:
     CheckMemoryLeakNoVar(const Tokenizer *tokenizer, const Settings *settings, ErrorLogger *errorLogger)
         : Check(myName(), tokenizer, settings, errorLogger), CheckMemoryLeak(tokenizer, errorLogger, settings) {}
 
@@ -312,7 +323,6 @@ public:
 
     void check();
 
-private:
     /**
      * @brief %Check if an input argument to a function is the return value of an allocation function
      * like malloc(), and the function does not release it.

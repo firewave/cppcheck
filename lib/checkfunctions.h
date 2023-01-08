@@ -50,9 +50,13 @@ namespace ValueFlow {
 
 class CPPCHECKLIB CheckFunctions : public Check {
 public:
+    friend class TestFunctions;
+    friend class TestFixture;
+
     /** This constructor is used when registering the CheckFunctions */
     CheckFunctions() : Check(myName()) {}
 
+private:
     /** This constructor is used when running checks. */
     CheckFunctions(const Tokenizer *tokenizer, const Settings *settings, ErrorLogger *errorLogger)
         : Check(myName(), tokenizer, settings, errorLogger) {}
@@ -109,7 +113,6 @@ public:
     /** @brief --check-library: warn for unconfigured function calls */
     void checkLibraryMatchFunctions();
 
-private:
     /** @brief %Check for missing "return" */
     void checkMissingReturn();
 

@@ -40,9 +40,12 @@ class Tokenizer;
 
 class CPPCHECKLIB CheckBool : public Check {
 public:
+    friend class TestFixture;
+
     /** @brief This constructor is used when registering the CheckClass */
     CheckBool() : Check(myName()) {}
 
+private:
     /** @brief This constructor is used when running checks. */
     CheckBool(const Tokenizer *tokenizer, const Settings *settings, ErrorLogger *errorLogger)
         : Check(myName(), tokenizer, settings, errorLogger) {}
@@ -95,7 +98,6 @@ public:
     /** @brief %Check if a function returning bool returns an integer other than 0 or 1 */
     void returnValueOfFunctionReturningBool();
 
-private:
     // Error messages..
     void comparisonOfFuncReturningBoolError(const Token *tok, const std::string &expression);
     void comparisonOfTwoFuncsReturningBoolError(const Token *tok, const std::string &expression1, const std::string &expression2);
