@@ -43,6 +43,8 @@ class CPPCHECKLIB CheckIO : public Check {
     friend class TestIO;
 
 public:
+    friend class TestIO;
+
     /** @brief This constructor is used when registering CheckIO */
     CheckIO() : Check(myName()) {}
 

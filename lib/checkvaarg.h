@@ -41,6 +41,8 @@ class Token;
 
 class CPPCHECKLIB CheckVaarg : public Check {
 public:
+    friend class TestFixture;
+
     CheckVaarg() : Check(myName()) {}
 
 private:

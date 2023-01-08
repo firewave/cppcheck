@@ -108,6 +108,8 @@ public:
 
 class CPPCHECKLIB CheckLeakAutoVar : public Check {
 public:
+    friend class TestFixture;
+
     /** This constructor is used when registering the CheckLeakAutoVar */
     CheckLeakAutoVar() : Check(myName()) {}
 

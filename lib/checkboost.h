@@ -39,6 +39,8 @@ class Token;
 /** @brief %Check Boost usage */
 class CPPCHECKLIB CheckBoost : public Check {
 public:
+    friend class TestFixture;
+
     /** This constructor is used when registering the CheckClass */
     CheckBoost() : Check(myName()) {}
 

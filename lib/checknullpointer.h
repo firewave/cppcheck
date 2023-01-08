@@ -50,6 +50,9 @@ class CPPCHECKLIB CheckNullPointer : public Check {
     friend class TestNullPointer;
 
 public:
+    friend class TestNullPointer;
+    friend class TestFixture;
+
     /** @brief This constructor is used when registering the CheckNullPointer */
     CheckNullPointer() : Check(myName()) {}
 

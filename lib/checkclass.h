@@ -56,6 +56,10 @@ class CPPCHECKLIB CheckClass : public Check {
     friend class TestUnusedPrivateFunction;
 
 public:
+    friend class TestClass;
+    friend class TestConstructors;
+    friend class TestUnusedPrivateFunction;
+
     /** @brief This constructor is used when registering the CheckClass */
     CheckClass() : Check(myName()) {}
 

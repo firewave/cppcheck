@@ -52,6 +52,11 @@ class CPPCHECKLIB CheckOther : public Check {
     friend class TestOther;
 
 public:
+    friend class TestCharVar;
+    friend class TestIncompleteStatement;
+    friend class TestOther;
+    friend class TestFixture;
+
     /** @brief This constructor is used when registering the CheckClass */
     CheckOther() : Check(myName()) {}
 

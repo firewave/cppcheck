@@ -46,6 +46,8 @@ namespace ValueFlow {
 
 class CPPCHECKLIB CheckAutoVariables : public Check {
 public:
+    friend class TestFixture;
+
     /** This constructor is used when registering the CheckClass */
     CheckAutoVariables() : Check(myName()) {}
 

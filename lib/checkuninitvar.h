@@ -63,6 +63,8 @@ class CPPCHECKLIB CheckUninitVar : public Check {
     friend class TestUninitVar;
 
 public:
+    friend class TestUninitVar;
+
     /** @brief This constructor is used when registering the CheckUninitVar */
     CheckUninitVar() : Check(myName()) {}
 

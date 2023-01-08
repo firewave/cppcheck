@@ -48,6 +48,8 @@ class CPPCHECKLIB CheckUnusedVar : public Check {
     friend class TestUnusedVar;
 
 public:
+    friend class TestUnusedVar;
+
     /** @brief This constructor is used when registering the CheckClass */
     CheckUnusedVar() : Check(myName()) {}
 

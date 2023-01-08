@@ -40,6 +40,8 @@ class Token;
 
 class CPPCHECKLIB CheckString : public Check {
 public:
+    friend class TestFixture;
+
     /** @brief This constructor is used when registering the CheckClass */
     CheckString() : Check(myName()) {}
 

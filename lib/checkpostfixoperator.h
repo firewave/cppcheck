@@ -43,6 +43,8 @@ class CPPCHECKLIB CheckPostfixOperator : public Check {
     friend class TestPostfixOperator;
 
 public:
+    friend class TestPostfixOperator;
+
     /** This constructor is used when registering the CheckPostfixOperator */
     CheckPostfixOperator() : Check(myName()) {}
 

@@ -40,6 +40,8 @@ class Token;
 
 class CPPCHECKLIB CheckSizeof : public Check {
 public:
+    friend class TestFixture;
+
     /** @brief This constructor is used when registering the CheckClass */
     CheckSizeof() : Check(myName()) {}
 

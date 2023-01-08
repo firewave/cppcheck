@@ -44,6 +44,8 @@ class CPPCHECKLIB Check64BitPortability : public Check {
     friend class Test64BitPortability;
 
 public:
+    friend class Test64BitPortability;
+
     /** This constructor is used when registering the Check64BitPortability */
     Check64BitPortability() : Check(myName()) {}
 

@@ -44,6 +44,8 @@ class ErrorLogger;
 /** @brief %Check STL usage (invalidation of iterators, mismatching containers, etc) */
 class CPPCHECKLIB CheckStl : public Check {
 public:
+    friend class TestFixture;
+
     /** This constructor is used when registering the CheckClass */
     CheckStl() : Check(myName()) {}
 
