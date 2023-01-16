@@ -15,7 +15,7 @@ import shlex
 # Version scheme (MAJOR.MINOR.PATCH) should orientate on "Semantic Versioning" https://semver.org/
 # Every change in this script should result in increasing the version number accordingly (exceptions may be cosmetic
 # changes)
-CLIENT_VERSION = "1.3.42"
+CLIENT_VERSION = "1.3.43"
 
 # Timeout for analysis with Cppcheck in seconds
 CPPCHECK_TIMEOUT = 30 * 60
@@ -179,8 +179,6 @@ def has_binary(cppcheck_path):
 
 
 def compile_version(cppcheck_path):
-    if has_binary(cppcheck_path):
-        return True
     # Build
     ret = compile_cppcheck(cppcheck_path)
     # Clean intermediate build files

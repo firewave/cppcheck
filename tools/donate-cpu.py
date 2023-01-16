@@ -182,6 +182,8 @@ while True:
         if ver == 'head':
             ver = 'main'
         current_cppcheck_dir = os.path.join(work_path, 'tree-'+ver)
+        if ver != 'main' and lib.has_binary(current_cppcheck_dir):
+            continue
         print('Fetching Cppcheck-{}..'.format(ver))
         try:
             has_changes = lib.try_retry(lib.checkout_cppcheck_version, fargs=(repo_path, ver, current_cppcheck_dir), max_tries=3, sleep_duration=30.0, sleep_factor=1.0)
@@ -192,9 +194,10 @@ while True:
             print('Failed to update Cppcheck ({}), retry later'.format(e))
             sys.exit(1)
         if ver == 'main':
-            if (has_changes or not lib.has_binary(current_cppcheck_dir)) and not lib.compile_cppcheck(current_cppcheck_dir):
-                print('Failed to compile Cppcheck-{}, retry later'.format(ver))
-                sys.exit(1)
+            if has_changes or not lib.has_binary(current_cppcheck_dir):
+                if not lib.compile_cppcheck(current_cppcheck_dir):
+                    print('Failed to compile Cppcheck-{}, retry later'.format(ver))
+                    sys.exit(1)
         else:
             if not lib.compile_version(current_cppcheck_dir):
                 print('Failed to compile Cppcheck-{}, retry later'.format(ver))
