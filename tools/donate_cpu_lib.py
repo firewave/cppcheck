@@ -28,6 +28,7 @@ RETURN_CODE_TIMEOUT = -999
 __jobs = '-j1'
 __server_address = ('cppcheck1.osuosl.org', 8000)
 __make_cmd = None
+__cxx_compiler = 'g++' if 'CXX' not in os.environ else os.environ['CXX']
 
 def detect_make():
     make_cmds = ['make', 'mingw32-make']
@@ -59,7 +60,7 @@ def check_requirements():
 
     apps = ['git', 'wget']
     if __make_cmd in ['make', 'mingw32-make']:
-        apps.append('g++')
+        apps.append(__cxx_compiler)
         apps.append('gdb')
 
     for app in apps:
@@ -742,7 +743,7 @@ def get_compiler_version():
         _, _, stderr, _ = __run_command('cl.exe', False)
         return stderr.split('\n')[0]
 
-    _, stdout, _, _ = __run_command('g++ --version', False)
+    _, stdout, _, _ = __run_command('{} --version'.format(__cxx_compiler), False)
     return stdout.split('\n')[0]
 
 
