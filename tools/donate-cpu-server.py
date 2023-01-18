@@ -26,7 +26,7 @@ from urllib.parse import urlparse
 # Version scheme (MAJOR.MINOR.PATCH) should orientate on "Semantic Versioning" https://semver.org/
 # Every change in this script should result in increasing the version number accordingly (exceptions may be cosmetic
 # changes)
-SERVER_VERSION = "1.3.36"
+SERVER_VERSION = "1.3.37"
 
 OLD_VERSION = '2.9'
 
@@ -113,6 +113,8 @@ def overviewReport() -> str:
     html += '<a href="head-syntaxError">syntaxError</a><br>\n'
     html += '<a href="head-DacaWrongData">DacaWrongData</a><br>\n'
     html += '<a href="head-dacaWrongSplitTemplateRightAngleBrackets">dacaWrongSplitTemplateRightAngleBrackets</a><br>\n'
+    html += '<br>\n'
+    html += '<a href="clientconfig.html">Client configuration report</a><br>\n'
     html += '<br>\n'
     html += 'version ' + SERVER_VERSION + '\n'
     html += '</body></html>'
@@ -964,6 +966,78 @@ def check_library_function_name(result_path: str, function_name: str) -> str:
     return ''.join(output_lines_list)
 
 
+# platform: Linux-5.10.0-20-amd64-x86_64-with-glibc2.31
+# python: 3.9.2
+# client-version: 1.3.41
+# compiler: g++ (Debian 10.2.1-6) 10.2.1 20210110
+def clientConfigReport(results_path: str, query_params: dict):
+    pkgs = '' if query_params.get('pkgs') == '1' else None
+
+    html = '<!DOCTYPE html>\n'
+    html += '<html><head><title>Client configuration report</title></head><body>\n'
+    html += '<h1>Crash report</h1>\n'
+    html += '<pre>\n'
+    html += '<b>' + fmt('Package', 'Date       Time', OLD_VERSION, 'Head', link=False) + '</b>\n'
+    client_configs = {}
+    for filename in sorted(glob.glob(os.path.expanduser(results_path + '/*'))):
+        if not os.path.isfile(filename) or filename.endswith('.diff'):
+            continue
+        with open(filename, 'rt') as file_:
+            client_version = None
+            platform = None
+            compiler = None
+            python = None
+            for line in file_:
+                line = line.strip()
+                if line.startswith('cppcheck: '):
+                    if OLD_VERSION not in line:
+                        # Package results seem to be too old, skip
+                        break
+                    else:
+                        # Current package, parse on
+                        continue
+                if platform is not None and line.startswith('platform:'):
+                    platform = line.split('')[1]
+                elif python is not None and line.startswith('python:'):
+                    python = line.split('')[1]
+
+                    key = hash(' '.join(stack_trace))
+
+                    if key in stack_traces:
+                        stack_traces[key]['code_line'] = code_line
+                        stack_traces[key]['stack_trace'] = stack_trace
+                        stack_traces[key]['n'] += 1
+                        stack_traces[key]['packages'].append(package)
+                    else:
+                        stack_traces[key] = {'stack_trace': stack_trace, 'n': 1, 'code_line': code_line, 'packages': [package], 'crash_line': crash_line}
+                    break
+                elif client_version is not None and line.startswith('client-version:'):
+                    client_version = line.split('')[1]
+                elif compiler is not None and line.startswith('compiler:'):
+                    compiler = line.split('')[1]
+                    break # compiler is the last of the fields
+
+        key = hash(client_version + ' ' + platform + ' ' + compiler + ' ' +  python)
+        if key in client_configs:
+            continue
+        # TODO: write entry
+
+    html += '</pre>\n'
+    html += '<pre>\n'
+    html += '<b>Stack traces</b>\n'
+    for stack_trace in sorted(list(stack_traces.values()), key=lambda x: x['n'], reverse=True):
+        html += 'Packages: ' + ' '.join(['<a href="' + p + '">' + p + '</a>' for p in stack_trace['packages']]) + '\n'
+        html += html_lib.escape(stack_trace['crash_line']) + '\n'
+        html += html_lib.escape(stack_trace['code_line']) + '\n'
+        html += html_lib.escape('\n'.join(stack_trace['stack_trace'])) + '\n\n'
+    html += '</pre>\n'
+
+    html += '</body></html>\n'
+    if pkgs is not None:
+        return pkgs, 'text/plain'
+    return html, 'text/html'
+
+
 def sendAll(connection: socket.socket, text: str) -> None:
     data = text.encode('utf-8', 'ignore')
     while data:
@@ -1070,6 +1144,9 @@ class HttpClientThread(Thread):
                 function_name = url[len('/check_library-'):]
                 text = check_library_function_name(self.resultPath + '/' + 'info_output', function_name)
                 httpGetResponse(self.connection, text, 'text/plain')
+            elif url == '/clientconfig.html':
+                text, mime = clientConfigReport(self.resultPath, queryParams)
+                httpGetResponse(self.connection, text, mime)
             else:
                 filename = resultPath + url
                 if not os.path.isfile(filename):
