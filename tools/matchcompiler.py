@@ -157,6 +157,11 @@ class MatchCompiler:
 
         self._matchFunctionCache[signature] = id
 
+    def _compileMatch(self, tok):
+        if len(tok) == 1:
+            return '(tok->str().size() == 1U && tok->str()[0] == \'' + tok + '\')'
+        return '(tok->str() == ' + self._getConstStringId(tok) + ')'
+
     def _compileCmd(self, tok):
         if tok == '%any%':
             return 'true'
@@ -175,9 +180,9 @@ class MatchCompiler:
         if tok == '%op%':
             return 'tok->isOp()'
         if tok == '%or%':
-            return '(tok->tokType() == Token::eBitOp && tok->str() == ' + self._getConstStringId('|') + ')'
+            return '(tok->tokType() == Token::eBitOp && ' + self._compileMatch('|') + ')'
         if tok == '%oror%':
-            return '(tok->tokType() == Token::eLogicalOp && tok->str() == ' + self._getConstStringId('||') + ')'
+            return '(tok->tokType() == Token::eLogicalOp && ' + self._compileMatch('||') + ')'
         if tok == '%str%':
             return '(tok->tokType() == Token::eString)'
         if tok == '%type%':
@@ -192,10 +197,9 @@ class MatchCompiler:
             print("unhandled:" + tok)
         elif tok in tokTypes:
             cond = ' || '.join(['tok->tokType() == Token::{}'.format(tokType) for tokType in tokTypes[tok]])
-            return '(({cond}) && tok->str() == MatchCompiler::makeConstString("{tok}"))'.format(cond=cond, tok=tok)
-        return (
-            '(tok->str() == ' + self._getConstStringId(tok) + ')'
-        )
+            return '(({cond}) && {match})'.format(cond=cond, match=self._compileMatch(tok))
+
+        return self._compileMatch(tok)
 
     def _compilePattern(self, pattern, nr, varid,
                         isFindMatch=False, tokenType="const Token"):
