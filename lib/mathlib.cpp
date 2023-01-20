@@ -529,7 +529,7 @@ template<> std::string MathLib::toString<double>(double value)
     std::string s = result.str();
     if (s == "-0")
         return "0.0";
-    if (s.find_first_of(".e") == std::string::npos)
+    if (utils::no_char_of(s, ".e"))
         return s + ".0";
     return s;
 }

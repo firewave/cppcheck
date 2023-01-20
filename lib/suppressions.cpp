@@ -155,7 +155,7 @@ std::vector<Suppressions::Suppression> Suppressions::parseMultiSuppressComment(c
             iss >> word;
             if (!iss)
                 break;
-            if (word.find_first_not_of("+-*/%#;") == std::string::npos)
+            if (utils::any_char_of(word, "+-*/%#;"))
                 break;
             if (word.compare(0, 11, "symbolName=") == 0) {
                 s.symbolName = word.substr(11);
@@ -299,7 +299,7 @@ bool Suppressions::Suppression::parseComment(std::string comment, std::string *e
         iss >> word;
         if (!iss)
             break;
-        if (word.find_first_not_of("+-*/%#;") == std::string::npos)
+        if (utils::any_char_of(word, "+-*/%#;"))
             break;
         if (word.compare(0,11,"symbolName=")==0)
             symbolName = word.substr(11);

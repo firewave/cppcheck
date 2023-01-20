@@ -24,6 +24,7 @@
 #include "symboldatabase.h"
 #include "token.h"
 #include "tokenize.h"
+#include "utils.h"
 
 #include <set>
 #include <cstring>
@@ -59,7 +60,7 @@ void CheckInternal::checkTokenMatchPatterns()
                 orInComplexPattern(tok, pattern, funcname);
 
             // Check for signs of complex patterns
-            if (pattern.find_first_of("[|") != std::string::npos)
+            if (utils::any_char_of(pattern, "[|"))
                 continue;
             else if (pattern.find("!!") != std::string::npos)
                 continue;

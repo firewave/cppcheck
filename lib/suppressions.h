@@ -22,6 +22,7 @@
 
 #include "config.h"
 #include "errortypes.h"
+#include "utils.h"
 
 #include <cstddef>
 #include <istream>
@@ -103,7 +104,7 @@ public:
         std::string getText() const;
 
         bool isLocal() const {
-            return !fileName.empty() && fileName.find_first_of("?*") == std::string::npos;
+            return !fileName.empty() && utils::no_char_of(fileName, "?*");
         }
 
         bool isSameParameters(const Suppression &other) const {

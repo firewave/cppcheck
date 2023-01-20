@@ -26,6 +26,7 @@
 #include <algorithm>
 #include <array>
 #include <cstddef>
+#include <cstring>
 #include <initializer_list>
 #include <string>
 #include <vector>
@@ -185,6 +186,26 @@ template<typename T, int size>
 std::size_t getArrayLength(const T (& /*unused*/)[size])
 {
     return size;
+}
+
+namespace utils {
+    // std::string::find_first_of() is much slower than its C equivalent strpbrk()
+    // see https://trac.cppcheck.net/ticket/10777
+    static inline std::string::size_type find_first_of(const std::string &s, const char* chars)
+    {
+        const char * const p = strpbrk(s.c_str(), chars);
+        if (p == nullptr)
+            return std::string::npos;
+        return p - s.data();
+    }
+
+    static inline bool any_char_of(const std::string &s, const char* chars) {
+        return find_first_of(s, chars) != std::string::npos;
+    }
+
+    static inline bool no_char_of(const std::string &s, const char* chars) {
+        return find_first_of(s, chars) == std::string::npos;
+    }
 }
 
 #endif

@@ -32,6 +32,7 @@ private:
         TEST_CASE(matchglob);
         TEST_CASE(isStringLiteral);
         TEST_CASE(isCharLiteral);
+        TEST_CASE(findFirstOf);
     }
 
     void isValidGlobPattern() const {
@@ -177,6 +178,25 @@ private:
         ASSERT_EQUALS(true, ::isCharLiteral("u'test'"));
         ASSERT_EQUALS(true, ::isCharLiteral("U'test'"));
         ASSERT_EQUALS(true, ::isCharLiteral("L'test'"));
+    }
+
+    void findFirstOf() const {
+        const std::string s("test");
+
+        ASSERT_EQUALS(std::string::npos, s.find_first_of("\r\n"));
+        ASSERT_EQUALS(std::string::npos, utils::find_first_of(s, "\r\n"));
+        ASSERT_EQUALS(false, utils::any_char_of(s, "\r\n"));
+        ASSERT_EQUALS(true, utils::no_char_of(s, "\r\n"));
+
+        ASSERT_EQUALS(0, s.find_first_of("t"));
+        ASSERT_EQUALS(0, utils::find_first_of(s, "t"));
+        ASSERT_EQUALS(true, utils::any_char_of(s, "t"));
+        ASSERT_EQUALS(false, utils::no_char_of(s, "t"));
+
+        ASSERT_EQUALS(1, s.find_first_of("es"));
+        ASSERT_EQUALS(1, utils::find_first_of(s, "es"));
+        ASSERT_EQUALS(true, utils::any_char_of(s, "es"));
+        ASSERT_EQUALS(false, utils::no_char_of(s, "es"));
     }
 };
 

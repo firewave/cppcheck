@@ -26,6 +26,7 @@
 #include "settings.h"
 #include "standards.h"
 #include "suppressions.h"
+#include "utils.h"
 
 #include <algorithm>
 #include <array>
@@ -604,7 +605,7 @@ static simplecpp::DUI createDUI(const Settings &mSettings, const std::string &cf
         splitcfg(cfg, dui.defines, emptyString);
 
     for (const std::string &def : mSettings.library.defines) {
-        const std::string::size_type pos = def.find_first_of(" (");
+        const std::string::size_type pos = utils::find_first_of(def, " (");
         if (pos == std::string::npos) {
             dui.defines.push_back(def);
             continue;
@@ -799,7 +800,7 @@ void Preprocessor::reportOutput(const simplecpp::OutputList &outputList, bool sh
         case simplecpp::Output::PORTABILITY_BACKSLASH:
             break;
         case simplecpp::Output::MISSING_HEADER: {
-            const std::string::size_type pos1 = out.msg.find_first_of("<\"");
+            const std::string::size_type pos1 = utils::find_first_of(out.msg, "<\"");
             const std::string::size_type pos2 = out.msg.find_first_of(">\"", pos1 + 1U);
             if (pos1 < pos2 && pos2 != std::string::npos)
                 missingInclude(out.location.file(), out.location.line, out.msg.substr(pos1+1, pos2-pos1-1), out.msg[pos1] == '\"' ? UserHeader : SystemHeader);

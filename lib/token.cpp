@@ -24,8 +24,8 @@
 #include "settings.h"
 #include "symboldatabase.h"
 #include "tokenlist.h"
-#include "utils.h"
 #include "tokenrange.h"
+#include "utils.h"
 #include "valueflow.h"
 
 #include <algorithm>
@@ -144,11 +144,11 @@ void Token::update_property_info()
         else if (mStr == "=" || mStr == "<<=" || mStr == ">>=" ||
                  (mStr.size() == 2U && mStr[1] == '=' && std::strchr("+-*/%&^|", mStr[0])))
             tokType(eAssignmentOp);
-        else if (mStr.size() == 1 && mStr.find_first_of(",[]()?:") != std::string::npos)
+        else if (mStr.size() == 1 && utils::any_char_of(mStr, ",[]()?:"))
             tokType(eExtendedOp);
-        else if (mStr=="<<" || mStr==">>" || (mStr.size()==1 && mStr.find_first_of("+-*/%") != std::string::npos))
+        else if (mStr=="<<" || mStr==">>" || (mStr.size()==1 && utils::any_char_of(mStr, "+-*/%")))
             tokType(eArithmeticalOp);
-        else if (mStr.size() == 1 && mStr.find_first_of("&|^~") != std::string::npos)
+        else if (mStr.size() == 1 && utils::any_char_of(mStr, "&|^~"))
             tokType(eBitOp);
         else if (mStr.size() <= 2 &&
                  (mStr == "&&" ||
@@ -169,7 +169,7 @@ void Token::update_property_info()
                  (mStr == "++" ||
                   mStr == "--"))
             tokType(eIncDecOp);
-        else if (mStr.size() == 1 && (mStr.find_first_of("{}") != std::string::npos || (mLink && mStr.find_first_of("<>") != std::string::npos)))
+        else if (mStr.size() == 1 && (utils::any_char_of(mStr, "{}") || (mLink && utils::any_char_of(mStr, "<>"))))
             tokType(eBracket);
         else if (mStr == "...")
             tokType(eEllipsis);
