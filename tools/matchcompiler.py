@@ -785,8 +785,8 @@ def main():
 
     # convert files
     for fi in files:
-        pi = lib_dir + '/' + fi
-        po = build_dir + '/' + fi
+        pi = os.path.join(lib_dir, fi)
+        po = os.path.join(build_dir, fi)
         print(pi + ' => ' + po)
         mc.convertFile(pi, po, line_directive)
 
