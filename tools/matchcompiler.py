@@ -746,8 +746,6 @@ def main():
                         help='directory from which files are read')
     parser.add_argument('--write-dir', default="build",
                         help='directory into which files are written')
-    parser.add_argument('--prefix', default="",
-                        help='prefix for build files')
     parser.add_argument('--line', action='store_true', default=False,
                         help='add line directive to input files into build files')
     parser.add_argument('file', nargs='*',
@@ -788,8 +786,7 @@ def main():
     # convert files
     for fi in files:
         pi = lib_dir + '/' + fi
-        fo = args.prefix + fi
-        po = build_dir + '/' + fo
+        po = build_dir + '/' + fi
         print(pi + ' => ' + po)
         mc.convertFile(pi, po, line_directive)
 

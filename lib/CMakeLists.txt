@@ -8,7 +8,7 @@ function(build_src output filename)
     endif()
 
     get_filename_component(file ${filename} NAME)
-    set(outfile ${CMAKE_CURRENT_BINARY_DIR}/build/mc_${file})
+    set(outfile ${CMAKE_CURRENT_BINARY_DIR}/build/${file})
     set(${output} ${${output}} ${outfile} PARENT_SCOPE)
     if (USE_MATCHCOMPILER STREQUAL "Verify")
         set(verify_option "--verify")
@@ -17,8 +17,7 @@ function(build_src output filename)
         OUTPUT ${outfile}
         COMMAND ${PYTHON_EXECUTABLE} "${PROJECT_SOURCE_DIR}/tools/matchcompiler.py" 
                 --read-dir="${CMAKE_CURRENT_SOURCE_DIR}" 
-                --prefix="mc_" 
-                --line 
+                --line
                 ${verify_option} 
                 ${file}
         DEPENDS ${file} 
