@@ -1,5 +1,5 @@
-file(GLOB_RECURSE hdrs "*.h")
-file(GLOB_RECURSE srcs "*.cpp")
+file(GLOB hdrs "*.h")
+file(GLOB srcs "*.cpp")
 
 function(build_src output filename)
     get_filename_component(file ${filename} NAME)
