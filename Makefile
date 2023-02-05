@@ -31,6 +31,9 @@ ifeq ($(MATCHCOMPILER),yes)
     else
         matchcompiler_S := $(shell $(PYTHON_INTERPRETER) tools/matchcompiler.py)
     endif
+    ifneq ($(.SHELLSTATUS),0)
+        $(error matchcompiler execution failed)
+    endif
     libcppdir:=build
 else
     libcppdir:=lib
