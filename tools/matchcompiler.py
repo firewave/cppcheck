@@ -748,6 +748,8 @@ def main():
                         help='directory into which files are written')
     parser.add_argument('--line', action='store_true', default=False,
                         help='add line directive to input files into build files')
+    parser.add_argument('--recursive', action='store_true', default=False,
+                        help='scan input directory recursively when no files are specified')
     parser.add_argument('file', nargs='*',
                         help='file to compile')
     args = parser.parse_args()
@@ -755,6 +757,9 @@ def main():
     build_dir = args.write_dir
     line_directive = args.line
     files = args.file
+
+    if len(files) > 0 and args.recursive:
+        print('--recursive has not effect since files were explicitly specified.')
 
     # Check if we are invoked from the right place
     if not os.path.exists(lib_dir):
@@ -772,13 +777,15 @@ def main():
 
     if not files:
         # select all *.cpp files in lib_dir
-        for f in glob.glob(lib_dir + '/*.cpp'):
+        for f in glob.glob(lib_dir + '/**/*.cpp', recursive=args.recursive):
             files.append(f[len(lib_dir) + 1:])
 
     # convert files
     for fi in files:
         pi = os.path.join(lib_dir, fi)
         po = os.path.join(build_dir, fi)
+        if args.recursive:
+            os.makedirs(os.path.dirname(po), exist_ok=True)
         print(pi + ' => ' + po)
         mc.convertFile(pi, po, line_directive)
 

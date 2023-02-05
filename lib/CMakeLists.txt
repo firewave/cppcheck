@@ -7,7 +7,10 @@ function(build_src output filename)
         return()
     endif()
 
-    get_filename_component(file ${filename} NAME)
+    file(RELATIVE_PATH file ${CMAKE_CURRENT_SOURCE_DIR} ${filename})
+    get_filename_component(basedir ${file} DIRECTORY)
+    set(basedir "/${basedir}")
+    get_filename_component(basename ${filename} NAME)
     set(outfile ${CMAKE_CURRENT_BINARY_DIR}/build/${file})
     set(${output} ${${output}} ${outfile} PARENT_SCOPE)
     if (USE_MATCHCOMPILER STREQUAL "Verify")
@@ -15,11 +18,12 @@ function(build_src output filename)
     endif()
     add_custom_command(
         OUTPUT ${outfile}
-        COMMAND ${PYTHON_EXECUTABLE} "${PROJECT_SOURCE_DIR}/tools/matchcompiler.py" 
-                --read-dir="${CMAKE_CURRENT_SOURCE_DIR}" 
+        COMMAND ${PYTHON_EXECUTABLE} "${PROJECT_SOURCE_DIR}/tools/matchcompiler.py"
+                --read-dir="${CMAKE_CURRENT_SOURCE_DIR}${basedir}"
+                --write-dir="${CMAKE_CURRENT_BINARY_DIR}/build${basedir}"
                 --line
                 ${verify_option} 
-                ${file}
+                ${basename}
         DEPENDS ${file} 
         DEPENDS ${PROJECT_SOURCE_DIR}/tools/matchcompiler.py
     )
