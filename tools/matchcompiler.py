@@ -762,15 +762,7 @@ def main():
         sys.exit(-1)
 
     # Create build directory if needed
-    try:
-        os.makedirs(build_dir)
-    except OSError as e:
-        # due to race condition in case of parallel build,
-        # makedirs may fail. Ignore that; if there's actual
-        # problem with directory creation, it'll be caught
-        # by the following isdir check
-        if e.errno != errno.EEXIST:
-            raise
+    os.makedirs(build_dir, exist_ok=True)
 
     if not os.path.isdir(build_dir):
         raise Exception(build_dir + ' is not a directory')
