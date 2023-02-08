@@ -115,7 +115,15 @@ bool cppcheck::Platform::platform(const std::string& platformstr, std::string& e
         platform(Unix32);
         platformFile = platformstr;
     }
+    else if (platformstr == "unix32-unsigned") {
+        platform(Unix32);
+        platformFile = platformstr;
+    }
     else if (platformstr == "unix64") {
+        platform(Unix64);
+        platformFile = platformstr;
+    }
+    else if (platformstr == "unix64-unsigned") {
         platform(Unix64);
         platformFile = platformstr;
     }
