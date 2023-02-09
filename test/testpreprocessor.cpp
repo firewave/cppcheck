@@ -48,7 +48,6 @@ public:
     TestPreprocessor()
         : TestFixture("TestPreprocessor")
         , preprocessor0(settings0, this) {
-        settings0.severity.enable(Severity::information);
     }
 
     class OurPreprocessor : public Preprocessor {
@@ -76,6 +75,13 @@ public:
 private:
     Settings settings0;
     Preprocessor preprocessor0;
+
+    void prepareTestInternal() override {
+        settings0 = Settings();
+        preprocessor0 = Preprocessor(settings0, this);
+
+        settings0.severity.enable(Severity::information);
+    }
 
     void run() override {
 
@@ -480,12 +486,12 @@ private:
         simplecpp::TokenList tokens(istr, files, "test.c");
 
         // preprocess code with unix32 platform..
-        settings.platform(Settings::PlatformType::Unix32);
+        PLATFORM(settings, Settings::PlatformType::Unix32);
         preprocessor.setPlatformInfo(&tokens);
         ASSERT_EQUALS("\n1", preprocessor.getcode(tokens, "", files, false));
 
         // preprocess code with unix64 platform..
-        settings.platform(Settings::PlatformType::Unix64);
+        PLATFORM(settings, Settings::PlatformType::Unix64);
         preprocessor.setPlatformInfo(&tokens);
         ASSERT_EQUALS("\n\n\n2", preprocessor.getcode(tokens, "", files, false));
     }

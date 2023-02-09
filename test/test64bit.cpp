@@ -19,6 +19,7 @@
 
 #include "check64bit.h"
 #include "errortypes.h"
+#include "helpers.h"
 #include "settings.h"
 #include "fixture.h"
 #include "tokenize.h"
@@ -30,11 +31,9 @@ public:
     Test64BitPortability() : TestFixture("Test64BitPortability") {}
 
 private:
-    Settings settings;
+    const Settings settings = buildSettings(Severity::portability);
 
     void run() override {
-        settings.severity.enable(Severity::portability);
-
         TEST_CASE(novardecl);
         TEST_CASE(functionpar);
         TEST_CASE(structmember);
@@ -46,9 +45,6 @@ private:
 
 #define check(code) check_(code, __FILE__, __LINE__)
     void check_(const char code[], const char* file, int line) {
-        // Clear the error buffer..
-        errout.str("");
-
         // Tokenize..
         Tokenizer tokenizer(&settings, this);
         LOAD_LIB_2(settings.library, "std.cfg");

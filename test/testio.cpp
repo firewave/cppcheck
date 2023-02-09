@@ -35,11 +35,15 @@ public:
 private:
     Settings settings;
 
-    void run() override {
+    void prepareTestInternal() override {
+        settings = Settings();
+
         LOAD_LIB_2(settings.library, "std.cfg");
         LOAD_LIB_2(settings.library, "windows.cfg");
         LOAD_LIB_2(settings.library, "qt.cfg");
+    }
 
+    void run() override {
         TEST_CASE(coutCerrMisusage);
 
         TEST_CASE(wrongMode_simple);
@@ -94,7 +98,7 @@ private:
         if (portability)
             settings.severity.enable(Severity::portability);
         settings.certainty.setEnabled(Certainty::inconclusive, inconclusive);
-        settings.platform(platform);
+        PLATFORM(settings, platform);
 
         // Tokenize..
         Tokenizer tokenizer(&settings, this);

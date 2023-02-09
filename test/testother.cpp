@@ -44,10 +44,13 @@ public:
 private:
     Settings _settings;
 
-    void run() override {
+    void prepareTestInternal() override {
+        _settings = Settings();
+
         LOAD_LIB_2(_settings.library, "std.cfg");
+    }
 
-
+    void run() override {
         TEST_CASE(emptyBrackets);
 
         TEST_CASE(zeroDiv1);
@@ -1991,7 +1994,7 @@ private:
         ASSERT_EQUALS("", errout.str());
 
         Settings settings1;
-        settings1.platform(Settings::Win64);
+        PLATFORM(settings1, cppcheck::Platform::Win64);
         check("using ui64 = unsigned __int64;\n"
               "ui64 Test(ui64 one, ui64 two) { return one + two; }\n",
               /*filename*/ nullptr, /*experimental*/ false, /*inconclusive*/ true, /*runSimpleChecks*/ true, /*verbose*/ false, &settings1);
@@ -2137,12 +2140,12 @@ private:
                                 "void f(X x) {}";
 
             Settings s32(_settings);
-            s32.platform(cppcheck::Platform::Unix32);
+            PLATFORM(s32, cppcheck::Platform::Unix32);
             check(code, &s32);
             ASSERT_EQUALS("[test.cpp:5]: (performance) Function parameter 'x' should be passed by const reference.\n", errout.str());
 
             Settings s64(_settings);
-            s64.platform(cppcheck::Platform::Unix64);
+            PLATFORM(s64, cppcheck::Platform::Unix64);
             check(code, &s64);
             ASSERT_EQUALS("", errout.str());
         }
@@ -7421,7 +7424,7 @@ private:
 
         // #9040
         Settings settings1;
-        settings1.platform(Settings::Win64);
+        PLATFORM(settings1, cppcheck::Platform::Win64);
         check("using BOOL = unsigned;\n"
               "int i;\n"
               "bool f() {\n"

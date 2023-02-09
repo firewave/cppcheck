@@ -43,10 +43,14 @@ public:
 private:
     Settings settings;
 
-    void run() override {
+    void prepareTestInternal() override {
+        settings = Settings();
+
         LOAD_LIB_2(settings.library, "std.cfg");
         settings.severity.enable(Severity::warning);
+    }
 
+    void run() override {
         TEST_CASE(nullpointerAfterLoop);
         TEST_CASE(nullpointer1);
         TEST_CASE(nullpointer2);

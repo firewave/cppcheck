@@ -36,11 +36,15 @@ public:
 private:
     Settings settings;
 
-    void run() override {
+    void prepareTestInternal() override {
+        settings = Settings();
+
         settings.debugwarnings = true;
         settings.severity.fill();
         settings.certainty.fill();
+    }
 
+    void run() override {
         // don't freak out when the syntax is wrong
 
         TEST_CASE(final_class_x);

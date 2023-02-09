@@ -37,8 +37,10 @@ private:
         // bail out if the tests are not executed from the base folder
         {
             std::ifstream fin("test/testfilelister.cpp");
-            if (!fin.is_open())
+            if (!fin.is_open()) {
+                // TODO: message
                 return;
+            }
         }
 
         TEST_CASE(isDirectory);

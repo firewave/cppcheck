@@ -39,12 +39,16 @@ public:
 private:
     Settings settings;
 
-    void run() override {
+    void prepareTestInternal() override {
+        settings = Settings();
+
         settings.severity.enable(Severity::portability);
 
         // If there are unused templates, keep those
         settings.checkUnusedTemplates = true;
+    }
 
+    void run() override {
         TEST_CASE(template1);
         TEST_CASE(template2);
         TEST_CASE(template3);
@@ -313,7 +317,7 @@ private:
         errout.str("");
 
         settings.debugwarnings = debugwarnings;
-        settings.platform(type);
+        PLATFORM(settings, type);
         Tokenizer tokenizer(&settings, this);
 
         std::istringstream istr(code);

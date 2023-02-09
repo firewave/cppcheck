@@ -64,10 +64,16 @@ private:
         ASSERT_EQUALS(result, executor.check());
     }
 
-    void run() override {
+    void prepareTestInternal() override {
+        settings = Settings();
+
 #if !defined(WIN32) && !defined(__MINGW32__) && !defined(__CYGWIN__)
         LOAD_LIB_2(settings.library, "std.cfg");
+#endif // !WIN32
+    }
 
+    void run() override {
+#if !defined(WIN32) && !defined(__MINGW32__) && !defined(__CYGWIN__)
         TEST_CASE(deadlock_with_many_errors);
         TEST_CASE(many_threads);
         TEST_CASE(many_threads_showtime);

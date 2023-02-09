@@ -34,9 +34,6 @@ private:
 
 #define check(...) check_(__FILE__, __LINE__, __VA_ARGS__)
     void check_(const char* file, int line, const char code[], bool inconclusive = true, const char* filename = "test.cpp") {
-        // Clear the error buffer..
-        errout.str("");
-
         settings.certainty.setEnabled(Certainty::inconclusive, inconclusive);
 
         // Tokenize..
@@ -47,12 +44,16 @@ private:
         runChecks<CheckAutoVariables>(&tokenizer, &settings, this);
     }
 
-    void run() override {
+    void prepareTestInternal() override {
+        settings = Settings();
+
         settings.severity.enable(Severity::warning);
         settings.severity.enable(Severity::style);
         LOAD_LIB_2(settings.library, "std.cfg");
         LOAD_LIB_2(settings.library, "qt.cfg");
+    }
 
+    void run() override {
         TEST_CASE(testautovar1);
         TEST_CASE(testautovar2);
         TEST_CASE(testautovar3); // ticket #2925

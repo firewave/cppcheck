@@ -33,9 +33,13 @@ public:
 private:
     Settings settings;
 
-    void run() override {
-        settings.severity.enable(Severity::style);
+    void prepareTestInternal() override {
+        settings = Settings();
 
+        settings.severity.enable(Severity::style);
+    }
+
+    void run() override {
         TEST_CASE(incondition);
         TEST_CASE(return1);
         TEST_CASE(return2);
@@ -83,7 +87,7 @@ private:
         // Clear the error buffer..
         errout.str("");
 
-        settings.platform(platform);
+        PLATFORM(settings, platform);
 
         // Tokenize..
         Tokenizer tokenizer(&settings, this);

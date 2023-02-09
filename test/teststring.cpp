@@ -33,10 +33,14 @@ public:
 private:
     Settings settings;
 
-    void run() override {
+    void prepareTestInternal() override {
+        settings = Settings();
+
         settings.severity.enable(Severity::warning);
         settings.severity.enable(Severity::style);
+    }
 
+    void run() override {
         TEST_CASE(stringLiteralWrite);
 
         TEST_CASE(alwaysTrueFalseStringCompare);

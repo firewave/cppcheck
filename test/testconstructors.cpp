@@ -67,10 +67,14 @@ private:
         checkClass.constructors();
     }
 
-    void run() override {
+    void prepareTestInternal() override {
+        settings = Settings();
+
         settings.severity.enable(Severity::style);
         settings.severity.enable(Severity::warning);
+    }
 
+    void run() override {
         TEST_CASE(simple1);
         TEST_CASE(simple2);
         TEST_CASE(simple3);

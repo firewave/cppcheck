@@ -257,8 +257,6 @@ private:
 
 #define checkCopyCtorAndEqOperator(code) checkCopyCtorAndEqOperator_(code, __FILE__, __LINE__)
     void checkCopyCtorAndEqOperator_(const char code[], const char* file, int line) {
-        // Clear the error log
-        errout.str("");
         Settings settings;
         settings.severity.enable(Severity::warning);
 
@@ -363,9 +361,6 @@ private:
 
 #define checkExplicitConstructors(code) checkExplicitConstructors_(code, __FILE__, __LINE__)
     void checkExplicitConstructors_(const char code[], const char* file, int line) {
-        // Clear the error log
-        errout.str("");
-
         // Tokenize..
         Tokenizer tokenizer(&settings0, this);
         std::istringstream istr(code);
@@ -515,9 +510,6 @@ private:
 
 #define checkDuplInheritedMembers(code) checkDuplInheritedMembers_(code, __FILE__, __LINE__)
     void checkDuplInheritedMembers_(const char code[], const char* file, int line) {
-        // Clear the error log
-        errout.str("");
-
         // Tokenize..
         Tokenizer tokenizer(&settings1, this);
         std::istringstream istr(code);
@@ -676,9 +668,6 @@ private:
 
 #define checkCopyConstructor(code) checkCopyConstructor_(code, __FILE__, __LINE__)
     void checkCopyConstructor_(const char code[], const char* file, int line) {
-        // Clear the error log
-        errout.str("");
-
         // Tokenize..
         Tokenizer tokenizer(&settings0, this);
         std::istringstream istr(code);
@@ -1123,9 +1112,6 @@ private:
     // Check that operator Equal returns reference to this
 #define checkOpertorEqRetRefThis(code) checkOpertorEqRetRefThis_(code, __FILE__, __LINE__)
     void checkOpertorEqRetRefThis_(const char code[], const char* file, int line) {
-        // Clear the error log
-        errout.str("");
-
         // Tokenize..
         Tokenizer tokenizer(&settings0, this);
         std::istringstream istr(code);
@@ -1597,9 +1583,6 @@ private:
     // Check that operator Equal checks for assignment to self
 #define checkOpertorEqToSelf(code) checkOpertorEqToSelf_(code, __FILE__, __LINE__)
     void checkOpertorEqToSelf_(const char code[], const char* file, int line) {
-        // Clear the error log
-        errout.str("");
-
         // Tokenize..
         Tokenizer tokenizer(&settings1, this);
         std::istringstream istr(code);

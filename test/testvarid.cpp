@@ -33,14 +33,20 @@ struct InternalError;
 class TestVarID : public TestFixture {
 public:
     TestVarID() : TestFixture("TestVarID") {
-        settings.platform(Settings::Unix64);
+    }
+
+private:
+    Settings settings;
+
+    void prepareTestInternal() override {
+        settings = Settings();
+
+        PLATFORM(settings, cppcheck::Platform::Unix64);
         settings.standards.c = Standards::C89;
         settings.standards.cpp = Standards::CPPLatest;
         settings.checkUnusedTemplates = true;
     }
 
-private:
-    Settings settings;
     void run() override {
         TEST_CASE(varid1);
         TEST_CASE(varid2);

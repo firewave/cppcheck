@@ -35,9 +35,6 @@ private:
 
 #define check(...) check_(__FILE__, __LINE__, __VA_ARGS__)
     void check_(const char* file, int line, const char code[], const char *filename = "test.cpp") {
-        // Clear the error buffer..
-        errout.str("");
-
         // Tokenize..
         Tokenizer tokenizer(&settings, this);
         std::istringstream istr(code);
@@ -47,9 +44,13 @@ private:
         runChecks<CheckAssert>(&tokenizer, &settings, this);
     }
 
-    void run() override {
-        settings.severity.enable(Severity::warning);
+    void prepareTestInternal() override {
+        settings = Settings();
 
+        settings.severity.enable(Severity::warning);
+    }
+
+    void run() override {
         TEST_CASE(assignmentInAssert);
         TEST_CASE(functionCallInAssert);
         TEST_CASE(memberFunctionCallInAssert);

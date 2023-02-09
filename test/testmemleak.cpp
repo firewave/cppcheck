@@ -39,7 +39,7 @@ public:
     TestMemleak() : TestFixture("TestMemleak") {}
 
 private:
-    Settings settings;
+    const Settings settings;
 
     void run() override {
         TEST_CASE(testFunctionReturnType);

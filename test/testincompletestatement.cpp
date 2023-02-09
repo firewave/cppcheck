@@ -63,9 +63,13 @@ private:
         checkOther.checkIncompleteStatement();
     }
 
-    void run() override {
-        settings.severity.enable(Severity::warning);
+    void prepareTestInternal() override {
+        settings = Settings();
 
+        settings.severity.enable(Severity::warning);
+    }
+
+    void run() override {
         TEST_CASE(test1);
         TEST_CASE(test2);
         TEST_CASE(test3);

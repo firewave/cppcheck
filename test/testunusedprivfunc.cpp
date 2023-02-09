@@ -38,9 +38,13 @@ public:
 private:
     Settings settings;
 
-    void run() override {
-        settings.severity.enable(Severity::style);
+    void prepareTestInternal() override {
+        settings = Settings();
 
+        settings.severity.enable(Severity::style);
+    }
+
+    void run() override {
         TEST_CASE(test1);
         TEST_CASE(test2);
         TEST_CASE(test3);
@@ -96,7 +100,7 @@ private:
         // Clear the error buffer..
         errout.str("");
 
-        settings.platform(platform);
+        PLATFORM(settings, platform);
 
         // Raw tokens..
         std::vector<std::string> files(1, "test.cpp");

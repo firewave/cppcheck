@@ -34,7 +34,8 @@ private:
     Settings settings;
 
     void run() override {
-        settings.platform(Settings::Unspecified);
+        std::string errstr;
+        PLATFORM(settings, Settings::Unspecified);
         settings.severity.enable(Severity::warning);
         settings.severity.enable(Severity::portability);
 
@@ -45,9 +46,6 @@ private:
 
 #define check(code) check_(code, __FILE__, __LINE__)
     void check_(const char code[], const char* file, int line) {
-        // Clear the error buffer..
-        errout.str("");
-
         // Tokenize..
         Tokenizer tokenizer(&settings, this);
         std::istringstream istr(code);

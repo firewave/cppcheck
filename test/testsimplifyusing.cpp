@@ -38,7 +38,11 @@ private:
     Settings settings1;
     Settings settings2;
 
-    void run() override {
+    void prepareTestInternal() override {
+        settings0 = Settings();
+        settings1 = Settings();
+        settings2 = Settings();
+
         settings0.severity.enable(Severity::style);
         settings2.severity.enable(Severity::style);
 
@@ -46,7 +50,9 @@ private:
         settings0.checkUnusedTemplates = true;
         settings1.checkUnusedTemplates = true;
         settings2.checkUnusedTemplates = true;
+    }
 
+    void run() override {
         TEST_CASE(simplifyUsing1);
         TEST_CASE(simplifyUsing2);
         TEST_CASE(simplifyUsing3);
@@ -103,7 +109,7 @@ private:
 
         settings0.certainty.enable(Certainty::inconclusive);
         settings0.debugwarnings = debugwarnings;
-        settings0.platform(type);
+        PLATFORM(settings0, type);
         Tokenizer tokenizer(&settings0, this);
 
         std::istringstream istr(code);

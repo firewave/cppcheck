@@ -47,9 +47,13 @@ private:
         checkPostfixOperator.postfixOperator();
     }
 
-    void run() override {
-        settings.severity.enable(Severity::performance);
+    void prepareTestInternal() override {
+        settings = Settings();
 
+        settings.severity.enable(Severity::performance);
+    }
+
+    void run() override {
         TEST_CASE(testsimple);
         TEST_CASE(testfor);
         TEST_CASE(testvolatile);

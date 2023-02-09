@@ -31,9 +31,13 @@ public:
 private:
     Settings settings;
 
-    void run() override {
-        settings.addEnabled("internal");
+    void prepareTestInternal() override {
+        settings = Settings();
 
+        settings.addEnabled("internal");
+    }
+
+    void run() override {
         TEST_CASE(simplePatternInTokenMatch);
         TEST_CASE(complexPatternInTokenSimpleMatch);
         TEST_CASE(simplePatternSquareBrackets);

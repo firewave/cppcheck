@@ -19,6 +19,7 @@
 
 #include "checkvaarg.h"
 #include "errortypes.h"
+#include "helpers.h"
 #include "settings.h"
 #include "fixture.h"
 #include "tokenize.h"
@@ -30,7 +31,7 @@ public:
     TestVaarg() : TestFixture("TestVaarg") {}
 
 private:
-    Settings settings;
+    const Settings settings = buildSettings(Severity::warning);
 
 #define check(code) check_(code, __FILE__, __LINE__)
     void check_(const char code[], const char* file, int line) {
@@ -47,8 +48,6 @@ private:
     }
 
     void run() override {
-        settings.severity.enable(Severity::warning);
-
         TEST_CASE(wrongParameterTo_va_start);
         TEST_CASE(referenceAs_va_start);
         TEST_CASE(va_end_missing);

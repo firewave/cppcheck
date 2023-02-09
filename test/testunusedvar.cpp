@@ -34,11 +34,15 @@ public:
 private:
     Settings settings;
 
-    void run() override {
+    void prepareTestInternal() override {
+        settings = Settings();
+
         settings.severity.enable(Severity::style);
         settings.checkLibrary = true;
         LOAD_LIB_2(settings.library, "std.cfg");
+    }
 
+    void run() override {
         TEST_CASE(isRecordTypeWithoutSideEffects);
         TEST_CASE(cleanFunction);
 

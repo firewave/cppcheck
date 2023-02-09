@@ -87,4 +87,10 @@ private:
     const std::string mFullPath;
 };
 
+Settings buildSettings(Severity::SeverityType severity) {
+    Settings settings;
+    settings.severity.enable(severity);
+    return settings;
+}
+
 #endif // helpersH

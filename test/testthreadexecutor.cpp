@@ -64,9 +64,13 @@ private:
         ASSERT_EQUALS(result, executor.check());
     }
 
-    void run() override {
-        LOAD_LIB_2(settings.library, "std.cfg");
+    void prepareTestInternal() override {
+        settings = Settings();
 
+        LOAD_LIB_2(settings.library, "std.cfg");
+    }
+
+    void run() override {
         TEST_CASE(deadlock_with_many_errors);
         TEST_CASE(many_threads);
         TEST_CASE(many_threads_showtime);

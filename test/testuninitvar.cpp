@@ -37,9 +37,13 @@ public:
 private:
     Settings settings;
 
-    void run() override {
-        LOAD_LIB_2(settings.library, "std.cfg");
+    void prepareTestInternal() override {
+        settings = Settings();
 
+        LOAD_LIB_2(settings.library, "std.cfg");
+    }
+
+    void run() override {
         TEST_CASE(uninitvar1);
         TEST_CASE(uninitvar_warn_once); // only write 1 warning at a time
         TEST_CASE(uninitvar_decl);      // handling various types in C and C++ files

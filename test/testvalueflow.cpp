@@ -49,7 +49,9 @@ public:
 private:
     Settings settings;
 
-    void run() override {
+    void prepareTestInternal() override {
+        settings = Settings();
+
         // strcpy, abort cfg
         const char cfg[] = "<?xml version=\"1.0\"?>\n"
                            "<def>\n"
@@ -58,7 +60,9 @@ private:
                            "</def>";
         ASSERT_EQUALS(true, settings.library.loadxmldata(cfg, sizeof(cfg)));
         LOAD_LIB_2(settings.library, "std.cfg");
+    }
 
+    void run() override {
         TEST_CASE(valueFlowNumber);
         TEST_CASE(valueFlowString);
         TEST_CASE(valueFlowPointerAlias);
@@ -989,7 +993,7 @@ private:
 
         // ~
         code  = "x = ~0U;";
-        settings.platform(cppcheck::Platform::Native); // ensure platform is native
+        PLATFORM(settings, cppcheck::Platform::Native); // ensure platform is native
         values = tokenValues(code,"~");
         ASSERT_EQUALS(1U, values.size());
         ASSERT_EQUALS(~0U, values.back().intvalue);

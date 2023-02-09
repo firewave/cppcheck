@@ -32,9 +32,13 @@ public:
 private:
     Settings settings;
 
-    void run() override {
-        settings.severity.fill();
+    void prepareTestInternal() override {
+        settings = Settings();
 
+        settings.severity.fill();
+    }
+
+    void run() override {
         TEST_CASE(destructors);
         TEST_CASE(deallocThrow1);
         TEST_CASE(deallocThrow2);

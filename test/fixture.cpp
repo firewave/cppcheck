@@ -77,8 +77,8 @@ std::set<std::string> TestFixture::missingLibs;
 
 TestFixture::TestFixture(const char * const _name)
     : mVerbose(false),
-    exename(),
     quiet_tests(false),
+    exename(),
     classname(_name)
 {
     TestRegistry::theInstance().addTest(this);
@@ -90,6 +90,9 @@ bool TestFixture::prepareTest(const char testname[])
     mVerbose = false;
     mTemplateFormat.clear();
     mTemplateLocation.clear();
+    errout.str("");
+    output.str("");
+    prepareTestInternal();
 
     // Check if tests should be executed
     if (testToRun.empty() || testToRun == testname) {

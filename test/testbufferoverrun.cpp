@@ -48,9 +48,6 @@ private:
 
 #define check(...) check_(__FILE__, __LINE__, __VA_ARGS__)
     void check_(const char* file, int line, const char code[], const char filename[] = "test.cpp") {
-        // Clear the error buffer..
-        errout.str("");
-
         settings0.certainty.enable(Certainty::inconclusive);
 
         // Tokenize..
@@ -67,18 +64,12 @@ private:
         std::istringstream istr(code);
         ASSERT_LOC(tokenizer.tokenize(istr, filename), file, line);
 
-        // Clear the error buffer..
-        errout.str("");
-
         // Check for buffer overruns..
         runChecks<CheckBufferOverrun>(&tokenizer, &settings, this);
     }
 
     void checkP(const char code[], const char* filename = "test.cpp")
     {
-        // Clear the error buffer..
-        errout.str("");
-
         Settings* settings = &settings0;
         settings->severity.enable(Severity::style);
         settings->severity.enable(Severity::warning);
@@ -112,13 +103,16 @@ private:
         runChecks<CheckBufferOverrun>(&tokenizer, settings, this);
     }
 
-    void run() override {
+    void prepareTestInternal() override {
+        settings0 = Settings();
+
         LOAD_LIB_2(settings0.library, "std.cfg");
 
         settings0.severity.enable(Severity::warning);
         settings0.severity.enable(Severity::style);
-        settings0.severity.enable(Severity::portability);
+        settings0.severity.enable(Severity::portability);    }
 
+    void run() override {
         TEST_CASE(noerr1);
         TEST_CASE(noerr2);
         TEST_CASE(noerr3);
@@ -5074,9 +5068,6 @@ private:
 
 #define ctu(code) ctu_(code, __FILE__, __LINE__)
     void ctu_(const char code[], const char* file, int line) {
-        // Clear the error buffer..
-        errout.str("");
-
         // Tokenize..
         Tokenizer tokenizer(&settings0, this);
         std::istringstream istr(code);

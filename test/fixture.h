@@ -45,16 +45,20 @@ private:
     std::string mTemplateLocation;
     std::string mTestname;
 
-protected:
-    std::string exename;
     std::string testToRun;
     bool quiet_tests;
+
+    std::string getLocationStr(const char * const filename, const unsigned int linenr) const;
+
+    void processOptions(const options& args);
+
+protected:
+    std::string exename;
 
     virtual void run() = 0;
 
     bool prepareTest(const char testname[]);
-    std::string getLocationStr(const char * const filename, const unsigned int linenr) const;
-
+    virtual void prepareTestInternal() {}
     bool assert_(const char * const filename, const unsigned int linenr, const bool condition) const;
 
     template<typename T, typename U>
@@ -103,8 +107,6 @@ protected:
         mTemplateLocation = "{file}:{line}:note:{info}";
     }
 
-    void processOptions(const options& args);
-
     template<typename T>
     static T& getCheck()
     {
@@ -126,12 +128,12 @@ public:
     void reportOut(const std::string &outmsg, Color c = Color::Reset) override;
     void reportErr(const ErrorMessage &msg) override;
     void run(const std::string &str);
-    static void printHelp();
     const std::string classname;
 
     explicit TestFixture(const char * const _name);
     ~TestFixture() override {}
 
+    static void printHelp();
     static std::size_t runTests(const options& args);
 };
 
@@ -165,5 +167,7 @@ extern std::ostringstream output;
             return; \
         } \
 } while (false)
+
+#define PLATFORM( S, P ) do { std::string errstr; assertEquals(__FILE__, __LINE__, true, S.platform(cppcheck::Platform::platformString(P), errstr, {exename.c_str()}), errstr); } while (false)
 
 #endif // fixtureH

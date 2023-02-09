@@ -29,7 +29,7 @@ public:
     TestTokenList() : TestFixture("TestTokenList") {}
 
 private:
-    Settings settings;
+    const Settings settings;
 
     void run() override {
         TEST_CASE(testaddtoken1);

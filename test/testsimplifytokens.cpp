@@ -39,7 +39,12 @@ private:
     Settings settings_std;
     Settings settings_windows;
 
-    void run() override {
+    void prepareTestInternal() override {
+        settings0 = Settings();
+        settings1 = Settings();
+        settings_std = Settings();
+        settings_windows = Settings();
+
         LOAD_LIB_2(settings_std.library, "std.cfg");
         LOAD_LIB_2(settings_windows.library, "windows.cfg");
         settings0.severity.enable(Severity::portability);
@@ -51,7 +56,9 @@ private:
         settings1.checkUnusedTemplates = true;
         settings_std.checkUnusedTemplates = true;
         settings_windows.checkUnusedTemplates = true;
+    }
 
+    void run() override {
         TEST_CASE(combine_strings);
         TEST_CASE(combine_wstrings);
         TEST_CASE(combine_ustrings);
@@ -178,7 +185,7 @@ private:
     std::string tok_(const char* file, int line, const char code[], bool simplify = true, Settings::PlatformType type = Settings::Native) {
         errout.str("");
 
-        settings0.platform(type);
+        PLATFORM(settings0, type);
         Tokenizer tokenizer(&settings0, this);
 
         std::istringstream istr(code);
@@ -207,7 +214,7 @@ private:
         errout.str("");
 
         settings1.debugwarnings = true;
-        settings1.platform(platform);
+        PLATFORM(settings1, platform);
         settings1.standards.cpp = cpp11 ? Standards::CPP11 : Standards::CPP03;
 
         // tokenize..

@@ -48,7 +48,12 @@ private:
     Settings settings2;
     Settings settings_windows;
 
-    void run() override {
+    void prepareTestInternal() override {
+        settings0 = Settings();
+        settings1 = Settings();
+        settings2 = Settings();
+        settings_windows = Settings();
+
         LOAD_LIB_2(settings_windows.library, "windows.cfg");
 
         // If there are unused templates, keep those
@@ -61,7 +66,9 @@ private:
         settings0.libraries.emplace_back("qt");
         settings1.libraries.emplace_back("qt");
         settings2.libraries.emplace_back("qt");
+    }
 
+    void run() override {
         TEST_CASE(tokenize1);
         TEST_CASE(tokenize2);
         TEST_CASE(tokenize4);
@@ -472,7 +479,7 @@ private:
         errout.str("");
 
         settings1.debugwarnings = true;
-        settings1.platform(platform);
+        PLATFORM(settings1, platform);
         settings1.standards.cpp = std;
 
         // tokenize..
@@ -501,7 +508,7 @@ private:
         errout.str("");
 
         settings_windows.debugwarnings = true;
-        settings_windows.platform(platform);
+        PLATFORM(settings_windows, platform);
         settings_windows.standards.cpp = cpp11 ? Standards::CPP11 : Standards::CPP03;
 
         // tokenize..
