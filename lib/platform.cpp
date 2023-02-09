@@ -87,63 +87,65 @@ bool cppcheck::Platform::platform(cppcheck::Platform::PlatformType type)
 
 bool cppcheck::Platform::platform(const std::string& platformstr, std::string& errstr, const std::vector<std::string>& paths, bool verbose)
 {
+    PlatformType type;
     std::string platformFile;
 
     if (platformstr == "win32A") {
-        platform(Win32A);
+        type = Win32A;
         platformFile = "win32a";
         std::cout << "platform 'win32A' is deprecated. Please use 'win32a' instead." << std::endl;
     }
     else if (platformstr == "win32a") {
-        platform(Win32A);
+        type = Win32A;
         platformFile = platformstr;
     }
     else if (platformstr == "win32W") {
-        platform(Win32W);
+        type = Win32W;
         platformFile = "win32w";
         std::cout << "platform 'win32W' is deprecated. Please use 'win32w' instead." << std::endl;
     }
     else if (platformstr == "win32w") {
-        platform(Win32W);
+        type = Win32W;
         platformFile = platformstr;
     }
     else if (platformstr == "win64") {
-        platform(Win64);
+        type = Win64;
         platformFile = platformstr;
     }
     else if (platformstr == "unix32") {
-        platform(Unix32);
+        type = Unix32;
         platformFile = platformstr;
     }
     else if (platformstr == "unix32-unsigned") {
-        platform(Unix32);
+        type = Unix32;
         platformFile = platformstr;
     }
     else if (platformstr == "unix64") {
-        platform(Unix64);
+        type = Unix64;
         platformFile = platformstr;
     }
     else if (platformstr == "unix64-unsigned") {
-        platform(Unix64);
+        type = Unix64;
         platformFile = platformstr;
     }
     else if (platformstr == "native") {
-        platform(Native);
+        type = Native;
     }
     else if (platformstr == "unspecified") {
-        platform(Unspecified);
+        type = Unspecified;
     }
     else if (paths.empty()) {
         errstr = "unrecognized platform: '" + platformstr + "' (no lookup).";
         return false;
     }
     else {
-        platform(PlatformFile);
+        type = PlatformFile;
         platformFile = platformstr;
     }
 
-    if (platformFile.empty())
+    if (platformstr.empty()) {
         return true;
+    }
 
     bool found = false;
     for (const std::string& path : paths) {
@@ -159,6 +161,7 @@ bool cppcheck::Platform::platform(const std::string& platformstr, std::string& e
         return false;
     }
 
+    platform(type);
     return true;
 }
 
