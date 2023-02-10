@@ -303,6 +303,18 @@ static void createDumpFile(const Settings& settings,
     fdump << "<dumps" << language << ">" << std::endl;
     fdump << "  <platform"
           << " name=\"" << settings.platform.toString() << '\"'
+          << " sizeof_bool=\"" << settings.platform.sizeof_bool << '\"'
+          << " sizeof_short=\"" << settings.platform.sizeof_short << '\"'
+          << " sizeof_int=\"" << settings.platform.sizeof_int << '\"'
+          << " sizeof_long=\"" << settings.platform.sizeof_long << '\"'
+          << " sizeof_long_long=\"" << settings.platform.sizeof_long_long << '\"'
+          << " sizeof_float=\"" << settings.platform.sizeof_float << '\"'
+          << " sizeof_double=\"" << settings.platform.sizeof_double << '\"'
+          << " sizeof_long_double=\"" << settings.platform.sizeof_long_double << '\"'
+          << " sizeof_wchar_t=\"" << settings.platform.sizeof_wchar_t << '\"'
+          << " sizeof_size_t=\"" << settings.platform.sizeof_size_t << '\"'
+          << " defaultSign=\"" << settings.platform.defaultSign << '\"'
+          << " windows=\"" << settings.platform.windows << '\"'
           << " char_bit=\"" << settings.platform.char_bit << '\"'
           << " short_bit=\"" << settings.platform.short_bit << '\"'
           << " int_bit=\"" << settings.platform.int_bit << '\"'

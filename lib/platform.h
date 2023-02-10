@@ -100,6 +100,8 @@ namespace cppcheck {
 
         char defaultSign;  // unsigned:'u', signed:'s', unknown:'\0'
 
+        bool windows;
+
         enum Type {
             Unspecified, // No platform specified
             Native, // whatever system this code was compiled on
@@ -130,16 +132,14 @@ namespace cppcheck {
         bool loadFromFile(const char exename[], const std::string &filename, bool verbose = false);
 
         /** load platform from xml document, primarily for testing */
-        bool loadFromXmlDocument(const tinyxml2::XMLDocument *doc);
+        bool loadFromXmlDocument(const tinyxml2::XMLDocument *doc, std::string &errstr);
 
         /**
          * @brief Returns true if platform type is Windows
          * @return true if Windows platform type.
          */
         bool isWindows() const {
-            return type == Type::Win32A ||
-                   type == Type::Win32W ||
-                   type == Type::Win64;
+            return windows;
         }
 
         const char *toString() const {

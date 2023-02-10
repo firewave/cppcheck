@@ -62,6 +62,7 @@ bool cppcheck::Platform::set(Type t)
         } else {
             defaultSign = std::numeric_limits<char>::is_signed ? 's' : 'u';
         }
+        windows = false;
         char_bit = 8;
         short_bit = char_bit * sizeof_short;
         int_bit = char_bit * sizeof_int;
@@ -236,7 +237,8 @@ bool cppcheck::Platform::loadFromFile(const char exename[], const std::string &f
     if (!success)
         return false;
 
-    return loadFromXmlDocument(&doc);
+    std::string errstr;
+    return loadFromXmlDocument(&doc, errstr);
 }
 
 static unsigned int xmlTextAsUInt(const tinyxml2::XMLElement* node, bool& error)
@@ -247,21 +249,43 @@ static unsigned int xmlTextAsUInt(const tinyxml2::XMLElement* node, bool& error)
     return retval;
 }
 
-bool cppcheck::Platform::loadFromXmlDocument(const tinyxml2::XMLDocument *doc)
+bool cppcheck::Platform::loadFromXmlDocument(const tinyxml2::XMLDocument *doc, std::string &errstr)
 {
     const tinyxml2::XMLElement * const rootnode = doc->FirstChildElement();
 
-    if (!rootnode || std::strcmp(rootnode->Name(), "platform") != 0)
+    if (!rootnode) {
+        errstr = "no root element present";
         return false;
+    }
 
+    if (std::strcmp(rootnode->Name(), "platform") != 0) {
+        errstr = "root element is not named 'platform'";
+        return false;
+    }
+
+    // TODO: error out on missing entries
     bool error = false;
-    for (const tinyxml2::XMLElement *node = rootnode->FirstChildElement(); node; node = node->NextSiblingElement()) {
-        if (std::strcmp(node->Name(), "default-sign") == 0) {
+    for (const tinyxml2::XMLElement *node = rootnode->FirstChildElement(); node && !error; node = node->NextSiblingElement()) {
+        if (std::strcmp(node->Name(), "windows") == 0) {
+            // TODO: default to false
+            const char* str = node->GetText();
+            if (std::strcmp(str, "true") == 0)
+                windows = true;
+            else if (std::strcmp(str, "false") == 0)
+                windows = false;
+            else {
+                error = true;
+                errstr = "invalid value for 'windows': " + std::string(str);
+            }
+        }
+        else if (std::strcmp(node->Name(), "default-sign") == 0) {
             const char* str = node->GetText();
             if (str)
                 defaultSign = *str;
-            else
+            else {
                 error = true;
+                errstr = "'defaultSign' element is empty";
+            }
         } else if (std::strcmp(node->Name(), "char_bit") == 0)
             char_bit = xmlTextAsUInt(node, error);
         else if (std::strcmp(node->Name(), "sizeof") == 0) {
@@ -288,6 +312,10 @@ bool cppcheck::Platform::loadFromXmlDocument(const tinyxml2::XMLDocument *doc)
                     sizeof_size_t = xmlTextAsUInt(sz, error);
                 else if (std::strcmp(sz->Name(), "wchar_t") == 0)
                     sizeof_wchar_t = xmlTextAsUInt(sz, error);
+                else {
+                    error = true;
+                    errstr = "unknown 'sizeof' sub-element: " + std::string(sz->Name());
+                }
             }
         }
     }
