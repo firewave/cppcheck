@@ -155,7 +155,7 @@ class MatchCompiler:
         self._matchFunctionCache[signature] = id
 
     @staticmethod
-    def _compileCmd(tok):
+    def _compileCmd(tok, skipTokType=False):
         if tok == '%any%':
             return 'true'
         elif tok == '%assign%':
@@ -173,9 +173,9 @@ class MatchCompiler:
         elif tok == '%op%':
             return 'tok->isOp()'
         elif tok == '%or%':
-            return '(tok->tokType() == Token::eBitOp && tok->str() == MatchCompiler::makeConstString("|") )'
+            return '(tok->tokType() == Token::eBitOp && ' + MatchCompiler._compileCmd('|') + ')'
         elif tok == '%oror%':
-            return '(tok->tokType() == Token::eLogicalOp && tok->str() == MatchCompiler::makeConstString("||"))'
+            return '(tok->tokType() == Token::eLogicalOp && ' + MatchCompiler._compileCmd('||') + ')'
         elif tok == '%str%':
             return '(tok->tokType() == Token::eString)'
         elif tok == '%type%':
@@ -188,9 +188,9 @@ class MatchCompiler:
             return '(tok->isName() && tok->varId() == varid)'
         elif (len(tok) > 2) and (tok[0] == "%"):
             raise Exception('unhandled pattern: ' + tok)
-        elif tok in tokTypes:
+        elif not skipTokType and tok in tokTypes:
             cond = ' || '.join(['tok->tokType() == Token::{}'.format(tokType) for tokType in tokTypes[tok]])
-            return '(({cond}) && tok->str() == MatchCompiler::makeConstString("{tok}"))'.format(cond=cond, tok=tok)
+            return '(({cond}) && '.format(cond=cond) + MatchCompiler._compileCmd(tok, True) + ')'
         return (
             '(tok->str() == MatchCompiler::makeConstString("' + tok + '"))'
         )
@@ -257,7 +257,7 @@ class MatchCompiler:
 
             # !!a
             elif tok[0:2] == "!!":
-                ret += '    if (tok && tok->str() == MatchCompiler::makeConstString("' + tok[2:] + '"))\n'
+                ret += '    if (tok && ' + self._compileCmd(tok[2:]) + ')\n'
                 ret += '        ' + returnStatement
                 gotoNextToken = '    tok = tok ? tok->next() : nullptr;\n'
 
