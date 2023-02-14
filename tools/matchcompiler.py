@@ -98,9 +98,10 @@ tokTypes = {
 
 class MatchCompiler:
 
-    def __init__(self, verify_mode=False, show_skipped=False):
+    def __init__(self, verify_mode=False, show_skipped=False, single_char_opt=False):
         self._verifyMode = verify_mode
         self._showSkipped = show_skipped
+        self._singleCharOpt = single_char_opt
         self._reset()
 
     def _reset(self):
@@ -154,8 +155,7 @@ class MatchCompiler:
 
         self._matchFunctionCache[signature] = id
 
-    @staticmethod
-    def _compileCmd(tok, skipTokType=False):
+    def _compileCmd(self, tok, skipTokType=False):
         if tok == '%any%':
             return 'true'
         elif tok == '%assign%':
@@ -173,9 +173,9 @@ class MatchCompiler:
         elif tok == '%op%':
             return 'tok->isOp()'
         elif tok == '%or%':
-            return '(tok->tokType() == Token::eBitOp && ' + MatchCompiler._compileCmd('|') + ')'
+            return '(tok->tokType() == Token::eBitOp && ' + self._compileCmd('|') + ')'
         elif tok == '%oror%':
-            return '(tok->tokType() == Token::eLogicalOp && ' + MatchCompiler._compileCmd('||') + ')'
+            return '(tok->tokType() == Token::eLogicalOp && ' + self._compileCmd('||') + ')'
         elif tok == '%str%':
             return '(tok->tokType() == Token::eString)'
         elif tok == '%type%':
@@ -190,7 +190,9 @@ class MatchCompiler:
             raise Exception('unhandled pattern: ' + tok)
         elif not skipTokType and tok in tokTypes:
             cond = ' || '.join(['tok->tokType() == Token::{}'.format(tokType) for tokType in tokTypes[tok]])
-            return '(({cond}) && '.format(cond=cond) + MatchCompiler._compileCmd(tok, True) + ')'
+            return '(({cond}) && '.format(cond=cond) + self._compileCmd(tok, True) + ')'
+        elif self._singleCharOpt and len(tok) == 1:
+            return "(tok->str().size() == 1U && tok->str()[0] == '" + tok + "')"
         return (
             '(tok->str() == MatchCompiler::makeConstString("' + tok + '"))'
         )
@@ -757,6 +759,8 @@ def main():
                         help='add line directive to input files into build files')
     parser.add_argument('--dry-run', action='store_true', default=False,
                         help='perform match compilation wthout writing the output files')
+    parser.add_argument('--single-char-opt', action='store_true', default=True,
+                        help='do not use ConstString for single character comparisons')
     parser.add_argument('file', nargs='*',
                         help='file to compile')
     args = parser.parse_args()
@@ -785,7 +789,8 @@ def main():
         raise Exception(build_dir + ' is not a directory')
 
     mc = MatchCompiler(verify_mode=args.verify,
-                       show_skipped=args.show_skipped)
+                       show_skipped=args.show_skipped,
+                       single_char_opt=args.single_char_opt)
 
     if not files:
         # select all *.cpp files in lib_dir
