@@ -676,7 +676,7 @@ class MatchCompiler:
         line = line.replace('MatchCompiler::makeConstStringEnd', '")')
         return line
 
-    def convertFile(self, srcname, destname, line_directive):
+    def convertFile(self, srcname, destname, line_directive, write_file):
         self._reset()
 
         fin = io.open(srcname, "rt", encoding="utf-8")
@@ -708,6 +708,9 @@ class MatchCompiler:
                 modified = True
 
             code += line
+
+        if not write_file:
+            return
 
         # Compute matchFunctions
         strFunctions = u''
@@ -752,6 +755,8 @@ def main():
                         help='prefix for build files')
     parser.add_argument('--line', action='store_true', default=False,
                         help='add line directive to input files into build files')
+    parser.add_argument('--dry-run', action='store_true', default=False,
+                        help='perform match compilation wthout writing the output files')
     parser.add_argument('file', nargs='*',
                         help='file to compile')
     args = parser.parse_args()
@@ -793,7 +798,7 @@ def main():
         fo = args.prefix + fi
         po = build_dir + '/' + fo
         print(pi + ' => ' + po)
-        mc.convertFile(pi, po, line_directive)
+        mc.convertFile(pi, po, line_directive, not args.dry_run)
 
 if __name__ == '__main__':
     main()
