@@ -187,7 +187,7 @@ class MatchCompiler:
         elif tok == '%varid%':
             return '(tok->isName() && tok->varId() == varid)'
         elif (len(tok) > 2) and (tok[0] == "%"):
-            print("unhandled:" + tok)
+            raise Exception('unhandled pattern: ' + tok)
         elif tok in tokTypes:
             cond = ' || '.join(['tok->tokType() == Token::{}'.format(tokType) for tokType in tokTypes[tok]])
             return '(({cond}) && tok->str() == MatchCompiler::makeConstString("{tok}"))'.format(cond=cond, tok=tok)
