@@ -29,7 +29,7 @@ public:
     TestTokenList() : TestFixture("TestTokenList") {}
 
 private:
-    Settings settings;
+    const Settings settings;
 
     void run() override {
         TEST_CASE(testaddtoken1);
@@ -48,8 +48,9 @@ private:
 
     void testaddtoken2() {
         const std::string code = "0xF0000000";
-        settings.int_bit = 32;
-        TokenList tokenlist(&settings);
+        Settings settings1;
+        settings1.int_bit = 32;
+        TokenList tokenlist(&settings1);
         tokenlist.addtoken(code, 1, 1, false);
         ASSERT_EQUALS("0xF0000000", tokenlist.front()->str());
     }
