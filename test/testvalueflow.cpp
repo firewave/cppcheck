@@ -47,7 +47,7 @@ public:
     TestValueFlow() : TestFixture("TestValueFlow") {}
 
 private:
-    Settings settings;
+    Settings settings = settingsBuilder().library("std.cfg").build();
 
     void run() override {
         // strcpy, abort cfg
@@ -57,7 +57,6 @@ private:
                            "  <function name=\"abort\"> <noreturn>true</noreturn> </function>\n" // abort is a noreturn function
                            "</def>";
         ASSERT_EQUALS(true, settings.library.loadxmldata(cfg, sizeof(cfg)));
-        LOAD_LIB_2(settings.library, "std.cfg");
 
         TEST_CASE(valueFlowNumber);
         TEST_CASE(valueFlowString);
@@ -6440,8 +6439,7 @@ private:
     void valueFlowSafeFunctionParameterValues() {
         const char *code;
         std::list<ValueFlow::Value> values;
-        Settings s;
-        LOAD_LIB_2(s.library, "std.cfg");
+        Settings s = settingsBuilder().library("std.cfg").build();
         s.safeChecks.classes = s.safeChecks.externalFunctions = s.safeChecks.internalFunctions = true;
 
         code = "short f(short x) {\n"
@@ -6492,8 +6490,7 @@ private:
     void valueFlowUnknownFunctionReturn() {
         const char *code;
         std::list<ValueFlow::Value> values;
-        Settings s;
-        LOAD_LIB_2(s.library, "std.cfg");
+        Settings s = settingsBuilder().library("std.cfg").build();
         s.checkUnknownFunctionReturn.insert("rand");
 
         code = "x = rand();";

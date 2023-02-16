@@ -40,19 +40,13 @@ public:
     TestCondition() : TestFixture("TestCondition") {}
 
 private:
-    Settings settings0;
-    Settings settings1;
+    Settings settings0 = settingsBuilder().library("qt.cfg").library("std.cfg").severity(Severity::style).severity(Severity::warning).build();
+    Settings settings1 = settingsBuilder().severity(Severity::style).severity(Severity::warning).build();
 
     void run() override {
         // known platform..
         PLATFORM(settings0, cppcheck::Platform::Native);
         PLATFORM(settings1, cppcheck::Platform::Native);
-
-        LOAD_LIB_2(settings0.library, "qt.cfg");
-        LOAD_LIB_2(settings0.library, "std.cfg");
-
-        settings0.severity.enable(Severity::style);
-        settings0.severity.enable(Severity::warning);
 
         const char cfg[] = "<?xml version=\"1.0\"?>\n"
                            "<def>\n"
@@ -60,8 +54,6 @@ private:
                            "</def>";
         tinyxml2::XMLDocument xmldoc;
         xmldoc.Parse(cfg, sizeof(cfg));
-        settings1.severity.enable(Severity::style);
-        settings1.severity.enable(Severity::warning);
         settings1.library.load(xmldoc);
 
         TEST_CASE(assignAndCompare);   // assignment and comparison don't match
@@ -5578,8 +5570,7 @@ private:
     }
 
     void compareOutOfTypeRange() {
-        Settings settingsUnix64;
-        settingsUnix64.severity.enable(Severity::style);
+        Settings settingsUnix64 = settingsBuilder().severity(Severity::style).build();
         PLATFORM(settingsUnix64, cppcheck::Platform::PlatformType::Unix64);
 
         check("void f(unsigned char c) {\n"

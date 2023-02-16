@@ -39,7 +39,7 @@ public:
     TestMemleak() : TestFixture("TestMemleak") {}
 
 private:
-    Settings settings;
+    const Settings settings;
 
     void run() override {
         TEST_CASE(testFunctionReturnType);
@@ -126,33 +126,25 @@ public:
     TestMemleakInFunction() : TestFixture("TestMemleakInFunction") {}
 
 private:
-    Settings settings0;
-    Settings settings1;
-    Settings settings2;
+    const Settings settings = settingsBuilder().library("std.cfg").library("posix.cfg").build();
 
 #define check(...) check_(__FILE__, __LINE__, __VA_ARGS__)
     void check_(const char* file, int line, const char code[]) {
         // Clear the error buffer..
         errout.str("");
 
-        Settings *settings = &settings1;
-
         // Tokenize..
-        Tokenizer tokenizer(settings, this);
+        Tokenizer tokenizer(&settings, this);
         std::istringstream istr(code);
         ASSERT_LOC(tokenizer.tokenize(istr, "test.cpp"), file, line);
 
         // Check for memory leaks..
-        CheckMemoryLeakInFunction checkMemoryLeak(&tokenizer, settings, this);
+        CheckMemoryLeakInFunction checkMemoryLeak(&tokenizer, &settings, this);
         checkMemoryLeak.checkReallocUsage();
     }
 
 
     void run() override {
-        LOAD_LIB_2(settings1.library, "std.cfg");
-        LOAD_LIB_2(settings1.library, "posix.cfg");
-        LOAD_LIB_2(settings2.library, "std.cfg");
-
         TEST_CASE(realloc1);
         TEST_CASE(realloc2);
         TEST_CASE(realloc3);
@@ -470,7 +462,7 @@ public:
     TestMemleakInClass() : TestFixture("TestMemleakInClass") {}
 
 private:
-    Settings settings;
+    const Settings settings = settingsBuilder().severity(Severity::warning).severity(Severity::style).library("std.cfg").build();
 
     /**
      * Tokenize and execute leak check for given code
@@ -491,11 +483,6 @@ private:
     }
 
     void run() override {
-        settings.severity.enable(Severity::warning);
-        settings.severity.enable(Severity::style);
-
-        LOAD_LIB_2(settings.library, "std.cfg");
-
         TEST_CASE(class1);
         TEST_CASE(class2);
         TEST_CASE(class3);
@@ -1686,7 +1673,7 @@ public:
     TestMemleakStructMember() : TestFixture("TestMemleakStructMember") {}
 
 private:
-    Settings settings;
+    const Settings settings = settingsBuilder().library("std.cfg").library("posix.cfg").build();
 
     void check_(const char* file, int line, const char code[], bool isCPP = true) {
         // Clear the error buffer..
@@ -1703,9 +1690,6 @@ private:
     }
 
     void run() override {
-        LOAD_LIB_2(settings.library, "std.cfg");
-        LOAD_LIB_2(settings.library, "posix.cfg");
-
         // testing that errors are detected
         TEST_CASE(err);
 
@@ -2273,7 +2257,7 @@ public:
     TestMemleakNoVar() : TestFixture("TestMemleakNoVar") {}
 
 private:
-    Settings settings;
+    const Settings settings = settingsBuilder().certainty(Certainty::inconclusive).severity(Severity::warning).library("std.cfg").library("posix.cfg").build();
 
     void check_(const char* file, int line, const char code[]) {
         // Clear the error buffer..
@@ -2290,13 +2274,6 @@ private:
     }
 
     void run() override {
-        settings.certainty.setEnabled(Certainty::inconclusive, true);
-        settings.libraries.emplace_back("posix");
-        settings.severity.enable(Severity::warning);
-
-        LOAD_LIB_2(settings.library, "std.cfg");
-        LOAD_LIB_2(settings.library, "posix.cfg");
-
         // pass allocated memory to function..
         TEST_CASE(functionParameter);
 

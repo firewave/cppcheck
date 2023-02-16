@@ -240,9 +240,8 @@ private:
     }
 
     void checkIntegerOverflow() {
-        Settings settings;
+        Settings settings = settingsBuilder().severity(Severity::warning).build();
         PLATFORM(settings, Settings::Unix32);
-        settings.severity.enable(Severity::warning);
 
         check("x = (int)0x10000 * (int)0x10000;", &settings);
         ASSERT_EQUALS("[test.cpp:1]: (error) Signed integer overflow for expression '(int)0x10000*(int)0x10000'.\n", errout.str());
@@ -332,8 +331,7 @@ private:
     }
 
     void longCastAssign() {
-        Settings settings;
-        settings.severity.enable(Severity::style);
+        Settings settings = settingsBuilder().severity(Severity::style).build();
         PLATFORM(settings, Settings::Unix64);
 
         check("long f(int x, int y) {\n"
@@ -364,8 +362,7 @@ private:
     }
 
     void longCastReturn() {
-        Settings settings;
-        settings.severity.enable(Severity::style);
+        Settings settings = settingsBuilder().severity(Severity::style).build();
 
         check("long f(int x, int y) {\n"
               "  return x * y;\n"
