@@ -20,8 +20,6 @@
 #include "fixture.h"
 #include "utils.h"
 
-const Settings givenACodeSampleToTokenize::settings;
-
 class TestUtils : public TestFixture {
 public:
     TestUtils() : TestFixture("TestUtils") {}

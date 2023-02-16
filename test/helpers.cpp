@@ -59,3 +59,5 @@ ScopedFile::~ScopedFile() {
 #endif
     }
 }
+
+const Settings givenACodeSampleToTokenize::settings;
