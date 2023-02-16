@@ -39,7 +39,6 @@ private:
     static std::size_t fails_counter;
     static std::size_t todos_counter;
     static std::size_t succeeded_todos_counter;
-    static std::set<std::string> missingLibs;
     bool mVerbose;
     std::string mTemplateFormat;
     std::string mTemplateLocation;
@@ -91,7 +90,6 @@ protected:
     void assertThrow(const char * const filename, const unsigned int linenr) const;
     void assertThrowFail(const char * const filename, const unsigned int linenr) const;
     void assertNoThrowFail(const char * const filename, const unsigned int linenr) const;
-    static void complainMissingLib(const char * const libname);
     static std::string deleteLineNumber(const std::string &message);
 
     void setVerbose(bool v) {
@@ -159,12 +157,7 @@ extern std::ostringstream output;
 #define EXPECT_EQ( EXPECTED, ACTUAL ) assertEquals(__FILE__, __LINE__, EXPECTED, ACTUAL)
 #define REGISTER_TEST( CLASSNAME ) namespace { CLASSNAME instance_ ## CLASSNAME; }
 
-#define LOAD_LIB_2( LIB, NAME ) do { \
-        if (((LIB).load(exename.c_str(), NAME).errorcode != Library::ErrorCode::OK)) { \
-            complainMissingLib(NAME); \
-            return; \
-        } \
-} while (false)
+#define LOAD_LIB_2( LIB, NAME ) do { if (((LIB).load(exename.c_str(), NAME).errorcode != Library::ErrorCode::OK)) throw std::runtime_error("library '" + std::string(NAME) + "' not found"); } while (false)
 
 #define PLATFORM( S, P ) do { std::string errstr; assertEquals(__FILE__, __LINE__, true, S.platform(cppcheck::Platform::platformString(P), errstr, {exename}), errstr); } while (false)
 
