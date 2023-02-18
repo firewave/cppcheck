@@ -37,8 +37,8 @@ public:
     TestClass() : TestFixture("TestClass") {}
 
 private:
-    Settings settings0 = settingsBuilder().severity(Severity::style).build();
-    Settings settings1 = settingsBuilder().severity(Severity::warning).build();
+    Settings settings0 = SettingsBuilder().severity(Severity::style).build();
+    Settings settings1 = SettingsBuilder().severity(Severity::warning).build();
 
     void run() override {
         // Load std.cfg configuration
@@ -256,7 +256,7 @@ private:
     void checkCopyCtorAndEqOperator_(const char code[], const char* file, int line) {
         // Clear the error log
         errout.str("");
-        static const Settings settings = settingsBuilder().severity(Severity::warning).build();
+        static const Settings settings = SettingsBuilder().severity(Severity::warning).build();
 
         // Tokenize..
         Tokenizer tokenizer(&settings, this);
@@ -2869,7 +2869,7 @@ private:
 
 #define checkNoMemset(...) checkNoMemset_(__FILE__, __LINE__, __VA_ARGS__)
     void checkNoMemset_(const char* file, int line, const char code[]) {
-        static const Settings settings = settingsBuilder().severity(Severity::warning).severity(Severity::portability).build();
+        static const Settings settings = SettingsBuilder().severity(Severity::warning).severity(Severity::portability).build();
         checkNoMemset_(file, line, code, settings);
     }
 
@@ -3131,7 +3131,7 @@ private:
                       errout.str());
 
         // #1655
-        static const Settings s = settingsBuilder().library("std.cfg").build();
+        static const Settings s = SettingsBuilder().library("std.cfg").build();
         checkNoMemset("void f() {\n"
                       "    char c[] = \"abc\";\n"
                       "    std::string s;\n"
@@ -7034,7 +7034,7 @@ private:
     }
 
     void qualifiedNameMember() { // #10872
-        Settings s = settingsBuilder().severity(Severity::style).debugwarnings().library("std.cfg").build();
+        Settings s = SettingsBuilder().severity(Severity::style).debugwarnings().library("std.cfg").build();
         checkConst("struct data {};\n"
                    "    struct S {\n"
                    "    std::vector<data> std;\n"
@@ -7087,7 +7087,7 @@ private:
         errout.str("");
 
         // Check..
-        static const Settings settings = settingsBuilder().severity(Severity::performance).build();
+        static const Settings settings = SettingsBuilder().severity(Severity::performance).build();
 
         // Tokenize..
         Tokenizer tokenizer(&settings, this);
@@ -7765,7 +7765,7 @@ private:
         // Clear the error log
         errout.str("");
 
-        static const Settings settings = settingsBuilder().severity(Severity::style).build();
+        static const Settings settings = SettingsBuilder().severity(Severity::style).build();
 
         // Tokenize..
         Tokenizer tokenizer(&settings, this);
@@ -7940,7 +7940,7 @@ private:
         // Clear the error log
         errout.str("");
 
-        Settings settings = settingsBuilder().severity(Severity::warning).build();
+        Settings settings = SettingsBuilder().severity(Severity::warning).build();
         settings.safeChecks.classes = true;
 
         // Tokenize..

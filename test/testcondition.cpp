@@ -40,8 +40,8 @@ public:
     TestCondition() : TestFixture("TestCondition") {}
 
 private:
-    Settings settings0 = settingsBuilder().library("qt.cfg").library("std.cfg").severity(Severity::style).severity(Severity::warning).build();
-    Settings settings1 = settingsBuilder().severity(Severity::style).severity(Severity::warning).build();
+    Settings settings0 = SettingsBuilder().library("qt.cfg").library("std.cfg").severity(Severity::style).severity(Severity::warning).build();
+    Settings settings1 = SettingsBuilder().severity(Severity::style).severity(Severity::warning).build();
 
     void run() override {
         // known platform..
@@ -5570,7 +5570,7 @@ private:
     }
 
     void compareOutOfTypeRange() {
-        Settings settingsUnix64 = settingsBuilder().severity(Severity::style).build();
+        Settings settingsUnix64 = SettingsBuilder().severity(Severity::style).build();
         PLATFORM(settingsUnix64, cppcheck::Platform::PlatformType::Unix64);
 
         check("void f(unsigned char c) {\n"

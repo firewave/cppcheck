@@ -33,7 +33,7 @@ public:
     TestIO() : TestFixture("TestIO") {}
 
 private:
-    const Settings settings = settingsBuilder().library("std.cfg").library("windows.cfg").library("qt.cfg").build();
+    const Settings settings = SettingsBuilder().library("std.cfg").library("windows.cfg").library("qt.cfg").build();
 
     void run() override {
         TEST_CASE(coutCerrMisusage);

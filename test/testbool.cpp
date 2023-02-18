@@ -30,7 +30,7 @@ public:
     TestBool() : TestFixture("TestBool") {}
 
 private:
-    const Settings settings = settingsBuilder().severity(Severity::style).severity(Severity::warning).certainty(Certainty::inconclusive).build();
+    const Settings settings = SettingsBuilder().severity(Severity::style).severity(Severity::warning).certainty(Certainty::inconclusive).build();
 
     void run() override {
         TEST_CASE(bitwiseOnBoolean);      // if (bool & bool)

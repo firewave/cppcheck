@@ -240,7 +240,7 @@ private:
     }
 
     void checkIntegerOverflow() {
-        Settings settings = settingsBuilder().severity(Severity::warning).build();
+        Settings settings = SettingsBuilder().severity(Severity::warning).build();
         PLATFORM(settings, Settings::Unix32);
 
         check("x = (int)0x10000 * (int)0x10000;", &settings);
@@ -331,7 +331,7 @@ private:
     }
 
     void longCastAssign() {
-        Settings settings = settingsBuilder().severity(Severity::style).build();
+        Settings settings = SettingsBuilder().severity(Severity::style).build();
         PLATFORM(settings, Settings::Unix64);
 
         check("long f(int x, int y) {\n"
@@ -362,7 +362,7 @@ private:
     }
 
     void longCastReturn() {
-        Settings settings = settingsBuilder().severity(Severity::style).build();
+        Settings settings = SettingsBuilder().severity(Severity::style).build();
 
         check("long f(int x, int y) {\n"
               "  return x * y;\n"

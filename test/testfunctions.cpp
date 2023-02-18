@@ -35,7 +35,7 @@ public:
     TestFunctions() : TestFixture("TestFunctions") {}
 
 private:
-    Settings settings = settingsBuilder().severity(Severity::style).severity(Severity::warning).severity(Severity::performance).severity(Severity::portability).
+    Settings settings = SettingsBuilder().severity(Severity::style).severity(Severity::warning).severity(Severity::performance).severity(Severity::portability).
                         certainty(Certainty::inconclusive).c(Standards::C11).cpp(Standards::CPP11).library("std.cfg").library("posix.cfg").build();
 
     void run() override {

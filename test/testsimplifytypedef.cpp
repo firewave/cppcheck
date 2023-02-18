@@ -41,9 +41,9 @@ public:
 
 private:
     // If there are unused templates, keep those
-    const Settings settings0 = settingsBuilder().severity(Severity::style).checkUnusedTemplates().build();
-    const Settings settings1 = settingsBuilder().checkUnusedTemplates().build();
-    const Settings settings2 = settingsBuilder().severity(Severity::style).checkUnusedTemplates().build();
+    const Settings settings0 = SettingsBuilder().severity(Severity::style).checkUnusedTemplates().build();
+    const Settings settings1 = SettingsBuilder().checkUnusedTemplates().build();
+    const Settings settings2 = SettingsBuilder().severity(Severity::style).checkUnusedTemplates().build();
 
     void run() override {
         TEST_CASE(simplifyTypedef1);
@@ -206,7 +206,7 @@ private:
         errout.str("");
 
         // show warnings about unhandled typedef
-        Settings settings = settingsBuilder(settings0).certainty(Certainty::inconclusive).debugwarnings(debugwarnings).build();
+        Settings settings = SettingsBuilder(settings0).certainty(Certainty::inconclusive).debugwarnings(debugwarnings).build();
         PLATFORM(settings, type);
         Tokenizer tokenizer(&settings, this);
 
@@ -258,7 +258,7 @@ private:
         errout.str("");
         // Tokenize..
         // show warnings about unhandled typedef
-        static const Settings settings = settingsBuilder(settings2).certainty(Certainty::inconclusive).debugwarnings().build();
+        static const Settings settings = SettingsBuilder(settings2).certainty(Certainty::inconclusive).debugwarnings().build();
         Tokenizer tokenizer(&settings, this);
         std::istringstream istr(code);
         ASSERT_LOC(tokenizer.tokenize(istr, "test.cpp"), file, line);

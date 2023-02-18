@@ -126,7 +126,7 @@ public:
     TestMemleakInFunction() : TestFixture("TestMemleakInFunction") {}
 
 private:
-    const Settings settings = settingsBuilder().library("std.cfg").library("posix.cfg").build();
+    const Settings settings = SettingsBuilder().library("std.cfg").library("posix.cfg").build();
 
 #define check(...) check_(__FILE__, __LINE__, __VA_ARGS__)
     void check_(const char* file, int line, const char code[]) {
@@ -462,7 +462,7 @@ public:
     TestMemleakInClass() : TestFixture("TestMemleakInClass") {}
 
 private:
-    const Settings settings = settingsBuilder().severity(Severity::warning).severity(Severity::style).library("std.cfg").build();
+    const Settings settings = SettingsBuilder().severity(Severity::warning).severity(Severity::style).library("std.cfg").build();
 
     /**
      * Tokenize and execute leak check for given code
@@ -1673,7 +1673,7 @@ public:
     TestMemleakStructMember() : TestFixture("TestMemleakStructMember") {}
 
 private:
-    const Settings settings = settingsBuilder().library("std.cfg").library("posix.cfg").build();
+    const Settings settings = SettingsBuilder().library("std.cfg").library("posix.cfg").build();
 
     void check_(const char* file, int line, const char code[], bool isCPP = true) {
         // Clear the error buffer..
@@ -2257,7 +2257,7 @@ public:
     TestMemleakNoVar() : TestFixture("TestMemleakNoVar") {}
 
 private:
-    const Settings settings = settingsBuilder().certainty(Certainty::inconclusive).severity(Severity::warning).library("std.cfg").library("posix.cfg").build();
+    const Settings settings = SettingsBuilder().certainty(Certainty::inconclusive).severity(Severity::warning).library("std.cfg").library("posix.cfg").build();
 
     void check_(const char* file, int line, const char code[]) {
         // Clear the error buffer..

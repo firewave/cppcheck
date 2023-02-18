@@ -31,7 +31,7 @@ public:
     TestCharVar() : TestFixture("TestCharVar") {}
 
 private:
-    Settings settings = settingsBuilder().severity(Severity::warning).severity(Severity::portability).build();
+    Settings settings = SettingsBuilder().severity(Severity::warning).severity(Severity::portability).build();
 
     void run() override {
         PLATFORM(settings, Settings::Unspecified);

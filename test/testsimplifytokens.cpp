@@ -35,10 +35,10 @@ public:
 
 private:
     // If there are unused templates, keep those
-    const Settings settings0 = settingsBuilder().severity(Severity::portability).checkUnusedTemplates().build();
-    const Settings settings1 = settingsBuilder().severity(Severity::style).checkUnusedTemplates().build();
-    const Settings settings_std = settingsBuilder().library("std.cfg").checkUnusedTemplates().build();
-    const Settings settings_windows = settingsBuilder().library("windows.cfg").severity(Severity::portability).checkUnusedTemplates().build();
+    const Settings settings0 = SettingsBuilder().severity(Severity::portability).checkUnusedTemplates().build();
+    const Settings settings1 = SettingsBuilder().severity(Severity::style).checkUnusedTemplates().build();
+    const Settings settings_std = SettingsBuilder().library("std.cfg").checkUnusedTemplates().build();
+    const Settings settings_windows = SettingsBuilder().library("windows.cfg").severity(Severity::portability).checkUnusedTemplates().build();
 
     void run() override {
         TEST_CASE(combine_strings);
@@ -194,7 +194,7 @@ private:
     std::string tokenizeAndStringify_(const char* file, int linenr, const char code[], bool simplify = false, bool expand = true, Settings::PlatformType platform = Settings::Native, const char* filename = "test.cpp", bool cpp11 = true) {
         errout.str("");
 
-        Settings settings = settingsBuilder(settings1).debugwarnings().build();
+        Settings settings = SettingsBuilder(settings1).debugwarnings().build();
         PLATFORM(settings, platform);
         settings.standards.cpp = cpp11 ? Standards::CPP11 : Standards::CPP03;
 

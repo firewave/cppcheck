@@ -30,7 +30,7 @@ public:
     TestBoost() : TestFixture("TestBoost") {}
 
 private:
-    const Settings settings = settingsBuilder().severity(Severity::style).severity(Severity::performance).build();
+    const Settings settings = SettingsBuilder().severity(Severity::style).severity(Severity::performance).build();
 
     void run() override {
         TEST_CASE(BoostForeachContainerModification);

@@ -30,7 +30,7 @@ public:
     Test64BitPortability() : TestFixture("Test64BitPortability") {}
 
 private:
-    const Settings settings = settingsBuilder().severity(Severity::portability).library("std.cfg").build();
+    const Settings settings = SettingsBuilder().severity(Severity::portability).library("std.cfg").build();
 
     void run() override {
         TEST_CASE(novardecl);

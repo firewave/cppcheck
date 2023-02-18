@@ -138,7 +138,7 @@ private:
     }
 
     std::string parse(const char clang[]) {
-        static const Settings settings = settingsBuilder().clang().build();
+        static const Settings settings = SettingsBuilder().clang().build();
         Tokenizer tokenizer(&settings, this);
         std::istringstream istr(clang);
         clangimport::parseClangAstDump(&tokenizer, istr);
@@ -1049,7 +1049,7 @@ private:
 
 
 #define GET_SYMBOL_DB(AST) \
-    Settings settings = settingsBuilder().clang().build(); \
+    Settings settings = SettingsBuilder().clang().build(); \
     { \
         std::string errstr; \
         ASSERT_EQUALS_MSG(true, settings.platform("unix64", errstr, {exename.c_str()}), errstr); \

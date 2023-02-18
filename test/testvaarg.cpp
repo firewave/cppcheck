@@ -30,7 +30,7 @@ public:
     TestVaarg() : TestFixture("TestVaarg") {}
 
 private:
-    const Settings settings = settingsBuilder().severity(Severity::warning).build();
+    const Settings settings = SettingsBuilder().severity(Severity::warning).build();
 
 #define check(code) check_(code, __FILE__, __LINE__)
     void check_(const char code[], const char* file, int line) {

@@ -34,14 +34,14 @@ public:
     TestConstructors() : TestFixture("TestConstructors") {}
 
 private:
-    Settings settings = settingsBuilder().severity(Severity::style).severity(Severity::warning).build();
+    Settings settings = SettingsBuilder().severity(Severity::style).severity(Severity::warning).build();
 
 #define check(...) check_(__FILE__, __LINE__, __VA_ARGS__)
     void check_(const char* file, int line, const char code[], bool inconclusive = false) {
         // Clear the error buffer..
         errout.str("");
 
-        const Settings settings1 = settingsBuilder(settings).certainty(Certainty::inconclusive, inconclusive).build();
+        const Settings settings1 = SettingsBuilder(settings).certainty(Certainty::inconclusive, inconclusive).build();
 
         // Tokenize..
         Tokenizer tokenizer(&settings1, this);
@@ -1948,7 +1948,7 @@ private:
     }
 
     void initvar_smartptr() { // #10237
-        static const Settings s = settingsBuilder()/*.library("std.cfg")*/.build();
+        static const Settings s = SettingsBuilder()/*.library("std.cfg")*/.build();
         check("struct S {\n"
               "    explicit S(const std::shared_ptr<S>& sp) {\n"
               "        set(*sp);\n"
@@ -1990,7 +1990,7 @@ private:
               "{ }", true);
         ASSERT_EQUALS("[test.cpp:13]: (warning, inconclusive) Member variable 'Fred::ints' is not assigned a value in 'Fred::operator='.\n", errout.str());
 
-        static const Settings s = settingsBuilder().certainty(Certainty::inconclusive).severity(Severity::style).severity(Severity::warning).library("std.cfg").build();
+        static const Settings s = SettingsBuilder().certainty(Certainty::inconclusive).severity(Severity::style).severity(Severity::warning).library("std.cfg").build();
         check("struct S {\n"
               "    S& operator=(const S& s) { return *this; }\n"
               "    std::mutex m;\n"
@@ -3580,7 +3580,7 @@ private:
     }
 
     void uninitVarInheritClassInit() {
-        static const Settings s = settingsBuilder()/*.library("vcl.cfg")*/.build();
+        static const Settings s = SettingsBuilder()/*.library("vcl.cfg")*/.build();
 
         check("class Fred: public TObject\n"
               "{\n"

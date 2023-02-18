@@ -2628,7 +2628,7 @@ public:
     TestLeakAutoVarRecursiveCountLimit() : TestFixture("TestLeakAutoVarRecursiveCountLimit") {}
 
 private:
-    const Settings settings = settingsBuilder().library("std.cfg").checkLibrary().build();
+    const Settings settings = SettingsBuilder().library("std.cfg").checkLibrary().build();
 
     void checkP(const char code[], bool cpp = false) {
         // Clear the error buffer..
@@ -2684,7 +2684,7 @@ public:
     TestLeakAutoVarStrcpy() : TestFixture("TestLeakAutoVarStrcpy") {}
 
 private:
-    const Settings settings = settingsBuilder().library("std.cfg").checkLibrary().build();
+    const Settings settings = SettingsBuilder().library("std.cfg").checkLibrary().build();
 
     void check_(const char* file, int line, const char code[]) {
         // Clear the error buffer..
@@ -2729,7 +2729,7 @@ public:
     TestLeakAutoVarWindows() : TestFixture("TestLeakAutoVarWindows") {}
 
 private:
-    const Settings settings = settingsBuilder().library("windows.cfg").build();
+    const Settings settings = SettingsBuilder().library("windows.cfg").build();
 
     void check_(const char* file, int line, const char code[]) {
         // Clear the error buffer..

@@ -178,14 +178,6 @@ protected:
         Settings settings;
     };
 
-    SettingsBuilder settingsBuilder() const {
-        return SettingsBuilder();
-    }
-
-    SettingsBuilder settingsBuilder(Settings settings) const {
-        return SettingsBuilder(std::move(settings));
-    }
-
 public:
     void reportOut(const std::string &outmsg, Color c = Color::Reset) override;
     void reportErr(const ErrorMessage &msg) override;

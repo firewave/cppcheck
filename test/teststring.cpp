@@ -31,7 +31,7 @@ public:
     TestString() : TestFixture("TestString") {}
 
 private:
-    const Settings settings = settingsBuilder().severity(Severity::warning).severity(Severity::style).build();
+    const Settings settings = SettingsBuilder().severity(Severity::warning).severity(Severity::style).build();
 
     void run() override {
         TEST_CASE(stringLiteralWrite);

@@ -37,7 +37,7 @@ public:
     }
 
 private:
-    Settings settings = settingsBuilder().c(Standards::C89).cpp(Standards::CPPLatest).checkUnusedTemplates().build();
+    Settings settings = SettingsBuilder().c(Standards::C89).cpp(Standards::CPPLatest).checkUnusedTemplates().build();
     void run() override {
         TEST_CASE(varid1);
         TEST_CASE(varid2);

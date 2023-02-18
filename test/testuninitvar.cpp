@@ -35,7 +35,7 @@ public:
     TestUninitVar() : TestFixture("TestUninitVar") {}
 
 private:
-    Settings settings = settingsBuilder().library("std.cfg").build();
+    Settings settings = SettingsBuilder().library("std.cfg").build();
 
     void run() override {
         TEST_CASE(uninitvar1);
@@ -108,7 +108,7 @@ private:
         // Clear the error buffer..
         errout.str("");
 
-        const Settings settings1 = settingsBuilder(settings).debugwarnings(debugwarnings).build();
+        const Settings settings1 = SettingsBuilder(settings).debugwarnings(debugwarnings).build();
 
         // Tokenize..
         Tokenizer tokenizer(&settings1, this);

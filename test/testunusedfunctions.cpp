@@ -31,7 +31,7 @@ public:
     TestUnusedFunctions() : TestFixture("TestUnusedFunctions") {}
 
 private:
-    Settings settings = settingsBuilder().severity(Severity::style).build();
+    Settings settings = SettingsBuilder().severity(Severity::style).build();
 
     void run() override {
         TEST_CASE(incondition);

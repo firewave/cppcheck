@@ -35,13 +35,13 @@ public:
     TestIncompleteStatement() : TestFixture("TestIncompleteStatement") {}
 
 private:
-    const Settings settings = settingsBuilder().severity(Severity::warning).build();
+    const Settings settings = SettingsBuilder().severity(Severity::warning).build();
 
     void check(const char code[], bool inconclusive = false) {
         // Clear the error buffer..
         errout.str("");
 
-        const Settings settings1 = settingsBuilder(settings).certainty(Certainty::inconclusive, inconclusive).build();
+        const Settings settings1 = SettingsBuilder(settings).certainty(Certainty::inconclusive, inconclusive).build();
 
         // Raw tokens..
         std::vector<std::string> files(1, "test.cpp");

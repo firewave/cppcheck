@@ -41,7 +41,7 @@ public:
     TestNullPointer() : TestFixture("TestNullPointer") {}
 
 private:
-    const Settings settings = settingsBuilder().library("std.cfg").severity(Severity::warning).build();
+    const Settings settings = SettingsBuilder().library("std.cfg").severity(Severity::warning).build();
 
     void run() override {
         TEST_CASE(nullpointerAfterLoop);
@@ -178,7 +178,7 @@ private:
         // Clear the error buffer..
         errout.str("");
 
-        const Settings settings1 = settingsBuilder(settings).certainty(Certainty::inconclusive, inconclusive).build();
+        const Settings settings1 = SettingsBuilder(settings).certainty(Certainty::inconclusive, inconclusive).build();
 
         // Tokenize..
         Tokenizer tokenizer(&settings1, this);
@@ -193,7 +193,7 @@ private:
         // Clear the error buffer..
         errout.str("");
 
-        static const Settings settings1 = settingsBuilder(settings).certainty(Certainty::inconclusive, false).build();
+        static const Settings settings1 = SettingsBuilder(settings).certainty(Certainty::inconclusive, false).build();
 
         // Raw tokens..
         std::vector<std::string> files(1, "test.cpp");

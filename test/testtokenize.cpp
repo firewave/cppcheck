@@ -44,10 +44,10 @@ public:
 
 private:
     // If there are unused templates, keep those
-    Settings settings0 = settingsBuilder().library("qt.cfg").checkUnusedTemplates().build();
-    const Settings settings1 = settingsBuilder().library("qt.cfg").checkUnusedTemplates().build();
-    const Settings settings2 = settingsBuilder().library("qt.cfg").checkUnusedTemplates().build();
-    const Settings settings_windows = settingsBuilder().library("windows.cfg").checkUnusedTemplates().build();
+    Settings settings0 = SettingsBuilder().library("qt.cfg").checkUnusedTemplates().build();
+    const Settings settings1 = SettingsBuilder().library("qt.cfg").checkUnusedTemplates().build();
+    const Settings settings2 = SettingsBuilder().library("qt.cfg").checkUnusedTemplates().build();
+    const Settings settings_windows = SettingsBuilder().library("windows.cfg").checkUnusedTemplates().build();
 
     void run() override {
         TEST_CASE(tokenize1);
@@ -459,7 +459,7 @@ private:
     std::string tokenizeAndStringify_(const char* file, int linenr, const char code[], bool expand = true, Settings::PlatformType platform = Settings::Native, const char* filename = "test.cpp", Standards::cppstd_t std = Standards::CPP11) {
         errout.str("");
 
-        Settings settings = settingsBuilder(settings1).debugwarnings().cpp(std).build();
+        Settings settings = SettingsBuilder(settings1).debugwarnings().cpp(std).build();
         PLATFORM(settings, platform);
 
         // tokenize..
@@ -487,7 +487,7 @@ private:
     std::string tokenizeAndStringifyWindows_(const char* file, int linenr, const char code[], bool expand = true, Settings::PlatformType platform = Settings::Native, const char* filename = "test.cpp", bool cpp11 = true) {
         errout.str("");
 
-        Settings settings = settingsBuilder(settings_windows).debugwarnings().cpp(cpp11 ? Standards::CPP11 : Standards::CPP03).build();
+        Settings settings = SettingsBuilder(settings_windows).debugwarnings().cpp(cpp11 ? Standards::CPP11 : Standards::CPP03).build();
         PLATFORM(settings, platform);
 
         // tokenize..
@@ -527,7 +527,7 @@ private:
     std::string tokenizeDebugListing_(const char* file, int line, const char code[], const char filename[] = "test.cpp") {
         errout.str("");
 
-        static const Settings settings = settingsBuilder(settings2).c(Standards::C89).cpp(Standards::CPP03).build();
+        static const Settings settings = SettingsBuilder(settings2).c(Standards::C89).cpp(Standards::CPP03).build();
 
         Tokenizer tokenizer(&settings, this);
         std::istringstream istr(code);

@@ -47,7 +47,7 @@ public:
     TestValueFlow() : TestFixture("TestValueFlow") {}
 
 private:
-    Settings settings = settingsBuilder().library("std.cfg").build();
+    Settings settings = SettingsBuilder().library("std.cfg").build();
 
     void run() override {
         // strcpy, abort cfg
@@ -6439,7 +6439,7 @@ private:
     void valueFlowSafeFunctionParameterValues() {
         const char *code;
         std::list<ValueFlow::Value> values;
-        Settings s = settingsBuilder().library("std.cfg").build();
+        Settings s = SettingsBuilder().library("std.cfg").build();
         s.safeChecks.classes = s.safeChecks.externalFunctions = s.safeChecks.internalFunctions = true;
 
         code = "short f(short x) {\n"
@@ -6490,7 +6490,7 @@ private:
     void valueFlowUnknownFunctionReturn() {
         const char *code;
         std::list<ValueFlow::Value> values;
-        Settings s = settingsBuilder().library("std.cfg").build();
+        Settings s = SettingsBuilder().library("std.cfg").build();
         s.checkUnknownFunctionReturn.insert("rand");
 
         code = "x = rand();";

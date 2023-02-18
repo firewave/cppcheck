@@ -35,9 +35,9 @@ public:
 
 private:
     // If there are unused templates, keep those
-    const Settings settings0 = settingsBuilder().severity(Severity::style).checkUnusedTemplates().build();
-    const Settings settings1 = settingsBuilder().checkUnusedTemplates().build();
-    const Settings settings2 = settingsBuilder().severity(Severity::style).checkUnusedTemplates().build();
+    const Settings settings0 = SettingsBuilder().severity(Severity::style).checkUnusedTemplates().build();
+    const Settings settings1 = SettingsBuilder().checkUnusedTemplates().build();
+    const Settings settings2 = SettingsBuilder().severity(Severity::style).checkUnusedTemplates().build();
 
     void run() override {
         TEST_CASE(simplifyUsing1);
@@ -94,7 +94,7 @@ private:
     std::string tok_(const char* file, int line, const char code[], Settings::PlatformType type = Settings::Native, bool debugwarnings = true) {
         errout.str("");
 
-        Settings settings = settingsBuilder(settings0).certainty(Certainty::inconclusive).debugwarnings(debugwarnings).build();
+        Settings settings = SettingsBuilder(settings0).certainty(Certainty::inconclusive).debugwarnings(debugwarnings).build();
         PLATFORM(settings, type);
         Tokenizer tokenizer(&settings, this);
 

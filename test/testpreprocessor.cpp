@@ -73,7 +73,7 @@ public:
     };
 
 private:
-    Settings settings0 = settingsBuilder().severity(Severity::information).build();
+    Settings settings0 = SettingsBuilder().severity(Severity::information).build();
     Preprocessor preprocessor0;
 
     void run() override {

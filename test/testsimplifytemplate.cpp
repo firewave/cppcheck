@@ -38,7 +38,7 @@ public:
 
 private:
     // If there are unused templates, keep those
-    const Settings settings = settingsBuilder().severity(Severity::portability).checkUnusedTemplates().build();
+    const Settings settings = SettingsBuilder().severity(Severity::portability).checkUnusedTemplates().build();
 
     void run() override {
         TEST_CASE(template1);
@@ -308,7 +308,7 @@ private:
     std::string tok_(const char* file, int line, const char code[], bool debugwarnings = false, Settings::PlatformType type = Settings::Native) {
         errout.str("");
 
-        Settings settings1 = settingsBuilder(settings).debugwarnings(debugwarnings).build();
+        Settings settings1 = SettingsBuilder(settings).debugwarnings(debugwarnings).build();
         PLATFORM(settings1, type);
         Tokenizer tokenizer(&settings1, this);
 

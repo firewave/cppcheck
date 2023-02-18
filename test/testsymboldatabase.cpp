@@ -74,8 +74,8 @@ private:
     const Token* vartok;
     const Token* typetok;
     // If there are unused templates, keep those
-    Settings settings1 = settingsBuilder().library("std.cfg").checkUnusedTemplates().build();
-    Settings settings2 = settingsBuilder().checkUnusedTemplates().build();
+    Settings settings1 = SettingsBuilder().library("std.cfg").checkUnusedTemplates().build();
+    Settings settings2 = SettingsBuilder().checkUnusedTemplates().build();
 
     void reset() {
         vartok = nullptr;
@@ -2251,7 +2251,7 @@ private:
         errout.str("");
 
         // Check..
-        const Settings settings = settingsBuilder(settings1).debugwarnings(debug).build();
+        const Settings settings = SettingsBuilder(settings1).debugwarnings(debug).build();
 
         // Tokenize..
         Tokenizer tokenizer(&settings, this);

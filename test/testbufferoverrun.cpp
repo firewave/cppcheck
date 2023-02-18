@@ -44,14 +44,14 @@ public:
     TestBufferOverrun() : TestFixture("TestBufferOverrun") {}
 
 private:
-    Settings settings0 = settingsBuilder().library("std.cfg").severity(Severity::warning).severity(Severity::style).severity(Severity::portability).build();
+    Settings settings0 = SettingsBuilder().library("std.cfg").severity(Severity::warning).severity(Severity::style).severity(Severity::portability).build();
 
 #define check(...) check_(__FILE__, __LINE__, __VA_ARGS__)
     void check_(const char* file, int line, const char code[], const char filename[] = "test.cpp") {
         // Clear the error buffer..
         errout.str("");
 
-        const Settings settings = settingsBuilder(settings0).certainty(Certainty::inconclusive).build();
+        const Settings settings = SettingsBuilder(settings0).certainty(Certainty::inconclusive).build();
 
         // Tokenize..
         Tokenizer tokenizer(&settings, this);
@@ -5495,7 +5495,7 @@ private:
 
     void checkPipeParameterSize() { // #3521
 
-        static const Settings settings = settingsBuilder().library("posix.cfg").build();
+        static const Settings settings = SettingsBuilder().library("posix.cfg").build();
 
         check("void f(){\n"
               "int pipefd[1];\n" // <--  array of two integers is needed
