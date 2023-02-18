@@ -46,7 +46,7 @@ private:
     std::string mTestname;
 
 protected:
-    std::string exename;
+    static const std::string exename;
     std::string testToRun;
     bool quiet_tests;
 
@@ -126,8 +126,8 @@ protected:
     class SettingsBuilder
     {
     public:
-        explicit SettingsBuilder(const TestFixture &fixture) : fixture(fixture) {}
-        SettingsBuilder(const TestFixture &fixture, Settings settings) : fixture(fixture), settings(std::move(settings)) {}
+        SettingsBuilder() {}
+        explicit SettingsBuilder(Settings settings) : settings(std::move(settings)) {}
 
         SettingsBuilder& severity(Severity::SeverityType sev) {
             settings.severity.enable(sev);
@@ -175,16 +175,15 @@ protected:
             return std::move(settings);
         }
     private:
-        const TestFixture &fixture;
         Settings settings;
     };
 
     SettingsBuilder settingsBuilder() const {
-        return SettingsBuilder(*this);
+        return SettingsBuilder();
     }
 
     SettingsBuilder settingsBuilder(Settings settings) const {
-        return SettingsBuilder(*this, std::move(settings));
+        return SettingsBuilder(std::move(settings));
     }
 
 public:

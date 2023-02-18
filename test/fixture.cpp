@@ -27,7 +27,14 @@
 #include <cctype>
 #include <iostream>
 #include <sstream>
+#include <stdexcept>
 #include <string>
+
+#ifdef _WIN32
+#include <windows.h>
+#else
+#include <unistd.h>
+#endif
 
 std::ostringstream errout;
 std::ostringstream output;
@@ -75,9 +82,28 @@ std::size_t TestFixture::fails_counter = 0;
 std::size_t TestFixture::todos_counter = 0;
 std::size_t TestFixture::succeeded_todos_counter = 0;
 
+static std::string getExePath()
+{
+    std::array<char, 1024> buf;
+#ifdef _WIN32
+    if (GetModuleFileNameA(nullptr, buf.data(), buf.size()-1) == 0) {
+        throw std::runtime_error("GetModuleFileName() failed");
+    }
+#else
+    const ssize_t res = readlink("/proc/self/exe", buf.data(), buf.size()-1);
+    if (res == -1) {
+        const int err = errno;
+        throw std::runtime_error("readlink() failed with " + std::to_string(err));
+    }
+    buf[res] = '\0';
+#endif
+    return std::string(buf.data());
+}
+
+const std::string TestFixture::exename = getExePath();
+
 TestFixture::TestFixture(const char * const _name)
     : mVerbose(false),
-    exename(),
     quiet_tests(false),
     classname(_name)
 {
@@ -317,7 +343,6 @@ void TestFixture::run(const std::string &str)
 void TestFixture::processOptions(const options& args)
 {
     quiet_tests = args.quiet();
-    exename = args.exe();
 }
 
 std::size_t TestFixture::runTests(const options& args)
@@ -368,7 +393,7 @@ void TestFixture::reportErr(const ErrorMessage &msg)
 }
 
 TestFixture::SettingsBuilder& TestFixture::SettingsBuilder::library(const char lib[]) {
-    LOAD_LIB_2_EXE(settings.library, lib, fixture.exename.c_str());
+    LOAD_LIB_2_EXE(settings.library, lib, TestFixture::exename.c_str());
     // strip extension
     std::string lib_s(lib);
     static const std::string ext(".cfg");
