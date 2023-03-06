@@ -49,7 +49,7 @@ private:
      * Read from the pipe, parse and handle what ever is in there.
      * @return False in case of an recoverable error - will exit process on others
      */
-    bool handleRead(int rpipe, unsigned int &result, const std::string& filename);
+    bool handleRead(ErrorLogger &errlogger, int rpipe, unsigned int &result, const std::string& filename);
 
     /**
      * @brief Check load average condition
@@ -62,7 +62,7 @@ private:
      * @brief Reports internal errors related to child processes
      * @param msg The error message
      */
-    void reportInternalChildErr(const std::string &childname, const std::string &msg);
+    void reportInternalChildErr(ErrorLogger &errlogger, const std::string &childname, const std::string &msg);
 };
 
 /// @}

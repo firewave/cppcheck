@@ -58,6 +58,12 @@
 // NOLINTNEXTLINE(misc-unused-using-decls) - required for FD_ZERO
 using std::memset;
 
+// regular strerror() is not thread-safe
+static std::string strerror_safe(int err)
+{
+    std::array<char, 1024> buf;
+    return strerror_r(err, buf.data(), buf.size());
+}
 
 ProcessExecutor::ProcessExecutor(const std::map<std::string, std::size_t> &files, Settings &settings, ErrorLogger &errorLogger)
     : Executor(files, settings, errorLogger)
@@ -81,8 +87,8 @@ public:
         writeToPipe(REPORT_ERROR, msg.serialize());
     }
 
-    void writeEnd(const std::string& str) const {
-        writeToPipe(CHILD_END, str);
+    void writeEnd(unsigned int res) const {
+        writeToPipe(CHILD_END, std::to_string(res));
     }
 
 private:
@@ -98,7 +104,7 @@ private:
             const int err = errno;
             delete[] out;
             out = nullptr;
-            std::cerr << "#### ThreadExecutor::writeToPipe, Failed to write to pipe: " << std::strerror(err) << std::endl;
+            std::cerr << "#### ThreadExecutor::writeToPipe, Failed to write to pipe: " << strerror_safe(err) << std::endl;
             std::exit(EXIT_FAILURE);
         }
 
@@ -108,7 +114,7 @@ private:
     const int mWpipe;
 };
 
-bool ProcessExecutor::handleRead(int rpipe, unsigned int &result, const std::string& filename)
+bool ProcessExecutor::handleRead(ErrorLogger &errlogger, int rpipe, unsigned int &result, const std::string& filename)
 {
     std::size_t bytes_to_read;
     ssize_t bytes_read;
@@ -141,11 +147,11 @@ bool ProcessExecutor::handleRead(int rpipe, unsigned int &result, const std::str
     bytes_read = read(rpipe, &len, bytes_to_read);
     if (bytes_read <= 0) {
         const int err = errno;
-        std::cerr << "#### ThreadExecutor::handleRead(" << filename << ") error (len) for type " << int(type) << ": " << std::strerror(err) << std::endl;
+        std::cerr << "#### ThreadExecutor::handleRead(" << filename << ") error (len) for type " << int(type) << ": " << strerror_safe(err) << std::endl;
         std::exit(EXIT_FAILURE);
     }
     if (bytes_read != bytes_to_read) {
-        std::cerr << "#### ThreadExecutor::handleRead(" << filename << ") error (len) for type" << int(type) << ": insufficient data read (expected: " << bytes_to_read << " / got: " << bytes_read << ")"  << std::endl;
+        std::cerr << "#### ThreadExecutor::handleRead(" << filename << ") error (len) for type " << int(type) << ": insufficient data read (expected: " << bytes_to_read << " / got: " << bytes_read << ")"  << std::endl;
         std::exit(EXIT_FAILURE);
     }
 
@@ -158,7 +164,7 @@ bool ProcessExecutor::handleRead(int rpipe, unsigned int &result, const std::str
         bytes_read = read(rpipe, data_start, bytes_to_read);
         if (bytes_read <= 0) {
             const int err = errno;
-            std::cerr << "#### ThreadExecutor::handleRead(" << filename << ") error (buf) for type" << int(type) << ": " << std::strerror(err) << std::endl;
+            std::cerr << "#### ThreadExecutor::handleRead(" << filename << ") error (buf) for type " << int(type) << ": " << strerror_safe(err) << std::endl;
             std::exit(EXIT_FAILURE);
         }
         bytes_to_read -= bytes_read;
@@ -168,7 +174,7 @@ bool ProcessExecutor::handleRead(int rpipe, unsigned int &result, const std::str
 
     bool res = true;
     if (type == PipeWriter::REPORT_OUT) {
-        mErrorLogger.reportOut(buf);
+        errlogger.reportOut(buf);
     } else if (type == PipeWriter::REPORT_ERROR) {
         ErrorMessage msg;
         try {
@@ -179,7 +185,7 @@ bool ProcessExecutor::handleRead(int rpipe, unsigned int &result, const std::str
         }
 
         if (hasToLog(msg))
-            mErrorLogger.reportErr(msg);
+            errlogger.reportErr(msg);
     } else if (type == PipeWriter::CHILD_END) {
         result += std::stoi(buf);
         res = false;
@@ -210,47 +216,67 @@ bool ProcessExecutor::checkLoadAverage(size_t nchildren)
 #endif
 }
 
+class ThreadData
+{
+public:
+    ThreadData(Executor &executor, ErrorLogger &errorLogger, const Settings &settings, const std::map<std::string, std::size_t> &files, const std::list<ImportProject::FileSettings> &fileSettings)
+        : logForwarder(errorLogger)
+    {}
+
+    bool next(const std::string *&file, const ImportProject::FileSettings *&fs, std::size_t &fileSize) {
+        return false;
+    }
+
+    unsigned int check(ErrorLogger &errorLogger, const std::string *file, const ImportProject::FileSettings *fs) {
+        return 0;
+    }
+
+    void status(std::size_t fileSize) {}
+
+    ErrorLogger &logForwarder;
+};
+
 unsigned int ProcessExecutor::check()
 {
-    unsigned int fileCount = 0;
     unsigned int result = 0;
 
-    const std::size_t totalfilesize = std::accumulate(mFiles.cbegin(), mFiles.cend(), std::size_t(0), [](std::size_t v, const std::pair<std::string, std::size_t>& p) {
-        return v + p.second;
-    });
+    ThreadData data(*this, mErrorLogger, mSettings, mFiles, mSettings.project.fileSettings);
 
-    std::size_t processedsize = 0;
-    std::map<std::string, std::size_t>::const_iterator iFile = mFiles.cbegin();
-    std::list<ImportProject::FileSettings>::const_iterator iFileSettings = mSettings.project.fileSettings.cbegin();
-    for (;;) {
-        if (iFile == mFiles.end() && iFileSettings == mSettings.project.fileSettings.end())
-            break;
+    const std::string *file;
+    const ImportProject::FileSettings *fs;
+    std::size_t fileSize;
 
+    while (data.next(file, fs, fileSize)) {
+        const std::string &fileName = file ? *file : emptyString;
         // Start a new child
         //const size_t nchildren = childFile.size();
         if (true /*nchildren < mSettings.jobs && checkLoadAverage(nchildren)*/) {
             // setup pipe
             int pipes[2];
             if (pipe(pipes) == -1) {
-                std::cerr << "#### ThreadExecutor::check, pipe() failed: "<< std::strerror(errno) << std::endl;
+                const int err = errno;
+                std::cerr << "#### ThreadExecutor::check(" << fileName << ") pipe() failed: "<< strerror_safe(err) << std::endl;
                 std::exit(EXIT_FAILURE);
             }
 
             const int flags = fcntl(pipes[0], F_GETFL, 0);
             if (flags < 0) {
-                std::cerr << "#### ThreadExecutor::check, fcntl(F_GETFL) failed: "<< std::strerror(errno) << std::endl;
+                const int err = errno;
+                std::cerr << "#### ThreadExecutor::check(" << fileName << ") fcntl(F_GETFL) failed: "<< strerror_safe(err) << std::endl;
                 std::exit(EXIT_FAILURE);
             }
 
             if (fcntl(pipes[0], F_SETFL, flags | O_NONBLOCK) < 0) {
-                std::cerr << "#### ThreadExecutor::check, fcntl(F_SETFL) failed: "<< std::strerror(errno) << std::endl;
+                const int err = errno;
+                std::cerr << "#### ThreadExecutor::check(" << fileName << ") fcntl(F_SETFL) failed: "<< strerror_safe(err) << std::endl;
                 std::exit(EXIT_FAILURE);
             }
 
             // fork process
             const pid_t pid = fork();
             if (pid < 0) {
-                std::cerr << "#### ThreadExecutor::check, Failed to create child process: "<< std::strerror(errno) << std::endl;
+                const int err = errno;
+                std::cerr << "#### ThreadExecutor::check(" << fileName << ") failed to create child process: "<< strerror_safe(err) << std::endl;
                 std::exit(EXIT_FAILURE);
             }
             if (pid == 0) {
@@ -261,34 +287,14 @@ unsigned int ProcessExecutor::check()
                 close(pipes[0]);
 
                 PipeWriter pipewriter(pipes[1]);
-                CppCheck fileChecker(pipewriter, false, CppCheckExecutor::executeCommand);
-                fileChecker.settings() = mSettings;
-                unsigned int resultOfCheck = 0;
+                const unsigned int resultOfCheck = data.check(pipewriter, file, fs);
 
-                if (iFileSettings != mSettings.project.fileSettings.end()) {
-                    resultOfCheck = fileChecker.check(*iFileSettings);
-                } else {
-                    // Read file from a file
-                    resultOfCheck = fileChecker.check(iFile->first);
-                }
-
-                pipewriter.writeEnd(std::to_string(resultOfCheck));
+                pipewriter.writeEnd(resultOfCheck);
                 std::exit(EXIT_SUCCESS);
             }
 
             // in main process
             close(pipes[1]);
-            std::string fileName;
-            std::size_t fileSize;
-            if (iFileSettings != mSettings.project.fileSettings.end()) {
-                fileName = iFileSettings->filename + ' ' + iFileSettings->cfg;
-                fileSize = 0;
-                ++iFileSettings;
-            } else {
-                fileName = iFile->first;
-                fileSize = iFile->second;
-                ++iFile;
-            }
 
             // wait for pipe
             while (true) {
@@ -306,15 +312,9 @@ unsigned int ProcessExecutor::check()
                 if (!FD_ISSET(pipes[0], &rfds))
                     continue;
 
-                const bool readRes = handleRead(pipes[0], result, fileName);
+                const bool readRes = handleRead(data.logForwarder, pipes[0], result, fileName);
                 if (!readRes) {
-                    fileCount++;
-                    processedsize += fileSize;
-                    if (!mSettings.quiet)
-                        CppCheckExecutor::reportStatus(fileCount,
-                                                       mFiles.size() + mSettings.project.fileSettings.size(),
-                                                       processedsize, totalfilesize);
-
+                    data.status(fileSize);
                     close(pipes[0]);
                     break;
                 }
@@ -330,7 +330,7 @@ unsigned int ProcessExecutor::check()
             if (child == -1) {
                 const int err = errno;
                 if (err != ECHILD) {
-                    std::cerr << "#### ThreadExecutor::check, Failed to wait for child process:"<< std::strerror(err) << std::endl;
+                    std::cerr << "#### ThreadExecutor::check(" << fileName << ") failed to wait for child process: "<< strerror_safe(err) << std::endl;
                     std::exit(EXIT_FAILURE);
                 }
             }
@@ -338,14 +338,10 @@ unsigned int ProcessExecutor::check()
             if (WIFEXITED(stat)) {
                 const int exitstatus = WEXITSTATUS(stat);
                 if (exitstatus != EXIT_SUCCESS) {
-                    std::ostringstream oss;
-                    oss << "Child process exited with " << exitstatus;
-                    reportInternalChildErr(fileName, oss.str());
+                    reportInternalChildErr(data.logForwarder, fileName, "Child process exited with " + std::to_string(exitstatus));
                 }
             } else if (WIFSIGNALED(stat)) {
-                std::ostringstream oss;
-                oss << "Child process crashed with signal " << WTERMSIG(stat);
-                reportInternalChildErr(fileName, oss.str());
+                reportInternalChildErr(data.logForwarder, fileName, "Child process crashed with signal " + std::to_string(WTERMSIG(stat)));
             }
         }
     }
@@ -353,7 +349,7 @@ unsigned int ProcessExecutor::check()
     return result;
 }
 
-void ProcessExecutor::reportInternalChildErr(const std::string &childname, const std::string &msg)
+void ProcessExecutor::reportInternalChildErr(ErrorLogger &errorlogger, const std::string &childname, const std::string &msg)
 {
     std::list<ErrorMessage::FileLocation> locations;
     locations.emplace_back(childname, 0, 0);
@@ -365,7 +361,7 @@ void ProcessExecutor::reportInternalChildErr(const std::string &childname, const
                               Certainty::normal);
 
     if (!mSettings.nomsg.isSuppressed(errmsg))
-        mErrorLogger.reportErr(errmsg);
+        errorlogger.reportErr(errmsg);
 }
 
 #endif // !WIN32
