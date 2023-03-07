@@ -58,6 +58,12 @@
 // NOLINTNEXTLINE(misc-unused-using-decls) - required for FD_ZERO
 using std::memset;
 
+// regular strerror() is not thread-safe
+static std::string strerror_safe(int err)
+{
+    std::array<char, 1024> buf;
+    return strerror_r(err, buf.data(), buf.size());
+}
 
 ProcessExecutor::ProcessExecutor(const std::map<std::string, std::size_t> &files, Settings &settings, ErrorLogger &errorLogger)
     : Executor(files, settings, errorLogger)
@@ -102,7 +108,7 @@ private:
             const int err = errno;
             delete[] out;
             out = nullptr;
-            std::cerr << "#### ThreadExecutor::writeToPipe() error for type " << type << ": " << std::strerror(err) << std::endl;
+            std::cerr << "#### ThreadExecutor::writeToPipe() error for type " << type << ": " << strerror_safe(err) << std::endl;
             std::exit(EXIT_FAILURE);
         }
         // TODO: write until everything is written
@@ -152,11 +158,11 @@ bool ProcessExecutor::handleRead(int rpipe, unsigned int &result, const std::str
     bytes_read = read(rpipe, &len, bytes_to_read);
     if (bytes_read <= 0) {
         const int err = errno;
-        std::cerr << "#### ThreadExecutor::handleRead(" << filename << ") error (len) for type " << int(type) << ": " << std::strerror(err) << std::endl;
+        std::cerr << "#### ThreadExecutor::handleRead(" << filename << ") error (len) for type " << int(type) << ": " << strerror_safe(err) << std::endl;
         std::exit(EXIT_FAILURE);
     }
     if (bytes_read != bytes_to_read) {
-        std::cerr << "#### ThreadExecutor::handleRead(" << filename << ") error (len) for type" << int(type) << ": insufficient data read (expected: " << bytes_to_read << " / got: " << bytes_read << ")"  << std::endl;
+        std::cerr << "#### ThreadExecutor::handleRead(" << filename << ") error (len) for type " << int(type) << ": insufficient data read (expected: " << bytes_to_read << " / got: " << bytes_read << ")"  << std::endl;
         std::exit(EXIT_FAILURE);
     }
 
@@ -169,7 +175,7 @@ bool ProcessExecutor::handleRead(int rpipe, unsigned int &result, const std::str
         bytes_read = read(rpipe, data_start, bytes_to_read);
         if (bytes_read <= 0) {
             const int err = errno;
-            std::cerr << "#### ThreadExecutor::handleRead(" << filename << ") error (buf) for type" << int(type) << ": " << std::strerror(err) << std::endl;
+            std::cerr << "#### ThreadExecutor::handleRead(" << filename << ") error (buf) for type " << int(type) << ": " << strerror_safe(err) << std::endl;
             std::exit(EXIT_FAILURE);
         }
         bytes_to_read -= bytes_read;
@@ -243,25 +249,29 @@ unsigned int ProcessExecutor::check()
             // setup pipe
             int pipes[2];
             if (pipe(pipes) == -1) {
-                std::cerr << "#### ThreadExecutor::check, pipe() failed: "<< std::strerror(errno) << std::endl;
+                const int err = errno;
+                std::cerr << "#### ThreadExecutor::check, pipe() failed: "<< strerror_safe(err) << std::endl;
                 std::exit(EXIT_FAILURE);
             }
 
             const int flags = fcntl(pipes[0], F_GETFL, 0);
             if (flags < 0) {
-                std::cerr << "#### ThreadExecutor::check, fcntl(F_GETFL) failed: "<< std::strerror(errno) << std::endl;
+                const int err = errno;
+                std::cerr << "#### ThreadExecutor::check, fcntl(F_GETFL) failed: "<< strerror_safe(err) << std::endl;
                 std::exit(EXIT_FAILURE);
             }
 
             if (fcntl(pipes[0], F_SETFL, flags | O_NONBLOCK) < 0) {
-                std::cerr << "#### ThreadExecutor::check, fcntl(F_SETFL) failed: "<< std::strerror(errno) << std::endl;
+                const int err = errno;
+                std::cerr << "#### ThreadExecutor::check, fcntl(F_SETFL) failed: "<< strerror_safe(err) << std::endl;
                 std::exit(EXIT_FAILURE);
             }
 
             // fork process
             const pid_t pid = fork();
             if (pid < 0) {
-                std::cerr << "#### ThreadExecutor::check, Failed to create child process: "<< std::strerror(errno) << std::endl;
+                const int err = errno;
+                std::cerr << "#### ThreadExecutor::check, Failed to create child process: "<< strerror_safe(err) << std::endl;
                 std::exit(EXIT_FAILURE);
             }
             if (pid == 0) {
@@ -341,7 +351,7 @@ unsigned int ProcessExecutor::check()
             if (child == -1) {
                 const int err = errno;
                 if (err != ECHILD) {
-                    std::cerr << "#### ThreadExecutor::check, Failed to wait for child process:"<< std::strerror(err) << std::endl;
+                    std::cerr << "#### ThreadExecutor::check(" << fileName << ") failed to wait for child process: "<< strerror_safe(err) << std::endl;
                     std::exit(EXIT_FAILURE);
                 }
             }
