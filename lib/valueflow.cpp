@@ -2339,7 +2339,9 @@ static bool bifurcate(const Token* tok, const std::set<nonneg int>& varids, cons
 }
 
 struct ValueFlowAnalyzer : Analyzer {
-    const TokenList& tokenlist;
+protected:
+    std::reference_wrapper<const TokenList> tokenlist;
+public:
     const Settings* settings;
     ProgramMemoryState pms;
 
@@ -2386,7 +2388,7 @@ struct ValueFlowAnalyzer : Analyzer {
     }
 
     bool isCPP() const {
-        return tokenlist.isCPP();
+        return tokenlist.get().isCPP();
     }
 
     const Settings* getSettings() const {
