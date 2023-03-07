@@ -90,8 +90,8 @@ public:
         writeToPipe(REPORT_ERROR, msg.serialize());
     }
 
-    void writeEnd(const std::string& str) const {
-        writeToPipe(CHILD_END, str);
+    void writeEnd(unsigned int res) const {
+        writeToPipe(CHILD_END, std::to_string(res));
     }
 
 private:
@@ -128,7 +128,7 @@ private:
     const int mWpipe;
 };
 
-bool ProcessExecutor::handleRead(int rpipe, unsigned int &result, const std::string& filename)
+bool ProcessExecutor::handleRead(ErrorLogger &errlogger, int rpipe, unsigned int &result, const std::string& filename)
 {
     std::size_t bytes_to_read;
     ssize_t bytes_read;
@@ -190,7 +190,7 @@ bool ProcessExecutor::handleRead(int rpipe, unsigned int &result, const std::str
     if (type == PipeWriter::REPORT_OUT) {
         // the first character is the color
         const Color c = static_cast<Color>(buf[0]);
-        mErrorLogger.reportOut(buf + 1, c);
+        errlogger.reportOut(buf + 1, c);
     } else if (type == PipeWriter::REPORT_ERROR) {
         ErrorMessage msg;
         try {
@@ -201,7 +201,7 @@ bool ProcessExecutor::handleRead(int rpipe, unsigned int &result, const std::str
         }
 
         if (hasToLog(msg))
-            mErrorLogger.reportErr(msg);
+            errlogger.reportErr(msg);
     } else if (type == PipeWriter::CHILD_END) {
         result += std::stoi(buf);
         res = false;
@@ -299,7 +299,7 @@ unsigned int ProcessExecutor::check()
                     resultOfCheck = fileChecker.check(iFile->first);
                 }
 
-                pipewriter.writeEnd(std::to_string(resultOfCheck));
+                pipewriter.writeEnd(resultOfCheck);
                 std::exit(EXIT_SUCCESS);
             }
 
@@ -333,7 +333,7 @@ unsigned int ProcessExecutor::check()
                 if (!FD_ISSET(pipes[0], &rfds))
                     continue;
 
-                const bool readRes = handleRead(pipes[0], result, fileName);
+                const bool readRes = handleRead(mErrorLogger, pipes[0], result, fileName);
                 if (!readRes) {
                     fileCount++;
                     processedsize += fileSize;
@@ -365,14 +365,10 @@ unsigned int ProcessExecutor::check()
             if (WIFEXITED(stat)) {
                 const int exitstatus = WEXITSTATUS(stat);
                 if (exitstatus != EXIT_SUCCESS) {
-                    std::ostringstream oss;
-                    oss << "Child process exited with " << exitstatus;
-                    reportInternalChildErr(fileName, oss.str());
+                    reportInternalChildErr(mErrorLogger, fileName, "Child process exited with " + std::to_string(exitstatus));
                 }
             } else if (WIFSIGNALED(stat)) {
-                std::ostringstream oss;
-                oss << "Child process crashed with signal " << WTERMSIG(stat);
-                reportInternalChildErr(fileName, oss.str());
+                reportInternalChildErr(mErrorLogger, fileName, "Child process crashed with signal " + std::to_string(WTERMSIG(stat)));
             }
         }
     }
@@ -380,7 +376,7 @@ unsigned int ProcessExecutor::check()
     return result;
 }
 
-void ProcessExecutor::reportInternalChildErr(const std::string &childname, const std::string &msg)
+void ProcessExecutor::reportInternalChildErr(ErrorLogger &errorlogger, const std::string &childname, const std::string &msg)
 {
     std::list<ErrorMessage::FileLocation> locations;
     locations.emplace_back(childname, 0, 0);
@@ -392,7 +388,7 @@ void ProcessExecutor::reportInternalChildErr(const std::string &childname, const
                               Certainty::normal);
 
     if (!mSettings.nomsg.isSuppressed(errmsg))
-        mErrorLogger.reportErr(errmsg);
+        errorlogger.reportErr(errmsg);
 }
 
 #endif // !WIN32
