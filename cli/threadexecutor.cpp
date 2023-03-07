@@ -165,7 +165,7 @@ static unsigned int STDCALL threadProc(ThreadData *data)
     std::size_t fileSize;
 
     while (data->next(file, fs, fileSize)) {
-        data->check(data->logForwarder, file, fs);
+        result += data->check(data->logForwarder, file, fs);
 
         data->status(fileSize);
     }
