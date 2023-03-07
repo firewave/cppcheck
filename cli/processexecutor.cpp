@@ -227,22 +227,16 @@ bool ProcessExecutor::checkLoadAverage(size_t nchildren)
 #endif
 }
 
-unsigned int ProcessExecutor::check()
+unsigned int STDCALL ProcessExecutor::threadProc(ThreadData *data)
 {
-    unsigned int fileCount = 0;
     unsigned int result = 0;
 
-    const std::size_t totalfilesize = std::accumulate(mFiles.cbegin(), mFiles.cend(), std::size_t(0), [](std::size_t v, const std::pair<std::string, std::size_t>& p) {
-        return v + p.second;
-    });
+    const std::string *file;
+    const ImportProject::FileSettings *fs;
+    std::size_t fileSize;
 
-    std::size_t processedsize = 0;
-    std::map<std::string, std::size_t>::const_iterator iFile = mFiles.cbegin();
-    std::list<ImportProject::FileSettings>::const_iterator iFileSettings = mSettings.project.fileSettings.cbegin();
-    for (;;) {
-        if (iFile == mFiles.end() && iFileSettings == mSettings.project.fileSettings.end())
-            break;
-
+    while (data->next(file, fs, fileSize)) {
+        const std::string &fileName = file ? *file : emptyString;
         // Start a new child
         //const size_t nchildren = childFile.size();
         if (true /*nchildren < mSettings.jobs && checkLoadAverage(nchildren)*/) {
@@ -250,20 +244,20 @@ unsigned int ProcessExecutor::check()
             int pipes[2];
             if (pipe(pipes) == -1) {
                 const int err = errno;
-                std::cerr << "#### ThreadExecutor::check, pipe() failed: "<< strerror_safe(err) << std::endl;
+                std::cerr << "#### ThreadExecutor::check(" << fileName << ") pipe() failed: "<< strerror_safe(err) << std::endl;
                 std::exit(EXIT_FAILURE);
             }
 
             const int flags = fcntl(pipes[0], F_GETFL, 0);
             if (flags < 0) {
                 const int err = errno;
-                std::cerr << "#### ThreadExecutor::check, fcntl(F_GETFL) failed: "<< strerror_safe(err) << std::endl;
+                std::cerr << "#### ThreadExecutor::check(" << fileName << ") fcntl(F_GETFL) failed: "<< strerror_safe(err) << std::endl;
                 std::exit(EXIT_FAILURE);
             }
 
             if (fcntl(pipes[0], F_SETFL, flags | O_NONBLOCK) < 0) {
                 const int err = errno;
-                std::cerr << "#### ThreadExecutor::check, fcntl(F_SETFL) failed: "<< strerror_safe(err) << std::endl;
+                std::cerr << "#### ThreadExecutor::check(" << fileName << ") fcntl(F_SETFL) failed: "<< strerror_safe(err) << std::endl;
                 std::exit(EXIT_FAILURE);
             }
 
@@ -271,7 +265,7 @@ unsigned int ProcessExecutor::check()
             const pid_t pid = fork();
             if (pid < 0) {
                 const int err = errno;
-                std::cerr << "#### ThreadExecutor::check, Failed to create child process: "<< strerror_safe(err) << std::endl;
+                std::cerr << "#### ThreadExecutor::check(" << fileName << ") failed to create child process: "<< strerror_safe(err) << std::endl;
                 std::exit(EXIT_FAILURE);
             }
             if (pid == 0) {
@@ -282,16 +276,7 @@ unsigned int ProcessExecutor::check()
                 close(pipes[0]);
 
                 PipeWriter pipewriter(pipes[1]);
-                CppCheck fileChecker(pipewriter, false, CppCheckExecutor::executeCommand);
-                fileChecker.settings() = mSettings;
-                unsigned int resultOfCheck = 0;
-
-                if (iFileSettings != mSettings.project.fileSettings.end()) {
-                    resultOfCheck = fileChecker.check(*iFileSettings);
-                } else {
-                    // Read file from a file
-                    resultOfCheck = fileChecker.check(iFile->first);
-                }
+                const unsigned int resultOfCheck = data->check(pipewriter, file, fs);
 
                 pipewriter.writeEnd(resultOfCheck);
                 std::exit(EXIT_SUCCESS);
@@ -299,17 +284,6 @@ unsigned int ProcessExecutor::check()
 
             // in main process
             close(pipes[1]);
-            std::string fileName;
-            std::size_t fileSize;
-            if (iFileSettings != mSettings.project.fileSettings.end()) {
-                fileName = iFileSettings->filename + ' ' + iFileSettings->cfg;
-                fileSize = 0;
-                ++iFileSettings;
-            } else {
-                fileName = iFile->first;
-                fileSize = iFile->second;
-                ++iFile;
-            }
 
             // wait for pipe
             while (true) {
@@ -327,15 +301,9 @@ unsigned int ProcessExecutor::check()
                 if (!FD_ISSET(pipes[0], &rfds))
                     continue;
 
-                const bool readRes = handleRead(mErrorLogger, pipes[0], result, fileName);
+                const bool readRes = handleRead(data->logForwarder(), pipes[0], result, fileName);
                 if (!readRes) {
-                    fileCount++;
-                    processedsize += fileSize;
-                    if (!mSettings.quiet)
-                        CppCheckExecutor::reportStatus(fileCount,
-                                                       mFiles.size() + mSettings.project.fileSettings.size(),
-                                                       processedsize, totalfilesize);
-
+                    data->status(fileSize);
                     close(pipes[0]);
                     break;
                 }
@@ -359,10 +327,10 @@ unsigned int ProcessExecutor::check()
             if (WIFEXITED(stat)) {
                 const int exitstatus = WEXITSTATUS(stat);
                 if (exitstatus != EXIT_SUCCESS) {
-                    reportInternalChildErr(mErrorLogger, fileName, "Child process exited with " + std::to_string(exitstatus));
+                    reportInternalChildErr(data->logForwarder(), fileName, "Child process exited with " + std::to_string(exitstatus));
                 }
             } else if (WIFSIGNALED(stat)) {
-                reportInternalChildErr(mErrorLogger, fileName, "Child process crashed with signal " + std::to_string(WTERMSIG(stat)));
+                reportInternalChildErr(data->logForwarder(), fileName, "Child process crashed with signal " + std::to_string(WTERMSIG(stat)));
             }
         }
     }
