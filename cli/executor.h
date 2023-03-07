@@ -19,9 +19,13 @@
 #ifndef EXECUTOR_H
 #define EXECUTOR_H
 
+#include "config.h"
+#include "importproject.h"
+
 #include <cstddef>
 #include <list>
 #include <map>
+#include <memory>
 #include <mutex>
 #include <string>
 
@@ -44,9 +48,31 @@ public:
     Executor(const Executor &) = delete;
     void operator=(const Executor &) = delete;
 
-    virtual unsigned int check() = 0;
+    unsigned int check();
 
 protected:
+    class ThreadData
+    {
+    public:
+        ThreadData(Executor &executor, ErrorLogger &errorLogger, const Settings &settings, const std::map<std::string, std::size_t> &files, const std::list<ImportProject::FileSettings> &fileSettings);
+
+        bool next(const std::string *&file, const ImportProject::FileSettings *&fs, std::size_t &fileSize);
+
+        unsigned int check(ErrorLogger &errorLogger, const std::string *file, const ImportProject::FileSettings *fs);
+
+        void status(std::size_t fileSize);
+
+        ErrorLogger& logForwarder();
+
+    private:
+        class ThreadDataImpl;
+        std::unique_ptr<ThreadDataImpl> mImpl;
+    };
+
+    friend class SyncLogForwarder;
+
+    virtual unsigned int STDCALL threadProc(ThreadData *data) = 0;
+
     /**
      * @brief Check if message is being suppressed and unique.
      * @param msg the message to check

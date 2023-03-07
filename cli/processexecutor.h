@@ -42,7 +42,9 @@ public:
     ~ProcessExecutor() override;
     void operator=(const ProcessExecutor &) = delete;
 
-    unsigned int check() override;
+    unsigned int check();
+
+    unsigned int STDCALL threadProc(ThreadData */*data*/) override { return 0; }
 
 private:
     /**
