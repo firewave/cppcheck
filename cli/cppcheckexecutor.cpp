@@ -85,25 +85,16 @@ bool CppCheckExecutor::parseFromArgs(Settings &settings, int argc, const char* c
     const bool success = parser.parseFromArgs(argc, argv);
 
     if (success) {
-        if (parser.getShowVersion() && !parser.getShowErrorMessages()) {
-            if (!settings.cppcheckCfgProductName.empty()) {
-                std::cout << settings.cppcheckCfgProductName << std::endl;
-            } else {
-                const char * const extraVersion = CppCheck::extraVersion();
-                if (*extraVersion != 0)
-                    std::cout << "Cppcheck " << CppCheck::version() << " ("
-                              << extraVersion << ')' << std::endl;
-                else
-                    std::cout << "Cppcheck " << CppCheck::version() << std::endl;
-            }
-        }
-
         if (parser.getShowErrorMessages()) {
             mShowAllErrors = true;
             std::cout << ErrorMessage::getXMLHeader(settings.cppcheckCfgProductName);
             // TODO
             //cppcheck->getErrorMessages();
             std::cout << ErrorMessage::getXMLFooter() << std::endl;
+            mShowAllErrors = false;
+
+            Settings::terminate();
+            return true;
         }
 
         if (parser.exitAfterPrinting()) {

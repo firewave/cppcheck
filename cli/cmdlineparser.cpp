@@ -962,8 +962,6 @@ bool CmdLineParser::parseFromArgs(int argc, const char* const argv[])
             else if (std::strcmp(argv[i], "--version") == 0) {
                 mShowVersion = true;
                 mExitAfterPrint = true;
-                mSettings.loadCppcheckCfg();
-                return true;
             }
 
             // Write results in results.xml
@@ -1005,6 +1003,20 @@ bool CmdLineParser::parseFromArgs(int argc, const char* const argv[])
     }
 
     mSettings.loadCppcheckCfg();
+
+    if (mShowVersion) {
+        if (!mSettings.cppcheckCfgProductName.empty()) {
+            std::cout << mSettings.cppcheckCfgProductName << std::endl;
+        } else {
+            const char * const extraVersion = CppCheck::extraVersion();
+            if (*extraVersion != 0)
+                std::cout << "Cppcheck " << CppCheck::version() << " ("
+                          << extraVersion << ')' << std::endl;
+            else
+                std::cout << "Cppcheck " << CppCheck::version() << std::endl;
+        }
+        return true;
+    }
 
     // Default template format..
     if (mSettings.templateFormat.empty()) {
