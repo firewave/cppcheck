@@ -388,10 +388,12 @@ static std::string getDefinesFlags(const std::string &semicolonSeparatedString)
     return flags;
 }
 
-CppCheck::CppCheck(ErrorLogger &errorLogger,
+CppCheck::CppCheck(Settings &settings,
+                   ErrorLogger &errorLogger,
                    bool useGlobalSuppressions,
                    std::function<bool(std::string,std::vector<std::string>,std::string,std::string&)> executeCommand)
-    : mErrorLogger(errorLogger)
+    : mSettings(settings)
+    , mErrorLogger(errorLogger)
     , mExitCode(0)
     , mUseGlobalSuppressions(useGlobalSuppressions)
     , mTooManyConfigs(false)
@@ -596,24 +598,27 @@ unsigned int CppCheck::check(const std::string &path, const std::string &content
 
 unsigned int CppCheck::check(const ImportProject::FileSettings &fs)
 {
-    CppCheck temp(mErrorLogger, mUseGlobalSuppressions, mExecuteCommand);
-    temp.mSettings = mSettings;
-    if (!temp.mSettings.userDefines.empty())
-        temp.mSettings.userDefines += ';';
-    if (mSettings.clang)
-        temp.mSettings.userDefines += fs.defines;
-    else
-        temp.mSettings.userDefines += fs.cppcheckDefines();
-    temp.mSettings.includePaths = fs.includePaths;
-    temp.mSettings.userUndefs.insert(fs.undefs.cbegin(), fs.undefs.cend());
-    if (fs.standard.find("++") != std::string::npos)
-        temp.mSettings.standards.setCPP(fs.standard);
-    else if (!fs.standard.empty())
-        temp.mSettings.standards.setC(fs.standard);
-    if (fs.platformType != cppcheck::Platform::Type::Unspecified)
-        temp.mSettings.platform.set(fs.platformType);
+    // TODO: get rid of copy
+    Settings s = mSettings;
+    if (!s.userDefines.empty())
+        s.userDefines += ';';
     if (mSettings.clang) {
-        temp.mSettings.includePaths.insert(temp.mSettings.includePaths.end(), fs.systemIncludePaths.cbegin(), fs.systemIncludePaths.cend());
+        s.userDefines += fs.defines;
+        s.includePaths.insert(s.includePaths.end(), fs.systemIncludePaths.cbegin(), fs.systemIncludePaths.cend());
+    }
+    else
+        s.userDefines += fs.cppcheckDefines();
+    s.includePaths = fs.includePaths;
+    s.userUndefs.insert(fs.undefs.cbegin(), fs.undefs.cend());
+    if (fs.standard.find("++") != std::string::npos)
+        s.standards.setCPP(fs.standard);
+    else if (!fs.standard.empty())
+        s.standards.setC(fs.standard);
+    if (fs.platformType != cppcheck::Platform::Type::Unspecified)
+        s.platform.set(fs.platformType);
+
+    CppCheck temp(s, mErrorLogger, mUseGlobalSuppressions, mExecuteCommand);
+    if (mSettings.clang) {
         return temp.check(Path::simplifyPath(fs.filename));
     }
     std::ifstream fin(fs.filename);
@@ -1530,11 +1535,6 @@ void CppCheck::executeAddonsWholeProgram(const std::map<std::string, std::size_t
         for (const std::string &f: ctuInfoFiles)
             std::remove(f.c_str());
     }
-}
-
-Settings &CppCheck::settings()
-{
-    return mSettings;
 }
 
 void CppCheck::tooManyConfigsError(const std::string &file, const int numberOfConfigurations)
