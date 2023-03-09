@@ -1669,6 +1669,7 @@ void CppCheck::getErrorMessages()
 
     mTooManyConfigs = true;
     tooManyConfigsError(emptyString,0U);
+    mTooManyConfigs = false;
 
     // call all "getErrorMessages" in all registered Check classes
     for (std::list<Check *>::const_iterator it = Check::instances().cbegin(); it != Check::instances().cend(); ++it)

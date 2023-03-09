@@ -79,9 +79,8 @@ CppCheckExecutor::~CppCheckExecutor()
     delete mErrorOutput;
 }
 
-bool CppCheckExecutor::parseFromArgs(CppCheck *cppcheck, int argc, const char* const argv[])
+bool CppCheckExecutor::parseFromArgs(Settings &settings, int argc, const char* const argv[])
 {
-    Settings& settings = *const_cast<Settings*>(mSettings);
     CmdLineParser parser(settings);
     const bool success = parser.parseFromArgs(argc, argv);
 
@@ -102,7 +101,8 @@ bool CppCheckExecutor::parseFromArgs(CppCheck *cppcheck, int argc, const char* c
         if (parser.getShowErrorMessages()) {
             mShowAllErrors = true;
             std::cout << ErrorMessage::getXMLHeader(settings.cppcheckCfgProductName);
-            cppcheck->getErrorMessages();
+            // TODO
+            //cppcheck->getErrorMessages();
             std::cout << ErrorMessage::getXMLFooter() << std::endl;
         }
 
@@ -201,21 +201,18 @@ int CppCheckExecutor::check(int argc, const char* const argv[])
     CheckUnusedFunctions::clear();
 
     Settings settings;
+    if (!parseFromArgs(settings, argc, argv)) {
+        return EXIT_FAILURE;
+    }
+    if (Settings::terminated()) {
+        return EXIT_SUCCESS;
+    }
+
     CppCheck cppCheck(settings, *this, true, executeCommand);
 
     mSettings = &settings;
 
-    if (!parseFromArgs(&cppCheck, argc, argv)) {
-        mSettings = nullptr;
-        return EXIT_FAILURE;
-    }
-    if (Settings::terminated()) {
-        mSettings = nullptr;
-        return EXIT_SUCCESS;
-    }
-
     int ret;
-
     if (settings.exceptionHandling)
         ret = check_wrapper(cppCheck);
     else
