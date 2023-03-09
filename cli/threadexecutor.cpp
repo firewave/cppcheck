@@ -142,8 +142,9 @@ static unsigned int STDCALL threadProc(Data *data, SyncLogForwarder* logForwarde
         if (!data->next(file, fs, fileSize))
             break;
 
-        CppCheck fileChecker(*logForwarder, false, CppCheckExecutor::executeCommand);
-        fileChecker.settings() = settings;
+        // TODO: get rid of copy
+        Settings s = settings;
+        CppCheck fileChecker(s, *logForwarder, false, CppCheckExecutor::executeCommand);
 
         if (fs) {
             // file settings..

@@ -119,6 +119,7 @@ protected:
     State mState;
 
     ThreadResult &mResult;
+    Settings mSettings;
     /**
      * @brief Cppcheck itself
      */

@@ -81,7 +81,7 @@ CppCheckExecutor::~CppCheckExecutor()
 
 bool CppCheckExecutor::parseFromArgs(CppCheck *cppcheck, int argc, const char* const argv[])
 {
-    Settings& settings = cppcheck->settings();
+    Settings& settings = *const_cast<Settings*>(mSettings);
     CmdLineParser parser(settings);
     const bool success = parser.parseFromArgs(argc, argv);
 
@@ -200,9 +200,9 @@ int CppCheckExecutor::check(int argc, const char* const argv[])
 {
     CheckUnusedFunctions::clear();
 
-    CppCheck cppCheck(*this, true, executeCommand);
+    Settings settings;
+    CppCheck cppCheck(settings, *this, true, executeCommand);
 
-    const Settings& settings = cppCheck.settings();
     mSettings = &settings;
 
     if (!parseFromArgs(&cppCheck, argc, argv)) {
@@ -216,7 +216,7 @@ int CppCheckExecutor::check(int argc, const char* const argv[])
 
     int ret;
 
-    if (cppCheck.settings().exceptionHandling)
+    if (settings.exceptionHandling)
         ret = check_wrapper(cppCheck);
     else
         ret = check_internal(cppCheck);
@@ -259,7 +259,7 @@ bool CppCheckExecutor::reportSuppressions(const Settings &settings, bool unusedF
  * */
 int CppCheckExecutor::check_internal(CppCheck& cppcheck)
 {
-    Settings& settings = cppcheck.settings();
+    Settings& settings = *const_cast<Settings*>(mSettings);
     const bool std = tryLoadLibrary(settings.library, settings.exename, "std.cfg");
 
     for (const std::string &lib : settings.libraries) {

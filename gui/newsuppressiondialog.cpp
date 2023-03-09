@@ -45,8 +45,9 @@ NewSuppressionDialog::NewSuppressionDialog(QWidget *parent) :
         QStringList errorIds;
     };
 
+    Settings s;
     QErrorLogger errorLogger;
-    CppCheck cppcheck(errorLogger, false, nullptr);
+    CppCheck cppcheck(s, errorLogger, false, nullptr);
     cppcheck.getErrorMessages();
     errorLogger.errorIds.sort();
 

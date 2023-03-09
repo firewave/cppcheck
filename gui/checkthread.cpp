@@ -75,7 +75,7 @@ static bool executeCommand(std::string exe, std::vector<std::string> args, std::
 CheckThread::CheckThread(ThreadResult &result) :
     mState(Ready),
     mResult(result),
-    mCppcheck(result, true, executeCommand),
+    mCppcheck(mSettings, mResult, true, executeCommand),
     mAnalyseWholeProgram(false)
 {
     //ctor
@@ -89,7 +89,8 @@ CheckThread::~CheckThread()
 void CheckThread::check(const Settings &settings)
 {
     mFiles.clear();
-    mCppcheck.settings() = settings;
+    // TODO
+    //mCppcheck.settings() = settings;
     start();
 }
 
@@ -111,7 +112,8 @@ void CheckThread::run()
         std::map<std::string,std::size_t> files2;
         for (const QString& file : mFiles)
             files2[file.toStdString()] = 0;
-        mCppcheck.analyseWholeProgram(mCppcheck.settings().buildDir, files2);
+        // TODO
+        //mCppcheck.analyseWholeProgram(mCppcheck.settings().buildDir, files2);
         mFiles.clear();
         emit done();
         return;
@@ -200,15 +202,17 @@ void CheckThread::runAddonsAndTools(const ImportProject::FileSettings *fileSetti
                 args << ("-std=" + QString::fromStdString(fileSettings->standard));
             else {
                 // TODO: pass C or C++ standard based on file type
+                /*
                 const std::string std = mCppcheck.settings().standards.getCPP();
                 if (!std.empty()) {
                     args << ("-std=" + QString::fromStdString(std));
                 }
+                 */
             }
 
             QString analyzerInfoFile;
 
-            const std::string &buildDir = mCppcheck.settings().buildDir;
+            const std::string &buildDir = emptyString; //mCppcheck.settings().buildDir;
             if (!buildDir.empty()) {
                 analyzerInfoFile = QString::fromStdString(AnalyzerInformation::getAnalyzerInfoFile(buildDir, fileSettings->filename, fileSettings->cfg));
 
