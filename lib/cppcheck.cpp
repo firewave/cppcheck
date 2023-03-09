@@ -631,10 +631,6 @@ unsigned int CppCheck::checkFile(const std::string& filename, const std::string 
 {
     mExitCode = 0;
 
-    // only show debug warnings for accepted C/C++ source files
-    if (!Path::acceptFile(filename))
-        mSettings.debugwarnings = false;
-
     if (Settings::terminated())
         return mExitCode;
 
