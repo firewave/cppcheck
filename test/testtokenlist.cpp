@@ -40,14 +40,14 @@ private:
 
     // inspired by #5895
     void testaddtoken1() {
-        const std::string code = "0x89504e470d0a1a0a";
+        const char code[] = "0x89504e470d0a1a0a";
         TokenList tokenlist(&settings);
         tokenlist.addtoken(code, 1, 1, false);
         ASSERT_EQUALS("0x89504e470d0a1a0a", tokenlist.front()->str());
     }
 
     void testaddtoken2() {
-        const std::string code = "0xF0000000";
+        const char code[] = "0xF0000000";
         settings.platform.int_bit = 32;
         TokenList tokenlist(&settings);
         tokenlist.addtoken(code, 1, 1, false);

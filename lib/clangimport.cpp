@@ -353,7 +353,7 @@ namespace clangimport {
         }
     private:
         Token *createTokens(TokenList *tokenList);
-        Token *addtoken(TokenList *tokenList, const std::string &str, bool valueType=true);
+        Token *addtoken(TokenList *tokenList, std::string str, bool valueType=true);
         const ::Type *addTypeTokens(TokenList *tokenList, const std::string &str, const Scope *scope = nullptr);
         void addFullScopeNameTokens(TokenList *tokenList, const Scope *recordScope);
         Scope *createScope(TokenList *tokenList, Scope::ScopeType scopeType, AstNodePtr astNode, const Token *def);
@@ -526,10 +526,10 @@ void clangimport::AstNode::setLocations(TokenList *tokenList, int file, int line
     }
 }
 
-Token *clangimport::AstNode::addtoken(TokenList *tokenList, const std::string &str, bool valueType)
+Token *clangimport::AstNode::addtoken(TokenList *tokenList, std::string str, bool valueType)
 {
     const Scope *scope = getNestedInScope(tokenList);
-    tokenList->addtoken(str, mLine, mCol, mFile);
+    tokenList->addtoken(std::move(str), mLine, mCol, mFile);
     tokenList->back()->scope(scope);
     if (valueType)
         setValueType(tokenList->back());

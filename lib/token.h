@@ -200,7 +200,7 @@ public:
 
     template<typename T>
     void str(T&& s) {
-        mStr = s;
+        mStr = std::forward(s);
         mImpl->mVarId = 0;
 
         update_property_info();
@@ -852,11 +852,11 @@ public:
      * @param prepend Insert the new token before this token when it's not
      * the first one on the tokens list.
      */
-    Token* insertToken(const std::string& tokenStr, const std::string& originalNameStr = emptyString, bool prepend = false);
+    Token* insertToken(std::string tokenStr, const std::string& originalNameStr = emptyString, bool prepend = false);
 
-    Token* insertTokenBefore(const std::string& tokenStr, const std::string& originalNameStr = emptyString)
+    Token* insertTokenBefore(std::string tokenStr, const std::string& originalNameStr = emptyString)
     {
-        return insertToken(tokenStr, originalNameStr, true);
+        return insertToken(std::move(tokenStr), originalNameStr, true);
     }
 
     Token *previous() const {

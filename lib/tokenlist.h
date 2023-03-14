@@ -69,8 +69,8 @@ public:
      */
     static void deleteTokens(Token *tok);
 
-    void addtoken(const std::string& str, const nonneg int lineno, const nonneg int column, const nonneg int fileno, bool split = false);
-    void addtoken(const std::string& str, const Token *locationTok);
+    void addtoken(std::string str, const nonneg int lineno, const nonneg int column, const nonneg int fileno, bool split = false);
+    void addtoken(std::string str, const Token *locationTok);
 
     void addtoken(const Token *tok, const nonneg int lineno, const nonneg int column, const nonneg int fileno);
     void addtoken(const Token *tok, const Token *locationTok);
@@ -96,6 +96,7 @@ public:
      * - comments are not handled.
      * @param code input stream for code
      * @param file0 source file name
+     * @returns True if no error occurred during parsing
      */
     bool createTokens(std::istream &code, const std::string& file0 = emptyString);
 

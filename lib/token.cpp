@@ -1034,14 +1034,14 @@ void Token::function(const Function *f)
         tokType(eName);
 }
 
-Token* Token::insertToken(const std::string& tokenStr, const std::string& originalNameStr, bool prepend)
+Token* Token::insertToken(std::string tokenStr, const std::string& originalNameStr, bool prepend)
 {
     Token *newToken;
     if (mStr.empty())
         newToken = this;
     else
         newToken = new Token(mTokensFrontBack);
-    newToken->str(tokenStr);
+    newToken->str(std::move(tokenStr));
     if (!originalNameStr.empty())
         newToken->originalName(originalNameStr);
 

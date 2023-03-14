@@ -128,7 +128,7 @@ void TokenList::deleteTokens(Token *tok)
 // add a token.
 //---------------------------------------------------------------------------
 
-void TokenList::addtoken(const std::string& str, const nonneg int lineno, const nonneg int column, const nonneg int fileno, bool split)
+void TokenList::addtoken(std::string str, const nonneg int lineno, const nonneg int column, const nonneg int fileno, bool split)
 {
     if (str.empty())
         return;
@@ -149,11 +149,11 @@ void TokenList::addtoken(const std::string& str, const nonneg int lineno, const 
     }
 
     if (mTokensFrontBack.back) {
-        mTokensFrontBack.back->insertToken(str);
+        mTokensFrontBack.back->insertToken(std::move(str));
     } else {
         mTokensFrontBack.front = new Token(&mTokensFrontBack);
         mTokensFrontBack.back = mTokensFrontBack.front;
-        mTokensFrontBack.back->str(str);
+        mTokensFrontBack.back->str(std::move(str));
     }
 
     mTokensFrontBack.back->linenr(lineno);
@@ -161,17 +161,17 @@ void TokenList::addtoken(const std::string& str, const nonneg int lineno, const 
     mTokensFrontBack.back->fileIndex(fileno);
 }
 
-void TokenList::addtoken(const std::string& str, const Token *locationTok)
+void TokenList::addtoken(std::string str, const Token *locationTok)
 {
     if (str.empty())
         return;
 
     if (mTokensFrontBack.back) {
-        mTokensFrontBack.back->insertToken(str);
+        mTokensFrontBack.back->insertToken(std::move(str));
     } else {
         mTokensFrontBack.front = new Token(&mTokensFrontBack);
         mTokensFrontBack.back = mTokensFrontBack.front;
-        mTokensFrontBack.back->str(str);
+        mTokensFrontBack.back->str(std::move(str));
     }
 
     mTokensFrontBack.back->linenr(locationTok->linenr());
@@ -334,8 +334,12 @@ bool TokenList::createTokens(std::istream &code, const std::string& file0)
 
 void TokenList::createTokens(simplecpp::TokenList&& tokenList)
 {
-    if (tokenList.cfront())
+    if (tokenList.cfront()) {
+        // this is a copy
+        // TODO: the same as TokenList.files - move that instead
+        // TODO: this points to mFiles when called from createTokens(std::istream &, const std::string&)
         mOrigFiles = mFiles = tokenList.cfront()->location.files;
+    }
     else
         mFiles.clear();
 
@@ -343,6 +347,7 @@ void TokenList::createTokens(simplecpp::TokenList&& tokenList)
 
     for (const simplecpp::Token *tok = tokenList.cfront(); tok;) {
 
+        // TODO: move from TokenList
         std::string str = tok->str();
 
         // Float literal
@@ -350,11 +355,11 @@ void TokenList::createTokens(simplecpp::TokenList&& tokenList)
             str = '0' + str;
 
         if (mTokensFrontBack.back) {
-            mTokensFrontBack.back->insertToken(str);
+            mTokensFrontBack.back->insertToken(std::move(str));
         } else {
             mTokensFrontBack.front = new Token(&mTokensFrontBack);
             mTokensFrontBack.back = mTokensFrontBack.front;
-            mTokensFrontBack.back->str(str);
+            mTokensFrontBack.back->str(std::move(str));
         }
 
         mTokensFrontBack.back->fileIndex(tok->location.fileIndex);
