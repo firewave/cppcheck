@@ -2378,7 +2378,7 @@ bool Tokenizer::simplifyUsing()
             structEnd = structEnd->link();
 
             // add ';' after end of struct
-            structEnd->insertToken(";", emptyString);
+            structEnd->insertToken(";", "");
 
             // add name for anonymous struct
             if (!hasName) {
@@ -2388,8 +2388,8 @@ bool Tokenizer::simplifyUsing()
                 else
                     newName = "Unnamed" + MathLib::toString(mUnnamedCount++);
                 TokenList::copyTokens(structEnd->next(), tok, start);
-                structEnd->tokAt(5)->insertToken(newName, emptyString);
-                start->insertToken(newName, emptyString);
+                structEnd->tokAt(5)->insertToken(newName, "");
+                start->insertToken(newName, "");
             } else
                 TokenList::copyTokens(structEnd->next(), tok, start->next());
 
@@ -6608,11 +6608,11 @@ void Tokenizer::simplifyStaticConst()
             // Move the qualifier to the left-most position in the declaration
             tok->deleteNext();
             if (!leftTok) {
-                list.front()->insertToken(qualifiers[i], emptyString, false);
+                list.front()->insertToken(qualifiers[i], "", false);
                 list.front()->swapWithNext();
                 tok = list.front();
             } else if (leftTok->next()) {
-                leftTok->next()->insertToken(qualifiers[i], emptyString, true);
+                leftTok->next()->insertToken(qualifiers[i], "", true);
                 tok = leftTok->next();
             } else {
                 leftTok->insertToken(qualifiers[i]);
@@ -9556,7 +9556,7 @@ void Tokenizer::prepareTernaryOpForAST()
             }
             if (parenthesesNeeded && tok2 && tok2->str() == ":") {
                 tok->insertToken("(");
-                tok2->insertToken(")", emptyString, true);
+                tok2->insertToken(")", "", true);
                 Token::createMutualLinks(tok->next(), tok2->previous());
             }
         }

@@ -852,11 +852,11 @@ public:
      * @param prepend Insert the new token before this token when it's not
      * the first one on the tokens list.
      */
-    Token* insertToken(std::string tokenStr, const std::string& originalNameStr = emptyString, bool prepend = false);
+    Token* insertToken(std::string tokenStr, std::string originalNameStr = "", bool prepend = false);
 
-    Token* insertTokenBefore(std::string tokenStr, const std::string& originalNameStr = emptyString)
+    Token* insertTokenBefore(std::string tokenStr, std::string originalNameStr = "")
     {
-        return insertToken(std::move(tokenStr), originalNameStr, true);
+        return insertToken(std::move(tokenStr), std::move(originalNameStr), true);
     }
 
     Token *previous() const {
@@ -1187,9 +1187,9 @@ public:
     template<typename T>
     void originalName(T&& name) {
         if (!mImpl->mOriginalName)
-            mImpl->mOriginalName = new std::string(name);
+            mImpl->mOriginalName = new std::string(std::forward(name));
         else
-            *mImpl->mOriginalName = name;
+            *mImpl->mOriginalName = std::forward(name);
     }
 
     bool hasKnownIntValue() const;

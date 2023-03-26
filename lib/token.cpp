@@ -1034,7 +1034,7 @@ void Token::function(const Function *f)
         tokType(eName);
 }
 
-Token* Token::insertToken(std::string tokenStr, const std::string& originalNameStr, bool prepend)
+Token* Token::insertToken(std::string tokenStr, std::string originalNameStr, bool prepend)
 {
     Token *newToken;
     if (mStr.empty())
@@ -1043,7 +1043,7 @@ Token* Token::insertToken(std::string tokenStr, const std::string& originalNameS
         newToken = new Token(mTokensFrontBack);
     newToken->str(std::move(tokenStr));
     if (!originalNameStr.empty())
-        newToken->originalName(originalNameStr);
+        newToken->originalName(std::move(originalNameStr));
 
     if (newToken != this) {
         newToken->mImpl->mLineNumber = mImpl->mLineNumber;
