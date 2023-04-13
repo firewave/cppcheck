@@ -22,6 +22,7 @@
 
 #include "config.h"
 
+#include <atomic>
 #include <cstddef>
 #include <istream>
 #include <list>
@@ -68,8 +69,8 @@ public:
             symbolName = other.symbolName;
             hash = other.hash;
             thisAndNextLine = other.thisAndNextLine;
-            matched = other.matched;
-            checked = other.checked;
+            matched = other.matched.load();
+            checked = other.checked.load();
             return *this;
         }
 
@@ -122,8 +123,8 @@ public:
         std::string symbolName;
         std::size_t hash;
         bool thisAndNextLine; // Special case for backwards compatibility: { // cppcheck-suppress something
-        bool matched;
-        bool checked; // for inline suppressions, checked or not
+        std::atomic_bool matched;
+        std::atomic_bool checked; // for inline suppressions, checked or not
 
         enum { NO_LINE = -1 };
     };
@@ -163,21 +164,15 @@ public:
      * @param suppression suppression details
      * @return error message. empty upon success
      */
-    std::string addSuppression(const Suppression &suppression);
-
-    /**
-     * @brief Combine list of suppressions into the current suppressions.
-     * @param suppressions list of suppression details
-     * @return error message. empty upon success
-     */
-    std::string addSuppressions(const std::list<Suppression> &suppressions);
+    std::string addSuppression(Suppression suppression);
 
     /**
      * @brief Returns true if this message should not be shown to the user.
      * @param errmsg error message
+     * @param global use global suppressions
      * @return true if this error is suppressed.
      */
-    bool isSuppressed(const ErrorMessage &errmsg);
+    bool isSuppressed(const ErrorMessage &errmsg, bool global = true);
 
     /**
      * @brief Returns true if this message should not be shown to the user.
@@ -185,13 +180,6 @@ public:
      * @return true if this error is suppressed.
      */
     bool isSuppressed(const ::ErrorMessage &errmsg);
-
-    /**
-     * @brief Returns true if this message should not be shown to the user, only uses local suppressions.
-     * @param errmsg error message
-     * @return true if this error is suppressed.
-     */
-    bool isSuppressedLocal(const ErrorMessage &errmsg);
 
     /**
      * @brief Create an xml dump of suppressions

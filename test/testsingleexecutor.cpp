@@ -73,13 +73,16 @@ private:
         settings.showtime = showtime;
         if (plistOutput)
             settings.plistOutput = plistOutput;
+        else
+            settings.plistOutput = "";
+        Suppressions suppressions;
+        Suppressions suppressionsNoFail;
         // NOLINTNEXTLINE(performance-unnecessary-value-param)
-        CppCheck cppcheck(*this, true, [](std::string,std::vector<std::string>,std::string,std::string&){
+        CppCheck cppcheck(settings, suppressions, suppressionsNoFail, *this, true, [](std::string,std::vector<std::string>,std::string,std::string&){
             return false;
         });
-        cppcheck.settings() = settings;
         // TODO: test with settings.project.fileSettings;
-        SingleExecutor executor(cppcheck, filemap, settings, *this);
+        SingleExecutor executor(cppcheck, filemap, settings, suppressions, suppressionsNoFail, *this);
         std::vector<std::unique_ptr<ScopedFile>> scopedfiles;
         scopedfiles.reserve(filemap.size());
         for (std::map<std::string, std::size_t>::const_iterator i = filemap.cbegin(); i != filemap.cend(); ++i)

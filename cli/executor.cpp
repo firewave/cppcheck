@@ -28,8 +28,8 @@
 #include <sstream> // IWYU pragma: keep
 #include <utility>
 
-Executor::Executor(const std::map<std::string, std::size_t> &files, Settings &settings, ErrorLogger &errorLogger)
-    : mFiles(files), mSettings(settings), mErrorLogger(errorLogger)
+Executor::Executor(const std::map<std::string, std::size_t> &files, const Settings &settings, Suppressions &suppressions, Suppressions &suppressionsNoFail, ErrorLogger &errorLogger)
+    : mFiles(files), mSettings(settings), mSuppressions(suppressions), mSuppressionsNoFail(suppressionsNoFail), mErrorLogger(errorLogger)
 {}
 
 Executor::~Executor()
@@ -37,7 +37,7 @@ Executor::~Executor()
 
 bool Executor::hasToLog(const ErrorMessage &msg)
 {
-    if (!mSettings.nomsg.isSuppressed(msg))
+    if (!mSuppressions.isSuppressed(msg))
     {
         std::string errmsg = msg.toString(mSettings.verbose);
 

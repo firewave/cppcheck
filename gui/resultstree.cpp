@@ -1088,7 +1088,7 @@ void ResultsTree::suppressHash()
             suppression.errorId = data[ERRORID].toString().toStdString();
             suppression.fileName = data[FILENAME].toString().toStdString();
             suppression.lineNumber = data[LINE].toInt();
-            projectFile->addSuppression(suppression);
+            projectFile->addSuppression(std::move(suppression));
             changed = true;
         }
         fileItem->removeRow(item->row());

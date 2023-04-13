@@ -33,6 +33,7 @@
 class CppCheck;
 class Library;
 class Settings;
+class Suppressions;
 
 /**
  * This class works as an example of how CppCheck can be used in external
@@ -101,7 +102,7 @@ public:
      */
     static bool executeCommand(std::string exe, std::vector<std::string> args, std::string redirect, std::string &output_);
 
-    static bool reportSuppressions(const Settings &settings, bool unusedFunctionCheckEnabled, const std::map<std::string, std::size_t> &files, ErrorLogger& errorLogger);
+    static bool reportSuppressions(const Settings &settings, const Suppressions &suppressions, bool unusedFunctionCheckEnabled, const std::map<std::string, std::size_t> &files, ErrorLogger& errorLogger);
 
 protected:
 
@@ -116,11 +117,13 @@ protected:
      * from there.
      *
      * @param settings the settings to store into
+     * @param suppressions the suppressions to store into
+     * @param suppressionsNoFail the no-fail suppressions to store into
      * @param argc argc from main()
      * @param argv argv from main()
      * @return false when errors are found in the input
      */
-    bool parseFromArgs(Settings &settings, int argc, const char* const argv[]);
+    bool parseFromArgs(Settings &settings, Suppressions &suppressions, Suppressions &suppressionsNoFail, int argc, const char* const argv[]);
 
 private:
 

@@ -2563,6 +2563,7 @@ private:
         settings.templateFormat = "simple"; // has no effect
         setTemplateFormat("simple");
         settings.includePaths.emplace_back("system");
+        Suppressions suppressions;
 
         Preprocessor preprocessor(settings, this);
 
@@ -2647,6 +2648,7 @@ private:
         settings.includePaths.emplace_back("system");
         settings.templateFormat = "simple"; // has no effect
         setTemplateFormat("simple");
+        Suppressions suppressions;
 
         Preprocessor preprocessor(settings, this);
 

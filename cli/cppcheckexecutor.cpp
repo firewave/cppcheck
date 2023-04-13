@@ -78,9 +78,9 @@ CppCheckExecutor::~CppCheckExecutor()
     delete mErrorOutput;
 }
 
-bool CppCheckExecutor::parseFromArgs(Settings &settings, int argc, const char* const argv[])
+bool CppCheckExecutor::parseFromArgs(Settings &settings, Suppressions &suppressions, Suppressions &suppressionsNoFail, int argc, const char* const argv[])
 {
-    CmdLineParser parser(settings);
+    CmdLineParser parser(settings, suppressions, suppressionsNoFail);
     const bool success = parser.parseFromArgs(argc, argv);
 
     if (success) {
@@ -199,15 +199,16 @@ int CppCheckExecutor::check(int argc, const char* const argv[])
     CheckUnusedFunctions::clear();
 
     Settings settings;
-    if (!parseFromArgs(settings, argc, argv)) {
+    Suppressions suppressions;
+    Suppressions suppressionsNoFail;
+    if (!parseFromArgs(settings, suppressions, suppressionsNoFail, argc, argv)) {
         return EXIT_FAILURE;
     }
     if (Settings::terminated()) {
         return EXIT_SUCCESS;
     }
 
-    CppCheck cppCheck(*this, true, executeCommand);
-    cppCheck.settings() = settings;
+    CppCheck cppCheck(settings, suppressions, suppressionsNoFail, *this, true, executeCommand);
     mSettings = &settings;
 
     int ret;
@@ -231,9 +232,9 @@ int CppCheckExecutor::check_wrapper(CppCheck& cppcheck)
 #endif
 }
 
-bool CppCheckExecutor::reportSuppressions(const Settings &settings, bool unusedFunctionCheckEnabled, const std::map<std::string, std::size_t> &files, ErrorLogger& errorLogger) {
-    const auto& suppressions = settings.nomsg.getSuppressions();
-    if (std::any_of(suppressions.begin(), suppressions.end(), [](const Suppressions::Suppression& s) {
+bool CppCheckExecutor::reportSuppressions(const Settings &settings, const Suppressions &suppressions, bool unusedFunctionCheckEnabled, const std::map<std::string, std::size_t> &files, ErrorLogger& errorLogger) {
+    const auto& supprs = suppressions.getSuppressions();
+    if (std::any_of(supprs.begin(), supprs.end(), [](const Suppressions::Suppression& s) {
         return s.errorId == "unmatchedSuppression" && s.fileName.empty() && s.lineNumber == Suppressions::Suppression::NO_LINE;
     }))
         return false;
@@ -242,10 +243,10 @@ bool CppCheckExecutor::reportSuppressions(const Settings &settings, bool unusedF
     if (settings.useSingleJob()) {
         for (std::map<std::string, std::size_t>::const_iterator i = files.cbegin(); i != files.cend(); ++i) {
             err |= errorLogger.reportUnmatchedSuppressions(
-                settings.nomsg.getUnmatchedLocalSuppressions(i->first, unusedFunctionCheckEnabled));
+                    suppressions.getUnmatchedLocalSuppressions(i->first, unusedFunctionCheckEnabled));
         }
     }
-    err |= errorLogger.reportUnmatchedSuppressions(settings.nomsg.getUnmatchedGlobalSuppressions(unusedFunctionCheckEnabled));
+    err |= errorLogger.reportUnmatchedSuppressions(suppressions.getUnmatchedGlobalSuppressions(unusedFunctionCheckEnabled));
     return err;
 }
 
@@ -254,7 +255,10 @@ bool CppCheckExecutor::reportSuppressions(const Settings &settings, bool unusedF
  * */
 int CppCheckExecutor::check_internal(CppCheck& cppcheck)
 {
-    Settings& settings = cppcheck.settings();
+    Settings& settings = *const_cast<Settings*>(mSettings);
+    // TODO
+    Suppressions suppressions;
+    Suppressions suppressionsNoFail;
     const bool std = tryLoadLibrary(settings.library, settings.exename, "std.cfg");
 
     auto failed_lib = std::find_if(settings.libraries.begin(), settings.libraries.end(), [&](const std::string& lib) {
@@ -309,13 +313,13 @@ int CppCheckExecutor::check_internal(CppCheck& cppcheck)
     unsigned int returnValue = 0;
     if (settings.useSingleJob()) {
         // Single process
-        SingleExecutor executor(cppcheck, mFiles, settings, *this);
+        SingleExecutor executor(cppcheck, mFiles, settings, suppressions, suppressionsNoFail, *this);
         returnValue = executor.check();
     } else {
 #if defined(THREADING_MODEL_THREAD)
-        ThreadExecutor executor(mFiles, settings, *this);
+        ThreadExecutor executor(mFiles, settings, suppressions, suppressionsNoFail, *this);
 #elif defined(THREADING_MODEL_FORK)
-        ProcessExecutor executor(mFiles, settings, *this);
+        ProcessExecutor executor(mFiles, settings, suppressions, suppressionsNoFail, *this);
 #endif
         returnValue = executor.check();
     }
@@ -323,7 +327,7 @@ int CppCheckExecutor::check_internal(CppCheck& cppcheck)
     cppcheck.analyseWholeProgram(settings.buildDir, mFiles);
 
     if (settings.severity.isEnabled(Severity::information) || settings.checkConfiguration) {
-        const bool err = reportSuppressions(settings, cppcheck.isUnusedFunctionCheckEnabled(), mFiles, *this);
+        const bool err = reportSuppressions(settings, suppressions, cppcheck.isUnusedFunctionCheckEnabled(), mFiles, *this);
         if (err && returnValue == 0)
             returnValue = settings.exitCode;
     }

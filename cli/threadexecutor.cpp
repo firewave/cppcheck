@@ -40,8 +40,8 @@
 
 enum class Color;
 
-ThreadExecutor::ThreadExecutor(const std::map<std::string, std::size_t> &files, Settings &settings, ErrorLogger &errorLogger)
-    : Executor(files, settings, errorLogger)
+ThreadExecutor::ThreadExecutor(const std::map<std::string, std::size_t> &files, Settings &settings, Suppressions &suppressions, Suppressions &suppressionsNoFail, ErrorLogger &errorLogger)
+    : Executor(files, settings, suppressions, suppressionsNoFail, errorLogger)
 {
     assert(mSettings.jobs > 1);
 }
@@ -96,6 +96,7 @@ public:
         });
     }
 
+    // TODO: handle markup files
     bool next(const std::string *&file, const ImportProject::FileSettings *&fs, std::size_t &fileSize) {
         std::lock_guard<std::mutex> l(mFileSync);
         if (mItNextFile != mFiles.end()) {
@@ -117,18 +118,20 @@ public:
     }
 
     unsigned int check(ErrorLogger &errorLogger, const std::string *file, const ImportProject::FileSettings *fs) const {
-        CppCheck fileChecker(errorLogger, false, CppCheckExecutor::executeCommand);
-        fileChecker.settings() = mSettings; // this is a copy
+        Suppressions suppressions;
+        Suppressions suppressionsNoFail;
+        CppCheck fileChecker(mSettings, suppressions, suppressionsNoFail, errorLogger, false, CppCheckExecutor::executeCommand);
 
         unsigned int result;
         if (fs) {
             // file settings..
             result = fileChecker.check(*fs);
-            if (fileChecker.settings().clangTidy)
+            if (mSettings.clangTidy)
                 fileChecker.analyseClangTidy(*fs);
         } else {
             // Read file from a file
             result = fileChecker.check(*file);
+            // TODO: call analyseClangTidy()
         }
         return result;
     }

@@ -619,8 +619,10 @@ void MainWindow::analyzeCode(const QString& code, const QString& filename)
             mUI->mResults, SLOT(debugError(const ErrorItem&)));
 
     // Create CppCheck instance
-    CppCheck cppcheck(result, true, nullptr);
-    cppcheck.settings() = getCppcheckSettings();
+    Settings s = getCppcheckSettings();
+    Suppressions suppressions;
+    Suppressions suppressionsNoFail;
+    CppCheck cppcheck(s, suppressions, suppressionsNoFail, result, true, nullptr);
 
     // Check
     checkLockDownUI();
@@ -936,9 +938,12 @@ Settings MainWindow::getCppcheckSettings()
             tryLoadLibrary(&result.library, filename);
         }
 
+        // TODO
+        /*
         for (const Suppressions::Suppression &suppression : mProjectFile->getSuppressions()) {
             result.nomsg.addSuppression(suppression);
         }
+        */
 
         // Only check the given -D configuration
         if (!defines.isEmpty())
