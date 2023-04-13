@@ -131,7 +131,7 @@ protected:
 
     ThreadResult &mResult;
 
-    Settings mSettings;
+    Settings mSettings; // TODO: make ref
     Suppressions* mSuppressions{};
 
 private:

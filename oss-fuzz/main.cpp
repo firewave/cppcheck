@@ -48,13 +48,15 @@ static const FileWithDetails s_file("test.c");
 
 static void doCheck(const std::string& code)
 {
-    Suppressions supprs;
-    CppCheck cppcheck(supprs, s_errorLogger, false, nullptr);
     // TODO: load std.cfg when settings are no longer owned by CppCheck
-    cppcheck.settings().quiet = true;
-    cppcheck.settings().addEnabled("all");
-    cppcheck.settings().certainty.setEnabled(Certainty::inconclusive, true);
-    cppcheck.settings().checkLevel = Settings::CheckLevel::exhaustive;
+    // TODO: create the settings only once
+    Settings s;
+    s.quiet = true;
+    s.addEnabled("all");
+    s.certainty.setEnabled(Certainty::inconclusive, true);
+   s.checkLevel = Settings::CheckLevel::exhaustive;
+    Suppressions supprs;
+    CppCheck cppcheck(s, supprs, s_errorLogger, false, nullptr);
     cppcheck.check(s_file, code);
 }
 
