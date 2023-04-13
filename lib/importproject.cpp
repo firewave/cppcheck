@@ -1142,8 +1142,8 @@ bool ImportProject::importCppcheckGuiProject(std::istream &istr, Settings *setti
     const std::string &path = mPath;
 
     std::list<std::string> paths;
-    std::list<Suppressions::Suppression> suppressions;
     Settings temp;
+    Suppressions suppressions; // TODO: return
 
     guiProject.analyzeAllVsConfigs.clear();
 
@@ -1194,7 +1194,7 @@ bool ImportProject::importCppcheckGuiProject(std::istream &istr, Settings *setti
                 s.lineNumber = child->IntAttribute("lineNumber", Suppressions::Suppression::NO_LINE);
                 s.symbolName = readSafe(child->Attribute("symbolName"), "");
                 s.hash = strToInt<std::size_t>(readSafe(child->Attribute("hash"), "0"));
-                suppressions.push_back(std::move(s));
+                suppressions.addSuppression(std::move(s));
             }
         } else if (strcmp(node->Name(), CppcheckXml::VSConfigurationElementName) == 0)
             guiProject.checkVsConfigs = readXmlStringList(node, emptyString, CppcheckXml::VSConfigurationName, nullptr);

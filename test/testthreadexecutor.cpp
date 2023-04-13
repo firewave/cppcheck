@@ -82,8 +82,10 @@ private:
         settings1.showtime = opt.showtime;
         if (opt.plistOutput)
             settings1.plistOutput = opt.plistOutput;
+        Suppressions suppressions;
+        Suppressions suppressionsNoFail;
         // TODO: test with settings.project.fileSettings;
-        ThreadExecutor executor(filemap, settings1, settings1.nomsg, *this);
+        ThreadExecutor executor(filemap, settings1, suppressions, suppressionsNoFail, *this);
         std::vector<std::unique_ptr<ScopedFile>> scopedfiles;
         scopedfiles.reserve(filemap.size());
         for (std::map<std::string, std::size_t>::const_iterator i = filemap.cbegin(); i != filemap.cend(); ++i)

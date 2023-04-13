@@ -20,7 +20,6 @@
 #ifndef CHECKTHREAD_H
 #define CHECKTHREAD_H
 
-#include "cppcheck.h"
 #include "importproject.h"
 #include "suppressions.h"
 
@@ -124,9 +123,9 @@ protected:
 
     ThreadResult &mResult;
     /**
-     * @brief Cppcheck itself
+     * @brief The settings to run with.
      */
-    CppCheck mCppcheck;
+    Settings* mSettings{nullptr};
 
 private:
     void runAddonsAndTools(const ImportProject::FileSettings *fileSettings, const QString &fileName);

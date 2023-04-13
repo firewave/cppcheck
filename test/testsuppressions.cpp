@@ -196,17 +196,21 @@ private:
             files[i->first] = i->second.size();
         }
 
-        CppCheck cppCheck(*this, true, nullptr);
-        Settings& settings = cppCheck.settings();
+        // TODO: test with settings.project.fileSettings
+        Settings settings;
+        settings.exitCode = 1;
         settings.jobs = 1;
         settings.inlineSuppressions = true;
         settings.severity.enable(Severity::information);
         if (suppression == "unusedFunction")
             settings.checks.setEnabled(Checks::unusedFunction, true);
+        Suppressions suppressions;
+        Suppressions suppressionsNoFail;
         if (!suppression.empty()) {
             EXPECT_EQ("", settings.nomsg.addSuppressionLine(suppression));
         }
-        SingleExecutor executor(cppCheck, files, settings, settings.nomsg, *this);
+        CppCheck cppCheck(settings, suppressions, suppressionsNoFail, *this, true, nullptr);
+        SingleExecutor executor(cppCheck, files, settings, suppressions, *this);
         std::vector<std::unique_ptr<ScopedFile>> scopedfiles;
         scopedfiles.reserve(files.size());
         for (std::map<std::string, std::string>::const_iterator i = f.cbegin(); i != f.cend(); ++i)
@@ -214,7 +218,11 @@ private:
 
         const unsigned int exitCode = executor.check();
 
-        CppCheckExecutor::reportSuppressions(settings, false, files, *this);
+        std::map<std::string, std::size_t> files_for_report;
+        for (std::map<std::string, std::string>::const_iterator file = files.cbegin(); file != files.cend(); ++file)
+            files_for_report[file->first] = file->second.size();
+
+        CppCheckExecutor::reportSuppressions(settings, suppressions, false, files_for_report, *this);
 
         return exitCode;
     }
@@ -223,6 +231,7 @@ private:
         errout.str("");
         output.str("");
 
+        // TODO: test with settings.project.fileSettings
         std::map<std::string, std::size_t> files;
         files["test.cpp"] = strlen(code);
 
@@ -230,10 +239,12 @@ private:
         settings.jobs = 2;
         settings.inlineSuppressions = true;
         settings.severity.enable(Severity::information);
+        Suppressions suppressions;
+        Suppressions suppressionsNoFail;
         if (!suppression.empty()) {
-            EXPECT_EQ("", settings.nomsg.addSuppressionLine(suppression));
+            EXPECT_EQ("", suppressions.addSuppressionLine(suppression));
         }
-        ThreadExecutor executor(files, settings, settings.nomsg, *this);
+        ThreadExecutor executor(files, settings, suppressions, suppressionsNoFail, *this);
         std::vector<std::unique_ptr<ScopedFile>> scopedfiles;
         scopedfiles.reserve(files.size());
         for (std::map<std::string, std::size_t>::const_iterator i = files.cbegin(); i != files.cend(); ++i)
@@ -241,7 +252,7 @@ private:
 
         const unsigned int exitCode = executor.check();
 
-        CppCheckExecutor::reportSuppressions(settings, false, files, *this);
+        CppCheckExecutor::reportSuppressions(settings, suppressions, false, files, *this);
 
         return exitCode;
     }
@@ -251,6 +262,7 @@ private:
         errout.str("");
         output.str("");
 
+        // TODO: test with settings.project.fileSettings
         std::map<std::string, std::size_t> files;
         files["test.cpp"] = strlen(code);
 
@@ -258,10 +270,12 @@ private:
         settings.jobs = 2;
         settings.inlineSuppressions = true;
         settings.severity.enable(Severity::information);
+        Suppressions suppressions;
+        Suppressions suppressionsNoFail;
         if (!suppression.empty()) {
-            EXPECT_EQ("", settings.nomsg.addSuppressionLine(suppression));
+            EXPECT_EQ("", suppressions.addSuppressionLine(suppression));
         }
-        ProcessExecutor executor(files, settings, settings.nomsg, *this);
+        ProcessExecutor executor(files, settings, suppressions, suppressionsNoFail, *this);
         std::vector<std::unique_ptr<ScopedFile>> scopedfiles;
         scopedfiles.reserve(files.size());
         for (std::map<std::string, std::size_t>::const_iterator i = files.cbegin(); i != files.cend(); ++i)
@@ -269,7 +283,7 @@ private:
 
         const unsigned int exitCode = executor.check();
 
-        CppCheckExecutor::reportSuppressions(settings, false, files, *this);
+        CppCheckExecutor::reportSuppressions(settings, suppressions, false, files, *this);
 
         return exitCode;
     }
@@ -698,10 +712,13 @@ private:
     void globalSuppressions() { // Testing that Cppcheck::useGlobalSuppressions works (#8515)
         errout.str("");
 
-        CppCheck cppCheck(*this, false, nullptr); // <- do not "use global suppressions". pretend this is a thread that just checks a file.
-        Settings& settings = cppCheck.settings();
-        settings.nomsg.addSuppressionLine("uninitvar");
+        Settings settings;
         settings.exitCode = 1;
+        Suppressions suppressions;
+        Suppressions suppressionsNoFail;
+        suppressions.addSuppressionLine("uninitvar");
+
+        CppCheck cppCheck(settings, suppressions, suppressionsNoFail, *this, false, nullptr); // <- do not "use global suppressions". pretend this is a thread that just checks a file.
 
         const char code[] = "int f() { int a; return a; }";
         ASSERT_EQUALS(0, cppCheck.check("test.c", code)); // <- no unsuppressed error is seen
@@ -732,12 +749,13 @@ private:
         // Clear the error log
         errout.str("");
 
-        CppCheck cppCheck(*this, true, nullptr);
-        Settings& settings = cppCheck.settings();
+        Settings settings;
         settings.severity.enable(Severity::style);
         settings.inlineSuppressions = true;
         settings.relativePaths = true;
         settings.basePaths.emplace_back("/somewhere");
+        Suppressions suppressions;
+        Suppressions suppressionsNoFail;
         const char code[] =
             "struct Point\n"
             "{\n"
@@ -746,6 +764,7 @@ private:
             "    // cppcheck-suppress unusedStructMember\n"
             "    int y;\n"
             "};";
+        CppCheck cppCheck(settings, suppressions, suppressionsNoFail, *this, true, nullptr);
         cppCheck.check("/somewhere/test.cpp", code);
         ASSERT_EQUALS("",errout.str());
     }

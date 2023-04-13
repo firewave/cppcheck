@@ -38,7 +38,7 @@ class Suppressions;
  */
 class ProcessExecutor : public Executor {
 public:
-    ProcessExecutor(const std::map<std::string, std::size_t> &files, const Settings &settings, Suppressions &suppressions, ErrorLogger &errorLogger);
+    ProcessExecutor(const std::map<std::string, std::size_t> &files, const Settings &settings, Suppressions &suppressions, Suppressions &suppressionsNoFail, ErrorLogger &errorLogger);
     ProcessExecutor(const ProcessExecutor &) = delete;
     ~ProcessExecutor() override;
     void operator=(const ProcessExecutor &) = delete;

@@ -22,6 +22,7 @@
 
 #include "config.h"
 
+#include <atomic>
 #include <cstddef>
 #include <istream>
 #include <list>
@@ -107,8 +108,8 @@ public:
         std::string symbolName;
         std::size_t hash{};
         bool thisAndNextLine{}; // Special case for backwards compatibility: { // cppcheck-suppress something
-        bool matched{};
-        bool checked{}; // for inline suppressions, checked or not
+        std::atomic_bool matched;
+        std::atomic_bool checked; // for inline suppressions, checked or not
 
         enum { NO_LINE = -1 };
     };

@@ -52,7 +52,9 @@ public:
 
 private:
     Settings settings; // TODO: reset after each test
-    CmdLineParser defParser{settings, settings.nomsg, settings.nofail}; // TODO: reset after each test
+    Suppressions suppressions;
+    Suppressions suppressionsNoFail;
+    CmdLineParser defParser{settings, suppressions, suppressionsNoFail}; // TODO: reset after each test
 
     void run() override {
         TEST_CASE(nooptions);
@@ -154,7 +156,7 @@ private:
         TEST_CASE(plistEmpty);
         TEST_CASE(plistDoesNotExist);
         TEST_CASE(suppressionsOld);
-        TEST_CASE(suppressions);
+        TEST_CASE(suppressions_);
         TEST_CASE(suppressionsNoFile);
         TEST_CASE(suppressionSingle);
         TEST_CASE(suppressionSingleFile);
@@ -247,7 +249,7 @@ private:
     void nooptions() {
         REDIRECT;
         const char * const argv[] = {"cppcheck"};
-        CmdLineParser parser(settings, settings.nomsg, settings.nofail);
+        CmdLineParser parser(settings, suppressions, suppressionsNoFail);
         ASSERT(parser.parseFromArgs(1, argv));
         ASSERT_EQUALS(true, parser.getShowHelp());
         ASSERT(GET_REDIRECT_OUTPUT.find("Cppcheck - A tool for static C/C++ code analysis") == 0);
@@ -256,7 +258,7 @@ private:
     void helpshort() {
         REDIRECT;
         const char * const argv[] = {"cppcheck", "-h"};
-        CmdLineParser parser(settings, settings.nomsg, settings.nofail);
+        CmdLineParser parser(settings, suppressions, suppressionsNoFail);
         ASSERT(parser.parseFromArgs(2, argv));
         ASSERT_EQUALS(true, parser.getShowHelp());
         ASSERT(GET_REDIRECT_OUTPUT.find("Cppcheck - A tool for static C/C++ code analysis") == 0);
@@ -265,7 +267,7 @@ private:
     void helplong() {
         REDIRECT;
         const char * const argv[] = {"cppcheck", "--help"};
-        CmdLineParser parser(settings, settings.nomsg, settings.nofail);
+        CmdLineParser parser(settings, suppressions, suppressionsNoFail);
         ASSERT(parser.parseFromArgs(2, argv));
         ASSERT_EQUALS(true, parser.getShowHelp());
         ASSERT(GET_REDIRECT_OUTPUT.find("Cppcheck - A tool for static C/C++ code analysis") == 0);
@@ -274,7 +276,7 @@ private:
     void showversion() {
         REDIRECT;
         const char * const argv[] = {"cppcheck", "--version"};
-        CmdLineParser parser(settings, settings.nomsg, settings.nofail);
+        CmdLineParser parser(settings, suppressions, suppressionsNoFail);
         ASSERT(parser.parseFromArgs(2, argv));
         ASSERT_EQUALS(true, parser.getShowVersion());
         ASSERT_EQUALS("", GET_REDIRECT_OUTPUT); // version is not actually shown
@@ -283,7 +285,7 @@ private:
     void onefile() {
         REDIRECT;
         const char * const argv[] = {"cppcheck", "file.cpp"};
-        CmdLineParser parser(settings, settings.nomsg, settings.nofail);
+        CmdLineParser parser(settings, suppressions, suppressionsNoFail);
         ASSERT(parser.parseFromArgs(2, argv));
         ASSERT_EQUALS(1, (int)parser.getPathNames().size());
         ASSERT_EQUALS("file.cpp", parser.getPathNames().at(0));
@@ -293,7 +295,7 @@ private:
     void onepath() {
         REDIRECT;
         const char * const argv[] = {"cppcheck", "src"};
-        CmdLineParser parser(settings, settings.nomsg, settings.nofail);
+        CmdLineParser parser(settings, suppressions, suppressionsNoFail);
         ASSERT(parser.parseFromArgs(2, argv));
         ASSERT_EQUALS(1, (int)parser.getPathNames().size());
         ASSERT_EQUALS("src", parser.getPathNames().at(0));
@@ -303,7 +305,7 @@ private:
     void optionwithoutfile() {
         REDIRECT;
         const char * const argv[] = {"cppcheck", "-v"};
-        CmdLineParser parser(settings, settings.nomsg, settings.nofail);
+        CmdLineParser parser(settings, suppressions, suppressionsNoFail);
         ASSERT_EQUALS(false, parser.parseFromArgs(2, argv));
         ASSERT_EQUALS(0, (int)parser.getPathNames().size());
         ASSERT_EQUALS("cppcheck: error: no C or C++ source files found.\n", GET_REDIRECT_OUTPUT);
@@ -1227,7 +1229,7 @@ private:
         ASSERT_EQUALS("cppcheck: error: unrecognized command line option: \"--suppressions\".\n", GET_REDIRECT_OUTPUT);
     }
 
-    void suppressions() {
+    void suppressions_() {
         // TODO: Fails because there is no suppr.txt file!
         REDIRECT;
         const char * const argv[] = {"cppcheck", "--suppressions-list=suppr.txt", "file.cpp"};
@@ -1270,8 +1272,9 @@ private:
         REDIRECT;
         const char * const argv[] = {"cppcheck", "--suppress=uninitvar", "file.cpp"};
         settings = Settings();
+        suppressions = Suppressions();
         ASSERT(defParser.parseFromArgs(3, argv));
-        ASSERT_EQUALS(true, settings.nomsg.isSuppressed(errorMessage("uninitvar", "file.cpp", 1)));
+        ASSERT_EQUALS(true, suppressions.isSuppressed(errorMessage("uninitvar", "file.cpp", 1)));
         ASSERT_EQUALS("", GET_REDIRECT_OUTPUT);
     }
 
@@ -1279,8 +1282,9 @@ private:
         REDIRECT;
         const char * const argv[] = {"cppcheck", "--suppress=uninitvar:file.cpp", "file.cpp"};
         settings = Settings();
+        suppressions = Suppressions();
         ASSERT(defParser.parseFromArgs(3, argv));
-        ASSERT_EQUALS(true, settings.nomsg.isSuppressed(errorMessage("uninitvar", "file.cpp", 1U)));
+        ASSERT_EQUALS(true, suppressions.isSuppressed(errorMessage("uninitvar", "file.cpp", 1U)));
         ASSERT_EQUALS("", GET_REDIRECT_OUTPUT);
     }
 
@@ -1288,9 +1292,10 @@ private:
         REDIRECT;
         const char * const argv[] = {"cppcheck", "--suppress=uninitvar,noConstructor", "file.cpp"};
         settings = Settings();
+        suppressions = Suppressions();
         TODO_ASSERT_EQUALS(true, false, defParser.parseFromArgs(3, argv));
-        TODO_ASSERT_EQUALS(true, false, settings.nomsg.isSuppressed(errorMessage("uninitvar", "file.cpp", 1U)));
-        TODO_ASSERT_EQUALS(true, false, settings.nomsg.isSuppressed(errorMessage("noConstructor", "file.cpp", 1U)));
+        TODO_ASSERT_EQUALS(true, false, suppressions.isSuppressed(errorMessage("uninitvar", "file.cpp", 1U)));
+        TODO_ASSERT_EQUALS(true, false, suppressions.isSuppressed(errorMessage("noConstructor", "file.cpp", 1U)));
         TODO_ASSERT_EQUALS("", "cppcheck: error: Failed to add suppression. Invalid id \"uninitvar,noConstructor\"\n", GET_REDIRECT_OUTPUT);
     }
 
@@ -1298,9 +1303,10 @@ private:
         REDIRECT;
         const char * const argv[] = {"cppcheck", "--suppress=uninitvar", "--suppress=noConstructor", "file.cpp"};
         settings = Settings();
+        suppressions = Suppressions();
         ASSERT(defParser.parseFromArgs(4, argv));
-        ASSERT_EQUALS(true, settings.nomsg.isSuppressed(errorMessage("uninitvar", "file.cpp", 1U)));
-        ASSERT_EQUALS(true, settings.nomsg.isSuppressed(errorMessage("noConstructor", "file.cpp", 1U)));
+        ASSERT_EQUALS(true, suppressions.isSuppressed(errorMessage("uninitvar", "file.cpp", 1U)));
+        ASSERT_EQUALS(true, suppressions.isSuppressed(errorMessage("noConstructor", "file.cpp", 1U)));
         ASSERT_EQUALS("", GET_REDIRECT_OUTPUT);
     }
 
@@ -1564,7 +1570,7 @@ private:
     void ignorepathsnopath() {
         REDIRECT;
         const char * const argv[] = {"cppcheck", "-i"};
-        CmdLineParser parser(settings, settings.nomsg, settings.nofail);
+        CmdLineParser parser(settings, suppressions, suppressionsNoFail);
         // Fails since no ignored path given
         ASSERT_EQUALS(false, parser.parseFromArgs(2, argv));
         ASSERT_EQUALS("cppcheck: error: argument to '-i' is missing.\n", GET_REDIRECT_OUTPUT);
@@ -1832,7 +1838,7 @@ private:
     void ignorepaths1() {
         REDIRECT;
         const char * const argv[] = {"cppcheck", "-isrc", "file.cpp"};
-        CmdLineParser parser(settings, settings.nomsg, settings.nofail);
+        CmdLineParser parser(settings, suppressions, suppressionsNoFail);
         ASSERT(parser.parseFromArgs(3, argv));
         ASSERT_EQUALS(1, parser.getIgnoredPaths().size());
         ASSERT_EQUALS("src", parser.getIgnoredPaths()[0]);
@@ -1842,7 +1848,7 @@ private:
     void ignorepaths2() {
         REDIRECT;
         const char * const argv[] = {"cppcheck", "-i", "src", "file.cpp"};
-        CmdLineParser parser(settings, settings.nomsg, settings.nofail);
+        CmdLineParser parser(settings, suppressions, suppressionsNoFail);
         ASSERT(parser.parseFromArgs(4, argv));
         ASSERT_EQUALS(1, parser.getIgnoredPaths().size());
         ASSERT_EQUALS("src", parser.getIgnoredPaths()[0]);
@@ -1852,7 +1858,7 @@ private:
     void ignorepaths3() {
         REDIRECT;
         const char * const argv[] = {"cppcheck", "-isrc", "-imodule", "file.cpp"};
-        CmdLineParser parser(settings, settings.nomsg, settings.nofail);
+        CmdLineParser parser(settings, suppressions, suppressionsNoFail);
         ASSERT(parser.parseFromArgs(4, argv));
         ASSERT_EQUALS(2, parser.getIgnoredPaths().size());
         ASSERT_EQUALS("src", parser.getIgnoredPaths()[0]);
@@ -1863,7 +1869,7 @@ private:
     void ignorepaths4() {
         REDIRECT;
         const char * const argv[] = {"cppcheck", "-i", "src", "-i", "module", "file.cpp"};
-        CmdLineParser parser(settings, settings.nomsg, settings.nofail);
+        CmdLineParser parser(settings, suppressions, suppressionsNoFail);
         ASSERT(parser.parseFromArgs(6, argv));
         ASSERT_EQUALS(2, parser.getIgnoredPaths().size());
         ASSERT_EQUALS("src", parser.getIgnoredPaths()[0]);
@@ -1874,7 +1880,7 @@ private:
     void ignorefilepaths1() {
         REDIRECT;
         const char * const argv[] = {"cppcheck", "-ifoo.cpp", "file.cpp"};
-        CmdLineParser parser(settings, settings.nomsg, settings.nofail);
+        CmdLineParser parser(settings, suppressions, suppressionsNoFail);
         ASSERT(parser.parseFromArgs(3, argv));
         ASSERT_EQUALS(1, parser.getIgnoredPaths().size());
         ASSERT_EQUALS("foo.cpp", parser.getIgnoredPaths()[0]);
@@ -1884,7 +1890,7 @@ private:
     void ignorefilepaths2() {
         REDIRECT;
         const char * const argv[] = {"cppcheck", "-isrc/foo.cpp", "file.cpp"};
-        CmdLineParser parser(settings, settings.nomsg, settings.nofail);
+        CmdLineParser parser(settings, suppressions, suppressionsNoFail);
         ASSERT(parser.parseFromArgs(3, argv));
         ASSERT_EQUALS(1, parser.getIgnoredPaths().size());
         ASSERT_EQUALS("src/foo.cpp", parser.getIgnoredPaths()[0]);
