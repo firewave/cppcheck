@@ -110,10 +110,11 @@ void Settings::loadCppcheckCfg()
                 addons.emplace(s);
         }
     }
-    if (obj.count("suppressions") && obj["suppressions"].is<picojson::array>()) {
+    // TODO
+    /*if (obj.count("suppressions") && obj["suppressions"].is<picojson::array>()) {
         for (const picojson::value &v : obj["suppressions"].get<picojson::array>())
             nomsg.addSuppressionLine(v.get<std::string>());
-    }
+    }*/
 }
 
 std::string Settings::parseEnabled(const std::string &str, std::tuple<SimpleEnableGroup<Severity::SeverityType>, SimpleEnableGroup<Checks>> &groups)

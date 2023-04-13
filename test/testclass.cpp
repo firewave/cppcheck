@@ -2577,12 +2577,12 @@ private:
         Preprocessor preprocessor(settings0);
 
         // Tokenize..
-        Tokenizer tokenizer(&settings0, this, &preprocessor);
+        Tokenizer tokenizer(&s, this, &preprocessor);
         std::istringstream istr(code);
         ASSERT_LOC(tokenizer.tokenize(istr, "test.cpp"), file, line);
 
         // Check..
-        CheckClass checkClass(&tokenizer, &settings0, this);
+        CheckClass checkClass(&tokenizer, &s, this);
         checkClass.virtualDestructor();
     }
 
@@ -7240,16 +7240,17 @@ private:
         errout.str("");
 
         // Check..
-        settings0.certainty.setEnabled(Certainty::inconclusive, true);
+        Settings s = settings0;
+        s.certainty.setEnabled(Certainty::inconclusive, true);
 
         Preprocessor preprocessor(settings0);
 
         // Tokenize..
-        Tokenizer tokenizer(&settings0, this, &preprocessor);
+        Tokenizer tokenizer(&s, this, &preprocessor);
         std::istringstream istr(code);
         ASSERT_LOC(tokenizer.tokenize(istr, "test.cpp"), file, line);
 
-        CheckClass checkClass(&tokenizer, &settings0, this);
+        CheckClass checkClass(&tokenizer, &s, this);
         checkClass.initializerListOrder();
     }
 

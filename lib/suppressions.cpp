@@ -110,7 +110,7 @@ std::string Suppressions::parseXmlFile(const char *filename)
                 return "Unknown suppression element \"" + std::string(e2->Name()) + "\", expected id/fileName/lineNumber/symbolName/hash";
         }
 
-        const std::string err = addSuppression(s);
+        const std::string err = addSuppression(std::move(s));
         if (!err.empty())
             return err;
     }
@@ -218,10 +218,10 @@ std::string Suppressions::addSuppressionLine(const std::string &line)
 
     suppression.fileName = Path::simplifyPath(suppression.fileName);
 
-    return addSuppression(suppression);
+    return addSuppression(std::move(suppression));
 }
 
-std::string Suppressions::addSuppression(const Suppressions::Suppression &suppression)
+std::string Suppressions::addSuppression(Suppressions::Suppression suppression)
 {
     // Check if suppression is already in list
     auto foundSuppression = std::find_if(mSuppressions.begin(), mSuppressions.end(),
@@ -229,7 +229,7 @@ std::string Suppressions::addSuppression(const Suppressions::Suppression &suppre
     if (foundSuppression != mSuppressions.end()) {
         // Update matched state of existing global suppression
         if (!suppression.isLocal() && suppression.matched)
-            foundSuppression->matched = suppression.matched;
+            foundSuppression->matched = suppression.matched.load();
         return "";
     }
 
@@ -253,18 +253,8 @@ std::string Suppressions::addSuppression(const Suppressions::Suppression &suppre
     if (!isValidGlobPattern(suppression.fileName))
         return "Failed to add suppression. Invalid glob pattern '" + suppression.fileName + "'.";
 
-    mSuppressions.push_back(suppression);
+    mSuppressions.push_back(std::move(suppression));
 
-    return "";
-}
-
-std::string Suppressions::addSuppressions(const std::list<Suppression> &suppressions)
-{
-    for (const auto &newSuppression : suppressions) {
-        auto errmsg = addSuppression(newSuppression);
-        if (!errmsg.empty())
-            return errmsg;
-    }
     return "";
 }
 
@@ -367,10 +357,12 @@ std::string Suppressions::Suppression::getText() const
     return ret;
 }
 
-bool Suppressions::isSuppressed(const Suppressions::ErrorMessage &errmsg)
+bool Suppressions::isSuppressed(const Suppressions::ErrorMessage &errmsg, bool local)
 {
     const bool unmatchedSuppression(errmsg.errorId == "unmatchedSuppression");
     for (Suppression &s : mSuppressions) {
+        if (local && !s.isLocal())
+            continue;
         if (unmatchedSuppression && s.errorId != errmsg.errorId)
             continue;
         if (s.isMatch(errmsg))
@@ -384,20 +376,6 @@ bool Suppressions::isSuppressed(const ::ErrorMessage &errmsg)
     if (mSuppressions.empty())
         return false;
     return isSuppressed(errmsg.toSuppressionsErrorMessage());
-}
-
-bool Suppressions::isSuppressedLocal(const Suppressions::ErrorMessage &errmsg)
-{
-    const bool unmatchedSuppression(errmsg.errorId == "unmatchedSuppression");
-    for (Suppression &s : mSuppressions) {
-        if (!s.isLocal())
-            continue;
-        if (unmatchedSuppression && s.errorId != errmsg.errorId)
-            continue;
-        if (s.isMatch(errmsg))
-            return true;
-    }
-    return false;
 }
 
 void Suppressions::dump(std::ostream & out) const

@@ -61,8 +61,8 @@ enum class Color;
 using std::memset;
 
 
-ProcessExecutor::ProcessExecutor(const std::map<std::string, std::size_t> &files, Settings &settings, ErrorLogger &errorLogger)
-    : Executor(files, settings, errorLogger)
+ProcessExecutor::ProcessExecutor(const std::map<std::string, std::size_t> &files, Settings &settings, Suppressions &suppressions, Suppressions &suppressionsNoFail, ErrorLogger &errorLogger)
+    : Executor(files, settings, suppressions, suppressionsNoFail, errorLogger)
 {
     assert(mSettings.jobs > 1);
 }
@@ -273,15 +273,17 @@ unsigned int ProcessExecutor::check()
                 close(pipes[0]);
 
                 PipeWriter pipewriter(pipes[1]);
-                CppCheck fileChecker(mSettings, pipewriter, false, CppCheckExecutor::executeCommand);
+                CppCheck fileChecker(mSettings, mSuppressions, mSuppressionsNoFail, pipewriter, false, CppCheckExecutor::executeCommand);
                 unsigned int resultOfCheck = 0;
 
+                // TODO: markup handling
                 if (iFileSettings != mSettings.project.fileSettings.end()) {
                     resultOfCheck = fileChecker.check(*iFileSettings);
                 } else {
                     // Read file from a file
                     resultOfCheck = fileChecker.check(iFile->first);
                 }
+                // TODO: call analyseClangTidy()
 
                 pipewriter.writeEnd(std::to_string(resultOfCheck));
                 std::exit(EXIT_SUCCESS);
@@ -389,7 +391,7 @@ void ProcessExecutor::reportInternalChildErr(const std::string &childname, const
                               "cppcheckError",
                               Certainty::normal);
 
-    if (!mSettings.nomsg.isSuppressed(errmsg))
+    if (hasToLog(errmsg))
         mErrorLogger.reportErr(errmsg);
 }
 

@@ -27,7 +27,6 @@
 #include "library.h"
 #include "platform.h"
 #include "standards.h"
-#include "suppressions.h"
 
 #include <algorithm>
 #include <atomic>
@@ -228,12 +227,6 @@ public:
 
     /** @brief max template recursion */
     int maxTemplateRecursion;
-
-    /** @brief suppress exitcode */
-    Suppressions nofail;
-
-    /** @brief suppress message (--suppressions) */
-    Suppressions nomsg;
 
     /** @brief write results (--output-file=&lt;file&gt;) */
     std::string outputFile;
