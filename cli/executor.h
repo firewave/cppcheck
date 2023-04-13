@@ -39,7 +39,7 @@ class Suppressions;
  */
 class Executor {
 public:
-    Executor(const std::map<std::string, std::size_t> &files, const Settings &settings, Suppressions &suppressions, ErrorLogger &errorLogger);
+    Executor(const std::map<std::string, std::size_t> &files, const Settings &settings, Suppressions &suppressions, Suppressions &suppressionsNoFail, ErrorLogger &errorLogger);
     virtual ~Executor();
 
     Executor(const Executor &) = delete;
@@ -68,6 +68,7 @@ protected:
     const std::map<std::string, std::size_t> &mFiles;
     const Settings &mSettings;
     Suppressions &mSuppressions;
+    Suppressions &mSuppressionsNoFail;
     ErrorLogger &mErrorLogger;
 
 private:

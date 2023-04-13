@@ -228,7 +228,7 @@ std::string Suppressions::addSuppression(Suppressions::Suppression suppression)
     if (foundSuppression != mSuppressions.end()) {
         // Update matched state of existing global suppression
         if (!suppression.isLocal() && suppression.matched)
-            foundSuppression->matched = suppression.matched;
+            foundSuppression->matched = suppression.matched.load();
         return "";
     }
 

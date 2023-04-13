@@ -108,15 +108,17 @@ private:
         bool executeCommandCalled = false;
         std::string exe;
         std::vector<std::string> args;
+        Suppressions suppressions;
+        Suppressions suppressionsNoFail;
         // NOLINTNEXTLINE(performance-unnecessary-value-param)
-        CppCheck cppcheck(*this, true, [&executeCommandCalled, &exe, &args](std::string e,std::vector<std::string> a,std::string,std::string&){
+        CppCheck cppcheck(settings, suppressions, suppressionsNoFail, *this, true, [&executeCommandCalled, &exe, &args](std::string e,std::vector<std::string> a,std::string,std::string&){
             executeCommandCalled = true;
             exe = std::move(e);
             args = std::move(a);
             return true;
         });
-        cppcheck.settings() = settings;
-
+        // TODO: test with settings.project.fileSettings;
+        SingleExecutor executor(cppcheck, filemap, setting, suppressions, suppressionsNoFail, *this);
         std::vector<std::unique_ptr<ScopedFile>> scopedfiles;
         scopedfiles.reserve(filemap.size());
         for (std::map<std::string, std::size_t>::const_iterator i = filemap.cbegin(); i != filemap.cend(); ++i)
