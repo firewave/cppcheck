@@ -188,8 +188,8 @@ private:
             files[i->first] = i->second.size();
         }
 
-        CppCheck cppCheck(*this, true, nullptr);
-        Settings& settings = cppCheck.settings();
+        Settings settings;
+        settings.exitCode = 1;
         settings.jobs = 1;
         settings.inlineSuppressions = true;
         settings.severity.enable(Severity::information);
@@ -198,6 +198,9 @@ private:
         if (!suppression.empty()) {
             EXPECT_EQ("", settings.nomsg.addSuppressionLine(suppression));
         }
+
+        CppCheck cppCheck(settings, *this, true, nullptr);
+
         SingleExecutor executor(cppCheck, files, settings, *this);
         std::vector<std::unique_ptr<ScopedFile>> scopedfiles;
         scopedfiles.reserve(files.size());
@@ -688,10 +691,11 @@ private:
     void globalSuppressions() { // Testing that Cppcheck::useGlobalSuppressions works (#8515)
         errout.str("");
 
-        CppCheck cppCheck(*this, false, nullptr); // <- do not "use global suppressions". pretend this is a thread that just checks a file.
-        Settings& settings = cppCheck.settings();
+        Settings settings;
         settings.nomsg.addSuppressionLine("uninitvar");
         settings.exitCode = 1;
+
+        CppCheck cppCheck(settings, *this, false, nullptr); // <- do not "use global suppressions". pretend this is a thread that just checks a file.
 
         const char code[] = "int f() { int a; return a; }";
         ASSERT_EQUALS(0, cppCheck.check("test.c", code)); // <- no unsuppressed error is seen
@@ -722,8 +726,7 @@ private:
         // Clear the error log
         errout.str("");
 
-        CppCheck cppCheck(*this, true, nullptr);
-        Settings& settings = cppCheck.settings();
+        Settings settings;
         settings.severity.enable(Severity::style);
         settings.inlineSuppressions = true;
         settings.relativePaths = true;
@@ -736,6 +739,7 @@ private:
             "    // cppcheck-suppress unusedStructMember\n"
             "    int y;\n"
             "};";
+        CppCheck cppCheck(settings, *this, true, nullptr);
         cppCheck.check("/somewhere/test.cpp", code);
         ASSERT_EQUALS("",errout.str());
     }

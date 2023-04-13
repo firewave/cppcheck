@@ -53,7 +53,8 @@ public:
     /**
      * @brief Constructor.
      */
-    CppCheck(ErrorLogger &errorLogger,
+    CppCheck(Settings &settings,
+             ErrorLogger &errorLogger,
              bool useGlobalSuppressions,
              std::function<bool(std::string,std::vector<std::string>,std::string,std::string&)> executeCommand);
 
@@ -64,7 +65,7 @@ public:
 
     /**
      * @brief This starts the actual checking. Note that you must call
-     * parseFromArgs() or settings() and addFile() before calling this.
+     * parseFromArgs() before calling this.
      * @return amount of errors found or 0 if none were found.
      */
 
@@ -87,16 +88,8 @@ public:
      * @param path Path to the file to check.
      * @param content File content as a string.
      * @return amount of errors found or 0 if none were found.
-     * @note You must set settings before calling this function (by calling
-     *  settings()).
      */
     unsigned int check(const std::string &path, const std::string &content);
-
-    /**
-     * @brief Get reference to current settings.
-     * @return a reference to current settings
-     */
-    Settings &settings();
 
     /**
      * @brief Returns current version number as a string.
@@ -204,7 +197,7 @@ private:
     void reportOut(const std::string &outmsg, Color c = Color::Reset) override;
 
     std::list<std::string> mErrorList;
-    Settings mSettings;
+    Settings &mSettings;
 
     void reportProgress(const std::string &filename, const char stage[], const std::size_t value) override;
 

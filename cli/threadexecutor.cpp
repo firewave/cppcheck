@@ -117,14 +117,15 @@ public:
     }
 
     unsigned int check(ErrorLogger &errorLogger, const std::string *file, const ImportProject::FileSettings *fs) const {
-        CppCheck fileChecker(errorLogger, false, CppCheckExecutor::executeCommand);
-        fileChecker.settings() = mSettings; // this is a copy
+        // TODO: get rid of copy
+        Settings s = mSettings;
+        CppCheck fileChecker(s, errorLogger, false, CppCheckExecutor::executeCommand);
 
         unsigned int result;
         if (fs) {
             // file settings..
             result = fileChecker.check(*fs);
-            if (fileChecker.settings().clangTidy)
+            if (s.clangTidy)
                 fileChecker.analyseClangTidy(*fs);
         } else {
             // Read file from a file

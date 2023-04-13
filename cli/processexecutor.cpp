@@ -273,8 +273,7 @@ unsigned int ProcessExecutor::check()
                 close(pipes[0]);
 
                 PipeWriter pipewriter(pipes[1]);
-                CppCheck fileChecker(pipewriter, false, CppCheckExecutor::executeCommand);
-                fileChecker.settings() = mSettings;
+                CppCheck fileChecker(mSettings, pipewriter, false, CppCheckExecutor::executeCommand);
                 unsigned int resultOfCheck = 0;
 
                 if (iFileSettings != mSettings.project.fileSettings.end()) {

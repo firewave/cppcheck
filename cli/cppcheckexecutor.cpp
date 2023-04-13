@@ -206,8 +206,7 @@ int CppCheckExecutor::check(int argc, const char* const argv[])
         return EXIT_SUCCESS;
     }
 
-    CppCheck cppCheck(*this, true, executeCommand);
-    cppCheck.settings() = settings;
+    CppCheck cppCheck(settings, *this, true, executeCommand);
     mSettings = &settings;
 
     int ret;
@@ -254,7 +253,7 @@ bool CppCheckExecutor::reportSuppressions(const Settings &settings, bool unusedF
  * */
 int CppCheckExecutor::check_internal(CppCheck& cppcheck)
 {
-    Settings& settings = cppcheck.settings();
+    Settings& settings = *const_cast<Settings*>(mSettings);
 
     if (!loadLibraries(settings))
         return EXIT_FAILURE;

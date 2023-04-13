@@ -74,10 +74,9 @@ private:
         if (plistOutput)
             settings.plistOutput = plistOutput;
         // NOLINTNEXTLINE(performance-unnecessary-value-param)
-        CppCheck cppcheck(*this, true, [](std::string,std::vector<std::string>,std::string,std::string&){
+        CppCheck cppcheck(settings, *this, true, [](std::string,std::vector<std::string>,std::string,std::string&){
             return false;
         });
-        cppcheck.settings() = settings;
         // TODO: test with settings.project.fileSettings;
         SingleExecutor executor(cppcheck, filemap, settings, *this);
         std::vector<std::unique_ptr<ScopedFile>> scopedfiles;
