@@ -71,15 +71,6 @@ public:
         if (logfile != nullptr)
             std::fprintf(logfile, "%s\n", s.c_str());
     }
-
-    void reportProgress(const std::string& /*filename*/,
-                        const char /*stage*/[],
-                        const std::size_t /*value*/) override {
-        if (std::time(nullptr) >= stoptime) {
-            std::cout << "Time to analyse the code exceeded 2 seconds. Terminating.\n\n";
-            Settings::terminate();
-        }
-    }
 };
 
 

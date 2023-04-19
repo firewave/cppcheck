@@ -146,11 +146,8 @@ void SymbolDatabase::createSymbolDatabaseFindAllScopes()
 
     // find all scopes
     for (const Token *tok = mTokenizer.tokens(); tok; tok = tok ? tok->next() : nullptr) {
-        // #5593 suggested to add here:
-        if (mErrorLogger)
-            mErrorLogger->reportProgress(mTokenizer.list.getSourceFilePath(),
-                                         "SymbolDatabase",
-                                         tok->progressValue());
+        Settings::terminated();
+
         // Locate next class
         if ((mTokenizer.isCPP() && tok->isKeyword() &&
              ((Token::Match(tok, "class|struct|union|namespace ::| %name% final| {|:|::|<") &&
