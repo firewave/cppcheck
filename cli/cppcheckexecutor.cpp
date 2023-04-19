@@ -66,11 +66,26 @@
 #include <windows.h>
 #endif
 
+class XMLErrorMessagesLogger : public ErrorLogger
+{
+    void reportOut(const std::string & outmsg, Color /*c*/ = Color::Reset) override
+    {
+        std::cout << outmsg << std::endl;
+    }
+
+    void reportErr(const ErrorMessage &msg) override
+    {
+        reportOut(msg.toXML());
+    }
+
+    void reportProgress(const std::string & /*filename*/, const char /*stage*/[], const std::size_t /*value*/) override
+    {}
+};
 
 /*static*/ FILE* CppCheckExecutor::mExceptionOutput = stdout;
 
 CppCheckExecutor::CppCheckExecutor()
-    : mSettings(nullptr), mLatestProgressOutputTime(0), mErrorOutput(nullptr), mShowAllErrors(false)
+    : mSettings(nullptr), mLatestProgressOutputTime(0), mErrorOutput(nullptr)
 {}
 
 CppCheckExecutor::~CppCheckExecutor()
@@ -98,9 +113,9 @@ bool CppCheckExecutor::parseFromArgs(Settings &settings, int argc, const char* c
         }
 
         if (parser.getShowErrorMessages()) {
-            mShowAllErrors = true;
+            XMLErrorMessagesLogger xmlLogger;
             std::cout << ErrorMessage::getXMLHeader(settings.cppcheckCfgProductName);
-            CppCheck::getErrorMessages(*this);
+            CppCheck::getErrorMessages(xmlLogger);
             std::cout << ErrorMessage::getXMLFooter() << std::endl;
         }
 
@@ -407,11 +422,6 @@ void CppCheckExecutor::reportProgress(const std::string &filename, const char st
 
 void CppCheckExecutor::reportErr(const ErrorMessage &msg)
 {
-    if (mShowAllErrors) {
-        reportOut(msg.toXML());
-        return;
-    }
-
     // Alert only about unique errors
     if (!mShownErrors.insert(msg.toString(mSettings->verbose)).second)
         return;

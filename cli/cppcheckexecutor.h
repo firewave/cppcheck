@@ -173,11 +173,6 @@ private:
      * Error output
      */
     std::ofstream *mErrorOutput;
-
-    /**
-     * Has --errorlist been given?
-     */
-    bool mShowAllErrors;
 };
 
 #endif // CPPCHECKEXECUTOR_H
