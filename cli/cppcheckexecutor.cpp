@@ -50,6 +50,7 @@
 #include <iterator>
 #include <list>
 #include <memory>
+#include <set>
 #include <sstream> // IWYU pragma: keep
 #include <utility>
 #include <vector>
@@ -66,6 +67,30 @@
 #include <windows.h>
 #endif
 
+#ifdef _WIN32
+// fix trac ticket #439 'Cppcheck reports wrong filename for filenames containing 8-bit ASCII'
+static inline std::string ansiToOEM(const std::string &msg, bool doConvert)
+{
+    if (doConvert) {
+        const unsigned msglength = msg.length();
+        // convert ANSI strings to OEM strings in two steps
+        std::vector<WCHAR> wcContainer(msglength);
+        std::string result(msglength, '\0');
+
+        // ansi code page characters to wide characters
+        MultiByteToWideChar(CP_ACP, 0, msg.data(), msglength, wcContainer.data(), msglength);
+        // wide characters to oem codepage characters
+        WideCharToMultiByte(CP_OEMCP, 0, wcContainer.data(), msglength, const_cast<char *>(result.data()), msglength, nullptr, nullptr);
+
+        return result; // hope for return value optimization
+    }
+    return msg;
+}
+#else
+// no performance regression on non-windows systems
+#define ansiToOEM(msg, doConvert) (msg)
+#endif
+
 class XMLErrorMessagesLogger : public ErrorLogger
 {
     void reportOut(const std::string & outmsg, Color /*c*/ = Color::Reset) override
@@ -79,16 +104,114 @@ class XMLErrorMessagesLogger : public ErrorLogger
     }
 };
 
-/*static*/ FILE* CppCheckExecutor::mExceptionOutput = stdout;
-
-CppCheckExecutor::CppCheckExecutor()
-    : mSettings(nullptr), mErrorOutput(nullptr)
-{}
-
-CppCheckExecutor::~CppCheckExecutor()
+class OutputErrorLogger : public ErrorLogger
 {
-    delete mErrorOutput;
+public:
+    explicit OutputErrorLogger(bool verbose) : mVerbose(verbose) {}
+
+    ~OutputErrorLogger() override {
+        delete mErrorOutput;
+    }
+
+    void reportOut(const std::string &outmsg, Color c = Color::Reset) override
+    {
+        if (c == Color::Reset)
+            std::cout << ansiToOEM(outmsg, true) << std::endl;
+        else
+            std::cout << c << ansiToOEM(outmsg, true) << Color::Reset << std::endl;
+    }
+
+    void reportErr(const ErrorMessage &msg) override
+    {
+        // Alert only about unique errors
+        if (!mShownErrors.insert(msg.toString(mVerbose)).second)
+            return;
+
+        reportErr2(msg);
+    }
+
+    virtual void printHeader() {}
+    virtual void printFooter() {}
+
+    void setErrorOutput(std::ofstream *errorOutput) {
+        delete mErrorOutput;
+        mErrorOutput = errorOutput;
+    }
+
+protected:
+    void reportErr(const std::string &errmsg)
+    {
+        if (mErrorOutput)
+            *mErrorOutput << errmsg << std::endl;
+        else {
+            std::cerr << ansiToOEM(errmsg, (mSettings == nullptr) ? true : !mSettings->xml) << std::endl;
+        }
+    }
+
+    virtual void reportErr2(const ErrorMessage &msg) = 0;
+
+    bool mVerbose;
+
+private:
+    /**
+     * Error output
+     */
+    std::ofstream *mErrorOutput{nullptr};
+
+    /**
+     * Used to filter out duplicate error messages.
+     */
+    std::set<std::string> mShownErrors;
+};
+
+class XMLOutputErrorLogger : public OutputErrorLogger
+{
+public:
+    XMLOutputErrorLogger(bool verbose, std::string productName)
+        : OutputErrorLogger(verbose)
+        , mProductName(std::move(productName))
+    {}
+
+    void printHeader() override {
+        reportErr(ErrorMessage::getXMLHeader(mProductName));
+    }
+    void printFooter() override {}
+private:
+    void reportErr2(const ErrorMessage &msg) override
+    {
+        reportErr(msg.toXML());
+    }
+
+    std::string mProductName;
+};
+
+class TemplateOutputErrorLogger : public OutputErrorLogger
+{
+public:
+    TemplateOutputErrorLogger(bool verbose, std::string templateFormat, std::string templateLocation)
+        : OutputErrorLogger(verbose)
+        , mTemplateFormat(std::move(templateFormat))
+        , mTemplateLocation(std::move(templateLocation))
+    {}
+private:
+    void reportErr2(const ErrorMessage &msg) override
+    {
+        reportErr(msg.toString(mVerbose, mTemplateFormat, mTemplateLocation));
+    }
+
+    std::string mTemplateFormat;
+    std::string mTemplateLocation;
+};
+
+static std::unique_ptr<OutputErrorLogger> createOutputLogger(const Settings &settings)
+{
+    if (settings.xml)
+        return std::unique_ptr<OutputErrorLogger>(new XMLOutputErrorLogger(settings.verbose, settings.cppcheckCfgProductName));
+    return std::unique_ptr<OutputErrorLogger>(new TemplateOutputErrorLogger(settings.verbose, settings.templateFormat, settings.templateLocation));
 }
+
+
+/*static*/ FILE* CppCheckExecutor::mExceptionOutput = stdout;
 
 bool CppCheckExecutor::parseFromArgs(Settings &settings, int argc, const char* const argv[])
 {
@@ -218,28 +341,23 @@ int CppCheckExecutor::check(int argc, const char* const argv[])
         return EXIT_SUCCESS;
     }
 
-    CppCheck cppCheck(*this, true, executeCommand);
-    cppCheck.settings() = settings;
-    mSettings = &settings;
-
     int ret;
     if (settings.exceptionHandling)
-        ret = check_wrapper(cppCheck);
+        ret = check_wrapper(settings);
     else
-        ret = check_internal(cppCheck);
+        ret = check_internal(settings);
 
-    mSettings = nullptr;
     return ret;
 }
 
-int CppCheckExecutor::check_wrapper(CppCheck& cppcheck)
+int CppCheckExecutor::check_wrapper(Settings& settings)
 {
 #ifdef USE_WINDOWS_SEH
-    return check_wrapper_seh(*this, &CppCheckExecutor::check_internal, cppcheck);
+    return check_wrapper_seh(*this, &CppCheckExecutor::check_internal, settings);
 #elif defined(USE_UNIX_SIGNAL_HANDLING)
-    return check_wrapper_sig(*this, &CppCheckExecutor::check_internal, cppcheck);
+    return check_wrapper_sig(*this, &CppCheckExecutor::check_internal, settings);
 #else
-    return check_internal(cppcheck);
+    return check_internal(settings);
 #endif
 }
 
@@ -264,9 +382,13 @@ bool CppCheckExecutor::reportSuppressions(const Settings &settings, bool unusedF
 /*
  * That is a method which gets called from check_wrapper
  * */
-int CppCheckExecutor::check_internal(CppCheck& cppcheck)
+int CppCheckExecutor::check_internal(Settings& settings)
 {
-    Settings& settings = cppcheck.settings();
+    std::unique_ptr<OutputErrorLogger> outputLogger = createOutputLogger(settings);
+
+    CppCheck cppcheck(*outputLogger, true, executeCommand);
+    cppcheck.settings() = settings;
+
     const bool std = tryLoadLibrary(settings.library, settings.exename, "std.cfg");
 
     auto failed_lib = std::find_if(settings.libraries.begin(), settings.libraries.end(), [&](const std::string& lib) {
@@ -276,7 +398,7 @@ int CppCheckExecutor::check_internal(CppCheck& cppcheck)
         const std::string msg("Failed to load the library " + *failed_lib);
         const std::list<ErrorMessage::FileLocation> callstack;
         ErrorMessage errmsg(callstack, emptyString, Severity::information, msg, "failedToLoadCfg", Certainty::normal);
-        reportErr(errmsg);
+        outputLogger->reportErr(errmsg);
         return EXIT_FAILURE;
     }
 
@@ -294,17 +416,15 @@ int CppCheckExecutor::check_internal(CppCheck& cppcheck)
                                   "should be configured.");
 #endif
         ErrorMessage errmsg(callstack, emptyString, Severity::information, msg+" "+details, "failedToLoadCfg", Certainty::normal);
-        reportErr(errmsg);
+        outputLogger->reportErr(errmsg);
         return EXIT_FAILURE;
     }
 
     if (!settings.outputFile.empty()) {
-        mErrorOutput = new std::ofstream(settings.outputFile);
+        outputLogger->setErrorOutput(new std::ofstream(settings.outputFile));
     }
 
-    if (settings.xml) {
-        reportErr(ErrorMessage::getXMLHeader(settings.cppcheckCfgProductName));
-    }
+    outputLogger->printHeader();
 
     if (!settings.buildDir.empty()) {
         settings.loadSummaries();
@@ -318,13 +438,13 @@ int CppCheckExecutor::check_internal(CppCheck& cppcheck)
     unsigned int returnValue = 0;
     if (settings.useSingleJob()) {
         // Single process
-        SingleExecutor executor(cppcheck, mFiles, settings, *this);
+        SingleExecutor executor(cppcheck, mFiles, settings, *outputLogger);
         returnValue = executor.check();
     } else {
 #if defined(THREADING_MODEL_THREAD)
-        ThreadExecutor executor(mFiles, settings, *this);
+        ThreadExecutor executor(mFiles, settings, *outputLogger);
 #elif defined(THREADING_MODEL_FORK)
-        ProcessExecutor executor(mFiles, settings, *this);
+        ProcessExecutor executor(mFiles, settings, *outputLogger);
 #endif
         returnValue = executor.check();
     }
@@ -332,7 +452,7 @@ int CppCheckExecutor::check_internal(CppCheck& cppcheck)
     cppcheck.analyseWholeProgram(settings.buildDir, mFiles);
 
     if (settings.severity.isEnabled(Severity::information) || settings.checkConfiguration) {
-        const bool err = reportSuppressions(settings, cppcheck.isUnusedFunctionCheckEnabled(), mFiles, *this);
+        const bool err = reportSuppressions(settings, cppcheck.isUnusedFunctionCheckEnabled(), mFiles, *outputLogger);
         if (err && returnValue == 0)
             returnValue = settings.exitCode;
     }
@@ -341,66 +461,11 @@ int CppCheckExecutor::check_internal(CppCheck& cppcheck)
         cppcheck.tooManyConfigsError(emptyString,0U);
     }
 
-    if (settings.xml) {
-        reportErr(ErrorMessage::getXMLFooter());
-    }
+    outputLogger->printFooter();
 
     if (returnValue)
         return settings.exitCode;
     return 0;
-}
-
-#ifdef _WIN32
-// fix trac ticket #439 'Cppcheck reports wrong filename for filenames containing 8-bit ASCII'
-static inline std::string ansiToOEM(const std::string &msg, bool doConvert)
-{
-    if (doConvert) {
-        const unsigned msglength = msg.length();
-        // convert ANSI strings to OEM strings in two steps
-        std::vector<WCHAR> wcContainer(msglength);
-        std::string result(msglength, '\0');
-
-        // ansi code page characters to wide characters
-        MultiByteToWideChar(CP_ACP, 0, msg.data(), msglength, wcContainer.data(), msglength);
-        // wide characters to oem codepage characters
-        WideCharToMultiByte(CP_OEMCP, 0, wcContainer.data(), msglength, const_cast<char *>(result.data()), msglength, nullptr, nullptr);
-
-        return result; // hope for return value optimization
-    }
-    return msg;
-}
-#else
-// no performance regression on non-windows systems
-#define ansiToOEM(msg, doConvert) (msg)
-#endif
-
-void CppCheckExecutor::reportErr(const std::string &errmsg)
-{
-    if (mErrorOutput)
-        *mErrorOutput << errmsg << std::endl;
-    else {
-        std::cerr << ansiToOEM(errmsg, (mSettings == nullptr) ? true : !mSettings->xml) << std::endl;
-    }
-}
-
-void CppCheckExecutor::reportOut(const std::string &outmsg, Color c)
-{
-    if (c == Color::Reset)
-        std::cout << ansiToOEM(outmsg, true) << std::endl;
-    else
-        std::cout << c << ansiToOEM(outmsg, true) << Color::Reset << std::endl;
-}
-
-void CppCheckExecutor::reportErr(const ErrorMessage &msg)
-{
-    // Alert only about unique errors
-    if (!mShownErrors.insert(msg.toString(mSettings->verbose)).second)
-        return;
-
-    if (mSettings->xml)
-        reportErr(msg.toXML());
-    else
-        reportErr(msg.toString(mSettings->verbose, mSettings->templateFormat, mSettings->templateLocation));
 }
 
 void CppCheckExecutor::setExceptionOutput(FILE* exceptionOutput)

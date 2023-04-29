@@ -24,9 +24,9 @@
 #if defined(USE_UNIX_SIGNAL_HANDLING)
 
 class CppCheckExecutor;
-class CppCheck;
+class Settings;
 
-int check_wrapper_sig(CppCheckExecutor& executor, int (CppCheckExecutor::*f)(CppCheck&), CppCheck& cppcheck);
+int check_wrapper_sig(CppCheckExecutor& executor, int (CppCheckExecutor::*f)(Settings&), Settings& settings);
 
 #endif // CPPCHECKEXECUTORSIG_H
 

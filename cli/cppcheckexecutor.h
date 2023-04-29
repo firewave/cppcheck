@@ -26,11 +26,9 @@
 #include <ctime>
 #include <iosfwd>
 #include <map>
-#include <set>
 #include <string>
 #include <vector>
 
-class CppCheck;
 class Library;
 class Settings;
 
@@ -41,19 +39,14 @@ class Settings;
  * just rewrite this class for your needs and possibly use other methods
  * from CppCheck class instead the ones used here.
  */
-class CppCheckExecutor : public ErrorLogger {
+class CppCheckExecutor {
 public:
     /**
      * Constructor
      */
-    CppCheckExecutor();
+    CppCheckExecutor() = default;
     CppCheckExecutor(const CppCheckExecutor &) = delete;
     void operator=(const CppCheckExecutor&) = delete;
-
-    /**
-     * Destructor
-     */
-    ~CppCheckExecutor() override;
 
     /**
      * Starts the checking.
@@ -67,17 +60,6 @@ public:
      *         If no errors are found, 0 is returned.
      */
     int check(int argc, const char* const argv[]);
-
-    /**
-     * Information about progress is directed here. This should be
-     * called by the CppCheck class only.
-     *
-     * @param outmsg Progress message e.g. "Checking main.cpp..."
-     */
-    void reportOut(const std::string &outmsg, Color c = Color::Reset) override;
-
-    /** xml output of errors */
-    void reportErr(const ErrorMessage &msg) override;
 
     /**
      * @param exceptionOutput Output file
@@ -104,12 +86,6 @@ public:
 protected:
 
     /**
-     * Helper function to print out errors. Appends a line change.
-     * @param errmsg String printed to error stream
-     */
-    void reportErr(const std::string &errmsg);
-
-    /**
      * @brief Parse command line args and get settings and file lists
      * from there.
      *
@@ -126,31 +102,21 @@ private:
      * Wrapper around check_internal
      *   - installs optional platform dependent signal handling
      *
-     * @param cppcheck cppcheck instance
+     * @param settings the settings
      **/
-    int check_wrapper(CppCheck& cppcheck);
+    int check_wrapper(Settings& settings);
 
     /**
      * Starts the checking.
      *
-     * @param cppcheck cppcheck instance
+     * @param settings the settings
      * @return EXIT_FAILURE if arguments are invalid or no input files
      *         were found.
      *         If errors are found and --error-exitcode is used,
      *         given value is returned instead of default 0.
      *         If no errors are found, 0 is returned.
      */
-    int check_internal(CppCheck& cppcheck);
-
-    /**
-     * Pointer to current settings; set while check() is running for reportError().
-     */
-    const Settings* mSettings;
-
-    /**
-     * Used to filter out duplicate error messages.
-     */
-    std::set<std::string> mShownErrors;
+    int check_internal(Settings& settings);
 
     /**
      * Filename associated with size of file
@@ -161,11 +127,6 @@ private:
      * Output file name for exception handler
      */
     static FILE* mExceptionOutput;
-
-    /**
-     * Error output
-     */
-    std::ofstream *mErrorOutput;
 };
 
 #endif // CPPCHECKEXECUTOR_H
