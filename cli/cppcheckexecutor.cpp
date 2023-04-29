@@ -67,30 +67,6 @@
 #include <windows.h>
 #endif
 
-#ifdef _WIN32
-// fix trac ticket #439 'Cppcheck reports wrong filename for filenames containing 8-bit ASCII'
-static inline std::string ansiToOEM(const std::string &msg, bool doConvert)
-{
-    if (doConvert) {
-        const unsigned msglength = msg.length();
-        // convert ANSI strings to OEM strings in two steps
-        std::vector<WCHAR> wcContainer(msglength);
-        std::string result(msglength, '\0');
-
-        // ansi code page characters to wide characters
-        MultiByteToWideChar(CP_ACP, 0, msg.data(), msglength, wcContainer.data(), msglength);
-        // wide characters to oem codepage characters
-        WideCharToMultiByte(CP_OEMCP, 0, wcContainer.data(), msglength, const_cast<char *>(result.data()), msglength, nullptr, nullptr);
-
-        return result; // hope for return value optimization
-    }
-    return msg;
-}
-#else
-// no performance regression on non-windows systems
-#define ansiToOEM(msg, doConvert) (msg)
-#endif
-
 class XMLErrorMessagesLogger : public ErrorLogger
 {
     void reportOut(const std::string & outmsg, Color /*c*/ = Color::Reset) override
@@ -107,7 +83,9 @@ class XMLErrorMessagesLogger : public ErrorLogger
 class OutputErrorLogger : public ErrorLogger
 {
 public:
-    explicit OutputErrorLogger(bool verbose) : mVerbose(verbose) {}
+    explicit OutputErrorLogger(bool verbose) : mVerbose(verbose) {
+        mErrorOutput = new std::ostream(std::cerr.rdbuf());
+    }
 
     ~OutputErrorLogger() override {
         delete mErrorOutput;
@@ -115,10 +93,17 @@ public:
 
     void reportOut(const std::string &outmsg, Color c = Color::Reset) override
     {
+#ifdef _WIN32
         if (c == Color::Reset)
-            std::cout << ansiToOEM(outmsg, true) << std::endl;
+            std::cout << ansiToOEM(outmsg) << std::endl;
         else
-            std::cout << c << ansiToOEM(outmsg, true) << Color::Reset << std::endl;
+            std::cout << c << ansiToOEM(outmsg) << Color::Reset << std::endl;
+#else
+        if (c == Color::Reset)
+            std::cout << outmsg << std::endl;
+        else
+            std::cout << c << outmsg << Color::Reset << std::endl;
+#endif
     }
 
     void reportErr(const ErrorMessage &msg) override
@@ -133,7 +118,7 @@ public:
     virtual void printHeader() {}
     virtual void printFooter() {}
 
-    void setErrorOutput(std::ofstream *errorOutput) {
+    void setErrorOutput(std::ostream *errorOutput) {
         delete mErrorOutput;
         mErrorOutput = errorOutput;
     }
@@ -141,14 +126,18 @@ public:
 protected:
     void reportErr(const std::string &errmsg)
     {
-        if (mErrorOutput)
-            *mErrorOutput << errmsg << std::endl;
-        else {
-            std::cerr << ansiToOEM(errmsg, (mSettings == nullptr) ? true : !mSettings->xml) << std::endl;
-        }
+#ifdef _WIN32
+        *mErrorOutput << ansiToOEM(errmsg) << std::endl;
+#else
+        *mErrorOutput << errmsg << std::endl;
+#endif
     }
 
     virtual void reportErr2(const ErrorMessage &msg) = 0;
+
+#ifdef _WIN32
+    virtual std::string ansiToOEM(const std::string &msg) { return msg; }
+#endif
 
     bool mVerbose;
 
@@ -156,7 +145,7 @@ private:
     /**
      * Error output
      */
-    std::ofstream *mErrorOutput{nullptr};
+    std::ostream *mErrorOutput;
 
     /**
      * Used to filter out duplicate error messages.
@@ -198,6 +187,24 @@ private:
     {
         reportErr(msg.toString(mVerbose, mTemplateFormat, mTemplateLocation));
     }
+
+#ifdef _WIN32
+    // fix trac ticket #439 'Cppcheck reports wrong filename for filenames containing 8-bit ASCII'
+    std::string ansiToOEM(const std::string &msg) override
+    {
+        const unsigned msglength = msg.length();
+        // convert ANSI strings to OEM strings in two steps
+        std::vector<WCHAR> wcContainer(msglength);
+        std::string result(msglength, '\0');
+
+        // ansi code page characters to wide characters
+        MultiByteToWideChar(CP_ACP, 0, msg.data(), msglength, wcContainer.data(), msglength);
+        // wide characters to oem codepage characters
+        WideCharToMultiByte(CP_OEMCP, 0, wcContainer.data(), msglength, const_cast<char *>(result.data()), msglength, nullptr, nullptr);
+
+        return result; // hope for return value optimization
+    }
+#endif
 
     std::string mTemplateFormat;
     std::string mTemplateLocation;
@@ -435,7 +442,7 @@ int CppCheckExecutor::check_internal(Settings& settings)
         AnalyzerInformation::writeFilesTxt(settings.buildDir, fileNames, settings.userDefines, settings.project.fileSettings);
     }
 
-    unsigned int returnValue = 0;
+    unsigned int returnValue;
     if (settings.useSingleJob()) {
         // Single process
         SingleExecutor executor(cppcheck, mFiles, settings, *outputLogger);
