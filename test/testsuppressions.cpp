@@ -170,15 +170,15 @@ private:
     }
 
     // Check the suppression
-    unsigned int checkSuppression(const char code[], const std::string &suppression = emptyString) {
+    unsigned int checkSuppression(const char code[], const std::string &suppression = emptyString, const std::string &suppressionNoFail = emptyString) {
         std::map<std::string, std::string> files;
         files["test.cpp"] = code;
 
-        return checkSuppression(files, suppression);
+        return checkSuppression(files, suppression, suppressionNoFail);
     }
 
     // Check the suppression for multiple files
-    unsigned int checkSuppression(std::map<std::string, std::string> &f, const std::string &suppression = emptyString) {
+    unsigned int checkSuppression(std::map<std::string, std::string> &f, const std::string &suppression = emptyString, const std::string &suppressionNoFail = emptyString) {
         // Clear the error log
         errout.str("");
         output.str("");
@@ -198,6 +198,9 @@ private:
         if (!suppression.empty()) {
             EXPECT_EQ("", settings.nomsg.addSuppressionLine(suppression));
         }
+        if (!suppressionNoFail.empty()) {
+            EXPECT_EQ("", settings.nofail.addSuppressionLine(suppressionNoFail));
+        }
         SingleExecutor executor(cppCheck, files, settings, *this);
         std::vector<std::unique_ptr<ScopedFile>> scopedfiles;
         scopedfiles.reserve(files.size());
@@ -211,7 +214,7 @@ private:
         return exitCode;
     }
 
-    unsigned int checkSuppressionThreads(const char code[], const std::string &suppression = emptyString) {
+    unsigned int checkSuppressionThreads(const char code[], const std::string &suppression = emptyString, const std::string &suppressionNoFail = emptyString) {
         errout.str("");
         output.str("");
 
@@ -224,6 +227,9 @@ private:
         settings.severity.enable(Severity::information);
         if (!suppression.empty()) {
             EXPECT_EQ("", settings.nomsg.addSuppressionLine(suppression));
+        }
+        if (!suppressionNoFail.empty()) {
+            EXPECT_EQ("", settings.nofail.addSuppressionLine(suppressionNoFail));
         }
         ThreadExecutor executor(files, settings, *this);
         std::vector<std::unique_ptr<ScopedFile>> scopedfiles;
@@ -239,7 +245,7 @@ private:
     }
 
 #if !defined(WIN32) && !defined(__MINGW32__) && !defined(__CYGWIN__)
-    unsigned int checkSuppressionProcesses(const char code[], const std::string &suppression = emptyString) {
+    unsigned int checkSuppressionProcesses(const char code[], const std::string &suppression = emptyString, const std::string &suppressionNoFail = emptyString) {
         errout.str("");
         output.str("");
 
@@ -252,6 +258,9 @@ private:
         settings.severity.enable(Severity::information);
         if (!suppression.empty()) {
             EXPECT_EQ("", settings.nomsg.addSuppressionLine(suppression));
+        }
+        if (!suppressionNoFail.empty()) {
+            EXPECT_EQ("", settings.nofail.addSuppressionLine(suppressionNoFail));
         }
         ProcessExecutor executor(files, settings, *this);
         std::vector<std::unique_ptr<ScopedFile>> scopedfiles;
@@ -267,13 +276,13 @@ private:
     }
 #endif
 
-    void runChecks(unsigned int (TestSuppressions::*check)(const char[], const std::string &)) {
+    void runChecks(unsigned int (TestSuppressions::*check)(const char[], const std::string &, const std::string &)) {
         // check to make sure the appropriate error is present
         ASSERT_EQUALS(1, (this->*check)("void f() {\n"
                                         "    int a;\n"
                                         "    a++;\n"
                                         "}\n",
-                                        ""));
+                                        "", ""));
         ASSERT_EQUALS("[test.cpp:3]: (error) Uninitialized variable: a\n", errout.str());
 
         // suppress uninitvar globally
@@ -281,7 +290,7 @@ private:
                                         "    int a;\n"
                                         "    a++;\n"
                                         "}\n",
-                                        "uninitvar"));
+                                        "uninitvar", ""));
         ASSERT_EQUALS("", errout.str());
 
         // suppress uninitvar globally, without error present
@@ -289,7 +298,7 @@ private:
                                         "    int a;\n"
                                         "    b++;\n"
                                         "}\n",
-                                        "uninitvar"));
+                                        "uninitvar", ""));
         ASSERT_EQUALS("(information) Unmatched suppression: uninitvar\n", errout.str());
 
         // suppress uninitvar for this file only
@@ -297,7 +306,7 @@ private:
                                         "    int a;\n"
                                         "    a++;\n"
                                         "}\n",
-                                        "uninitvar:test.cpp"));
+                                        "uninitvar:test.cpp", ""));
         ASSERT_EQUALS("", errout.str());
 
         // suppress uninitvar for this file only, without error present
@@ -305,7 +314,7 @@ private:
                        "    int a;\n"
                        "    b++;\n"
                        "}\n",
-                       "uninitvar:test.cpp");
+                       "uninitvar:test.cpp", "");
         ASSERT_EQUALS("[test.cpp]: (information) Unmatched suppression: uninitvar\n", errout.str());
 
         // suppress all for this file only
@@ -313,7 +322,7 @@ private:
                                         "    int a;\n"
                                         "    a++;\n"
                                         "}\n",
-                                        "*:test.cpp"));
+                                        "*:test.cpp", ""));
         ASSERT_EQUALS("", errout.str());
 
         // suppress all for this file only, without error present
@@ -321,7 +330,7 @@ private:
                        "    int a;\n"
                        "    b++;\n"
                        "}\n",
-                       "*:test.cpp");
+                       "*:test.cpp", "");
         ASSERT_EQUALS("[test.cpp]: (information) Unmatched suppression: *\n", errout.str());
 
         // suppress uninitvar for this file and line
@@ -329,7 +338,7 @@ private:
                                         "    int a;\n"
                                         "    a++;\n"
                                         "}\n",
-                                        "uninitvar:test.cpp:3"));
+                                        "uninitvar:test.cpp:3", ""));
         ASSERT_EQUALS("", errout.str());
 
         // suppress uninitvar for this file and line, without error present
@@ -337,7 +346,7 @@ private:
                        "    int a;\n"
                        "    b++;\n"
                        "}\n",
-                       "uninitvar:test.cpp:3");
+                       "uninitvar:test.cpp:3", "");
         ASSERT_EQUALS("[test.cpp:3]: (information) Unmatched suppression: uninitvar\n", errout.str());
 
         // suppress uninitvar inline
@@ -346,7 +355,7 @@ private:
                                         "    // cppcheck-suppress uninitvar\n"
                                         "    a++;\n"
                                         "}\n",
-                                        ""));
+                                        "", ""));
         ASSERT_EQUALS("", errout.str());
 
         // suppress uninitvar inline
@@ -356,7 +365,7 @@ private:
                                         "\n"
                                         "    a++;\n"
                                         "}\n",
-                                        ""));
+                                        "", ""));
         ASSERT_EQUALS("", errout.str());
 
         // suppress uninitvar inline
@@ -364,7 +373,7 @@ private:
                                         "    int a;\n"
                                         "    a++;// cppcheck-suppress uninitvar\n"
                                         "}\n",
-                                        ""));
+                                        "", ""));
         ASSERT_EQUALS("", errout.str());
 
         // suppress uninitvar inline
@@ -373,7 +382,7 @@ private:
                                         "    /* cppcheck-suppress uninitvar */\n"
                                         "    a++;\n"
                                         "}\n",
-                                        ""));
+                                        "", ""));
         ASSERT_EQUALS("", errout.str());
 
         // suppress uninitvar inline
@@ -383,7 +392,7 @@ private:
                                         "\n"
                                         "    a++;\n"
                                         "}\n",
-                                        ""));
+                                        "", ""));
         ASSERT_EQUALS("", errout.str());
 
         // suppress uninitvar inline
@@ -391,7 +400,7 @@ private:
                                         "    int a;\n"
                                         "    a++;/* cppcheck-suppress uninitvar */\n"
                                         "}\n",
-                                        ""));
+                                        "", ""));
         ASSERT_EQUALS("", errout.str());
 
         // suppress uninitvar inline
@@ -400,7 +409,7 @@ private:
                                         "    // cppcheck-suppress[uninitvar]\n"
                                         "    a++;\n"
                                         "}\n",
-                                        ""));
+                                        "", ""));
         ASSERT_EQUALS("", errout.str());
 
         // suppress uninitvar inline
@@ -411,7 +420,7 @@ private:
                                         "\n"
                                         "    a++;\n"
                                         "}\n",
-                                        ""));
+                                        "", ""));
         ASSERT_EQUALS("", errout.str());
 
         // suppress uninitvar inline
@@ -419,7 +428,7 @@ private:
                                         "    int a;\n"
                                         "    a++;// cppcheck-suppress[uninitvar]\n"
                                         "}\n",
-                                        ""));
+                                        "", ""));
         ASSERT_EQUALS("", errout.str());
 
         // suppress uninitvar inline
@@ -428,7 +437,7 @@ private:
                                         "    /* cppcheck-suppress[uninitvar]*/\n"
                                         "    a++;\n"
                                         "}\n",
-                                        ""));
+                                        "", ""));
         ASSERT_EQUALS("", errout.str());
 
         // suppress uninitvar inline
@@ -438,7 +447,7 @@ private:
                                         "\n"
                                         "    a++;\n"
                                         "}\n",
-                                        ""));
+                                        "", ""));
         ASSERT_EQUALS("", errout.str());
 
         // suppress uninitvar inline
@@ -446,7 +455,7 @@ private:
                                         "    int a;\n"
                                         "    a++;/* cppcheck-suppress[uninitvar]*/\n"
                                         "}\n",
-                                        ""));
+                                        "", ""));
         ASSERT_EQUALS("", errout.str());
 
         // suppress uninitvar inline, with asm before (#6813)
@@ -458,7 +467,7 @@ private:
                                         "    // cppcheck-suppress uninitvar\n"
                                         "    a++;\n"
                                         "}",
-                                        ""));
+                                        "", ""));
         ASSERT_EQUALS("", errout.str());
 
         // suppress uninitvar inline, without error present
@@ -467,7 +476,7 @@ private:
                        "    // cppcheck-suppress uninitvar\n"
                        "    b++;\n"
                        "}\n",
-                       "");
+                       "", "");
         ASSERT_EQUALS("[test.cpp:4]: (information) Unmatched suppression: uninitvar\n", errout.str());
 
         // #5746 - exitcode
@@ -475,12 +484,46 @@ private:
                       (this->*check)("int f() {\n"
                                      "  int a; return a;\n"
                                      "}\n",
-                                     ""));
+                                     "", ""));
+        ASSERT_EQUALS("[test.cpp:2]: (error) Uninitialized variable: a\n", errout.str());
         ASSERT_EQUALS(0U,
                       (this->*check)("int f() {\n"
                                      "  int a; return a;\n"
                                      "}\n",
-                                     "uninitvar"));
+                                     "uninitvar", ""));
+        ASSERT_EQUALS("", errout.str());
+
+        // nofail suppressions
+        ASSERT_EQUALS(0U,
+                      (this->*check)("int f() {\n"
+                                     "  int a; return a;\n"
+                                     "}\n",
+                                     "", "uninitvar"));
+        ASSERT_EQUALS("[test.cpp:2]: (error) Uninitialized variable: a\n", errout.str());
+        ASSERT_EQUALS(0U,
+                      (this->*check)("int f() {\n"
+                                     "  int a; return a;\n"
+                                     "}\n",
+                                     "", "uninitvar:test.cpp"));
+        ASSERT_EQUALS("[test.cpp:2]: (error) Uninitialized variable: a\n", errout.str());
+        ASSERT_EQUALS(1U,
+                      (this->*check)("int f() {\n"
+                                     "  int a; return a;\n"
+                                     "}\n",
+                                     "", "memleak"));
+        ASSERT_EQUALS("[test.cpp:2]: (error) Uninitialized variable: a\n", errout.str());
+        ASSERT_EQUALS(0U,
+                      (this->*check)("int f() {\n"
+                                     "  int a; return a;\n"
+                                     "}\n",
+                                     "uninitvar", "uninitvar"));
+        ASSERT_EQUALS("", errout.str());
+        ASSERT_EQUALS(0U,
+                      (this->*check)("int f() {\n"
+                                     "  int a; return a;\n"
+                                     "}\n",
+                                     "uninitvar:test.cpp", "uninitvar"));
+        ASSERT_EQUALS("", errout.str());
     }
 
     void suppressionsSettings() {
