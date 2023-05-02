@@ -1617,15 +1617,15 @@ void CppCheck::reportErr(const ErrorMessage &msg)
         }
     }
 
-    if (!mSettings.nofail.isSuppressed(errorMessage) && !mSettings.nomsg.isSuppressed(errorMessage)) {
+    if (!mSettings.nofail.isSuppressed(errorMessage)) {
         mExitCode = 1;
     }
 
     mErrorList.push_back(errmsg);
 
     mErrorLogger.reportErr(msg);
-    // check if plistOutput should be populated and the current output file is open and the error is not suppressed
-    if (!mSettings.plistOutput.empty() && mPlistFile.is_open() && !mSettings.nomsg.isSuppressed(errorMessage)) {
+    // check if plistOutput should be populated and the current output file is open
+    if (!mSettings.plistOutput.empty() && mPlistFile.is_open()) {
         // add error to plist output file
         mPlistFile << ErrorLogger::plistData(msg);
     }
