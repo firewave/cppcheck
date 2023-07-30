@@ -276,11 +276,8 @@ std::string ErrorMessage::serialize() const
         serializeString(oss, text);
     }
 
-    const std::string saneShortMessage = fixInvalidChars(mShortMessage);
-    const std::string saneVerboseMessage = fixInvalidChars(mVerboseMessage);
-
-    serializeString(oss, saneShortMessage);
-    serializeString(oss, saneVerboseMessage);
+    serializeString(oss, mShortMessage);
+    serializeString(oss, mVerboseMessage);
     oss += std::to_string(callStack.size());
     oss += " ";
 

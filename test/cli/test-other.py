@@ -3,6 +3,7 @@
 
 import os
 import pytest
+import xml.etree.ElementTree as ElementTree
 
 from testutils import cppcheck
 
@@ -566,3 +567,22 @@ def test_missing_addon(tmpdir):
         'Did not find addon misra3.py'
     ]
     assert stderr == ""
+
+
+# #5300 / https://github.com/danmar/cppcheck/pull/5279
+# make sure error messages are still valid XML after being serialized
+def test_invalid_char_xml(tmpdir):
+    test_file = os.path.join(tmpdir, 'test.c')
+    with open(test_file, 'wt') as f:
+        f.write("""
+                    void foo() {
+                      strcmp ("a\203", "a\003");
+                    }
+                    """)
+
+    args = ['--xml', '--xml-version=2', '--enable=all', '-j2', test_file]
+
+    _, _, stderr = cppcheck(args)
+
+    # check if XML is valid
+    ElementTree.fromstring(stderr)
