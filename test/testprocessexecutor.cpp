@@ -69,12 +69,13 @@ private:
             }
         }
 
-        settings.jobs = jobs;
-        settings.showtime = showtime;
+        Settings s = settings;
+        s.jobs = jobs;
+        s.showtime = showtime;
         if (plistOutput)
-            settings.plistOutput = plistOutput;
+            s.plistOutput = plistOutput;
         // TODO: test with settings.project.fileSettings;
-        ProcessExecutor executor(filemap, settings, *this);
+        ProcessExecutor executor(filemap, s, *this);
         std::vector<std::unique_ptr<ScopedFile>> scopedfiles;
         scopedfiles.reserve(filemap.size());
         for (std::map<std::string, std::size_t>::const_iterator i = filemap.cbegin(); i != filemap.cend(); ++i)
