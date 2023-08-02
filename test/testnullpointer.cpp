@@ -37,6 +37,7 @@ public:
 
 private:
     const Settings settings = settingsBuilder().library("std.cfg").severity(Severity::warning).build();
+    const Settings settings_i = settingsBuilder(settings).certainty(Certainty::inconclusive).build();
 
     void run() override {
         mNewTemplate = true;
@@ -186,7 +187,7 @@ private:
 #define check(...) check_(__FILE__, __LINE__, __VA_ARGS__)
     template<size_t size>
     void check_(const char* file, int line, const char (&code)[size], const CheckOptions& options = make_default_obj()) {
-        const Settings settings1 = settingsBuilder(settings).certainty(Certainty::inconclusive, options.inconclusive).build();
+        const Settings &settings1 = options.inconclusive ? settings_i : settings;
 
         // Tokenize..
         SimpleTokenizer tokenizer(settings1, *this, options.cpp);
@@ -199,9 +200,7 @@ private:
 #define checkP(...) checkP_(__FILE__, __LINE__, __VA_ARGS__)
     template<size_t size>
     void checkP_(const char* file, int line, const char (&code)[size]) {
-        const Settings settings1 = settingsBuilder(settings).certainty(Certainty::inconclusive, false).build();
-
-        SimpleTokenizer2 tokenizer(settings1, *this, code, "test.cpp");
+        SimpleTokenizer2 tokenizer(settings, *this, code, "test.cpp");
 
         // Tokenizer..
         ASSERT_LOC(tokenizer.simplifyTokens1(""), file, line);

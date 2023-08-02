@@ -37,6 +37,8 @@ public:
 
 private:
     /*const*/ Settings settings0 = settingsBuilder().library("std.cfg").severity(Severity::warning).severity(Severity::style).severity(Severity::portability).build();
+    const Settings settings0_i = settingsBuilder(settings0).certainty(Certainty::inconclusive).build();
+    const Settings settings1 = settingsBuilder(settings0).severity(Severity::performance).certainty(Certainty::inconclusive).build();
 
     struct CheckOptions
     {
@@ -60,10 +62,8 @@ private:
 
     // TODO: get rid of this
     void check_(const char* file, int line, const std::string& code) {
-        const Settings settings = settingsBuilder(settings0).certainty(Certainty::inconclusive).build();
-
         // Tokenize..
-        SimpleTokenizer tokenizer(settings, *this);
+        SimpleTokenizer tokenizer(settings0_i, *this);
         ASSERT_LOC(tokenizer.tokenize(code), file, line);
 
         // Check for buffer overruns..
@@ -73,9 +73,7 @@ private:
 #define checkP(...) checkP_(__FILE__, __LINE__, __VA_ARGS__)
     void checkP_(const char* file, int line, const char code[])
     {
-        const Settings settings = settingsBuilder(settings0).severity(Severity::performance).certainty(Certainty::inconclusive).build();
-
-        SimpleTokenizer2 tokenizer(settings, *this, code, "test.cpp");
+        SimpleTokenizer2 tokenizer(settings1, *this, code, "test.cpp");
 
         // Tokenizer..
         ASSERT_LOC(tokenizer.simplifyTokens1(""), file, line);
