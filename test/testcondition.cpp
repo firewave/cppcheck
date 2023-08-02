@@ -39,7 +39,6 @@ public:
 
 private:
     const Settings settings0 = settingsBuilder().library("qt.cfg").library("std.cfg").severity(Severity::style).severity(Severity::warning).platform(cppcheck::Platform::Type::Native).build();
-    const Settings settings0_i = settingsBuilder(settings0).certainty(Certainty::inconclusive).build();
     Settings settings1 = settingsBuilder().severity(Severity::style).severity(Severity::warning).platform(cppcheck::Platform::Type::Native).build();
 
     void run() override {
@@ -154,8 +153,8 @@ private:
         runChecks<CheckCondition>(&tokenizer, &settings, this);
     }
 
-    void check(const char code[], const char* filename = "test.cpp", bool inconclusive = false) {
-        check(code, inconclusive ? settings0_i : settings0, filename);
+    void check(const char code[], const char* filename = "test.cpp") {
+        check(code, settings0, filename);
     }
 
     void assignAndCompare() {
@@ -1275,29 +1274,30 @@ private:
     }
 
     void incorrectLogicOperator6() { // char literals
+        const Settings s = settingsBuilder(settings0).certainty(Certainty::inconclusive).build();
         check("void f(char x) {\n"
               "  if (x == '1' || x == '2') {}\n"
-              "}", "test.cpp", true);
+              "}", s);
         ASSERT_EQUALS("", errout.str());
 
         check("void f(char x) {\n"
               "  if (x == '1' && x == '2') {}\n"
-              "}", "test.cpp", true);
+              "}", s);
         ASSERT_EQUALS("[test.cpp:2]: (warning) Logical conjunction always evaluates to false: x == '1' && x == '2'.\n", errout.str());
 
         check("int f(char c) {\n"
               "  return (c >= 'a' && c <= 'z');\n"
-              "}", "test.cpp", true);
+              "}", s);
         ASSERT_EQUALS("", errout.str());
 
         check("int f(char c) {\n"
               "  return (c <= 'a' && c >= 'z');\n"
-              "}", "test.cpp", true);
+              "}", s);
         ASSERT_EQUALS("[test.cpp:2]: (warning, inconclusive) Logical conjunction always evaluates to false: c <= 'a' && c >= 'z'.\n", errout.str());
 
         check("int f(char c) {\n"
               "  return (c <= 'a' && c >= 'z');\n"
-              "}", "test.cpp", false);
+              "}", s);
         ASSERT_EQUALS("[test.cpp:2] -> [test.cpp:2]: (style) Return value 'c>='z'' is always false\n", errout.str());
     }
 

@@ -4971,7 +4971,7 @@ private:
               "struct A { };\n"
               "static void make(external::ns::s ss) {\n"
               "  internal::ns1::make<A>(ss);\n"
-              "}\n", true);
+              "}\n");
         ASSERT_EQUALS("", errout.str());
     }
 
@@ -7716,7 +7716,7 @@ private:
               "    int func3();\n"
               "    int func4(int);\n"
               "    return func4(x);\n"
-              "}\n", true);
+              "}\n");
         ASSERT_EQUALS("", errout.str());
     }
 

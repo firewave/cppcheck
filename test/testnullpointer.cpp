@@ -2981,7 +2981,7 @@ private:
                 "    }\n"
                 "    *p = 0;\n"
                 "}";
-            check(code, false);
+            check(code);
             ASSERT_EQUALS("", errout.str());
 
             check(code, true);
@@ -3782,7 +3782,7 @@ private:
               "    oss << foo << p;\n"
               "    if(q == 0)\n"
               "        oss << foo << q;\n"
-              "}", false);
+              "}");
         ASSERT_EQUALS("[test.cpp:3]: (error) Null pointer dereference: p\n"
                       "[test.cpp:4]: (error) Null pointer dereference: p\n"
                       "[test.cpp:5] -> [test.cpp:6]: (warning) Either the condition 'q==0' is redundant or there is possible null pointer dereference: q.\n", errout.str());
@@ -3794,7 +3794,7 @@ private:
               "        std::cin >> p;\n"
               "        std::cout << abc << p;\n"
               "    }\n"
-              "}", false);
+              "}");
         TODO_ASSERT_EQUALS("[test.cpp:2] -> [test.cpp:3]: (warning) Either the condition 'p==0' is redundant or there is possible null pointer dereference: p.\n"
                            "[test.cpp:2] -> [test.cpp:4]: (warning) Either the condition 'p==0' is redundant or there is possible null pointer dereference: p.\n"
                            "[test.cpp:2] -> [test.cpp:5]: (warning) Either the condition 'p==0' is redundant or there is possible null pointer dereference: p.\n"

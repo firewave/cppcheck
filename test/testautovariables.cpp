@@ -257,7 +257,7 @@ private:
               "{\n"
               "    char a[10];\n"
               "    x->str = a;\n"
-              "}", true);
+              "}");
         ASSERT_EQUALS("[test.cpp:4]: (error, inconclusive) Address of local auto-variable assigned to a function parameter.\n", errout.str());
     }
 
@@ -1765,8 +1765,7 @@ private:
               "const int& bar(const std::unordered_map<int, int>& m, int k) {\n"
               "    auto x = 0;\n"
               "    return get_default(m, k, x);\n"
-              "}\n",
-              true);
+              "}\n");
         ASSERT_EQUALS(
             "[test.cpp:2] -> [test.cpp:4] -> [test.cpp:9] -> [test.cpp:9]: (error, inconclusive) Reference to local variable returned.\n",
             errout.str());
@@ -1779,8 +1778,7 @@ private:
               "}\n"
               "const int& bar(const std::unordered_map<int, int>& m, int k) {\n"
               "    return get_default(m, k, 0);\n"
-              "}\n",
-              true);
+              "}\n");
         ASSERT_EQUALS(
             "[test.cpp:2] -> [test.cpp:4] -> [test.cpp:8] -> [test.cpp:8]: (error, inconclusive) Reference to temporary returned.\n",
             errout.str());
@@ -2519,8 +2517,7 @@ private:
               "const int* bar(const std::unordered_map<int, int>& m, int k) {\n"
               "    auto x = 0;\n"
               "    return get_default(m, k, &x);\n"
-              "}\n",
-              true);
+              "}\n");
         ASSERT_EQUALS(
             "[test.cpp:9] -> [test.cpp:9] -> [test.cpp:8] -> [test.cpp:9]: (error, inconclusive) Returning pointer to local variable 'x' that will be invalid when returning.\n",
             errout.str());
@@ -2753,15 +2750,13 @@ private:
 
         check("std::string f(std::string Str, int first, int last) {\n"
               "    return { Str.begin() + first, Str.begin() + last + 1 };\n"
-              "}\n",
-              true);
+              "}\n");
         ASSERT_EQUALS("", errout.str());
 
         check("std::string f(std::string s) {\n"
               "    std::string r = { s.begin(), s.end() };\n"
               "    return r;\n"
-              "}\n",
-              true);
+              "}\n");
         ASSERT_EQUALS("", errout.str());
 
         check("struct A {\n"
@@ -3466,8 +3461,7 @@ private:
               "    int i = 0;\n"
               "    A a{i};\n"
               "    return a;\n"
-              "}\n",
-              true);
+              "}\n");
         ASSERT_EQUALS(
             "[test.cpp:7] -> [test.cpp:6] -> [test.cpp:8]: (error, inconclusive) Returning object that points to local variable 'i' that will be invalid when returning.\n",
             errout.str());
@@ -3480,8 +3474,7 @@ private:
               "    int i = 0;\n"
               "    A a{i};\n"
               "    return a;\n"
-              "}\n",
-              true);
+              "}\n");
         ASSERT_EQUALS("", errout.str());
 
         check("struct A {\n"
@@ -3634,8 +3627,7 @@ private:
               "S f() {\n"
               "    std::string m(\"abc\");\n"
               "    return S(m);\n"
-              "}\n",
-              true);
+              "}\n");
         ASSERT_EQUALS("", errout.str());
 
         check("struct S {\n"
@@ -3645,8 +3637,7 @@ private:
               "S f() {\n"
               "    std::string s(\"abc\");\n"
               "    return S(s.c_str());\n"
-              "}\n",
-              true);
+              "}\n");
         ASSERT_EQUALS("", errout.str());
     }
 
@@ -3992,16 +3983,14 @@ private:
               "void T::f() {\n"
               "    U u(p->g().c_str());\n"
               "    if (u.h()) {}\n"
-              "}\n",
-              true);
+              "}\n");
         ASSERT_EQUALS("", errout.str());
 
         // #11442
         check("const std::string& f(const P< std::string >& value) {\n"
               "   static const std::string empty;\n"
               "   return value.get() == nullptr ? empty : *value;\n"
-              "}\n",
-              true);
+              "}\n");
         ASSERT_EQUALS("", errout.str());
 
         // #11472
