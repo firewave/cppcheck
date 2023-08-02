@@ -31,13 +31,14 @@ public:
 
 private:
     const Settings settings = settingsBuilder().severity(Severity::warning).severity(Severity::style).library("std.cfg").library("qt.cfg").build();
+    const Settings settings_i = settingsBuilder(settings).certainty(Certainty::inconclusive).build();
 
 #define check(...) check_(__FILE__, __LINE__, __VA_ARGS__)
     void check_(const char* file, int line, const char code[], bool inconclusive = true, const char* filename = "test.cpp") {
         // Clear the error buffer..
         errout.str("");
 
-        const Settings settings1 = settingsBuilder(settings).certainty(Certainty::inconclusive, inconclusive).build();
+        const Settings &settings1 = inconclusive ? settings_i : settings;
 
         // Tokenize..
         Tokenizer tokenizer(&settings1, this);

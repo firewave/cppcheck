@@ -36,12 +36,13 @@ public:
 
 private:
     const Settings settings = settingsBuilder().severity(Severity::warning).build();
+    const Settings settings_i = settingsBuilder(settings).certainty(Certainty::inconclusive).build();
 
     void check(const char code[], bool inconclusive = false) {
         // Clear the error buffer..
         errout.str("");
 
-        const Settings settings1 = settingsBuilder(settings).certainty(Certainty::inconclusive, inconclusive).build();
+        const Settings &settings1 = inconclusive ? settings_i : settings;
 
         // Raw tokens..
         std::vector<std::string> files(1, "test.cpp");

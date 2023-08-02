@@ -5280,14 +5280,12 @@ private:
         errout.str("");
 
         // Tokenize..
-        const Settings s = settingsBuilder(settings).debugwarnings(false).build();
-
-        Tokenizer tokenizer(&s, this);
+        Tokenizer tokenizer(&settings, this);
         std::istringstream istr(code);
         ASSERT_LOC(tokenizer.tokenize(istr, fname), file, line);
 
         // Check for redundant code..
-        CheckUninitVar checkuninitvar(&tokenizer, &s, this);
+        CheckUninitVar checkuninitvar(&tokenizer, &settings, this);
         (checkuninitvar.valueFlowUninit)();
     }
 

@@ -69,6 +69,7 @@ private:
     const Token* vartok{nullptr};
     const Token* typetok{nullptr};
     Settings settings1 = settingsBuilder().library("std.cfg").build();
+    const Settings settings1_d = settingsBuilder().debugwarnings().build();
     const Settings settings2 = settingsBuilder().platform(cppcheck::Platform::Type::Unspecified).build();
 
     void reset() {
@@ -2341,7 +2342,7 @@ private:
         errout.str("");
 
         // Check..
-        const Settings settings = settingsBuilder(settings1).debugwarnings(debug).build();
+        const Settings &settings = debug ? settings1_d : settings1;
 
         // Tokenize..
         Tokenizer tokenizer(&settings, this);
