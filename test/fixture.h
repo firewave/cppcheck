@@ -160,7 +160,7 @@ protected:
 
         SettingsBuilder& severity(Severity sev, bool b = true) {
             if (REDUNDANT_CHECK && settings.severity.isEnabled(sev) == b)
-                throw std::runtime_error("redundant setting: severity");
+                throw std::runtime_error("redundant setting: severity - " + severityToString(sev));
             settings.severity.setEnabled(sev, b);
             return *this;
         }
