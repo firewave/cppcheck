@@ -39,6 +39,7 @@ public:
 
 private:
     const Settings settings0 = settingsBuilder().library("qt.cfg").library("std.cfg").severity(Severity::style).severity(Severity::warning).platform(cppcheck::Platform::Type::Native).build();
+    const Settings settings0_i = settingsBuilder(settings0).certainty(Certainty::inconclusive).build();
     Settings settings1 = settingsBuilder().severity(Severity::style).severity(Severity::warning).platform(cppcheck::Platform::Type::Native).build();
 
     void run() override {
@@ -154,8 +155,7 @@ private:
     }
 
     void check(const char code[], const char* filename = "test.cpp", bool inconclusive = false) {
-        const Settings settings = settingsBuilder(settings0).certainty(Certainty::inconclusive, inconclusive).build();
-        check(code, settings, filename);
+        check(code, inconclusive ? settings0_i : settings0, filename);
     }
 
     void assignAndCompare() {

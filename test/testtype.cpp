@@ -234,7 +234,7 @@ private:
     }
 
     void checkIntegerOverflow() {
-        const Settings settings = settingsBuilder().severity(Severity::warning).platform(cppcheck::Platform::Type::Unix32).build();
+        const Settings settings = settingsBuilder().platform(cppcheck::Platform::Type::Unix32).build();
 
         check("x = (int)0x10000 * (int)0x10000;", settings);
         ASSERT_EQUALS("[test.cpp:1]: (error) Signed integer overflow for expression '(int)0x10000*(int)0x10000'.\n", errout.str());

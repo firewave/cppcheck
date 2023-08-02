@@ -42,6 +42,7 @@ public:
 
 private:
     const Settings settings = settingsBuilder().library("std.cfg").severity(Severity::warning).build();
+    const Settings settings_i = settingsBuilder(settings).certainty(Certainty::inconclusive).build();
 
     void run() override {
         TEST_CASE(nullpointerAfterLoop);
@@ -181,7 +182,7 @@ private:
         // Clear the error buffer..
         errout.str("");
 
-        const Settings settings1 = settingsBuilder(settings).certainty(Certainty::inconclusive, inconclusive).build();
+        const Settings &settings1 = inconclusive ? settings_i : settings;
 
         // Tokenize..
         Tokenizer tokenizer(&settings1, this);
@@ -196,8 +197,6 @@ private:
         // Clear the error buffer..
         errout.str("");
 
-        const Settings settings1 = settingsBuilder(settings).certainty(Certainty::inconclusive, false).build();
-
         // Raw tokens..
         std::vector<std::string> files(1, "test.cpp");
         std::istringstream istr(code);
@@ -209,12 +208,12 @@ private:
         simplecpp::preprocess(tokens2, tokens1, files, filedata, simplecpp::DUI());
 
         // Tokenizer..
-        Tokenizer tokenizer(&settings1, this);
+        Tokenizer tokenizer(&settings, this);
         tokenizer.createTokens(std::move(tokens2));
         tokenizer.simplifyTokens1("");
 
         // Check for null pointer dereferences..
-        runChecks<CheckNullPointer>(&tokenizer, &settings1, this);
+        runChecks<CheckNullPointer>(&tokenizer, &settings, this);
     }
 
 
