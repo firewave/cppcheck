@@ -95,10 +95,10 @@ public:
     void ignorePaths(const std::vector<std::string> &ipaths);
     void ignoreOtherConfigs(const std::string &cfg);
 
-    Type import(const std::string &filename, Settings *settings=nullptr);
+    Type import(const std::string &filename, Settings &settings);
 protected:
     bool importCompileCommands(std::istream &istr);
-    bool importCppcheckGuiProject(std::istream &istr, Settings *settings);
+    bool importCppcheckGuiProject(std::istream &istr, Settings &settings);
     virtual bool sourceFileExists(const std::string &file);
 
 private:
