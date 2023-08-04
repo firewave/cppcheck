@@ -177,7 +177,7 @@ void ImportProject::fsSetIncludePaths(FileSettings& fs, const std::string &basep
     }
 }
 
-ImportProject::Type ImportProject::import(const std::string &filename, Settings *settings)
+ImportProject::Type ImportProject::import(const std::string &filename, Settings &settings)
 {
     std::ifstream fin(filename);
     if (!fin.is_open())
@@ -187,8 +187,7 @@ ImportProject::Type ImportProject::import(const std::string &filename, Settings 
     if (!mPath.empty() && !endsWith(mPath,'/'))
         mPath += '/';
 
-    const std::vector<std::string> fileFilters =
-        settings ? settings->fileFilters : std::vector<std::string>();
+    const std::vector<std::string>& fileFilters = settings.fileFilters;
 
     if (endsWith(filename, ".json")) {
         if (importCompileCommands(fin)) {
@@ -211,7 +210,7 @@ ImportProject::Type ImportProject::import(const std::string &filename, Settings 
             setRelativePaths(filename);
             return ImportProject::Type::BORLAND;
         }
-    } else if (settings && endsWith(filename, ".cppcheck")) {
+    } else if (endsWith(filename, ".cppcheck")) {
         if (importCppcheckGuiProject(fin, settings)) {
             setRelativePaths(filename);
             return ImportProject::Type::CPPCHECK_GUI;
@@ -1104,7 +1103,7 @@ static const char * readSafe(const char *s, const char *def) {
     return s ? s : def;
 }
 
-bool ImportProject::importCppcheckGuiProject(std::istream &istr, Settings *settings)
+bool ImportProject::importCppcheckGuiProject(std::istream &istr, Settings &settings)
 {
     tinyxml2::XMLDocument doc;
     const std::string xmldata = istream_to_string(istr);
@@ -1246,34 +1245,34 @@ bool ImportProject::importCppcheckGuiProject(std::istream &istr, Settings *setti
             return false;
         }
     }
-    settings->basePaths = temp.basePaths;
-    settings->relativePaths |= temp.relativePaths;
-    settings->buildDir = temp.buildDir;
-    settings->includePaths = temp.includePaths;
-    settings->userDefines = temp.userDefines;
-    settings->userUndefs = temp.userUndefs;
-    settings->addons = temp.addons;
-    settings->clang = temp.clang;
-    settings->clangTidy = temp.clangTidy;
+    settings.basePaths = temp.basePaths;
+    settings.relativePaths |= temp.relativePaths;
+    settings.buildDir = temp.buildDir;
+    settings.includePaths = temp.includePaths;
+    settings.userDefines = temp.userDefines;
+    settings.userUndefs = temp.userUndefs;
+    settings.addons = temp.addons;
+    settings.clang = temp.clang;
+    settings.clangTidy = temp.clangTidy;
 
-    if (!settings->premiumArgs.empty())
-        settings->premiumArgs += temp.premiumArgs;
+    if (!settings.premiumArgs.empty())
+        settings.premiumArgs += temp.premiumArgs;
     else if (!temp.premiumArgs.empty())
-        settings->premiumArgs = temp.premiumArgs.substr(1);
+        settings.premiumArgs = temp.premiumArgs.substr(1);
 
     for (const std::string &p : paths)
         guiProject.pathNames.push_back(p);
-    settings->supprs.nomsg.addSuppressions(std::move(suppressions));
-    settings->checkHeaders = temp.checkHeaders;
-    settings->checkUnusedTemplates = temp.checkUnusedTemplates;
-    settings->maxCtuDepth = temp.maxCtuDepth;
-    settings->maxTemplateRecursion = temp.maxTemplateRecursion;
-    settings->safeChecks = temp.safeChecks;
+    settings.supprs.nomsg.addSuppressions(std::move(suppressions));
+    settings.checkHeaders = temp.checkHeaders;
+    settings.checkUnusedTemplates = temp.checkUnusedTemplates;
+    settings.maxCtuDepth = temp.maxCtuDepth;
+    settings.maxTemplateRecursion = temp.maxTemplateRecursion;
+    settings.safeChecks = temp.safeChecks;
 
     if (checkLevelExhaustive)
-        settings->setCheckLevel(Settings::CheckLevel::exhaustive);
+        settings.setCheckLevel(Settings::CheckLevel::exhaustive);
     else
-        settings->setCheckLevel(Settings::CheckLevel::normal);
+        settings.setCheckLevel(Settings::CheckLevel::normal);
 
     return true;
 }
