@@ -41,12 +41,9 @@ public:
     TestOther() : TestFixture("TestOther") {}
 
 private:
-    Settings _settings;
+    const Settings settings0 = settingsBuilder().library("std.cfg").build();
 
     void run() override {
-        LOAD_LIB_2(_settings.library, "std.cfg");
-
-
         TEST_CASE(emptyBrackets);
 
         TEST_CASE(zeroDiv1);
@@ -293,51 +290,36 @@ private:
     }
 
 #define check(...) check_(__FILE__, __LINE__, __VA_ARGS__)
-    void check_(const char* file, int line, const char code[], const char *filename = nullptr, bool inconclusive = true, bool runSimpleChecks=true, bool verbose=false, Settings* settings = nullptr) {
+    void check_(const char* file, int line, const char code[], const char *filename = nullptr, bool inconclusive = true, bool verbose=false, const Settings* settings = nullptr) {
         // Clear the error buffer..
         errout.str("");
 
         if (!settings) {
-            settings = &_settings;
+            settings = &settings0;
         }
-        settings->severity.enable(Severity::style);
-        settings->severity.enable(Severity::warning);
-        settings->severity.enable(Severity::portability);
-        settings->severity.enable(Severity::performance);
-        settings->standards.c = Standards::CLatest;
-        settings->standards.cpp = Standards::CPPLatest;
-        settings->certainty.setEnabled(Certainty::inconclusive, inconclusive);
-        settings->verbose = verbose;
+        Settings s = settingsBuilder(*settings).severity(Severity::style).severity(Severity::warning).severity(Severity::portability).severity(Severity::performance).c(Standards::CLatest).cpp(Standards::CPPLatest).certainty(Certainty::inconclusive, inconclusive).build();
+        s.verbose = verbose;
 
-        Preprocessor preprocessor(*settings);
+        Preprocessor preprocessor(s);
 
         // Tokenize..
-        Tokenizer tokenizer(settings, this, &preprocessor);
+        Tokenizer tokenizer(&s, this, &preprocessor);
         std::istringstream istr(code);
         ASSERT_LOC(tokenizer.tokenize(istr, filename ? filename : "test.cpp"), file, line);
 
         // Check..
-        runChecks<CheckOther>(&tokenizer, settings, this);
-
-        (void)runSimpleChecks; // TODO Remove this
+        runChecks<CheckOther>(&tokenizer, &s, this);
     }
 
-    void check_(const char* file, int line, const char code[], Settings *s) {
-        check_(file, line, code, "test.cpp", true, true, false, s);
+    void check_(const char* file, int line, const char code[], const Settings *s) {
+        check_(file, line, code, "test.cpp", true, false, s);
     }
 
     void checkP(const char code[], const char *filename = "test.cpp") {
         // Clear the error buffer..
         errout.str("");
 
-        Settings* settings = &_settings;
-        settings->severity.enable(Severity::style);
-        settings->severity.enable(Severity::warning);
-        settings->severity.enable(Severity::portability);
-        settings->severity.enable(Severity::performance);
-        settings->standards.c = Standards::CLatest;
-        settings->standards.cpp = Standards::CPPLatest;
-        settings->certainty.enable(Certainty::inconclusive);
+        const Settings s = settingsBuilder(settings0).severity(Severity::style).severity(Severity::warning).severity(Severity::portability).severity(Severity::performance).c(Standards::CLatest).cpp(Standards::CPPLatest).certainty(Certainty::inconclusive).build();
 
         // Raw tokens..
         std::vector<std::string> files(1, filename);
@@ -349,23 +331,23 @@ private:
         std::map<std::string, simplecpp::TokenList*> filedata;
         simplecpp::preprocess(tokens2, tokens1, files, filedata, simplecpp::DUI());
 
-        Preprocessor preprocessor(*settings);
+        Preprocessor preprocessor(s);
         preprocessor.setDirectives(tokens1);
 
         // Tokenizer..
-        Tokenizer tokenizer(settings, this, &preprocessor);
+        Tokenizer tokenizer(&s, this, &preprocessor);
         tokenizer.createTokens(std::move(tokens2));
         tokenizer.simplifyTokens1("");
 
         // Check..
-        runChecks<CheckOther>(&tokenizer, settings, this);
+        runChecks<CheckOther>(&tokenizer, &s, this);
     }
 
     void checkInterlockedDecrement(const char code[]) {
         Settings settings;
         settings.platform.type = cppcheck::Platform::Type::Win32A;
 
-        check(code, nullptr, false, true, false, &settings);
+        check(code, nullptr, false, false, &settings);
     }
 
     void emptyBrackets() {
@@ -2148,10 +2130,10 @@ private:
                       "[test.cpp:18]: (performance) Function parameter 'v' should be passed by const reference.\n",
                       errout.str());
 
-        Settings settings1 = settingsBuilder().platform(cppcheck::Platform::Type::Win64).build();
+        const Settings settings1 = settingsBuilder().platform(cppcheck::Platform::Type::Win64).build();
         check("using ui64 = unsigned __int64;\n"
               "ui64 Test(ui64 one, ui64 two) { return one + two; }\n",
-              /*filename*/ nullptr, /*inconclusive*/ true, /*runSimpleChecks*/ true, /*verbose*/ false, &settings1);
+              /*filename*/ nullptr, /*inconclusive*/ true, /*verbose*/ false, &settings1);
         ASSERT_EQUALS("", errout.str());
     }
 
@@ -2293,11 +2275,11 @@ private:
                                 "};\n"
                                 "void f(X x) {}";
 
-            Settings s32 = settingsBuilder(_settings).platform(cppcheck::Platform::Type::Unix32).build();
+            const Settings s32 = settingsBuilder(settings0).platform(cppcheck::Platform::Type::Unix32).build();
             check(code, &s32);
             ASSERT_EQUALS("[test.cpp:5]: (performance) Function parameter 'x' should be passed by const reference.\n", errout.str());
 
-            Settings s64 = settingsBuilder(_settings).platform(cppcheck::Platform::Type::Unix64).build();
+            const Settings s64 = settingsBuilder(settings0).platform(cppcheck::Platform::Type::Unix64).build();
             check(code, &s64);
             ASSERT_EQUALS("", errout.str());
         }
@@ -3993,7 +3975,7 @@ private:
               "    case 3:\n"
               "      strcpy(str, \"b'\");\n"
               "    }\n"
-              "}", nullptr, false, false);
+              "}", nullptr, false);
         TODO_ASSERT_EQUALS("[test.cpp:6] -> [test.cpp:8]: (style) Buffer 'str' is being written before its old content has been used. 'break;' missing?\n",
                            "",
                            errout.str());
@@ -4024,7 +4006,7 @@ private:
               "      strcpy(str, \"b'\");\n"
               "      z++;\n"
               "    }\n"
-              "}", nullptr, false, false);
+              "}", nullptr, false);
         TODO_ASSERT_EQUALS("[test.cpp:7] -> [test.cpp:10]: (style) Buffer 'str' is being written before its old content has been used. 'break;' missing?\n",
                            "",
                            errout.str());
@@ -4053,7 +4035,7 @@ private:
               "    case 3:\n"
               "      strcpy(str, \"b'\");\n"
               "    }\n"
-              "}", nullptr, false, false);
+              "}", nullptr, false);
         ASSERT_EQUALS("", errout.str());
 
         // Ticket #5158 "segmentation fault (valid code)"
@@ -4067,7 +4049,7 @@ private:
               "} deflate_state;\n"
               "void f(deflate_state *s) {\n"
               "    s->dyn_ltree[0].fc.freq++;\n"
-              "}\n", nullptr, false, false);
+              "}\n", nullptr, false);
         ASSERT_EQUALS("", errout.str());
 
         // Ticket #6132 "crash: daca: kvirc CheckOther::checkRedundantAssignment()"
@@ -4077,7 +4059,7 @@ private:
               "} else {\n"
               "KviKvsScript :: run ( m_szCompletionCallback , out ? out : ( g_pApp . activeConsole ( ) ) , & vParams ) ;\n"
               "}\n"
-              "}\n", nullptr, false, true);
+              "}\n", nullptr, false);
         ASSERT_EQUALS("", errout.str());
 
         check("void f() {\n"
@@ -4238,7 +4220,7 @@ private:
               "        y++;\n"
               "    }\n"
               "    bar(y);\n"
-              "}", nullptr, false, false);
+              "}", nullptr, false);
         ASSERT_EQUALS("", errout.str());
         check("void foo()\n"
               "{\n"
@@ -4292,7 +4274,7 @@ private:
               "        y--;\n"
               "    }\n"
               "    bar(y);\n"
-              "}", nullptr, false, false);
+              "}", nullptr, false);
         ASSERT_EQUALS("", errout.str());
         check("void foo()\n"
               "{\n"
@@ -4648,20 +4630,20 @@ private:
               "            continue;\n"
               "        }\n"
               "    }\n"
-              "}", nullptr, false, false);
+              "}", nullptr, false);
         ASSERT_EQUALS("[test.cpp:5]: (style) Consecutive return, break, continue, goto or throw statements are unnecessary.\n", errout.str());
 
         check("int foo(int a) {\n"
               "    return 0;\n"
               "    return(a-1);\n"
-              "}", nullptr, false, false);
+              "}", nullptr, false);
         ASSERT_EQUALS("[test.cpp:3]: (style) Consecutive return, break, continue, goto or throw statements are unnecessary.\n", errout.str());
 
         check("int foo(int a) {\n"
               "  A:"
               "    return(0);\n"
               "    goto A;\n"
-              "}", nullptr, false, false);
+              "}", nullptr, false);
         ASSERT_EQUALS("[test.cpp:3]: (style) Consecutive return, break, continue, goto or throw statements are unnecessary.\n", errout.str());
 
         Settings settings;
@@ -4670,7 +4652,7 @@ private:
         check("void foo() {\n"
               "    exit(0);\n"
               "    break;\n"
-              "}", nullptr, false, false, false, &settings);
+              "}", nullptr, false, false, &settings);
         ASSERT_EQUALS("[test.cpp:3]: (style) Consecutive return, break, continue, goto or throw statements are unnecessary.\n", errout.str());
 
         check("class NeonSession {\n"
@@ -4679,16 +4661,16 @@ private:
               "void NeonSession::exit()\n"
               "{\n"
               "    SAL_INFO(\"ucb.ucp.webdav\", \"neon commands cannot be aborted\");\n"
-              "}", nullptr, false, false, false, &settings);
+              "}", nullptr, false, false, &settings);
         ASSERT_EQUALS("", errout.str());
 
         check("void NeonSession::exit()\n"
               "{\n"
               "    SAL_INFO(\"ucb.ucp.webdav\", \"neon commands cannot be aborted\");\n"
-              "}", nullptr, false, false, false, &settings);
+              "}", nullptr, false, false, &settings);
         ASSERT_EQUALS("", errout.str());
 
-        check("void foo() { xResAccess->exit(); }", nullptr, false, false, false, &settings);
+        check("void foo() { xResAccess->exit(); }", nullptr, false, false, &settings);
         ASSERT_EQUALS("", errout.str());
 
         check("void foo(int a)\n"
@@ -4702,7 +4684,7 @@ private:
               "            c++;\n"
               "            break;\n"
               "         }\n"
-              "}", nullptr, false, false);
+              "}", nullptr, false);
         ASSERT_EQUALS("[test.cpp:7]: (style) Consecutive return, break, continue, goto or throw statements are unnecessary.\n", errout.str());
 
         check("void foo(int a)\n"
@@ -4726,7 +4708,7 @@ private:
               "            break;\n"
               "          }\n"
               "       }\n"
-              "}", nullptr, false, false);
+              "}", nullptr, false);
         ASSERT_EQUALS("[test.cpp:6]: (style) Consecutive return, break, continue, goto or throw statements are unnecessary.\n", errout.str());
 
         check("void foo(int a)\n"
@@ -4738,7 +4720,7 @@ private:
               "          }\n"
               "          a+=2;\n"
               "       }\n"
-              "}", nullptr, false, false);
+              "}", nullptr, false);
         ASSERT_EQUALS("[test.cpp:6]: (style) Consecutive return, break, continue, goto or throw statements are unnecessary.\n", errout.str());
 
         check("void foo(int a)\n"
@@ -4755,44 +4737,44 @@ private:
         check("int foo() {\n"
               "    throw 0;\n"
               "    return 1;\n"
-              "}", nullptr, false, false);
+              "}", nullptr, false);
         ASSERT_EQUALS("[test.cpp:3]: (style) Consecutive return, break, continue, goto or throw statements are unnecessary.\n", errout.str());
 
         check("void foo() {\n"
               "    throw 0;\n"
               "    return;\n"
-              "}", nullptr, false, false);
+              "}", nullptr, false);
         ASSERT_EQUALS("[test.cpp:3]: (style) Consecutive return, break, continue, goto or throw statements are unnecessary.\n", errout.str());
 
         check("int foo() {\n"
               "    throw = 0;\n"
               "    return 1;\n"
-              "}", "test.c", false, false);
+              "}", "test.c", false);
         ASSERT_EQUALS("", errout.str());
 
         check("int foo() {\n"
               "    return 0;\n"
               "    return 1;\n"
-              "}", nullptr, false, false, false);
+              "}", nullptr, false);
         ASSERT_EQUALS("[test.cpp:3]: (style) Consecutive return, break, continue, goto or throw statements are unnecessary.\n", errout.str());
 
         check("int foo() {\n"
               "    return 0;\n"
               "    foo();\n"
-              "}", nullptr, false, false);
+              "}", nullptr, false);
         ASSERT_EQUALS("[test.cpp:3]: (style) Statements following 'return' will never be executed.\n", errout.str());
 
         check("int foo(int unused) {\n"
               "    return 0;\n"
               "    (void)unused;\n"
-              "}", nullptr, false, false);
+              "}", nullptr, false);
         ASSERT_EQUALS("", errout.str());
 
         check("int foo(int unused1, int unused2) {\n"
               "    return 0;\n"
               "    (void)unused1;\n"
               "    (void)unused2;\n"
-              "}", nullptr, false, false);
+              "}", nullptr, false);
         ASSERT_EQUALS("", errout.str());
 
         check("int foo(int unused1, int unused2) {\n"
@@ -4800,7 +4782,7 @@ private:
               "    (void)unused1;\n"
               "    (void)unused2;\n"
               "    foo();\n"
-              "}", nullptr, false, false);
+              "}", nullptr, false);
         ASSERT_EQUALS("[test.cpp:5]: (style) Statements following 'return' will never be executed.\n", errout.str());
 
         check("int foo() {\n"
@@ -4818,7 +4800,7 @@ private:
               "        return 0;\n"
               "    }\n"
               "    return 124;\n"
-              "}", nullptr, false, false);
+              "}", nullptr, false);
         ASSERT_EQUALS("[test.cpp:4]: (style) Consecutive return, break, continue, goto or throw statements are unnecessary.\n", errout.str());
 
         check("void foo() {\n"
@@ -4826,7 +4808,7 @@ private:
               "        return;\n"
               "        break;\n"
               "    }\n"
-              "}", nullptr, false, false);
+              "}", nullptr, false);
         ASSERT_EQUALS("[test.cpp:4]: (style) Consecutive return, break, continue, goto or throw statements are unnecessary.\n", errout.str());
 
         // #5707
@@ -4837,14 +4819,14 @@ private:
               "    }\n"
               "    return 0;\n"
               "    j=2;\n"
-              "}", nullptr, false, false);
+              "}", nullptr, false);
         ASSERT_EQUALS("[test.cpp:7]: (style) Statements following 'return' will never be executed.\n", errout.str());
 
         check("int foo() {\n"
               "    return 0;\n"
               "  label:\n"
               "    throw 0;\n"
-              "}", nullptr, false, false);
+              "}", nullptr, false);
         ASSERT_EQUALS("[test.cpp:3]: (style) Label 'label' is not used.\n", errout.str());
 
         check("struct A {\n"
@@ -4886,14 +4868,14 @@ private:
               "    return 0;\n"
               "\n" // #endif
               "    return 1;\n"
-              "}", nullptr, false, false);
+              "}", nullptr, false);
         ASSERT_EQUALS("", errout.str());
         check("int foo() {\n"
               "\n" // #ifdef A
               "    return 0;\n"
               "\n" // #endif
               "    return 1;\n"
-              "}", nullptr, true, false);
+              "}");
         ASSERT_EQUALS("[test.cpp:5]: (style, inconclusive) Consecutive return, break, continue, goto or throw statements are unnecessary.\n", errout.str());
 
         // #4711 lambda functions
@@ -4901,7 +4883,6 @@ private:
               "    return g([](int x){(void)x+1; return x;});\n"
               "}",
               nullptr,
-              false,
               false);
         ASSERT_EQUALS("", errout.str());
 
@@ -4916,7 +4897,7 @@ private:
               "             __asm__ (\"rorw $8, %w0\" : \"=r\" (__v) : \"0\" (__x) : \"cc\");\n"
               "         (void)__v;\n"
               "     }));\n"
-              "}", nullptr, false, false);
+              "}", nullptr, false);
         ASSERT_EQUALS("", errout.str());
 
         // #6008
@@ -4925,7 +4906,7 @@ private:
               "        int sum = a_ + b_;\n"
               "        return sum;\n"
               "    };\n"
-              "}", nullptr, false, false);
+              "}", nullptr, false);
         ASSERT_EQUALS("", errout.str());
 
         // #5789
@@ -4933,20 +4914,20 @@ private:
               "    uint64_t enter, exit;\n"
               "    uint64_t events;\n"
               "    per_state_info() : enter(0), exit(0), events(0) {}\n"
-              "};", nullptr, false, false);
+              "};", nullptr, false);
         ASSERT_EQUALS("", errout.str());
 
         // #6664
         check("void foo() {\n"
               "    (beat < 100) ? (void)0 : exit(0);\n"
               "    bar();\n"
-              "}", nullptr, false, false, false, &settings);
+              "}", nullptr, false, false, &settings);
         ASSERT_EQUALS("", errout.str());
 
         check("void foo() {\n"
               "    (beat < 100) ? exit(0) : (void)0;\n"
               "    bar();\n"
-              "}", nullptr, false, false, false, &settings);
+              "}", nullptr, false, false, &settings);
         ASSERT_EQUALS("", errout.str());
 
         // #8261
@@ -4954,7 +4935,7 @@ private:
         TODO_ASSERT_THROW(check("void foo() {\n"
                                 "    (beat < 100) ? (void)0 : throw(0);\n"
                                 "    bar();\n"
-                                "}", nullptr, false, false, false, &settings), InternalError);
+                                "}", nullptr, false, false, &settings), InternalError);
         //ASSERT_EQUALS("", errout.str());
 
         check("int foo() {\n"
@@ -5385,7 +5366,7 @@ private:
               "    b = 300\n"
               "  };\n"
               "};\n"
-              "const int DFLT_TIMEOUT = A::b % 1000000 ;\n", nullptr, false, false);
+              "const int DFLT_TIMEOUT = A::b % 1000000 ;\n", nullptr, false);
         ASSERT_EQUALS("", errout.str());
     }
 
@@ -5703,7 +5684,7 @@ private:
 
         check("void f(char c) {\n"
               "    printf(\"%i\", a + b ? 1 : 2);\n"
-              "}",nullptr,false,false);
+              "}",nullptr,false);
         ASSERT_EQUALS("[test.cpp:2]: (style) Clarify calculation precedence for '+' and '?'.\n", errout.str());
 
         check("void f() {\n"
@@ -5892,7 +5873,7 @@ private:
               "    else\n"
               "        ret = (unsigned char)value;\n"
               "    return ret;\n"
-              "}", nullptr, false, false);
+              "}", nullptr, false);
         ASSERT_EQUALS("", errout.str());
 
         check("void f() {\n"
@@ -6202,10 +6183,7 @@ private:
         // make sure there are not "same expression" fp when there are different casts
         check("void f(long x) { if ((int32_t)x == (int64_t)x) {} }",
               nullptr,  // filename
-              false, // inconclusive
-              false, // runSimpleChecks
-              false, // verbose
-              nullptr   // settings
+              false // inconclusive
               );
         ASSERT_EQUALS("", errout.str());
 
@@ -6260,7 +6238,7 @@ private:
         check("void f() {\n"
               "    enum { Four = 4 };\n"
               "    if (Four == 4) {}"
-              "}", nullptr, true, false);
+              "}");
         ASSERT_EQUALS("", errout.str());
 
         check("void f() {\n"
@@ -6279,7 +6257,7 @@ private:
               "    enum { FourInEnumOne = 4 };\n"
               "    enum { FourInEnumTwo = 4 };\n"
               "    if (FourInEnumOne == FourInEnumTwo) {}\n"
-              "}", nullptr, true, false);
+              "}");
         ASSERT_EQUALS("", errout.str());
 
         check("void f() {\n"
@@ -6317,7 +6295,7 @@ private:
         check("float f(float x) { return x-x; }"); // ticket #4485 (Inf)
         ASSERT_EQUALS("", errout.str());
 
-        check("float f(float x) { return (X double)x == (X double)x; }", nullptr, false, false);
+        check("float f(float x) { return (X double)x == (X double)x; }", nullptr, false);
         ASSERT_EQUALS("", errout.str());
 
         check("struct X { float f; };\n"
@@ -6342,7 +6320,7 @@ private:
                                "    <arg nr=\"2\"/>\n"
                                "  </function>\n"
                                "</def>";
-        Settings settings = settingsBuilder().libraryxml(xmldata, sizeof(xmldata)).build();
+        const Settings settings = settingsBuilder().libraryxml(xmldata, sizeof(xmldata)).build();
 
         check("void foo() {\n"
               "    if (x() || x()) {}\n"
@@ -6391,7 +6369,7 @@ private:
 
         check("void foo() {\n"
               "    if ((mystrcmp(a, b) == 0) || (mystrcmp(a, b) == 0)) {}\n"
-              "}", "test.cpp", false, true, false, &settings);
+              "}", "test.cpp", false, false, &settings);
         ASSERT_EQUALS("[test.cpp:2]: (style) Same expression on both sides of '||'.\n", errout.str());
 
         check("void GetValue() { return rand(); }\n"
@@ -6432,7 +6410,7 @@ private:
 
         check("void f(A *src) {\n"
               "    if (dynamic_cast<B*>(src) || dynamic_cast<B*>(src)) {}\n"
-              "}\n", "test.cpp", false, false); // don't run simplifications
+              "}\n", "test.cpp", false);
         ASSERT_EQUALS("[test.cpp:2]: (style) Same expression on both sides of '||'.\n", errout.str());
 
         // #5819
@@ -6936,7 +6914,7 @@ private:
             const char code[] = "void foo(bool flag) {\n"
                                 "  bar( (flag) ? ~0u : ~0ul);\n"
                                 "}";
-            Settings settings = _settings;
+            Settings settings = settings0;
             settings.platform.sizeof_int = 4;
             settings.platform.int_bit = 32;
 
@@ -7678,9 +7656,9 @@ private:
             const char code[] = "void foo(unsigned int x) {\n"
                                 "  if (x < 0) {}\n"
                                 "}";
-            check(code, nullptr, false, true, false);
+            check(code, nullptr, false);
             ASSERT_EQUALS("[test.cpp:2]: (style) Checking if unsigned expression 'x' is less than zero.\n", errout.str());
-            check(code, nullptr, false, true, true);
+            check(code, nullptr, false, true);
             ASSERT_EQUALS("[test.cpp:2]: (style) Checking if unsigned expression 'x' is less than zero.\n", errout.str());
         }
 
@@ -7699,9 +7677,9 @@ private:
                                 "  int y = 0;\n"
                                 "  if (x < y) {}\n"
                                 "}";
-            check(code, nullptr, false, true, false);
+            check(code, nullptr, false);
             ASSERT_EQUALS("[test.cpp:3]: (style) Checking if unsigned expression 'x' is less than zero.\n", errout.str());
-            check(code, nullptr, false, true, true);
+            check(code, nullptr, false, true);
             ASSERT_EQUALS("[test.cpp:2] -> [test.cpp:3]: (style) Checking if unsigned expression 'x' is less than zero.\n", errout.str());
         }
         check("void foo(unsigned x) {\n"
@@ -7867,7 +7845,7 @@ private:
         }
 
         {
-            Settings s = settingsBuilder().checkUnusedTemplates().build();
+            const Settings s = settingsBuilder().checkUnusedTemplates().build();
             check("template<int n> void foo(unsigned int x) {\n"
                   "if (x <= 0);\n"
                   "}", &s);
@@ -7885,7 +7863,7 @@ private:
         ASSERT_EQUALS("[test.cpp:3]: (style) Checking if unsigned expression 'value' is less than zero.\n", errout.str());
 
         // #9040
-        Settings settings1 = settingsBuilder().platform(cppcheck::Platform::Type::Win64).build();
+        const Settings settings1 = settingsBuilder().platform(cppcheck::Platform::Type::Win64).build();
         check("using BOOL = unsigned;\n"
               "int i;\n"
               "bool f() {\n"
@@ -7913,9 +7891,9 @@ private:
                                 "  int y = 0;\n"
                                 "  if (x >= y) {}\n"
                                 "}";
-            check(code, nullptr, false, true, false);
+            check(code, nullptr, false);
             ASSERT_EQUALS("[test.cpp:3]: (style) A pointer can not be negative so it is either pointless or an error to check if it is not.\n", errout.str());
-            check(code, nullptr, false, true, true);
+            check(code, nullptr, false, true);
             ASSERT_EQUALS("[test.cpp:2] -> [test.cpp:3]: (style) A pointer can not be negative so it is either pointless or an error to check if it is not.\n", errout.str());
         }
         check("void foo(const int* x) {\n"
@@ -7934,9 +7912,9 @@ private:
                                 "  if (x < y) {}\n"
                                 "}";
 
-            check(code, nullptr, false, true, false);
+            check(code, nullptr, false);
             ASSERT_EQUALS("[test.cpp:3]: (style) A pointer can not be negative so it is either pointless or an error to check if it is.\n", errout.str());
-            check(code, nullptr, false, true, true);
+            check(code, nullptr, false, true);
             ASSERT_EQUALS("[test.cpp:2] -> [test.cpp:3]: (style) A pointer can not be negative so it is either pointless or an error to check if it is.\n", errout.str());
         }
 
@@ -9717,32 +9695,32 @@ private:
               "  if (a < 0)\n"
               "    return a++,\n"
               "  do_something();\n"
-              "}", nullptr, false, false);
+              "}", nullptr, false);
         TODO_ASSERT_EQUALS("[test.cpp:3]: (style) Comma is used in return statement. The comma can easily be misread as a ';'.\n", "", errout.str());
 
         check("int fun(int a) {\n"
               "  if (a < 0)\n"
               "    return a++, do_something();\n"
-              "}", nullptr, false, false);
+              "}", nullptr, false);
         ASSERT_EQUALS("", errout.str());
 
         check("int fun(int a) {\n"
               "  if (a < 0)\n"
               "    return a+5,\n"
               "  do_something();\n"
-              "}", nullptr, false, false);
+              "}", nullptr, false);
         TODO_ASSERT_EQUALS("[test.cpp:3]: (style) Comma is used in return statement. The comma can easily be misread as a ';'.\n", "", errout.str());
 
         check("int fun(int a) {\n"
               "  if (a < 0)\n"
               "    return a+5, do_something();\n"
-              "}", nullptr, false, false);
+              "}", nullptr, false);
         ASSERT_EQUALS("", errout.str());
 
         check("int fun(int a) {\n"
               "  if (a < 0)\n"
               "    return c<int,\nint>::b;\n"
-              "}", nullptr, false, false);
+              "}", nullptr, false);
         ASSERT_EQUALS("", errout.str());
 
         // #4943 take care of C++11 initializer lists
@@ -9753,7 +9731,7 @@ private:
               "        { \"2\" },\n"
               "        { \"3\" }\n"
               "    };\n"
-              "}", nullptr, false, false);
+              "}", nullptr, false);
         ASSERT_EQUALS("", errout.str());
     }
 
@@ -9769,7 +9747,7 @@ private:
               "    explicit B(A a) : a(std::move(a)) {}\n"
               "    void Init(A _a) { a = std::move(_a); }\n"
               "    A a;"
-              "};", nullptr, false, true);
+              "};", nullptr, false);
         ASSERT_EQUALS("", errout.str());
 
         check("struct A\n"
@@ -9782,7 +9760,7 @@ private:
               "    explicit B(A a) : a{std::move(a)} {}\n"
               "    void Init(A _a) { a = std::move(_a); }\n"
               "    A a;"
-              "};", nullptr, false, true);
+              "};", nullptr, false);
         ASSERT_EQUALS("", errout.str());
 
         check("struct A\n"
@@ -9796,7 +9774,7 @@ private:
               "    void Init(A _a) { a = std::move(_a); }\n"
               "    A a;"
               "    A a2;"
-              "};", nullptr, false, true);
+              "};", nullptr, false);
         ASSERT_EQUALS("", errout.str());
 
         check("struct A\n"
@@ -9810,7 +9788,7 @@ private:
               "    void Init(A _a) { a = std::move(_a); }\n"
               "    A a;"
               "    A a2;"
-              "};", nullptr, false, true);
+              "};", nullptr, false);
         ASSERT_EQUALS("[test.cpp:8]: (performance) Function parameter 'a2' should be passed by const reference.\n", errout.str());
 
         check("struct A\n"
@@ -9824,7 +9802,7 @@ private:
               "    void Init(A _a) { a = std::move(_a); }\n"
               "    A a;"
               "    A a2;"
-              "};", nullptr, false, true);
+              "};", nullptr, false);
         ASSERT_EQUALS("[test.cpp:8]: (performance) Function parameter 'a2' should be passed by const reference.\n", errout.str());
 
         check("std::map<int, int> m;\n" // #10817
@@ -10701,7 +10679,7 @@ private:
     }
 
     void forwardAndUsed() {
-        Settings s = settingsBuilder().checkUnusedTemplates().build();
+        const Settings s = settingsBuilder().checkUnusedTemplates().build();
 
         check("template<typename T>\n"
               "void f(T && t) {\n"
