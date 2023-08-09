@@ -7495,16 +7495,16 @@ private:
         errout.str("");
 
         // Check..
-        settings0.certainty.setEnabled(Certainty::inconclusive, true);
+        const Settings s = settingsBuilder(settings0).certainty(Certainty::inconclusive).build();
 
-        Preprocessor preprocessor(settings0);
+        Preprocessor preprocessor(s);
 
         // Tokenize..
-        Tokenizer tokenizer(&settings0, this, &preprocessor);
+        Tokenizer tokenizer(&s, this, &preprocessor);
         std::istringstream istr(code);
         ASSERT_LOC(tokenizer.tokenize(istr, "test.cpp"), file, line);
 
-        CheckClass checkClass(&tokenizer, &settings0, this);
+        CheckClass checkClass(&tokenizer, &s, this);
         checkClass.initializerListOrder();
     }
 
