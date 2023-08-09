@@ -59,8 +59,8 @@ private:
         : Check(myName(), tokenizer, settings, errorLogger) {}
 
     /** @brief Run checks against the normal token list */
-    void runChecks(const Tokenizer &tokenizer, ErrorLogger *errorLogger) override {
-        CheckFunctions checkFunctions(&tokenizer, &tokenizer.getSettings(), errorLogger);
+    void runChecks(const Tokenizer &tokenizer) override {
+        CheckFunctions checkFunctions(&tokenizer, &tokenizer.getSettings(), tokenizer.getErrorLogger());
 
         checkFunctions.checkIgnoredReturnValue();
         checkFunctions.checkMissingReturn();  // Missing "return" in exit path

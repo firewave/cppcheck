@@ -54,11 +54,11 @@ private:
     CheckExceptionSafety(const Tokenizer *tokenizer, const Settings *settings, ErrorLogger *errorLogger)
         : Check(myName(), tokenizer, settings, errorLogger) {}
 
-    void runChecks(const Tokenizer &tokenizer, ErrorLogger *errorLogger) override {
+    void runChecks(const Tokenizer &tokenizer) override {
         if (tokenizer.isC())
             return;
 
-        CheckExceptionSafety checkExceptionSafety(&tokenizer, &tokenizer.getSettings(), errorLogger);
+        CheckExceptionSafety checkExceptionSafety(&tokenizer, &tokenizer.getSettings(), tokenizer.getErrorLogger());
         checkExceptionSafety.destructors();
         checkExceptionSafety.deallocThrow();
         checkExceptionSafety.checkRethrowCopy();

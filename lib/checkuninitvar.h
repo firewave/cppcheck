@@ -80,8 +80,8 @@ private:
         : Check(myName(), tokenizer, settings, errorLogger) {}
 
     /** @brief Run checks against the normal token list */
-    void runChecks(const Tokenizer &tokenizer, ErrorLogger *errorLogger) override {
-        CheckUninitVar checkUninitVar(&tokenizer, &tokenizer.getSettings(), errorLogger);
+    void runChecks(const Tokenizer &tokenizer) override {
+        CheckUninitVar checkUninitVar(&tokenizer, &tokenizer.getSettings(), tokenizer.getErrorLogger());
         checkUninitVar.valueFlowUninit();
         checkUninitVar.check();
     }

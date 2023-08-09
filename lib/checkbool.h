@@ -49,8 +49,8 @@ private:
         : Check(myName(), tokenizer, settings, errorLogger) {}
 
     /** @brief Run checks against the normal token list */
-    void runChecks(const Tokenizer &tokenizer, ErrorLogger *errorLogger) override {
-        CheckBool checkBool(&tokenizer, &tokenizer.getSettings(), errorLogger);
+    void runChecks(const Tokenizer &tokenizer) override {
+        CheckBool checkBool(&tokenizer, &tokenizer.getSettings(), tokenizer.getErrorLogger());
 
         // Checks
         checkBool.checkComparisonOfBoolExpressionWithInt();

@@ -87,7 +87,7 @@ private:
         ASSERT_LOC(tokenizer.tokenize(istr, filename), file, line);
 
         // Check...
-        runChecks<CheckBool>(tokenizer, this);
+        runChecks<CheckBool>(tokenizer);
     }
 
 

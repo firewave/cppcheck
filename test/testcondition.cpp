@@ -138,7 +138,7 @@ private:
         ASSERT_LOC(tokenizer.simplifyTokens1(""), file, line);
 
         // Run checks..
-        runChecks<CheckCondition>(tokenizer, this);
+        runChecks<CheckCondition>(tokenizer);
     }
 
     void check_(const char* file, int line, const char code[], const char* filename = "test.cpp", bool inconclusive = false) {
@@ -551,7 +551,7 @@ private:
         std::istringstream istr(code);
         ASSERT_LOC(tokenizer.tokenize(istr, "test.cpp"), file, line);
 
-        runChecks<CheckCondition>(tokenizer, this);
+        runChecks<CheckCondition>(tokenizer);
     }
 
     void overlappingElseIfCondition() {

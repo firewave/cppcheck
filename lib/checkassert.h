@@ -49,8 +49,8 @@ private:
         : Check(myName(), tokenizer, settings, errorLogger) {}
 
     /** run checks, the token list is not simplified */
-    void runChecks(const Tokenizer &tokenizer, ErrorLogger *errorLogger) override {
-        CheckAssert checkAssert(&tokenizer, &tokenizer.getSettings(), errorLogger);
+    void runChecks(const Tokenizer &tokenizer) override {
+        CheckAssert checkAssert(&tokenizer, &tokenizer.getSettings(), tokenizer.getErrorLogger());
         checkAssert.assertWithSideEffects();
     }
 

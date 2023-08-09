@@ -57,8 +57,8 @@ private:
     CheckCondition(const Tokenizer *tokenizer, const Settings *settings, ErrorLogger *errorLogger)
         : Check(myName(), tokenizer, settings, errorLogger) {}
 
-    void runChecks(const Tokenizer &tokenizer, ErrorLogger *errorLogger) override {
-        CheckCondition checkCondition(&tokenizer, &tokenizer.getSettings(), errorLogger);
+    void runChecks(const Tokenizer &tokenizer) override {
+        CheckCondition checkCondition(&tokenizer, &tokenizer.getSettings(), tokenizer.getErrorLogger());
         checkCondition.multiCondition();
         checkCondition.clarifyCondition();   // not simplified because ifAssign
         checkCondition.multiCondition2();

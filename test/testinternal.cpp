@@ -59,7 +59,7 @@ private:
         ASSERT_LOC(tokenizer.tokenize(istr, "test.cpp"), file, line);
 
         // Check..
-        runChecks<CheckInternal>(tokenizer, this);
+        runChecks<CheckInternal>(tokenizer);
     }
 
     void simplePatternInTokenMatch() {

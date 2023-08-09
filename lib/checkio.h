@@ -52,8 +52,8 @@ private:
         : Check(myName(), tokenizer, settings, errorLogger) {}
 
     /** @brief Run checks on the normal token list */
-    void runChecks(const Tokenizer &tokenizer, ErrorLogger *errorLogger) override {
-        CheckIO checkIO(&tokenizer, &tokenizer.getSettings(), errorLogger);
+    void runChecks(const Tokenizer &tokenizer) override {
+        CheckIO checkIO(&tokenizer, &tokenizer.getSettings(), tokenizer.getErrorLogger());
 
         checkIO.checkWrongPrintfScanfArguments();
         checkIO.checkCoutCerrMisusage();

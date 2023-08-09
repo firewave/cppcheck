@@ -116,8 +116,8 @@ private:
     CheckLeakAutoVar(const Tokenizer *tokenizer, const Settings *settings, ErrorLogger *errorLogger)
         : Check(myName(), tokenizer, settings, errorLogger) {}
 
-    void runChecks(const Tokenizer &tokenizer, ErrorLogger *errorLogger) override {
-        CheckLeakAutoVar checkLeakAutoVar(&tokenizer, &tokenizer.getSettings(), errorLogger);
+    void runChecks(const Tokenizer &tokenizer) override {
+        CheckLeakAutoVar checkLeakAutoVar(&tokenizer, &tokenizer.getSettings(), tokenizer.getErrorLogger());
         checkLeakAutoVar.check();
     }
 

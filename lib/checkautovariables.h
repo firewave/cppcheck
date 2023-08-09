@@ -55,8 +55,8 @@ private:
         : Check(myName(), tokenizer, settings, errorLogger) {}
 
     /** @brief Run checks against the normal token list */
-    void runChecks(const Tokenizer &tokenizer, ErrorLogger *errorLogger) override {
-        CheckAutoVariables checkAutoVariables(&tokenizer, &tokenizer.getSettings(), errorLogger);
+    void runChecks(const Tokenizer &tokenizer) override {
+        CheckAutoVariables checkAutoVariables(&tokenizer, &tokenizer.getSettings(), tokenizer.getErrorLogger());
         checkAutoVariables.assignFunctionArg();
         checkAutoVariables.checkVarLifetime();
         checkAutoVariables.autoVariables();

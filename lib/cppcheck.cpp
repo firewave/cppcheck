@@ -1101,7 +1101,7 @@ void CppCheck::checkNormalTokens(const Tokenizer &tokenizer)
             continue;
 
         Timer timerRunChecks(check->name() + "::runChecks", mSettings.showtime, &s_timerResults);
-        check->runChecks(tokenizer, this);
+        check->runChecks(tokenizer);
     }
 
     if (mSettings.clang)

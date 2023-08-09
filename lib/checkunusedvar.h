@@ -57,8 +57,8 @@ private:
         : Check(myName(), tokenizer, settings, errorLogger) {}
 
     /** @brief Run checks against the normal token list */
-    void runChecks(const Tokenizer &tokenizer, ErrorLogger *errorLogger) override {
-        CheckUnusedVar checkUnusedVar(&tokenizer, &tokenizer.getSettings(), errorLogger);
+    void runChecks(const Tokenizer &tokenizer) override {
+        CheckUnusedVar checkUnusedVar(&tokenizer, &tokenizer.getSettings(), tokenizer.getErrorLogger());
 
         // Coding style checks
         checkUnusedVar.checkStructMemberUsage();

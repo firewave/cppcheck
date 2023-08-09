@@ -63,7 +63,7 @@ private:
         ASSERT_LOC(tokenizer.tokenize(istr, filename), file, line);
 
         // Check..
-        runChecks<CheckType>(tokenizer, this);
+        runChecks<CheckType>(tokenizer);
     }
 
 #define checkP(...) checkP_(__FILE__, __LINE__, __VA_ARGS__)
@@ -82,7 +82,7 @@ private:
         ASSERT_LOC(tokenizer.simplifyTokens1(""), file, line);
 
         // Check..
-        runChecks<CheckType>(tokenizer, this);
+        runChecks<CheckType>(tokenizer);
     }
 
     void checkTooBigShift_Unix32() {

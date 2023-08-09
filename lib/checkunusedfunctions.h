@@ -83,7 +83,7 @@ private:
         CheckUnusedFunctions::unusedFunctionError(errorLogger, emptyString, 0, 0, "funcName");
     }
 
-    void runChecks(const Tokenizer & /*tokenizer*/, ErrorLogger * /*errorLogger*/) override {}
+    void runChecks(const Tokenizer & /*tokenizer*/) override {}
 
     /**
      * Dummy implementation, just to provide error for --errorlist

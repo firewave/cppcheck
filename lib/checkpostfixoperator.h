@@ -51,11 +51,11 @@ private:
     CheckPostfixOperator(const Tokenizer *tokenizer, const Settings *settings, ErrorLogger *errorLogger)
         : Check(myName(), tokenizer, settings, errorLogger) {}
 
-    void runChecks(const Tokenizer &tokenizer, ErrorLogger *errorLogger) override {
+    void runChecks(const Tokenizer &tokenizer) override {
         if (tokenizer.isC())
             return;
 
-        CheckPostfixOperator checkPostfixOperator(&tokenizer, &tokenizer.getSettings(), errorLogger);
+        CheckPostfixOperator checkPostfixOperator(&tokenizer, &tokenizer.getSettings(), tokenizer.getErrorLogger());
         checkPostfixOperator.postfixOperator();
     }
 

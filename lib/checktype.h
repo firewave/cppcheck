@@ -52,9 +52,9 @@ private:
         : Check(myName(), tokenizer, settings, errorLogger) {}
 
     /** @brief Run checks against the normal token list */
-    void runChecks(const Tokenizer &tokenizer, ErrorLogger *errorLogger) override {
+    void runChecks(const Tokenizer &tokenizer) override {
         // These are not "simplified" because casts can't be ignored
-        CheckType checkType(&tokenizer, &tokenizer.getSettings(), errorLogger);
+        CheckType checkType(&tokenizer, &tokenizer.getSettings(), tokenizer.getErrorLogger());
         checkType.checkTooBigBitwiseShift();
         checkType.checkIntegerOverflow();
         checkType.checkSignConversion();

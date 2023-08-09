@@ -85,8 +85,8 @@ private:
         : Check(myName(), tokenizer, settings, errorLogger) {}
 
     /** @brief Run checks against the normal token list */
-    void runChecks(const Tokenizer &tokenizer, ErrorLogger *errorLogger) override {
-        CheckNullPointer checkNullPointer(&tokenizer, &tokenizer.getSettings(), errorLogger);
+    void runChecks(const Tokenizer &tokenizer) override {
+        CheckNullPointer checkNullPointer(&tokenizer, &tokenizer.getSettings(), tokenizer.getErrorLogger());
         checkNullPointer.nullPointer();
         checkNullPointer.arithmetic();
         checkNullPointer.nullConstantDereference();

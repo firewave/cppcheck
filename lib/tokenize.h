@@ -644,6 +644,11 @@ public:
         return mSettings;
     }
 
+    // TODO: function should not be const
+    ErrorLogger *getErrorLogger() const {
+        return mErrorLogger;
+    }
+
     void calculateScopes();
 
     /** Disable copy constructor */

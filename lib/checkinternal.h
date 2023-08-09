@@ -48,11 +48,11 @@ private:
     CheckInternal(const Tokenizer *tokenizer, const Settings *settings, ErrorLogger *errorLogger)
         : Check(myName(), tokenizer, settings, errorLogger) {}
 
-    void runChecks(const Tokenizer &tokenizer, ErrorLogger *errorLogger) override {
+    void runChecks(const Tokenizer &tokenizer) override {
         if (!tokenizer.getSettings().checks.isEnabled(Checks::internalCheck))
             return;
 
-        CheckInternal checkInternal(&tokenizer, &tokenizer.getSettings(), errorLogger);
+        CheckInternal checkInternal(&tokenizer, &tokenizer.getSettings(), tokenizer.getErrorLogger());
 
         checkInternal.checkTokenMatchPatterns();
         checkInternal.checkTokenSimpleMatchPatterns();
