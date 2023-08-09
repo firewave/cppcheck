@@ -253,7 +253,7 @@ extern std::ostringstream errout;
 extern std::ostringstream output;
 
 // TODO: most asserts do not actually assert i.e. do not return
-#define TEST_CASE( NAME )  do { if (prepareTest(#NAME)) { setVerbose(false); NAME(); } } while (false)
+#define TEST_CASE( NAME )  do { if (prepareTest(#NAME)) { NAME(); } } while (false)
 #define ASSERT( CONDITION )  if (!assert_(__FILE__, __LINE__, (CONDITION))) return
 #define ASSERT_LOC( CONDITION, FILE_, LINE_ )  assert_(FILE_, LINE_, (CONDITION))
 #define CHECK_EQUALS( EXPECTED, ACTUAL )  assertEquals(__FILE__, __LINE__, (EXPECTED), (ACTUAL))
