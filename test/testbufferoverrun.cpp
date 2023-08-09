@@ -3405,7 +3405,7 @@ private:
     void buffer_overrun_errorpath() {
         setMultiline();
         const Settings settingsOld = settings0;
-        settings0.templateLocation = "{file}:{line}:note:{info}";
+        settings0.verbose = true;
 
         check("void f() {\n"
               "    char *p = malloc(10);\n"
@@ -3415,9 +3415,7 @@ private:
                       "test.cpp:2:note:Assign p, buffer with size 10\n"
                       "test.cpp:3:note:Buffer overrun\n", errout.str());
 
-        // TODO: need to reset this but it breaks other tests
-        (void)settingsOld;
-        //settings0 = settingsOld;
+        settings0 = settingsOld;
     }
 
     void buffer_overrun_bailoutIfSwitch() {
@@ -3744,6 +3742,9 @@ private:
     }
 
     void pointer_out_of_bounds_4() {
+        const Settings settingsOld = settings0;
+        settings0.verbose = true;
+
         check("const char* f() {\n"
               "    g(\"Hello\" + 6);\n"
               "}");
@@ -3793,6 +3794,8 @@ private:
               "        f(i, \"345\");\n"
               "}\n");
         ASSERT_EQUALS("", errout.str());
+
+        settings0 = settingsOld;
     }
 
 
@@ -3934,6 +3937,9 @@ private:
 
     // data is allocated with malloc
     void alloc_malloc() {
+        const Settings settingsOld = settings0;
+        settings0.verbose = true;
+
         check("void foo()\n"
               "{\n"
               "    char *s; s = (char *)malloc(10);\n"
@@ -4025,6 +4031,8 @@ private:
               "    a[i] = NULL;\n"
               "}");
         ASSERT_EQUALS("[test.cpp:3] -> [test.cpp:4]: (error) Array 'a[2]' accessed at index 2, which is out of bounds.\n", errout.str());
+
+        settings0 = settingsOld;
     }
 
     // statically allocated buffer
@@ -5061,6 +5069,9 @@ private:
     }
 
     void negativeMemoryAllocationSizeError() { // #389
+        const Settings settingsOld = settings0;
+        settings0.verbose = true;
+
         check("void f()\n"
               "{\n"
               "   int *a;\n"
@@ -5100,6 +5111,8 @@ private:
               "    return p;\n"
               "}\n");
         ASSERT_EQUALS("[test.cpp:2] -> [test.cpp:3] -> [test.cpp:5]: (warning, inconclusive) Memory allocation size is negative.\n", errout.str());
+
+        settings0 = settingsOld;
     }
 
     void negativeArraySize() {
