@@ -146,10 +146,10 @@ protected:
     }
 
     template<typename T>
-    static void runChecks(const Tokenizer &tokenizer, ErrorLogger *errorLogger)
+    static void runChecks(const Tokenizer &tokenizer)
     {
         Check& check = getCheck<T>();
-        check.runChecks(tokenizer, errorLogger);
+        check.runChecks(tokenizer);
     }
 
     class SettingsBuilder

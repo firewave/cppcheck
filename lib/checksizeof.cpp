@@ -502,9 +502,9 @@ void CheckSizeof::arithOperationsOnVoidPointerError(const Token* tok, const std:
     reportError(tok, Severity::portability, "arithOperationsOnVoidPointer", "$symbol:" + varname + '\n' + message + '\n' + verbose, CWE467, Certainty::normal);
 }
 
-void CheckSizeof::runChecks(const Tokenizer& tokenizer, ErrorLogger* errorLogger)
+void CheckSizeof::runChecks(const Tokenizer& tokenizer)
 {
-    CheckSizeof checkSizeof(&tokenizer, &tokenizer.getSettings(), errorLogger);
+    CheckSizeof checkSizeof(&tokenizer, &tokenizer.getSettings(), &tokenizer.getErrorLogger());
 
     // Checks
     checkSizeof.sizeofsizeof();

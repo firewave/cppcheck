@@ -69,7 +69,7 @@ private:
 
 
     /** @brief Run checks against the normal token list */
-    void runChecks(const Tokenizer &tokenizer, ErrorLogger *errorLogger) override;
+    void runChecks(const Tokenizer &tokenizer) override;
 
     /** @brief Clarify calculation for ".. a * b ? .." */
     void clarifyCalculation();

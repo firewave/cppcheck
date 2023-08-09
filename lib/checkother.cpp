@@ -4384,9 +4384,9 @@ void CheckOther::overlappingWriteFunction(const Token *tok, const std::string& f
     reportError(tok, Severity::error, "overlappingWriteFunction", "Overlapping read/write in " + funcname + "() is undefined behavior");
 }
 
-void CheckOther::runChecks(const Tokenizer &tokenizer, ErrorLogger *errorLogger)
+void CheckOther::runChecks(const Tokenizer &tokenizer)
 {
-    CheckOther checkOther(&tokenizer, &tokenizer.getSettings(), errorLogger);
+    CheckOther checkOther(&tokenizer, &tokenizer.getSettings(), &tokenizer.getErrorLogger());
 
     // Checks
     checkOther.warningOldStylePointerCast();

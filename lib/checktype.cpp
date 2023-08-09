@@ -523,10 +523,10 @@ void CheckType::floatToIntegerOverflowError(const Token *tok, const ValueFlow::V
                 errmsg.str(), CWE190, value.isInconclusive() ? Certainty::inconclusive : Certainty::normal);
 }
 
-void CheckType::runChecks(const Tokenizer &tokenizer, ErrorLogger *errorLogger)
+void CheckType::runChecks(const Tokenizer &tokenizer)
 {
     // These are not "simplified" because casts can't be ignored
-    CheckType checkType(&tokenizer, &tokenizer.getSettings(), errorLogger);
+    CheckType checkType(&tokenizer, &tokenizer.getSettings(), &tokenizer.getErrorLogger());
     checkType.checkTooBigBitwiseShift();
     checkType.checkIntegerOverflow();
     checkType.checkSignConversion();

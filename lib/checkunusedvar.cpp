@@ -1808,9 +1808,9 @@ bool CheckUnusedVar::isFunctionWithoutSideEffects(const Function& func, const To
     return !sideEffectReturnFound;
 }
 
-void CheckUnusedVar::runChecks(const Tokenizer &tokenizer, ErrorLogger *errorLogger)
+void CheckUnusedVar::runChecks(const Tokenizer &tokenizer)
 {
-    CheckUnusedVar checkUnusedVar(&tokenizer, &tokenizer.getSettings(), errorLogger);
+    CheckUnusedVar checkUnusedVar(&tokenizer, &tokenizer.getSettings(), &tokenizer.getErrorLogger());
 
     // Coding style checks
     checkUnusedVar.checkStructMemberUsage();

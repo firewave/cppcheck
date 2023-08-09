@@ -53,7 +53,7 @@ private:
         : Check(myName(), tokenizer, settings, errorLogger) {}
 
     /** @brief Run checks on the normal token list */
-    void runChecks(const Tokenizer &tokenizer, ErrorLogger *errorLogger) override;
+    void runChecks(const Tokenizer &tokenizer) override;
 
     /** @brief %Check for missusage of std::cout */
     void checkCoutCerrMisusage();

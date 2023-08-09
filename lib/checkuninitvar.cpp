@@ -1797,9 +1797,9 @@ bool CheckUninitVar::analyseWholeProgram(const CTU::FileInfo &ctu, const std::li
     return foundErrors;
 }
 
-void CheckUninitVar::runChecks(const Tokenizer &tokenizer, ErrorLogger *errorLogger)
+void CheckUninitVar::runChecks(const Tokenizer &tokenizer)
 {
-    CheckUninitVar checkUninitVar(&tokenizer, &tokenizer.getSettings(), errorLogger);
+    CheckUninitVar checkUninitVar(&tokenizer, &tokenizer.getSettings(), &tokenizer.getErrorLogger());
     checkUninitVar.valueFlowUninit();
     checkUninitVar.check();
 }

@@ -293,7 +293,7 @@ private:
 
         // call all "runChecks" in all registered Check classes
         for (auto it = Check::instances().cbegin(); it != Check::instances().cend(); ++it) {
-            (*it)->runChecks(tokenizer, this);
+            (*it)->runChecks(tokenizer);
         }
 
         return tokenizer.tokens()->stringifyList(false, false, false, true, false, nullptr, nullptr);

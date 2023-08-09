@@ -1359,7 +1359,7 @@ void CppCheck::checkNormalTokens(const Tokenizer &tokenizer, AnalyzerInformation
             }
 
             Timer::run(check->name() + "::runChecks", mSettings.showtime, &s_timerResults, [&]() {
-                check->runChecks(tokenizer, &mErrorLogger);
+                check->runChecks(tokenizer);
             });
         }
     }

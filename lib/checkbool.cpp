@@ -518,9 +518,9 @@ void CheckBool::returnValueBoolError(const Token *tok)
     reportError(tok, Severity::style, "returnNonBoolInBooleanFunction", "Non-boolean value returned from function returning bool");
 }
 
-void CheckBool::runChecks(const Tokenizer &tokenizer, ErrorLogger *errorLogger)
+void CheckBool::runChecks(const Tokenizer &tokenizer)
 {
-    CheckBool checkBool(&tokenizer, &tokenizer.getSettings(), errorLogger);
+    CheckBool checkBool(&tokenizer, &tokenizer.getSettings(), &tokenizer.getErrorLogger());
 
     // Checks
     checkBool.checkComparisonOfBoolExpressionWithInt();

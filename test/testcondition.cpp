@@ -146,7 +146,7 @@ private:
         ASSERT_LOC(tokenizer.simplifyTokens1(""), file, line);
 
         // Run checks..
-        runChecks<CheckCondition>(tokenizer, this);
+        runChecks<CheckCondition>(tokenizer);
     }
 
 #define checkP(...) checkP_(__FILE__, __LINE__, __VA_ARGS__)
@@ -160,7 +160,7 @@ private:
         ASSERT_LOC(tokenizer.simplifyTokens1(""), file, line);
 
         // Run checks..
-        runChecks<CheckCondition>(tokenizer, this);
+        runChecks<CheckCondition>(tokenizer);
     }
 
     void assignAndCompare() {
@@ -582,7 +582,7 @@ private:
         SimpleTokenizer tokenizer(settings1, *this);
         ASSERT_LOC(tokenizer.tokenize(code), file, line);
 
-        runChecks<CheckCondition>(tokenizer, this);
+        runChecks<CheckCondition>(tokenizer);
     }
 
     void overlappingElseIfCondition() {

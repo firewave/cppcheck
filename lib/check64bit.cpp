@@ -162,9 +162,9 @@ void Check64BitPortability::returnIntegerError(const Token *tok)
                 "The safe way is to always return a pointer.", CWE758, Certainty::normal);
 }
 
-void Check64BitPortability::runChecks(const Tokenizer &tokenizer, ErrorLogger *errorLogger)
+void Check64BitPortability::runChecks(const Tokenizer &tokenizer)
 {
-    Check64BitPortability check64BitPortability(&tokenizer, &tokenizer.getSettings(), errorLogger);
+    Check64BitPortability check64BitPortability(&tokenizer, &tokenizer.getSettings(), &tokenizer.getErrorLogger());
     check64BitPortability.pointerassignment();
 }
 

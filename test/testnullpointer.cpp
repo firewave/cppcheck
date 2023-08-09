@@ -193,7 +193,7 @@ private:
         ASSERT_LOC(tokenizer.tokenize(code), file, line);
 
         // Check for null pointer dereferences..
-        runChecks<CheckNullPointer>(tokenizer, this);
+        runChecks<CheckNullPointer>(tokenizer);
     }
 
 #define checkP(...) checkP_(__FILE__, __LINE__, __VA_ARGS__)
@@ -207,7 +207,7 @@ private:
         ASSERT_LOC(tokenizer.simplifyTokens1(""), file, line);
 
         // Check for null pointer dereferences..
-        runChecks<CheckNullPointer>(tokenizer, this);
+        runChecks<CheckNullPointer>(tokenizer);
     }
 
 

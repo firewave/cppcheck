@@ -47,7 +47,7 @@ private:
         SimpleTokenizer tokenizer(settings1, *this, options.cpp);
         ASSERT_LOC(tokenizer.tokenize(code), file, line);
 
-        runChecks<CheckAutoVariables>(tokenizer, this);
+        runChecks<CheckAutoVariables>(tokenizer);
     }
 
     void run() override {

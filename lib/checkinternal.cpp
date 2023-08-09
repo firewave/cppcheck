@@ -390,12 +390,12 @@ void CheckInternal::extraWhitespaceError(const Token* tok, const std::string& pa
                 );
 }
 
-void CheckInternal::runChecks(const Tokenizer &tokenizer, ErrorLogger *errorLogger)
+void CheckInternal::runChecks(const Tokenizer &tokenizer)
 {
     if (!tokenizer.getSettings().checks.isEnabled(Checks::internalCheck))
         return;
 
-    CheckInternal checkInternal(&tokenizer, &tokenizer.getSettings(), errorLogger);
+    CheckInternal checkInternal(&tokenizer, &tokenizer.getSettings(), &tokenizer.getErrorLogger());
 
     checkInternal.checkTokenMatchPatterns();
     checkInternal.checkTokenSimpleMatchPatterns();

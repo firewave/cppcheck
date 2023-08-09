@@ -3404,13 +3404,13 @@ void CheckStl::checkMutexes()
     }
 }
 
-void CheckStl::runChecks(const Tokenizer &tokenizer, ErrorLogger *errorLogger)
+void CheckStl::runChecks(const Tokenizer &tokenizer)
 {
     if (!tokenizer.isCPP()) {
         return;
     }
 
-    CheckStl checkStl(&tokenizer, &tokenizer.getSettings(), errorLogger);
+    CheckStl checkStl(&tokenizer, &tokenizer.getSettings(), &tokenizer.getErrorLogger());
     checkStl.erase();
     checkStl.if_find();
     checkStl.checkFindInsert();

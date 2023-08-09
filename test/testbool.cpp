@@ -90,7 +90,7 @@ private:
         ASSERT_LOC(tokenizer.tokenize(code), file, line);
 
         // Check...
-        runChecks<CheckBool>(tokenizer, this);
+        runChecks<CheckBool>(tokenizer);
     }
 
 

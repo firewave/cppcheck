@@ -40,7 +40,7 @@ private:
         ASSERT_LOC(tokenizer.tokenize(code), file, line);
 
         // Check..
-        runChecks<CheckAssert>(tokenizer, this);
+        runChecks<CheckAssert>(tokenizer);
     }
 
     void run() override {

@@ -327,7 +327,7 @@ private:
         ASSERT_LOC(tokenizer.tokenize(code), file, line);
 
         // Check..
-        runChecks<CheckOther>(tokenizer, this);
+        runChecks<CheckOther>(tokenizer);
 
         (void)runSimpleChecks; // TODO Remove this
     }
@@ -361,7 +361,7 @@ private:
         ASSERT_LOC(tokenizer.simplifyTokens1(""), file, line);
 
         // Check..
-        runChecks<CheckOther>(tokenizer, this);
+        runChecks<CheckOther>(tokenizer);
     }
 
     template<size_t size>
@@ -11584,7 +11584,7 @@ private:
         ASSERT_LOC(tokenizer.tokenize(code), file, line);
 
         // Check..
-        runChecks<CheckOther>(tokenizer, this);
+        runChecks<CheckOther>(tokenizer);
 
         (void)runSimpleChecks; // TODO Remove this
     }

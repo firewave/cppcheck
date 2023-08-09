@@ -39,7 +39,7 @@ private:
         ASSERT_LOC(tokenizer.tokenize(code), file, line);
 
         // Check..
-        runChecks<CheckVaarg>(tokenizer, this);
+        runChecks<CheckVaarg>(tokenizer);
     }
 
     void run() override {

@@ -57,7 +57,7 @@ private:
         ASSERT_LOC(tokenizer.tokenize(code), file, line);
 
         // Check..
-        runChecks<CheckInternal>(tokenizer, this);
+        runChecks<CheckInternal>(tokenizer);
     }
 
     void simplePatternInTokenMatch() {
