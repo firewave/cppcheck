@@ -23,6 +23,7 @@
 //---------------------------------------------------------------------------
 
 #include "check.h"
+#include "checkimpl.h"
 #include "config.h"
 
 #include <list>
@@ -51,7 +52,7 @@ class CPPCHECKLIB CheckNullPointer : public Check {
 
 public:
     /** @brief This constructor is used when registering the CheckNullPointer */
-    CheckNullPointer() : Check(myName()) {}
+    CheckNullPointer() : Check("Null pointer") {}
 
     /**
      * Is there a pointer dereference? Everything that should result in
@@ -62,38 +63,14 @@ public:
      * @param unknown it is not known if there is a pointer dereference (could be reported as a debug message)
      * @return true => there is a dereference
      */
-    bool isPointerDeRef(const Token *tok, bool &unknown) const;
-
     static bool isPointerDeRef(const Token *tok, bool &unknown, const Settings &settings, bool checkNullArg = true);
 
 private:
-    /**
-     * @brief parse a function call and extract information about variable usage
-     * @param tok first token
-     * @param library --library files data
-     * @param checkNullArg perform isnullargbad check for each argument?
-     * @return list of variables that the function reads / writes.
-     */
-    static std::list<const Token*> parseFunctionCall(const Token &tok, const Library &library, bool checkNullArg = true);
-
-    /** @brief This constructor is used when running checks. */
-    CheckNullPointer(const Tokenizer *tokenizer, const Settings *settings, ErrorLogger *errorLogger)
-        : Check(myName(), tokenizer, settings, errorLogger) {}
-
     /** @brief Run checks against the normal token list */
     void runChecks(const Tokenizer &tokenizer, ErrorLogger *errorLogger) override;
 
-    /** @brief possible null pointer dereference */
-    void nullPointer();
-
-    /** @brief dereferencing null constant (after Tokenizer::simplifyKnownVariables) */
-    void nullConstantDereference();
-
-    void nullPointerError(const Token *tok);
-    void nullPointerError(const Token *tok, const std::string &varname, const ValueFlow::Value* value, bool inconclusive);
-
     /** @brief Parse current TU and extract file info */
-    Check::FileInfo *getFileInfo(const Tokenizer &tokenizer, const Settings &settings, const std::string& /*currentConfig*/) const override;
+    Check::FileInfo *getFileInfo(const Tokenizer &tokenizer, const Settings &settings, const std::string& currentConfig) const override;
 
     Check::FileInfo * loadFileInfoFromXml(const tinyxml2::XMLElement *xmlElement) const override;
 
@@ -103,17 +80,37 @@ private:
     /** Get error messages. Used by --errorlist */
     void getErrorMessages(ErrorLogger *errorLogger, const Settings *settings) const override;
 
-    /** Name of check */
-    static std::string myName() {
-        return "Null pointer";
-    }
-
     /** class info in WIKI format. Used by --doc */
     std::string classInfo() const override {
         return "Null pointers\n"
                "- null pointer dereferencing\n"
                "- undefined null pointer arithmetic\n";
     }
+};
+
+class CheckNullPointerImpl : public CheckImpl {
+public:
+    /** @brief This constructor is used when running checks. */
+    CheckNullPointerImpl(const Tokenizer *tokenizer, const Settings *settings, ErrorLogger *errorLogger)
+        : CheckImpl(tokenizer, settings, errorLogger) {}
+
+    /**
+     * @brief parse a function call and extract information about variable usage
+     * @param tok first token
+     * @param library --library files data
+     * @param checkNullArg perform isnullargbad check for each argument?
+     * @return list of variables that the function reads / writes.
+     */
+    static std::list<const Token*> parseFunctionCall(const Token &tok, const Library &library, bool checkNullArg = true);
+
+    /** @brief possible null pointer dereference */
+    void nullPointer();
+
+    /** @brief dereferencing null constant (after Tokenizer::simplifyKnownVariables) */
+    void nullConstantDereference();
+
+    void nullPointerError(const Token *tok);
+    void nullPointerError(const Token *tok, const std::string &varname, const ValueFlow::Value* value, bool inconclusive);
 
     /**
      * @brief Does one part of the check for nullPointer().
