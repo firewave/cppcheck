@@ -30,7 +30,6 @@
 #include <string>
 
 class ErrorLogger;
-class Library;
 class Settings;
 class Token;
 class Tokenizer;
@@ -46,7 +45,7 @@ class CPPCHECKLIB CheckNullPointer : public Check {
 
 public:
     /** @brief This constructor is used when registering the CheckNullPointer */
-    CheckNullPointer() : Check(myName()) {}
+    CheckNullPointer() : Check("Null pointer") {}
 
     /**
      * Is there a pointer dereference? Everything that should result in
@@ -60,37 +59,13 @@ public:
     bool isPointerDeRef(const Token *tok, bool &unknown) const;
 
     static bool isPointerDeRef(const Token *tok, bool &unknown, const Settings &settings, bool checkNullArg = true);
+    static void parseFunctionCall(const Token &tok,
+                              std::list<const Token *> &var,
+                              const Library *library);
 
 private:
-    /**
-     * @brief parse a function call and extract information about variable usage
-     * @param tok first token
-     * @param var variables that the function read / write.
-     * @param library --library files data
-     */
-    static void parseFunctionCall(const Token &tok,
-                                  std::list<const Token *> &var,
-                                  const Library &library, bool checkNullArg = true);
-
-    /** @brief This constructor is used when running checks. */
-    CheckNullPointer(const Tokenizer *tokenizer, const Settings *settings, ErrorLogger *errorLogger)
-        : Check(myName(), tokenizer, settings, errorLogger) {}
-
     /** @brief Run checks against the normal token list */
     void runChecks(const Tokenizer &tokenizer, ErrorLogger *errorLogger) override;
-
-    /** @brief possible null pointer dereference */
-    void nullPointer();
-
-    /** @brief dereferencing null constant (after Tokenizer::simplifyKnownVariables) */
-    void nullConstantDereference();
-
-    void nullPointerError(const Token *tok) {
-        ValueFlow::Value v(0);
-        v.setKnown();
-        nullPointerError(tok, emptyString, &v, false);
-    }
-    void nullPointerError(const Token *tok, const std::string &varname, const ValueFlow::Value* value, bool inconclusive);
 
     /** @brief Parse current TU and extract file info */
     Check::FileInfo *getFileInfo(const Tokenizer &tokenizer, const Settings &settings) const override;
@@ -103,28 +78,12 @@ private:
     /** Get error messages. Used by --errorlist */
     void getErrorMessages(ErrorLogger *errorLogger, const Settings *settings) const override;
 
-    /** Name of check */
-    static std::string myName() {
-        return "Null pointer";
-    }
-
     /** class info in WIKI format. Used by --doc */
     std::string classInfo() const override {
         return "Null pointers\n"
                "- null pointer dereferencing\n"
                "- undefined null pointer arithmetic\n";
     }
-
-    /**
-     * @brief Does one part of the check for nullPointer().
-     * Dereferencing a pointer and then checking if it's NULL..
-     */
-    void nullPointerByDeRefAndCheck();
-
-    /** undefined null pointer arithmetic */
-    void arithmetic();
-    void pointerArithmeticError(const Token* tok, const ValueFlow::Value *value, bool inconclusive);
-    void redundantConditionWarning(const Token* tok, const ValueFlow::Value *value, const Token *condition, bool inconclusive);
 };
 /// @}
 //---------------------------------------------------------------------------

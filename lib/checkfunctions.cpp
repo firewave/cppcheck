@@ -23,6 +23,7 @@
 #include "checkfunctions.h"
 
 #include "astutils.h"
+#include "checkimpl.h"
 #include "errortypes.h"
 #include "library.h"
 #include "mathlib.h"
@@ -44,12 +45,6 @@
 
 //---------------------------------------------------------------------------
 
-
-// Register this check class (by creating a static instance of it)
-namespace {
-    CheckFunctions instance;
-}
-
 static const CWE CWE252(252U);  // Unchecked Return Value
 static const CWE CWE477(477U);  // Use of Obsolete Functions
 static const CWE CWE758(758U);  // Reliance on Undefined, Unspecified, or Implementation-Defined Behavior
@@ -58,7 +53,69 @@ static const CWE CWE686(686U);  // Function Call With Incorrect Argument Type
 static const CWE CWE687(687U);  // Function Call With Incorrectly Specified Argument Value
 static const CWE CWE688(688U);  // Function Call With Incorrect Variable or Reference as Argument
 
-void CheckFunctions::checkProhibitedFunctions()
+// Register this check class (by creating a static instance of it)
+namespace {
+    CheckFunctions instance;
+
+    class CheckFunctionsImpl : public CheckImpl {
+    public:
+        /** This constructor is used when running checks. */
+        CheckFunctionsImpl(const Tokenizer *tokenizer, const Settings *settings, ErrorLogger *errorLogger)
+            : CheckImpl(tokenizer, settings, errorLogger) {}
+
+        /** Check for functions that should not be used */
+        void checkProhibitedFunctions();
+
+        /**
+         * @brief Invalid function usage (invalid input value / overlapping data)
+         *
+         * %Check that given function parameters are valid according to the standard
+         * - wrong radix given for strtol/strtoul
+         * - overlapping data when using sprintf/snprintf
+         * - wrong input value according to library
+         */
+        void invalidFunctionUsage();
+
+        /** @brief %Check for ignored return values. */
+        void checkIgnoredReturnValue();
+
+        /** @brief %Check for parameters given to math function that do not make sense*/
+        void checkMathFunctions();
+
+        /** @brief %Check for filling zero bytes with memset() */
+        void memsetZeroBytes();
+
+        /** @brief %Check for invalid 2nd parameter of memset() */
+        void memsetInvalid2ndParam();
+
+        /** @brief %Check for copy elision by RVO|NRVO */
+        void returnLocalStdMove();
+
+        void useStandardLibrary();
+
+        /** @brief --check-library: warn for unconfigured function calls */
+        void checkLibraryMatchFunctions();
+
+        /** @brief %Check for missing "return" */
+        void checkMissingReturn();
+
+        void invalidFunctionArgError(const Token *tok, const std::string &functionName, int argnr, const ValueFlow::Value *invalidValue, const std::string &validstr);
+        void invalidFunctionArgBoolError(const Token *tok, const std::string &functionName, int argnr);
+        void invalidFunctionArgStrError(const Token *tok, const std::string &functionName, nonneg int argnr);
+        void ignoredReturnValueError(const Token* tok, const std::string& function);
+        void ignoredReturnErrorCode(const Token* tok, const std::string& function);
+        void mathfunctionCallWarning(const Token *tok, const nonneg int numParam = 1);
+        void mathfunctionCallWarning(const Token *tok, const std::string& oldexp, const std::string& newexp);
+        void memsetZeroBytesError(const Token *tok);
+        void memsetFloatError(const Token *tok, const std::string &var_value);
+        void memsetValueOutOfRangeError(const Token *tok, const std::string &value);
+        void missingReturnError(const Token *tok);
+        void copyElisionError(const Token *tok);
+        void useStandardLibraryError(const Token *tok, const std::string& expected);
+    };
+}
+
+void CheckFunctionsImpl::checkProhibitedFunctions()
 {
     const bool checkAlloca = mSettings->severity.isEnabled(Severity::warning) && ((mTokenizer->isC() && mSettings->standards.c >= Standards::C99) || mSettings->standards.cpp >= Standards::CPP11);
 
@@ -105,7 +162,7 @@ void CheckFunctions::checkProhibitedFunctions()
 //---------------------------------------------------------------------------
 // Check <valid>, <strz> and <not-bool>
 //---------------------------------------------------------------------------
-void CheckFunctions::invalidFunctionUsage()
+void CheckFunctionsImpl::invalidFunctionUsage()
 {
     logChecker("CheckFunctions::invalidFunctionUsage");
     const SymbolDatabase* symbolDatabase = mTokenizer->getSymbolDatabase();
@@ -197,7 +254,7 @@ void CheckFunctions::invalidFunctionUsage()
     }
 }
 
-void CheckFunctions::invalidFunctionArgError(const Token *tok, const std::string &functionName, int argnr, const ValueFlow::Value *invalidValue, const std::string &validstr)
+void CheckFunctionsImpl::invalidFunctionArgError(const Token *tok, const std::string &functionName, int argnr, const ValueFlow::Value *invalidValue, const std::string &validstr)
 {
     std::ostringstream errmsg;
     errmsg << "$symbol:" << functionName << '\n';
@@ -226,7 +283,7 @@ void CheckFunctions::invalidFunctionArgError(const Token *tok, const std::string
                     Certainty::normal);
 }
 
-void CheckFunctions::invalidFunctionArgBoolError(const Token *tok, const std::string &functionName, int argnr)
+void CheckFunctionsImpl::invalidFunctionArgBoolError(const Token *tok, const std::string &functionName, int argnr)
 {
     std::ostringstream errmsg;
     errmsg << "$symbol:" << functionName << '\n';
@@ -234,7 +291,7 @@ void CheckFunctions::invalidFunctionArgBoolError(const Token *tok, const std::st
     reportError(tok, Severity::error, "invalidFunctionArgBool", errmsg.str(), CWE628, Certainty::normal);
 }
 
-void CheckFunctions::invalidFunctionArgStrError(const Token *tok, const std::string &functionName, nonneg int argnr)
+void CheckFunctionsImpl::invalidFunctionArgStrError(const Token *tok, const std::string &functionName, nonneg int argnr)
 {
     std::ostringstream errmsg;
     errmsg << "$symbol:" << functionName << '\n';
@@ -245,7 +302,7 @@ void CheckFunctions::invalidFunctionArgStrError(const Token *tok, const std::str
 //---------------------------------------------------------------------------
 // Check for ignored return values.
 //---------------------------------------------------------------------------
-void CheckFunctions::checkIgnoredReturnValue()
+void CheckFunctionsImpl::checkIgnoredReturnValue()
 {
     if (!mSettings->severity.isEnabled(Severity::warning) &&
         !mSettings->severity.isEnabled(Severity::style) &&
@@ -296,13 +353,13 @@ void CheckFunctions::checkIgnoredReturnValue()
     }
 }
 
-void CheckFunctions::ignoredReturnValueError(const Token* tok, const std::string& function)
+void CheckFunctionsImpl::ignoredReturnValueError(const Token* tok, const std::string& function)
 {
     reportError(tok, Severity::warning, "ignoredReturnValue",
                 "$symbol:" + function + "\nReturn value of function $symbol() is not used.", CWE252, Certainty::normal);
 }
 
-void CheckFunctions::ignoredReturnErrorCode(const Token* tok, const std::string& function)
+void CheckFunctionsImpl::ignoredReturnErrorCode(const Token* tok, const std::string& function)
 {
     reportError(tok, Severity::style, "ignoredReturnErrorCode",
                 "$symbol:" + function + "\nError code from the return value of function $symbol() is not used.", CWE252, Certainty::normal);
@@ -313,7 +370,7 @@ void CheckFunctions::ignoredReturnErrorCode(const Token* tok, const std::string&
 //---------------------------------------------------------------------------
 static const Token *checkMissingReturnScope(const Token *tok, const Library &library);
 
-void CheckFunctions::checkMissingReturn()
+void CheckFunctionsImpl::checkMissingReturn()
 {
     logChecker("CheckFunctions::checkMissingReturn");
     const SymbolDatabase *symbolDatabase = mTokenizer->getSymbolDatabase();
@@ -418,7 +475,7 @@ static const Token *checkMissingReturnScope(const Token *tok, const Library &lib
     return nullptr;
 }
 
-void CheckFunctions::missingReturnError(const Token* tok)
+void CheckFunctionsImpl::missingReturnError(const Token* tok)
 {
     reportError(tok, Severity::error, "missingReturn",
                 "Found an exit path from function with non-void return type that has missing return statement", CWE758, Certainty::normal);
@@ -426,7 +483,7 @@ void CheckFunctions::missingReturnError(const Token* tok)
 //---------------------------------------------------------------------------
 // Detect passing wrong values to <cmath> functions like atan(0, x);
 //---------------------------------------------------------------------------
-void CheckFunctions::checkMathFunctions()
+void CheckFunctionsImpl::checkMathFunctions()
 {
     const bool styleC99 = mSettings->severity.isEnabled(Severity::style) && ((mTokenizer->isC() && mSettings->standards.c != Standards::C89) || (mTokenizer->isCPP() && mSettings->standards.cpp != Standards::CPP03));
     const bool printWarnings = mSettings->severity.isEnabled(Severity::warning);
@@ -487,7 +544,7 @@ void CheckFunctions::checkMathFunctions()
     }
 }
 
-void CheckFunctions::mathfunctionCallWarning(const Token *tok, const nonneg int numParam)
+void CheckFunctionsImpl::mathfunctionCallWarning(const Token *tok, const nonneg int numParam)
 {
     if (tok) {
         if (numParam == 1)
@@ -498,7 +555,7 @@ void CheckFunctions::mathfunctionCallWarning(const Token *tok, const nonneg int 
         reportError(tok, Severity::warning, "wrongmathcall", "Passing value '#' to #() leads to implementation-defined result.", CWE758, Certainty::normal);
 }
 
-void CheckFunctions::mathfunctionCallWarning(const Token *tok, const std::string& oldexp, const std::string& newexp)
+void CheckFunctionsImpl::mathfunctionCallWarning(const Token *tok, const std::string& oldexp, const std::string& newexp)
 {
     reportError(tok, Severity::style, "unpreciseMathCall", "Expression '" + oldexp + "' can be replaced by '" + newexp + "' to avoid loss of precision.", CWE758, Certainty::normal);
 }
@@ -506,7 +563,7 @@ void CheckFunctions::mathfunctionCallWarning(const Token *tok, const std::string
 //---------------------------------------------------------------------------
 // memset(p, y, 0 /* bytes to fill */) <- 2nd and 3rd arguments inverted
 //---------------------------------------------------------------------------
-void CheckFunctions::memsetZeroBytes()
+void CheckFunctionsImpl::memsetZeroBytes()
 {
 // FIXME:
 //  Replace this with library configuration.
@@ -535,7 +592,7 @@ void CheckFunctions::memsetZeroBytes()
     }
 }
 
-void CheckFunctions::memsetZeroBytesError(const Token *tok)
+void CheckFunctionsImpl::memsetZeroBytesError(const Token *tok)
 {
     const std::string summary("memset() called to fill 0 bytes.");
     const std::string verbose(summary + " The second and third arguments might be inverted."
@@ -544,7 +601,7 @@ void CheckFunctions::memsetZeroBytesError(const Token *tok)
     reportError(tok, Severity::warning, "memsetZeroBytes", summary + "\n" + verbose, CWE687, Certainty::normal);
 }
 
-void CheckFunctions::memsetInvalid2ndParam()
+void CheckFunctionsImpl::memsetInvalid2ndParam()
 {
 // FIXME:
 //  Replace this with library configuration.
@@ -592,7 +649,7 @@ void CheckFunctions::memsetInvalid2ndParam()
     }
 }
 
-void CheckFunctions::memsetFloatError(const Token *tok, const std::string &var_value)
+void CheckFunctionsImpl::memsetFloatError(const Token *tok, const std::string &var_value)
 {
     const std::string message("The 2nd memset() argument '" + var_value +
                               "' is a float, its representation is implementation defined.");
@@ -601,7 +658,7 @@ void CheckFunctions::memsetFloatError(const Token *tok, const std::string &var_v
     reportError(tok, Severity::portability, "memsetFloat", message + "\n" + verbose, CWE688, Certainty::normal);
 }
 
-void CheckFunctions::memsetValueOutOfRangeError(const Token *tok, const std::string &value)
+void CheckFunctionsImpl::memsetValueOutOfRangeError(const Token *tok, const std::string &value)
 {
     const std::string message("The 2nd memset() argument '" + value + "' doesn't fit into an 'unsigned char'.");
     const std::string verbose(message + " The 2nd parameter is passed as an 'int', but the function fills the block of memory using the 'unsigned char' conversion of this value.");
@@ -612,7 +669,7 @@ void CheckFunctions::memsetValueOutOfRangeError(const Token *tok, const std::str
 // --check-library => warn for unconfigured functions
 //---------------------------------------------------------------------------
 
-void CheckFunctions::checkLibraryMatchFunctions()
+void CheckFunctionsImpl::checkLibraryMatchFunctions()
 {
     if (!mSettings->checkLibrary)
         return;
@@ -684,7 +741,7 @@ void CheckFunctions::checkLibraryMatchFunctions()
 // Check for problems to compiler apply (Named) Return Value Optimization for local variable
 // Technically we have different guarantees between standard versions
 // details: https://en.cppreference.com/w/cpp/language/copy_elision
-void CheckFunctions::returnLocalStdMove()
+void CheckFunctionsImpl::returnLocalStdMove()
 {
     if (!mTokenizer->isCPP() || mSettings->standards.cpp < Standards::CPP11)
         return;
@@ -714,7 +771,7 @@ void CheckFunctions::returnLocalStdMove()
     }
 }
 
-void CheckFunctions::copyElisionError(const Token *tok)
+void CheckFunctionsImpl::copyElisionError(const Token *tok)
 {
     reportError(tok,
                 Severity::performance,
@@ -723,7 +780,7 @@ void CheckFunctions::copyElisionError(const Token *tok)
                 " More: https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines#Rf-return-move-local");
 }
 
-void CheckFunctions::useStandardLibrary()
+void CheckFunctionsImpl::useStandardLibrary()
 {
     if (!mSettings->severity.isEnabled(Severity::style))
         return;
@@ -827,16 +884,15 @@ void CheckFunctions::useStandardLibrary()
     }
 }
 
-void CheckFunctions::useStandardLibraryError(const Token *tok, const std::string& expected)
+void CheckFunctionsImpl::useStandardLibraryError(const Token *tok, const std::string& expected)
 {
     reportError(tok, Severity::style,
                 "useStandardLibrary",
                 "Consider using " + expected + " instead of loop.");
 }
 
-void CheckFunctions::runChecks(const Tokenizer &tokenizer, ErrorLogger *errorLogger)
-{
-    CheckFunctions checkFunctions(&tokenizer, &tokenizer.getSettings(), errorLogger);
+void CheckFunctions::runChecks(const Tokenizer &tokenizer, ErrorLogger *errorLogger) {
+    CheckFunctionsImpl checkFunctions(&tokenizer, &tokenizer.getSettings(), errorLogger);
 
     checkFunctions.checkIgnoredReturnValue();
     checkFunctions.checkMissingReturn();  // Missing "return" in exit path
@@ -853,12 +909,12 @@ void CheckFunctions::runChecks(const Tokenizer &tokenizer, ErrorLogger *errorLog
     checkFunctions.useStandardLibrary();
 }
 
-void CheckFunctions::getErrorMessages(ErrorLogger *errorLogger, const Settings *settings) const
-{
-    CheckFunctions c(nullptr, settings, errorLogger);
+void CheckFunctions::getErrorMessages(ErrorLogger *errorLogger, const Settings *settings) const {
+    CheckFunctionsImpl c(nullptr, settings, errorLogger);
 
-    for (auto i = settings->library.functionwarn().cbegin(); i != settings->library.functionwarn().cend(); ++i) {
-        c.reportError(nullptr, Severity::style, i->first+"Called", i->second.message);
+    for (std::map<std::string, Library::WarnInfo>::const_iterator i = settings->library.functionwarn().cbegin(); i != settings->library.functionwarn().cend(); ++i) {
+        // TODO
+        //c.reportError(nullptr, Severity::style, i->first+"Called", i->second.message);
     }
 
     c.invalidFunctionArgError(nullptr, "func_name", 1, nullptr,"1:4");

@@ -46,54 +46,13 @@ class Tokenizer;
 class CPPCHECKLIB CheckExceptionSafety : public Check {
 public:
     /** This constructor is used when registering the CheckClass */
-    CheckExceptionSafety() : Check(myName()) {}
+    CheckExceptionSafety() : Check("Exception Safety") {}
 
 private:
-    /** This constructor is used when running checks. */
-    CheckExceptionSafety(const Tokenizer *tokenizer, const Settings *settings, ErrorLogger *errorLogger)
-        : Check(myName(), tokenizer, settings, errorLogger) {}
-
     void runChecks(const Tokenizer &tokenizer, ErrorLogger *errorLogger) override;
-
-    /** Don't throw exceptions in destructors */
-    void destructors();
-
-    /** deallocating memory and then throw (dead pointer) */
-    void deallocThrow();
-
-    /** Don't rethrow a copy of the caught exception; use a bare throw instead */
-    void checkRethrowCopy();
-
-    /** @brief %Check for exceptions that are caught by value instead of by reference */
-    void checkCatchExceptionByValue();
-
-    /** @brief %Check for functions that throw that shouldn't */
-    void nothrowThrows();
-
-    /** @brief %Check for unhandled exception specification */
-    void unhandledExceptionSpecification();
-
-    /** @brief %Check for rethrow not from catch scope */
-    void rethrowNoCurrentException();
-
-    /** Don't throw exceptions in destructors */
-    void destructorsError(const Token * tok, const std::string &className);
-    void deallocThrowError(const Token * tok, const std::string &varname);
-    void rethrowCopyError(const Token * tok, const std::string &varname);
-    void catchExceptionByValueError(const Token *tok);
-    void noexceptThrowError(const Token * tok);
-    /** Missing exception specification */
-    void unhandledExceptionSpecificationError(const Token * tok1, const Token * tok2, const std::string & funcname);
-    /** Rethrow without currently handled exception */
-    void rethrowNoCurrentExceptionError(const Token *tok);
 
     /** Generate all possible errors (for --errorlist) */
     void getErrorMessages(ErrorLogger *errorLogger, const Settings *settings) const override;
-
-    /** Short description of class (for --doc) */
-    static std::string myName() {
-        return "Exception Safety";
-    }
 
     /** wiki formatted description of the class (for --doc) */
     std::string classInfo() const override {

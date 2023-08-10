@@ -21,6 +21,7 @@
 #include "checkunusedvar.h"
 
 #include "astutils.h"
+#include "checkimpl.h"
 #include "errortypes.h"
 #include "fwdanalysis.h"
 #include "library.h"
@@ -97,82 +98,84 @@ static bool isRaiiClass(const ValueType *valueType, bool cpp, bool defaultReturn
     return defaultReturn;
 }
 
-/**
- * @brief This class is used create a list of variables within a function.
- */
-class Variables {
-public:
-    enum VariableType : std::uint8_t { standard, array, pointer, reference, pointerArray, referenceArray, pointerPointer, none };
-
-    /** Store information about variable usage */
-    class VariableUsage {
+namespace {
+    /**
+     * @brief This class is used create a list of variables within a function.
+     */
+    class Variables {
     public:
-        explicit VariableUsage(const Variable *var = nullptr,
-                               VariableType type = standard,
-                               bool read = false,
-                               bool write = false,
-                               bool modified = false,
-                               bool allocateMemory = false) :
-            _var(var),
-            _lastAccess(var ? var->nameToken() : nullptr),
-            mType(type),
-            _read(read),
-            _write(write),
-            _modified(modified),
-            _allocateMemory(allocateMemory) {}
+        enum VariableType : std::uint8_t { standard, array, pointer, reference, pointerArray, referenceArray, pointerPointer, none };
 
-        /** variable is used.. set both read+write */
-        void use() {
-            _read = true;
-            _write = true;
+        /** Store information about variable usage */
+        class VariableUsage {
+        public:
+            explicit VariableUsage(const Variable *var = nullptr,
+                                   VariableType type = standard,
+                                   bool read = false,
+                                   bool write = false,
+                                   bool modified = false,
+                                   bool allocateMemory = false) :
+                _var(var),
+                _lastAccess(var ? var->nameToken() : nullptr),
+                mType(type),
+                _read(read),
+                _write(write),
+                _modified(modified),
+                _allocateMemory(allocateMemory) {}
+
+            /** variable is used.. set both read+write */
+            void use() {
+                _read = true;
+                _write = true;
+            }
+
+            /** is variable unused? */
+            bool unused() const {
+                return (!_read && !_write);
+            }
+
+            std::set<nonneg int> _aliases;
+            std::set<const Scope*> _assignments;
+
+            const Variable* _var;
+            const Token* _lastAccess;
+            VariableType mType;
+            bool _read;
+            bool _write;
+            bool _modified; // read/modify/write
+            bool _allocateMemory;
+        };
+
+        void clear() {
+            mVarUsage.clear();
         }
-
-        /** is variable unused? */
-        bool unused() const {
-            return (!_read && !_write);
+        const std::map<nonneg int, VariableUsage> &varUsage() const {
+            return mVarUsage;
         }
+        void addVar(const Variable *var, VariableType type, bool write_);
+        void allocateMemory(nonneg int varid, const Token* tok);
+        void read(nonneg int varid, const Token* tok);
+        void readAliases(nonneg int varid, const Token* tok);
+        void readAll(nonneg int varid, const Token* tok);
+        void write(nonneg int varid, const Token* tok);
+        void writeAliases(nonneg int varid, const Token* tok);
+        void writeAll(nonneg int varid, const Token* tok);
+        void use(nonneg int varid, const Token* tok);
+        void modified(nonneg int varid, const Token* tok);
+        VariableUsage *find(nonneg int varid);
+        void alias(nonneg int varid1, nonneg int varid2, bool replace);
+        void erase(nonneg int varid) {
+            mVarUsage.erase(varid);
+        }
+        void eraseAliases(nonneg int varid);
+        void eraseAll(nonneg int varid);
+        void clearAliases(nonneg int varid);
 
-        std::set<nonneg int> _aliases;
-        std::set<const Scope*> _assignments;
+    private:
 
-        const Variable* _var;
-        const Token* _lastAccess;
-        VariableType mType;
-        bool _read;
-        bool _write;
-        bool _modified; // read/modify/write
-        bool _allocateMemory;
+        std::map<nonneg int, VariableUsage> mVarUsage;
     };
-
-    void clear() {
-        mVarUsage.clear();
-    }
-    const std::map<nonneg int, VariableUsage> &varUsage() const {
-        return mVarUsage;
-    }
-    void addVar(const Variable *var, VariableType type, bool write_);
-    void allocateMemory(nonneg int varid, const Token* tok);
-    void read(nonneg int varid, const Token* tok);
-    void readAliases(nonneg int varid, const Token* tok);
-    void readAll(nonneg int varid, const Token* tok);
-    void write(nonneg int varid, const Token* tok);
-    void writeAliases(nonneg int varid, const Token* tok);
-    void writeAll(nonneg int varid, const Token* tok);
-    void use(nonneg int varid, const Token* tok);
-    void modified(nonneg int varid, const Token* tok);
-    VariableUsage *find(nonneg int varid);
-    void alias(nonneg int varid1, nonneg int varid2, bool replace);
-    void erase(nonneg int varid) {
-        mVarUsage.erase(varid);
-    }
-    void eraseAliases(nonneg int varid);
-    void eraseAll(nonneg int varid);
-    void clearAliases(nonneg int varid);
-
-private:
-
-    std::map<nonneg int, VariableUsage> mVarUsage;
-};
+}
 
 
 /**
@@ -628,6 +631,38 @@ static const Token* doAssignment(Variables &variables, const Token *tok, bool de
     return tok;
 }
 
+namespace {
+    class CheckUnusedVarImpl : public CheckImpl {
+    public:
+        /** @brief This constructor is used when running checks. */
+        CheckUnusedVarImpl(const Tokenizer *tokenizer, const Settings *settings, ErrorLogger *errorLogger)
+            : CheckImpl(tokenizer, settings, errorLogger) {}
+
+        /** @brief %Check for unused function variables */
+        void checkFunctionVariableUsage_iterateScopes(const Scope* const scope, Variables& variables);
+        void checkFunctionVariableUsage();
+
+        /** @brief %Check that all struct members are used */
+        void checkStructMemberUsage();
+
+        bool isRecordTypeWithoutSideEffects(const Type* type);
+        bool isVariableWithoutSideEffects(const Variable& var, const Type* type = nullptr);
+        bool isEmptyType(const Type* type);
+        bool isFunctionWithoutSideEffects(const Function& func, const Token* functionUsageToken,
+                                          std::list<const Function*> checkedFuncs);
+
+        // Error messages..
+        void unusedStructMemberError(const Token *tok, const std::string &structname, const std::string &varname, const std::string& prefix = "struct");
+        void unusedVariableError(const Token *tok, const std::string &varname);
+        void allocatedButUnusedVariableError(const Token *tok, const std::string &varname);
+        void unreadVariableError(const Token *tok, const std::string &varname, bool modified);
+        void unassignedVariableError(const Token *tok, const std::string &varname);
+
+        std::map<const Type *,bool> mIsRecordTypeWithoutSideEffectsMap;
+        std::map<const Type *,bool> mIsEmptyTypeMap;
+    };
+}
+
 static bool isPartOfClassStructUnion(const Token* tok)
 {
     for (; tok; tok = tok->previous()) {
@@ -689,7 +724,7 @@ static void useFunctionArgs(const Token *tok, Variables& variables)
 //---------------------------------------------------------------------------
 // Usage of function variables
 //---------------------------------------------------------------------------
-void CheckUnusedVar::checkFunctionVariableUsage_iterateScopes(const Scope* const scope, Variables& variables)
+void CheckUnusedVarImpl::checkFunctionVariableUsage_iterateScopes(const Scope* const scope, Variables& variables)
 {
     // Find declarations if the scope is executable..
     if (scope->isExecutable()) {
@@ -1160,7 +1195,7 @@ static bool isReturnedByRef(const Variable* var, const Function* func)
     });
 }
 
-void CheckUnusedVar::checkFunctionVariableUsage()
+void CheckUnusedVarImpl::checkFunctionVariableUsage()
 {
     if (!mSettings->severity.isEnabled(Severity::style) && !mSettings->checkLibrary && !mSettings->isPremiumEnabled("unusedVariable"))
         return;
@@ -1425,7 +1460,7 @@ void CheckUnusedVar::checkFunctionVariableUsage()
     }
 }
 
-void CheckUnusedVar::unusedVariableError(const Token *tok, const std::string &varname)
+void CheckUnusedVarImpl::unusedVariableError(const Token *tok, const std::string &varname)
 {
     if (!mSettings->severity.isEnabled(Severity::style) && !mSettings->isPremiumEnabled("unusedVariable"))
         return;
@@ -1433,7 +1468,7 @@ void CheckUnusedVar::unusedVariableError(const Token *tok, const std::string &va
     reportError(tok, Severity::style, "unusedVariable", "$symbol:" + varname + "\nUnused variable: $symbol", CWE563, Certainty::normal);
 }
 
-void CheckUnusedVar::allocatedButUnusedVariableError(const Token *tok, const std::string &varname)
+void CheckUnusedVarImpl::allocatedButUnusedVariableError(const Token *tok, const std::string &varname)
 {
     if (!mSettings->severity.isEnabled(Severity::style) && !mSettings->isPremiumEnabled("unusedVariable"))
         return;
@@ -1441,7 +1476,7 @@ void CheckUnusedVar::allocatedButUnusedVariableError(const Token *tok, const std
     reportError(tok, Severity::style, "unusedAllocatedMemory", "$symbol:" + varname + "\nVariable '$symbol' is allocated memory that is never used.", CWE563, Certainty::normal);
 }
 
-void CheckUnusedVar::unreadVariableError(const Token *tok, const std::string &varname, bool modified)
+void CheckUnusedVarImpl::unreadVariableError(const Token *tok, const std::string &varname, bool modified)
 {
     if (!mSettings->severity.isEnabled(Severity::style) && !mSettings->isPremiumEnabled("unusedVariable"))
         return;
@@ -1452,7 +1487,7 @@ void CheckUnusedVar::unreadVariableError(const Token *tok, const std::string &va
         reportError(tok, Severity::style, "unreadVariable", "$symbol:" + varname + "\nVariable '$symbol' is assigned a value that is never used.", CWE563, Certainty::normal);
 }
 
-void CheckUnusedVar::unassignedVariableError(const Token *tok, const std::string &varname)
+void CheckUnusedVarImpl::unassignedVariableError(const Token *tok, const std::string &varname)
 {
     if (!mSettings->severity.isEnabled(Severity::style) && !mSettings->isPremiumEnabled("unusedVariable"))
         return;
@@ -1463,7 +1498,7 @@ void CheckUnusedVar::unassignedVariableError(const Token *tok, const std::string
 //---------------------------------------------------------------------------
 // Check that all struct members are used
 //---------------------------------------------------------------------------
-void CheckUnusedVar::checkStructMemberUsage()
+void CheckUnusedVarImpl::checkStructMemberUsage()
 {
     if (!mSettings->severity.isEnabled(Severity::style) && !mSettings->isPremiumEnabled("unusedStructMember") && !mSettings->isPremiumEnabled("unusedVariable"))
         return;
@@ -1576,12 +1611,12 @@ void CheckUnusedVar::checkStructMemberUsage()
     }
 }
 
-void CheckUnusedVar::unusedStructMemberError(const Token* tok, const std::string& structname, const std::string& varname, const std::string& prefix)
+void CheckUnusedVarImpl::unusedStructMemberError(const Token* tok, const std::string& structname, const std::string& varname, const std::string& prefix)
 {
     reportError(tok, Severity::style, "unusedStructMember", "$symbol:" + structname + "::" + varname + '\n' + prefix + " member '$symbol' is never used.", CWE563, Certainty::normal);
 }
 
-bool CheckUnusedVar::isRecordTypeWithoutSideEffects(const Type* type)
+bool CheckUnusedVarImpl::isRecordTypeWithoutSideEffects(const Type* type)
 {
     // a type that has no side effects (no constructors and no members with constructors)
     /** @todo false negative: check constructors for side effects */
@@ -1657,7 +1692,7 @@ bool CheckUnusedVar::isRecordTypeWithoutSideEffects(const Type* type)
     return (withoutSideEffects = true);
 }
 
-bool CheckUnusedVar::isVariableWithoutSideEffects(const Variable& var, const Type* type)
+bool CheckUnusedVarImpl::isVariableWithoutSideEffects(const Variable& var, const Type* type)
 {
     const Type* variableType = var.type();
     if (variableType && variableType != type) {
@@ -1674,7 +1709,7 @@ bool CheckUnusedVar::isVariableWithoutSideEffects(const Variable& var, const Typ
     return true;
 }
 
-bool CheckUnusedVar::isEmptyType(const Type* type)
+bool CheckUnusedVarImpl::isEmptyType(const Type* type)
 {
     // a type that has no variables and no constructor
 
@@ -1695,7 +1730,7 @@ bool CheckUnusedVar::isEmptyType(const Type* type)
     return (emptyType = false);
 }
 
-bool CheckUnusedVar::isFunctionWithoutSideEffects(const Function& func, const Token* functionUsageToken,
+bool CheckUnusedVarImpl::isFunctionWithoutSideEffects(const Function& func, const Token* functionUsageToken,
                                                   std::list<const Function*> checkedFuncs)
 {
     // no body to analyze
@@ -1774,21 +1809,20 @@ bool CheckUnusedVar::isFunctionWithoutSideEffects(const Function& func, const To
     return !sideEffectReturnFound;
 }
 
-void CheckUnusedVar::runChecks(const Tokenizer &tokenizer, ErrorLogger *errorLogger)
-{
-    CheckUnusedVar checkUnusedVar(&tokenizer, &tokenizer.getSettings(), errorLogger);
+void CheckUnusedVar::runChecks(const Tokenizer &tokenizer, ErrorLogger *errorLogger) {
+    CheckUnusedVarImpl checkUnusedVar(&tokenizer, &tokenizer.getSettings(), errorLogger);
 
     // Coding style checks
     checkUnusedVar.checkStructMemberUsage();
     checkUnusedVar.checkFunctionVariableUsage();
 }
 
-void CheckUnusedVar::getErrorMessages(ErrorLogger *errorLogger, const Settings *settings) const
-{
-    CheckUnusedVar c(nullptr, settings, errorLogger);
+void CheckUnusedVar::getErrorMessages(ErrorLogger *errorLogger, const Settings *settings) const {
+    CheckUnusedVarImpl c(nullptr, settings, errorLogger);
     c.unusedVariableError(nullptr, "varname");
     c.allocatedButUnusedVariableError(nullptr, "varname");
     c.unreadVariableError(nullptr, "varname", false);
     c.unassignedVariableError(nullptr, "varname");
     c.unusedStructMemberError(nullptr, "structname", "variable");
 }
+

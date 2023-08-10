@@ -46,8 +46,7 @@ private:
         ASSERT_LOC(tokenizer.tokenize(code), file, line);
 
         // Check char variable usage..
-        CheckOther checkOther(&tokenizer, &settings, this);
-        checkOther.checkCharVariable();
+        (CheckOther::checkCharVariable)(&tokenizer, &settings, this);
     }
 
     void array_index_1() {

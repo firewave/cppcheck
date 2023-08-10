@@ -25,7 +25,6 @@
 #include "check.h"
 #include "config.h"
 
-#include <list>
 #include <string>
 
 class ErrorLogger;
@@ -47,46 +46,13 @@ namespace ValueFlow
 class CPPCHECKLIB CheckType : public Check {
 public:
     /** @brief This constructor is used when registering the CheckClass */
-    CheckType() : Check(myName()) {}
+    CheckType() : Check("Type") {}
 
 private:
-    /** @brief This constructor is used when running checks. */
-    CheckType(const Tokenizer *tokenizer, const Settings *settings, ErrorLogger *errorLogger)
-        : Check(myName(), tokenizer, settings, errorLogger) {}
-
     /** @brief Run checks against the normal token list */
     void runChecks(const Tokenizer &tokenizer, ErrorLogger *errorLogger) override;
 
-    /** @brief %Check for bitwise shift with too big right operand */
-    void checkTooBigBitwiseShift();
-
-    /** @brief %Check for integer overflow */
-    void checkIntegerOverflow();
-
-    /** @brief %Check for dangerous sign conversion */
-    void checkSignConversion();
-
-    /** @brief %Check for implicit long cast of int result */
-    void checkLongCast();
-
-    /** @brief %Check for float to integer overflow */
-    void checkFloatToIntegerOverflow();
-    void checkFloatToIntegerOverflow(const Token *tok, const ValueType *vtint, const ValueType *vtfloat, const std::list<ValueFlow::Value> &floatValues);
-
-    // Error messages..
-    void tooBigBitwiseShiftError(const Token *tok, int lhsbits, const ValueFlow::Value &rhsbits);
-    void tooBigSignedBitwiseShiftError(const Token *tok, int lhsbits, const ValueFlow::Value &rhsbits);
-    void integerOverflowError(const Token *tok, const ValueFlow::Value &value, bool isOverflow = true);
-    void signConversionError(const Token *tok, const ValueFlow::Value *negativeValue, bool constvalue);
-    void longCastAssignError(const Token *tok, const ValueType* src = nullptr, const ValueType* tgt = nullptr);
-    void longCastReturnError(const Token *tok, const ValueType* src = nullptr, const ValueType* tgt = nullptr);
-    void floatToIntegerOverflowError(const Token *tok, const ValueFlow::Value &value);
-
     void getErrorMessages(ErrorLogger *errorLogger, const Settings *settings) const override;
-
-    static std::string myName() {
-        return "Type";
-    }
 
     std::string classInfo() const override {
         return "Type checks\n"

@@ -42,8 +42,7 @@ private:
         ASSERT_LOC(tokenizer.tokenize(code), file, line);
 
         // Check class constructors..
-        CheckClass checkClass(&tokenizer, &settings1, this);
-        checkClass.constructors();
+        CheckClass::constructors(&tokenizer, &settings1, this);
     }
 
     template<size_t size>
@@ -53,8 +52,7 @@ private:
         ASSERT_LOC(tokenizer.tokenize(code), file, line);
 
         // Check class constructors..
-        CheckClass checkClass(&tokenizer, &s, this);
-        checkClass.constructors();
+        CheckClass::constructors(&tokenizer, &s, this);
     }
 
     void run() override {

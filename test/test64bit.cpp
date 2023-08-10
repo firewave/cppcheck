@@ -49,8 +49,7 @@ private:
         ASSERT_LOC(tokenizer.tokenize(code), file, line);
 
         // Check char variable usage..
-        Check64BitPortability check64BitPortability(&tokenizer, &settings, this);
-        check64BitPortability.pointerassignment();
+        runChecks<Check64BitPortability>(tokenizer, this);
     }
 
     void assignment() {

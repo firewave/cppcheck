@@ -41,65 +41,13 @@ class Tokenizer;
 class CPPCHECKLIB CheckBool : public Check {
 public:
     /** @brief This constructor is used when registering the CheckClass */
-    CheckBool() : Check(myName()) {}
+    CheckBool() : Check("Boolean") {}
 
 private:
-    /** @brief This constructor is used when running checks. */
-    CheckBool(const Tokenizer *tokenizer, const Settings *settings, ErrorLogger *errorLogger)
-        : Check(myName(), tokenizer, settings, errorLogger) {}
-
     /** @brief Run checks against the normal token list */
     void runChecks(const Tokenizer &tokenizer, ErrorLogger *errorLogger) override;
 
-    /** @brief %Check for comparison of function returning bool*/
-    void checkComparisonOfFuncReturningBool();
-
-    /** @brief %Check for comparison of variable of type bool*/
-    void checkComparisonOfBoolWithBool();
-
-    /** @brief %Check for using postfix increment on bool */
-    void checkIncrementBoolean();
-
-    /** @brief %Check for suspicious comparison of a bool and a non-zero (and non-one) value (e.g. "if (!x==4)") */
-    void checkComparisonOfBoolWithInt();
-
-    /** @brief assigning bool to pointer */
-    void checkAssignBoolToPointer();
-
-    /** @brief assigning bool to float */
-    void checkAssignBoolToFloat();
-
-    /** @brief %Check for using bool in bitwise expression */
-    void checkBitwiseOnBoolean();
-
-    /** @brief %Check for comparing a bool expression with an integer other than 0 or 1 */
-    void checkComparisonOfBoolExpressionWithInt();
-
-    /** @brief %Check for 'if (p+1)' etc. either somebody forgot to dereference, or else somebody uses pointer overflow */
-    void pointerArithBool();
-    void pointerArithBoolCond(const Token *tok);
-
-    /** @brief %Check if a function returning bool returns an integer other than 0 or 1 */
-    void returnValueOfFunctionReturningBool();
-
-    // Error messages..
-    void comparisonOfFuncReturningBoolError(const Token *tok, const std::string &expression);
-    void comparisonOfTwoFuncsReturningBoolError(const Token *tok, const std::string &expression1, const std::string &expression2);
-    void comparisonOfBoolWithBoolError(const Token *tok, const std::string &expression);
-    void incrementBooleanError(const Token *tok);
-    void comparisonOfBoolWithInvalidComparator(const Token *tok, const std::string &expression);
-    void assignBoolToPointerError(const Token *tok);
-    void assignBoolToFloatError(const Token *tok);
-    void bitwiseOnBooleanError(const Token* tok, const std::string& expression, const std::string& op, bool isCompound = false);
-    void comparisonOfBoolExpressionWithIntError(const Token *tok, bool not0or1);
-    void pointerArithBoolError(const Token *tok);
-    void returnValueBoolError(const Token *tok);
-
     void getErrorMessages(ErrorLogger *errorLogger, const Settings *settings) const override;
-
-    static std::string myName() {
-        return "Boolean";
-    }
 
     std::string classInfo() const override {
         return "Boolean type checks\n"

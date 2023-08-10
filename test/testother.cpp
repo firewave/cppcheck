@@ -1864,8 +1864,7 @@ private:
         SimpleTokenizer tokenizerCpp(settings, *this);
         ASSERT_LOC(tokenizerCpp.tokenize(code), file, line);
 
-        CheckOther checkOtherCpp(&tokenizerCpp, &settings, this);
-        checkOtherCpp.warningOldStylePointerCast();
+        CheckOther::warningOldStylePointerCast(&tokenizerCpp, &settings, this);
     }
 
     void oldStylePointerCast() {
@@ -2097,8 +2096,7 @@ private:
         SimpleTokenizer tokenizer(settings, *this);
         ASSERT_LOC(tokenizer.tokenize(code), file, line);
 
-        CheckOther checkOtherCpp(&tokenizer, &settings, this);
-        checkOtherCpp.invalidPointerCast();
+        CheckOther::invalidPointerCast(&tokenizer, &settings, this);
     }
 
 

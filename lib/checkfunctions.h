@@ -27,7 +27,6 @@
 
 #include <string>
 
-class Token;
 class ErrorLogger;
 class Tokenizer;
 class Settings;
@@ -47,71 +46,13 @@ namespace ValueFlow {
 class CPPCHECKLIB CheckFunctions : public Check {
 public:
     /** This constructor is used when registering the CheckFunctions */
-    CheckFunctions() : Check(myName()) {}
+    CheckFunctions() : Check("Check function usage") {}
 
 private:
-    /** This constructor is used when running checks. */
-    CheckFunctions(const Tokenizer *tokenizer, const Settings *settings, ErrorLogger *errorLogger)
-        : Check(myName(), tokenizer, settings, errorLogger) {}
-
     /** @brief Run checks against the normal token list */
     void runChecks(const Tokenizer &tokenizer, ErrorLogger *errorLogger) override;
 
-    /** Check for functions that should not be used */
-    void checkProhibitedFunctions();
-
-    /**
-     * @brief Invalid function usage (invalid input value / overlapping data)
-     *
-     * %Check that given function parameters are valid according to the standard
-     * - wrong radix given for strtol/strtoul
-     * - overlapping data when using sprintf/snprintf
-     * - wrong input value according to library
-     */
-    void invalidFunctionUsage();
-
-    /** @brief %Check for ignored return values. */
-    void checkIgnoredReturnValue();
-
-    /** @brief %Check for parameters given to math function that do not make sense*/
-    void checkMathFunctions();
-
-    /** @brief %Check for filling zero bytes with memset() */
-    void memsetZeroBytes();
-
-    /** @brief %Check for invalid 2nd parameter of memset() */
-    void memsetInvalid2ndParam();
-
-    /** @brief %Check for copy elision by RVO|NRVO */
-    void returnLocalStdMove();
-
-    void useStandardLibrary();
-
-    /** @brief --check-library: warn for unconfigured function calls */
-    void checkLibraryMatchFunctions();
-
-    /** @brief %Check for missing "return" */
-    void checkMissingReturn();
-
-    void invalidFunctionArgError(const Token *tok, const std::string &functionName, int argnr, const ValueFlow::Value *invalidValue, const std::string &validstr);
-    void invalidFunctionArgBoolError(const Token *tok, const std::string &functionName, int argnr);
-    void invalidFunctionArgStrError(const Token *tok, const std::string &functionName, nonneg int argnr);
-    void ignoredReturnValueError(const Token* tok, const std::string& function);
-    void ignoredReturnErrorCode(const Token* tok, const std::string& function);
-    void mathfunctionCallWarning(const Token *tok, nonneg int numParam = 1);
-    void mathfunctionCallWarning(const Token *tok, const std::string& oldexp, const std::string& newexp);
-    void memsetZeroBytesError(const Token *tok);
-    void memsetFloatError(const Token *tok, const std::string &var_value);
-    void memsetValueOutOfRangeError(const Token *tok, const std::string &value);
-    void missingReturnError(const Token *tok);
-    void copyElisionError(const Token *tok);
-    void useStandardLibraryError(const Token *tok, const std::string& expected);
-
     void getErrorMessages(ErrorLogger *errorLogger, const Settings *settings) const override;
-
-    static std::string myName() {
-        return "Check function usage";
-    }
 
     std::string classInfo() const override {
         return "Check function usage:\n"

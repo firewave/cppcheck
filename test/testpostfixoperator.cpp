@@ -39,8 +39,7 @@ private:
         ASSERT_LOC(tokenizer.tokenize(code), file, line);
 
         // Check for postfix operators..
-        CheckPostfixOperator checkPostfixOperator(&tokenizer, &settings, this);
-        checkPostfixOperator.postfixOperator();
+        runChecks<CheckPostfixOperator>(tokenizer, this);
     }
 
     void run() override {

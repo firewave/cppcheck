@@ -45,6 +45,7 @@
     <ClCompile Include="checkersreport.cpp" />
     <ClCompile Include="checkexceptionsafety.cpp" />
     <ClCompile Include="checkfunctions.cpp" />
+    <ClCompile Include="checkimpl.cpp" />
     <ClCompile Include="checkinternal.cpp" />
     <ClCompile Include="checkio.cpp" />
     <ClCompile Include="checkleakautovar.cpp" />
@@ -116,6 +117,7 @@
     <ClInclude Include="checkersreport.h" />
     <ClInclude Include="checkexceptionsafety.h" />
     <ClInclude Include="checkfunctions.h" />
+    <ClInclude Include="checkimpl.h" />
     <ClInclude Include="checkinternal.h" />
     <ClInclude Include="checkio.h" />
     <ClInclude Include="checkleakautovar.h" />

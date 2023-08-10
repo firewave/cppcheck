@@ -41,28 +41,12 @@ class Tokenizer;
 
 class CPPCHECKLIB CheckVaarg : public Check {
 public:
-    CheckVaarg() : Check(myName()) {}
-
-private:
-    CheckVaarg(const Tokenizer *tokenizer, const Settings *settings, ErrorLogger *errorLogger)
-        : Check(myName(), tokenizer, settings, errorLogger) {}
+    CheckVaarg() : Check("Vaarg") {}
 
     void runChecks(const Tokenizer &tokenizer, ErrorLogger *errorLogger) override;
 
-    void va_start_argument();
-    void va_list_usage();
-
-    void wrongParameterTo_va_start_error(const Token *tok, const std::string& paramIsName, const std::string& paramShouldName);
-    void referenceAs_va_start_error(const Token *tok, const std::string& paramName);
-    void va_end_missingError(const Token *tok, const std::string& varname);
-    void va_list_usedBeforeStartedError(const Token *tok, const std::string& varname);
-    void va_start_subsequentCallsError(const Token *tok, const std::string& varname);
-
+private:
     void getErrorMessages(ErrorLogger *errorLogger, const Settings *settings) const override;
-
-    static std::string myName() {
-        return "Vaarg";
-    }
 
     std::string classInfo() const override {
         return "Check for misusage of variable argument lists:\n"

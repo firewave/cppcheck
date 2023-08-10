@@ -24,12 +24,9 @@
 #include "check.h"
 #include "config.h"
 
-#include <list>
-#include <map>
 #include <string>
 
 class ErrorLogger;
-class Scope;
 class Settings;
 class Token;
 class Type;
@@ -49,41 +46,13 @@ class CPPCHECKLIB CheckUnusedVar : public Check {
 
 public:
     /** @brief This constructor is used when registering the CheckClass */
-    CheckUnusedVar() : Check(myName()) {}
+    CheckUnusedVar() : Check("UnusedVar") {}
 
 private:
-    /** @brief This constructor is used when running checks. */
-    CheckUnusedVar(const Tokenizer *tokenizer, const Settings *settings, ErrorLogger *errorLogger)
-        : Check(myName(), tokenizer, settings, errorLogger) {}
-
     /** @brief Run checks against the normal token list */
     void runChecks(const Tokenizer &tokenizer, ErrorLogger *errorLogger) override;
 
-    /** @brief %Check for unused function variables */
-    void checkFunctionVariableUsage_iterateScopes(const Scope* scope, Variables& variables);
-    void checkFunctionVariableUsage();
-
-    /** @brief %Check that all struct members are used */
-    void checkStructMemberUsage();
-
-    bool isRecordTypeWithoutSideEffects(const Type* type);
-    bool isVariableWithoutSideEffects(const Variable& var, const Type* type = nullptr);
-    bool isEmptyType(const Type* type);
-    bool isFunctionWithoutSideEffects(const Function& func, const Token* functionUsageToken,
-                                      std::list<const Function*> checkedFuncs);
-
-    // Error messages..
-    void unusedStructMemberError(const Token *tok, const std::string &structname, const std::string &varname, const std::string& prefix = "struct");
-    void unusedVariableError(const Token *tok, const std::string &varname);
-    void allocatedButUnusedVariableError(const Token *tok, const std::string &varname);
-    void unreadVariableError(const Token *tok, const std::string &varname, bool modified);
-    void unassignedVariableError(const Token *tok, const std::string &varname);
-
     void getErrorMessages(ErrorLogger *errorLogger, const Settings *settings) const override;
-
-    static std::string myName() {
-        return "UnusedVar";
-    }
 
     std::string classInfo() const override {
         return "UnusedVar checks\n"
@@ -95,11 +64,6 @@ private:
                "- unassigned variable\n"
                "- unused struct member\n";
     }
-
-    std::map<const Type *,bool> mIsRecordTypeWithoutSideEffectsMap;
-
-    std::map<const Type *,bool> mIsEmptyTypeMap;
-
 };
 /// @}
 //---------------------------------------------------------------------------
