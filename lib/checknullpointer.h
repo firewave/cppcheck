@@ -80,6 +80,17 @@ private:
                                   std::list<const Token *> &var,
                                   const Library *library);
 
+private:
+    /**
+     * @brief parse a function call and extract information about variable usage
+     * @param tok first token
+     * @param var variables that the function read / write.
+     * @param library --library files data
+     */
+    static void parseFunctionCall(const Token &tok,
+                                  std::list<const Token *> &var,
+                                  const Library *library);
+
     /** @brief This constructor is used when running checks. */
     CheckNullPointer(const Tokenizer *tokenizer, const Settings *settings, ErrorLogger *errorLogger)
         : Check(myName(), tokenizer, settings, errorLogger) {}
