@@ -57,14 +57,15 @@ class Tokenizer;
  * other function and pass a buffer and reads or writes too much data.
  */
 class CPPCHECKLIB CheckBufferOverrun : public Check {
-public:
+private:
+    static CheckBufferOverrun instance;
+
     friend class TestBufferOverrun;
     friend class TestFixture;
 
     /** This constructor is used when registering the CheckClass */
     CheckBufferOverrun() : Check(myName()) {}
 
-private:
     /** This constructor is used when running checks. */
     CheckBufferOverrun(const Tokenizer *tokenizer, const Settings *settings, ErrorLogger *errorLogger)
         : Check(myName(), tokenizer, settings, errorLogger) {}

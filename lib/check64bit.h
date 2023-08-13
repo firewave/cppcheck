@@ -41,13 +41,14 @@ class Tokenizer;
  */
 
 class CPPCHECKLIB Check64BitPortability : public Check {
-public:
+private:
+    static Check64BitPortability instance;
+
     friend class Test64BitPortability;
 
     /** This constructor is used when registering the Check64BitPortability */
     Check64BitPortability() : Check(myName()) {}
 
-private:
     /** This constructor is used when running checks. */
     Check64BitPortability(const Tokenizer *tokenizer, const Settings *settings, ErrorLogger *errorLogger)
         : Check(myName(), tokenizer, settings, errorLogger) {}

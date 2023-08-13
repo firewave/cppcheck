@@ -41,9 +41,7 @@
 //---------------------------------------------------------------------------
 
 // Register this check class (by creating a static instance of it)
-namespace {
-    CheckUnusedVar instance;
-}
+CheckUnusedVar CheckUnusedVar::instance;
 
 static const struct CWE CWE563(563U);   // Assignment to Variable without Use ('Unused Variable')
 static const struct CWE CWE665(665U);   // Improper Initialization

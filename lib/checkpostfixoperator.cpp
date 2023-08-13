@@ -34,9 +34,7 @@
 
 
 // Register this check class (by creating a static instance of it)
-namespace {
-    CheckPostfixOperator instance;
-}
+CheckPostfixOperator CheckPostfixOperator::instance;
 
 
 // CWE ids used

@@ -40,12 +40,13 @@ class Tokenizer;
  */
 
 class CPPCHECKLIB CheckVaarg : public Check {
-public:
+private:
+    static CheckVaarg instance;
+
     friend class TestFixture;
 
     CheckVaarg() : Check(myName()) {}
 
-private:
     CheckVaarg(const Tokenizer *tokenizer, const Settings *settings, ErrorLogger *errorLogger)
         : Check(myName(), tokenizer, settings, errorLogger) {}
 

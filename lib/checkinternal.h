@@ -39,11 +39,12 @@ class Tokenizer;
 
 /** @brief %Check Internal cppcheck API usage */
 class CPPCHECKLIB CheckInternal : public Check {
-public:
+private:
+    static CheckInternal instance;
+
     /** This constructor is used when registering the CheckClass */
     CheckInternal() : Check(myName()) {}
 
-private:
     /** This constructor is used when running checks. */
     CheckInternal(const Tokenizer *tokenizer, const Settings *settings, ErrorLogger *errorLogger)
         : Check(myName(), tokenizer, settings, errorLogger) {}

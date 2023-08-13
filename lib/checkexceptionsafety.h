@@ -45,13 +45,14 @@ class Token;
  */
 
 class CPPCHECKLIB CheckExceptionSafety : public Check {
-public:
+private:
+    static CheckExceptionSafety instance;
+
     friend class TestFixture;
 
     /** This constructor is used when registering the CheckClass */
     CheckExceptionSafety() : Check(myName()) {}
 
-private:
     /** This constructor is used when running checks. */
     CheckExceptionSafety(const Tokenizer *tokenizer, const Settings *settings, ErrorLogger *errorLogger)
         : Check(myName(), tokenizer, settings, errorLogger) {}

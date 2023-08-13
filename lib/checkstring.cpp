@@ -37,9 +37,7 @@
 //---------------------------------------------------------------------------
 
 // Register this check class (by creating a static instance of it)
-namespace {
-    CheckString instance;
-}
+CheckString CheckString::instance;
 
 // CWE ids used:
 static const struct CWE CWE570(570U);   // Expression is Always False

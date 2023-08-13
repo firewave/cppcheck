@@ -43,13 +43,14 @@ class ErrorLogger;
 
 /** @brief %Check STL usage (invalidation of iterators, mismatching containers, etc) */
 class CPPCHECKLIB CheckStl : public Check {
-public:
+private:
+    static CheckStl instance;
+
     friend class TestFixture;
 
     /** This constructor is used when registering the CheckClass */
     CheckStl() : Check(myName()) {}
 
-private:
     /** This constructor is used when running checks. */
     CheckStl(const Tokenizer* tokenizer, const Settings* settings, ErrorLogger* errorLogger)
         : Check(myName(), tokenizer, settings, errorLogger) {}

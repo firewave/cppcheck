@@ -49,14 +49,15 @@ namespace ValueFlow {
  */
 
 class CPPCHECKLIB CheckFunctions : public Check {
-public:
+private:
+    static CheckFunctions instance;
+
     friend class TestFunctions;
     friend class TestFixture;
 
     /** This constructor is used when registering the CheckFunctions */
     CheckFunctions() : Check(myName()) {}
 
-private:
     /** This constructor is used when running checks. */
     CheckFunctions(const Tokenizer *tokenizer, const Settings *settings, ErrorLogger *errorLogger)
         : Check(myName(), tokenizer, settings, errorLogger) {}

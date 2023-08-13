@@ -41,6 +41,9 @@
 #include <utility>
 #include <vector>
 
+// Register this check class (by creating a static instance of it)
+CheckCondition CheckCondition::instance;
+
 // CWE ids used
 static const struct CWE uncheckedErrorConditionCWE(391U);
 static const struct CWE CWE398(398U);   // Indicator of Poor Code Quality
@@ -48,11 +51,6 @@ static const struct CWE CWE570(570U);   // Expression is Always False
 static const struct CWE CWE571(571U);   // Expression is Always True
 
 //---------------------------------------------------------------------------
-
-// Register this check class (by creating a static instance of it)
-namespace {
-    CheckCondition instance;
-}
 
 bool CheckCondition::diag(const Token* tok, bool insert)
 {

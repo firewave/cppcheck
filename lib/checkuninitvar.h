@@ -60,18 +60,21 @@ struct VariableValue {
 /** @brief Checking for uninitialized variables */
 
 class CPPCHECKLIB CheckUninitVar : public Check {
+private:
+    static CheckUninitVar instance;
+
 public:
-    friend class TestUninitVar;
-
-    /** @brief This constructor is used when registering the CheckUninitVar */
-    CheckUninitVar() : Check(myName()) {}
-
     enum Alloc { NO_ALLOC, NO_CTOR_CALL, CTOR_CALL, ARRAY };
 
     static const Token *isVariableUsage(bool cpp, const Token *vartok, const Library &library, bool pointer, Alloc alloc, int indirect = 0);
     const Token *isVariableUsage(const Token *vartok, bool pointer, Alloc alloc, int indirect = 0) const;
 
 private:
+    friend class TestUninitVar;
+
+    /** @brief This constructor is used when registering the CheckUninitVar */
+    CheckUninitVar() : Check(myName()) {}
+
     /** @brief This constructor is used when running checks. */
     CheckUninitVar(const Tokenizer *tokenizer, const Settings *settings, ErrorLogger *errorLogger)
         : Check(myName(), tokenizer, settings, errorLogger) {}

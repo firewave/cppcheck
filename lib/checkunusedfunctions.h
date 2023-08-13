@@ -44,6 +44,9 @@ namespace CTU {
 /// @{
 
 class CPPCHECKLIB CheckUnusedFunctions : public Check {
+private:
+    static CheckUnusedFunctions instance;
+
 public:
     friend class TestUnusedFunctions;
 
@@ -81,8 +84,6 @@ private:
 
     /** @brief Analyse all file infos for all TU */
     bool analyseWholeProgram(const CTU::FileInfo *ctu, const std::list<Check::FileInfo*> &fileInfo, const Settings& settings, ErrorLogger &errorLogger) override;
-
-    static CheckUnusedFunctions instance;
 
     void getErrorMessages(ErrorLogger *errorLogger, const Settings * /*settings*/) const override {
         CheckUnusedFunctions::unusedFunctionError(errorLogger, emptyString, 0, "funcName");

@@ -35,9 +35,7 @@
 //---------------------------------------------------------------------------
 
 // Register this check class (by creating a static instance of it)
-namespace {
-    CheckSizeof instance;
-}
+CheckSizeof CheckSizeof::instance;
 
 // CWE IDs used:
 static const struct CWE CWE398(398U);   // Indicator of Poor Code Quality

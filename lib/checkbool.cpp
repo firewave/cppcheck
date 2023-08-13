@@ -33,9 +33,7 @@
 //---------------------------------------------------------------------------
 
 // Register this check class (by creating a static instance of it)
-namespace {
-    CheckBool instance;
-}
+CheckBool CheckBool::instance;
 
 static const CWE CWE398(398U);  // Indicator of Poor Code Quality
 static const CWE CWE571(571U);  // Expression is Always True

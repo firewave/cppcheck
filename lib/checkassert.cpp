@@ -35,9 +35,7 @@
 static const struct CWE CWE398(398U);   // Indicator of Poor Code Quality
 
 // Register this check class (by creating a static instance of it)
-namespace {
-    CheckAssert instance;
-}
+CheckAssert CheckAssert::instance;
 
 void CheckAssert::assertWithSideEffects()
 {

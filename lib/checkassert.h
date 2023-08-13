@@ -41,12 +41,13 @@ class Tokenizer;
  */
 
 class CPPCHECKLIB CheckAssert : public Check {
-public:
+private:
+    static CheckAssert instance;
+
     friend class TestFixture;
 
     CheckAssert() : Check(myName()) {}
 
-private:
     CheckAssert(const Tokenizer *tokenizer, const Settings *settings, ErrorLogger *errorLogger)
         : Check(myName(), tokenizer, settings, errorLogger) {}
 

@@ -39,13 +39,14 @@ class Tokenizer;
 /** @brief Detect misusage of C-style strings and related standard functions */
 
 class CPPCHECKLIB CheckString : public Check {
-public:
+private:
+    static CheckString instance;
+
     friend class TestFixture;
 
     /** @brief This constructor is used when registering the CheckClass */
     CheckString() : Check(myName()) {}
 
-private:
     /** @brief This constructor is used when running checks. */
     CheckString(const Tokenizer *tokenizer, const Settings *settings, ErrorLogger *errorLogger)
         : Check(myName(), tokenizer, settings, errorLogger) {}

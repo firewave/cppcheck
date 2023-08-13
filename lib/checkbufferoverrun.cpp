@@ -45,9 +45,7 @@
 //---------------------------------------------------------------------------
 
 // Register this check class (by creating a static instance of it)
-namespace {
-    CheckBufferOverrun instance;
-}
+CheckBufferOverrun CheckBufferOverrun::instance;
 
 //---------------------------------------------------------------------------
 
