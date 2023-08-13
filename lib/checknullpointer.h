@@ -55,16 +55,6 @@ public:
     CheckNullPointer() : Check(myName()) {}
 
     /**
-     * @brief parse a function call and extract information about variable usage
-     * @param tok first token
-     * @param var variables that the function read / write.
-     * @param library --library files data
-     */
-    static void parseFunctionCall(const Token &tok,
-                                  std::list<const Token *> &var,
-                                  const Library *library);
-
-    /**
      * Is there a pointer dereference? Everything that should result in
      * a nullpointer dereference error message will result in a true
      * return value. If it's unknown if the pointer is dereferenced false
@@ -76,6 +66,17 @@ public:
     bool isPointerDeRef(const Token *tok, bool &unknown) const;
 
     static bool isPointerDeRef(const Token *tok, bool &unknown, const Settings *settings);
+
+private:
+    /**
+     * @brief parse a function call and extract information about variable usage
+     * @param tok first token
+     * @param var variables that the function read / write.
+     * @param library --library files data
+     */
+    static void parseFunctionCall(const Token &tok,
+                                  std::list<const Token *> &var,
+                                  const Library *library);
 
 private:
     /** @brief This constructor is used when running checks. */

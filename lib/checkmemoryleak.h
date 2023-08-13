@@ -170,9 +170,6 @@ public:
     /** @brief This constructor is used when registering this class */
     CheckMemoryLeakInFunction() : Check(myName()), CheckMemoryLeak(nullptr, nullptr, nullptr) {}
 
-    /** @brief Unit testing : testing the white list */
-    static bool test_white_list(const std::string &funcname, const Settings *settings, bool cpp);
-
 private:
     /** @brief This constructor is used when running checks */
     CheckMemoryLeakInFunction(const Tokenizer *tokenizer, const Settings *settings, ErrorLogger *errorLogger)
