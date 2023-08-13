@@ -57,21 +57,20 @@ class Tokenizer;
  * All checking classes must inherit from this class
  */
 class CPPCHECKLIB Check {
-public:
+protected:
     /** This constructor is used when registering the CheckClass */
     explicit Check(const std::string &aname);
 
-protected:
     /** This constructor is used when running checks. */
     Check(std::string aname, const Tokenizer *tokenizer, const Settings *settings, ErrorLogger *errorLogger)
         : mTokenizer(tokenizer), mSettings(settings), mErrorLogger(errorLogger), mName(std::move(aname)) {}
 
-public:
     virtual ~Check() {
         if (!mTokenizer)
             instances().remove(this);
     }
 
+public:
     Check(const Check &) = delete;
     Check& operator=(const Check &) = delete;
 
