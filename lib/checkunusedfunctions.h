@@ -70,11 +70,11 @@ public:
     std::string analyzerInfo() const;
 
     /** @brief Combine and analyze all analyzerInfos for all TUs */
-    static void analyseWholeProgram(const Settings &settings, ErrorLogger * const errorLogger, const std::string &buildDir);
+    void analyseWholeProgram(const Settings &settings, ErrorLogger * const errorLogger, const std::string &buildDir);
 
 private:
     // Return true if an error is reported.
-    bool check(ErrorLogger * const errorLogger, const Settings& settings) const;
+    bool check(ErrorLogger * const errorLogger, const Settings& settings);
 
 public:
     /** @brief Parse current TU and extract file info */
@@ -85,8 +85,9 @@ private:
     /** @brief Analyse all file infos for all TU */
     bool analyseWholeProgram(const CTU::FileInfo *ctu, const std::list<Check::FileInfo*> &fileInfo, const Settings& settings, ErrorLogger &errorLogger) override;
 
-    void getErrorMessages(ErrorLogger *errorLogger, const Settings * /*settings*/) const override {
-        CheckUnusedFunctions::unusedFunctionError(errorLogger, emptyString, 0, "funcName");
+    void getErrorMessages(ErrorLogger *errorLogger, const Settings * settings) const override {
+        CheckUnusedFunctions c(nullptr, settings, errorLogger);
+        c.unusedFunctionError(emptyString, 0, "funcName");
     }
 
     void runChecks(const Tokenizer * /*tokenizer*/, const Settings * /*settings*/, ErrorLogger * /*errorLogger*/) override {}
@@ -94,9 +95,8 @@ private:
     /**
      * Dummy implementation, just to provide error for --errorlist
      */
-    static void unusedFunctionError(ErrorLogger * const errorLogger,
-                                    const std::string &filename, unsigned int lineNumber,
-                                    const std::string &funcname);
+    void unusedFunctionError(const std::string &filename, unsigned int lineNumber,
+                             const std::string &funcname);
 
     static std::string myName() {
         return "Unused functions";

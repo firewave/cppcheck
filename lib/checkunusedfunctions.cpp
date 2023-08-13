@@ -310,7 +310,7 @@ static bool isOperatorFunction(const std::string & funcName)
     return std::find(additionalOperators.cbegin(), additionalOperators.cend(), funcName.substr(operatorPrefix.length())) != additionalOperators.cend();
 }
 
-bool CheckUnusedFunctions::check(ErrorLogger * const errorLogger, const Settings& settings) const
+bool CheckUnusedFunctions::check(const Settings& settings)
 {
     using ErrorParams = std::tuple<std::string, unsigned int, std::string>;
     std::vector<ErrorParams> errors; // ensure well-defined order
@@ -340,12 +340,11 @@ bool CheckUnusedFunctions::check(ErrorLogger * const errorLogger, const Settings
     }
     std::sort(errors.begin(), errors.end());
     for (const auto& e : errors)
-        unusedFunctionError(errorLogger, std::get<0>(e), std::get<1>(e), std::get<2>(e));
+        unusedFunctionError(std::get<0>(e), std::get<1>(e), std::get<2>(e));
     return !errors.empty();
 }
 
-void CheckUnusedFunctions::unusedFunctionError(ErrorLogger * const errorLogger,
-                                               const std::string &filename, unsigned int lineNumber,
+void CheckUnusedFunctions::unusedFunctionError(const std::string &filename, unsigned int lineNumber,
                                                const std::string &funcname)
 {
     std::list<ErrorMessage::FileLocation> locationList;
@@ -353,11 +352,7 @@ void CheckUnusedFunctions::unusedFunctionError(ErrorLogger * const errorLogger,
         locationList.emplace_back(filename, lineNumber);
     }
 
-    const ErrorMessage errmsg(locationList, emptyString, Severity::style, "$symbol:" + funcname + "\nThe function '$symbol' is never used.", "unusedFunction", CWE561, Certainty::normal);
-    if (errorLogger)
-        errorLogger->reportErr(errmsg);
-    else
-        Check::writeToErrorList(errmsg);
+    reportError(locationList, emptyString, Severity::style, "$symbol:" + funcname + "\nThe function '$symbol' is never used.", "unusedFunction", CWE561, Certainty::normal);
 }
 
 Check::FileInfo *CheckUnusedFunctions::getFileInfo(const Tokenizer *tokenizer, const Settings *settings) const
@@ -403,7 +398,7 @@ namespace {
     };
 }
 
-void CheckUnusedFunctions::analyseWholeProgram(const Settings &settings, ErrorLogger * const errorLogger, const std::string &buildDir)
+void CheckUnusedFunctions::analyseWholeProgram(const Settings &settings, const std::string &buildDir)
 {
     std::map<std::string, Location> decls;
     std::set<std::string> calls;
@@ -461,7 +456,7 @@ void CheckUnusedFunctions::analyseWholeProgram(const Settings &settings, ErrorLo
 
         if (calls.find(functionName) == calls.end() && !isOperatorFunction(functionName)) {
             const Location &loc = decl->second;
-            unusedFunctionError(errorLogger, loc.fileName, loc.lineNumber, functionName);
+            unusedFunctionError(loc.fileName, loc.lineNumber, functionName);
         }
     }
 }
