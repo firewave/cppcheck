@@ -58,6 +58,8 @@ class Tokenizer;
  */
 class CPPCHECKLIB Check {
 protected:
+    friend class CheckMemoryLeak;
+
     /** This constructor is used when registering the CheckClass */
     explicit Check(const std::string &aname);
 

@@ -54,7 +54,7 @@ private:
         std::istringstream istr(code);
         ASSERT_LOC(tokenizer.tokenize(istr, "test.cpp"), file, line);
 
-        const CheckMemoryLeak c(&tokenizer, this, &settings);
+        CheckMemoryLeak c(&tokenizer, this, &settings);
 
         return (c.functionReturnType)(&tokenizer.getSymbolDatabase()->scopeList.front().functionList.front());
     }
@@ -108,7 +108,7 @@ private:
 
         // there is no allocation
         const Token *tok = Token::findsimplematch(tokenizer.tokens(), "ret =");
-        const CheckMemoryLeak check(&tokenizer, nullptr, &settings);
+        CheckMemoryLeak check(&tokenizer, nullptr, &settings);
         ASSERT_EQUALS(CheckMemoryLeak::No, check.getAllocationType(tok->tokAt(2), 1));
     }
 };

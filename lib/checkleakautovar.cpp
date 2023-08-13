@@ -139,25 +139,25 @@ void VarInfo::possibleUsageAll(const std::pair<std::string, Usage>& functionUsag
 }
 
 
-void CheckLeakAutoVar::leakError(const Token *tok, const std::string &varname, int type) const
+void CheckLeakAutoVar::leakError(const Token *tok, const std::string &varname, int type)
 {
-    const CheckMemoryLeak checkmemleak(mTokenizer, mErrorLogger, mSettings);
+    const CheckMemoryLeak checkmemleak(*this, 0);
     if (Library::isresource(type))
         checkmemleak.resourceLeakError(tok, varname);
     else
         checkmemleak.memleakError(tok, varname);
 }
 
-void CheckLeakAutoVar::mismatchError(const Token *deallocTok, const Token *allocTok, const std::string &varname) const
+void CheckLeakAutoVar::mismatchError(const Token *deallocTok, const Token *allocTok, const std::string &varname)
 {
-    const CheckMemoryLeak c(mTokenizer, mErrorLogger, mSettings);
+    CheckMemoryLeak c(*this, 0);
     const std::list<const Token *> callstack = { allocTok, deallocTok };
     c.mismatchAllocDealloc(callstack, varname);
 }
 
-void CheckLeakAutoVar::deallocUseError(const Token *tok, const std::string &varname) const
+void CheckLeakAutoVar::deallocUseError(const Token *tok, const std::string &varname)
 {
-    const CheckMemoryLeak c(mTokenizer, mErrorLogger, mSettings);
+    const CheckMemoryLeak c(*this, 0);
     c.deallocuseError(tok, varname);
 }
 
@@ -853,7 +853,7 @@ const Token * CheckLeakAutoVar::checkTokenInsideExpression(const Token * const t
 }
 
 
-void CheckLeakAutoVar::changeAllocStatusIfRealloc(std::map<int, VarInfo::AllocInfo> &alloctype, const Token *fTok, const Token *retTok) const
+void CheckLeakAutoVar::changeAllocStatusIfRealloc(std::map<int, VarInfo::AllocInfo> &alloctype, const Token *fTok, const Token *retTok)
 {
     const Library::AllocFunc* f = mSettings->library.getReallocFuncInfo(fTok);
     if (f && f->arg == -1 && f->reallocArg > 0 && f->reallocArg <= numberOfArguments(fTok)) {

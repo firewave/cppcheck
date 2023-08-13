@@ -71,7 +71,7 @@ CheckMemoryLeak::AllocType CheckMemoryLeak::getAllocationType(const Token *tok2,
         if (reallocType != No)
             return reallocType;
 
-        if (mTokenizer_->isCPP() && tok2->str() == "new") {
+        if (mCheck.mTokenizer->isCPP() && tok2->str() == "new") {
             if (tok2->strAt(1) == "(" && !Token::Match(tok2->next(),"( std| ::| nothrow )"))
                 return No;
             if (tok2->astOperand1() && (tok2->astOperand1()->str() == "[" || (tok2->astOperand1()->astOperand1() && tok2->astOperand1()->astOperand1()->str() == "[")))
@@ -90,7 +90,7 @@ CheckMemoryLeak::AllocType CheckMemoryLeak::getAllocationType(const Token *tok2,
             return New;
         }
 
-        if (mSettings_->hasLib("posix")) {
+        if (mCheck.mSettings->hasLib("posix")) {
             if (Token::Match(tok2, "open|openat|creat|mkstemp|mkostemp|socket (")) {
                 // simple sanity check of function parameters..
                 // TODO: Make such check for all these functions
@@ -109,11 +109,11 @@ CheckMemoryLeak::AllocType CheckMemoryLeak::getAllocationType(const Token *tok2,
         }
 
         // Does tok2 point on a Library allocation function?
-        const int alloctype = mSettings_->library.getAllocId(tok2, -1);
+        const int alloctype = mCheck.mSettings->library.getAllocId(tok2, -1);
         if (alloctype > 0) {
-            if (alloctype == mSettings_->library.deallocId("free"))
+            if (alloctype == mCheck.mSettings->library.deallocId("free"))
                 return Malloc;
-            if (alloctype == mSettings_->library.deallocId("fclose"))
+            if (alloctype == mCheck.mSettings->library.deallocId("fclose"))
                 return File;
             return Library::ismemory(alloctype) ? OtherMem : OtherRes;
         }
@@ -154,7 +154,7 @@ CheckMemoryLeak::AllocType CheckMemoryLeak::getReallocationType(const Token *tok
     if (!Token::Match(tok2, "%name% ("))
         return No;
 
-    const Library::AllocFunc *f = mSettings_->library.getReallocFuncInfo(tok2);
+    const Library::AllocFunc *f = mCheck.mSettings->library.getReallocFuncInfo(tok2);
     if (!(f && f->reallocArg > 0 && f->reallocArg <= numberOfArguments(tok2)))
         return No;
     const auto args = getArguments(tok2);
@@ -168,11 +168,11 @@ CheckMemoryLeak::AllocType CheckMemoryLeak::getReallocationType(const Token *tok
     if (varid > 0 && !Token::Match(arg, "%varid% [,)]", varid))
         return No;
 
-    const int realloctype = mSettings_->library.getReallocId(tok2, -1);
+    const int realloctype = mCheck.mSettings->library.getReallocId(tok2, -1);
     if (realloctype > 0) {
-        if (realloctype == mSettings_->library.deallocId("free"))
+        if (realloctype == mCheck.mSettings->library.deallocId("free"))
             return Malloc;
-        if (realloctype == mSettings_->library.deallocId("fclose"))
+        if (realloctype == mCheck.mSettings->library.deallocId("fclose"))
             return File;
         return Library::ismemory(realloctype) ? OtherMem : OtherRes;
     }
@@ -182,7 +182,7 @@ CheckMemoryLeak::AllocType CheckMemoryLeak::getReallocationType(const Token *tok
 
 CheckMemoryLeak::AllocType CheckMemoryLeak::getDeallocationType(const Token *tok, nonneg int varid) const
 {
-    if (mTokenizer_->isCPP() && tok->str() == "delete" && tok->astOperand1()) {
+    if (mCheck.mTokenizer->isCPP() && tok->str() == "delete" && tok->astOperand1()) {
         const Token* vartok = tok->astOperand1();
         if (Token::Match(vartok, ".|::"))
             vartok = vartok->astOperand2();
@@ -211,7 +211,7 @@ CheckMemoryLeak::AllocType CheckMemoryLeak::getDeallocationType(const Token *tok
                 if (tok->str() == "realloc" && Token::simpleMatch(vartok->next(), ", 0 )"))
                     return Malloc;
 
-                if (mSettings_->hasLib("posix")) {
+                if (mCheck.mSettings->hasLib("posix")) {
                     if (tok->str() == "close")
                         return Fd;
                     if (tok->str() == "pclose")
@@ -219,11 +219,11 @@ CheckMemoryLeak::AllocType CheckMemoryLeak::getDeallocationType(const Token *tok
                 }
 
                 // Does tok point on a Library deallocation function?
-                const int dealloctype = mSettings_->library.getDeallocId(tok, argNr);
+                const int dealloctype = mCheck.mSettings->library.getDeallocId(tok, argNr);
                 if (dealloctype > 0) {
-                    if (dealloctype == mSettings_->library.deallocId("free"))
+                    if (dealloctype == mCheck.mSettings->library.deallocId("free"))
                         return Malloc;
-                    if (dealloctype == mSettings_->library.deallocId("fclose"))
+                    if (dealloctype == mCheck.mSettings->library.deallocId("fclose"))
                         return File;
                     return Library::ismemory(dealloctype) ? OtherMem : OtherRes;
                 }
@@ -238,7 +238,7 @@ CheckMemoryLeak::AllocType CheckMemoryLeak::getDeallocationType(const Token *tok
 bool CheckMemoryLeak::isReopenStandardStream(const Token *tok) const
 {
     if (getReallocationType(tok, 0) == File) {
-        const Library::AllocFunc *f = mSettings_->library.getReallocFuncInfo(tok);
+        const Library::AllocFunc *f = mCheck.mSettings->library.getReallocFuncInfo(tok);
         if (f && f->reallocArg > 0 && f->reallocArg <= numberOfArguments(tok)) {
             const Token* arg = getArguments(tok).at(f->reallocArg - 1);
             if (Token::Match(arg, "stdin|stdout|stderr"))
@@ -250,7 +250,7 @@ bool CheckMemoryLeak::isReopenStandardStream(const Token *tok) const
 
 bool CheckMemoryLeak::isOpenDevNull(const Token *tok) const
 {
-    if (mSettings_->hasLib("posix") && tok->str() == "open" && numberOfArguments(tok) == 2) {
+    if (mCheck.mSettings->hasLib("posix") && tok->str() == "open" && numberOfArguments(tok) == 2) {
         const Token* arg = getArguments(tok).at(0);
         if (Token::simpleMatch(arg, "\"/dev/null\""))
             return true;
@@ -282,16 +282,7 @@ void CheckMemoryLeak::reportErr(const Token *tok, Severity::SeverityType severit
     if (tok)
         callstack.push_back(tok);
 
-    reportErr(callstack, severity, id, msg, cwe);
-}
-
-void CheckMemoryLeak::reportErr(const std::list<const Token *> &callstack, Severity::SeverityType severity, const std::string &id, const std::string &msg, const CWE &cwe) const
-{
-    const ErrorMessage errmsg(callstack, mTokenizer_ ? &mTokenizer_->list : nullptr, severity, id, msg, cwe, Certainty::normal);
-    if (mErrorLogger_)
-        mErrorLogger_->reportErr(errmsg);
-    else
-        Check::writeToErrorList(errmsg);
+    mCheck.reportError(callstack, severity, id, msg, cwe, Certainty::normal);
 }
 
 void CheckMemoryLeak::memleakError(const Token *tok, const std::string &varname) const
@@ -317,9 +308,9 @@ void CheckMemoryLeak::deallocuseError(const Token *tok, const std::string &varna
     reportErr(tok, Severity::error, "deallocuse", "$symbol:" + varname + "\nDereferencing '$symbol' after it is deallocated / released", CWE(416U));
 }
 
-void CheckMemoryLeak::mismatchAllocDealloc(const std::list<const Token *> &callstack, const std::string &varname) const
+void CheckMemoryLeak::mismatchAllocDealloc(const std::list<const Token *> &callstack, const std::string &varname)
 {
-    reportErr(callstack, Severity::error, "mismatchAllocDealloc", "$symbol:" + varname + "\nMismatching allocation and deallocation: $symbol", CWE(762U));
+    mCheck.reportError(callstack, Severity::error, "mismatchAllocDealloc", "$symbol:" + varname + "\nMismatching allocation and deallocation: $symbol", CWE(762U), Certainty::normal);
 }
 
 CheckMemoryLeak::AllocType CheckMemoryLeak::functionReturnType(const Function* func, std::list<const Function*> *callstack) const
@@ -370,7 +361,7 @@ CheckMemoryLeak::AllocType CheckMemoryLeak::functionReturnType(const Function* f
         if (Token::Match(tok, "= %varid% ;", varid)) {
             return No;
         }
-        if (!mTokenizer_->isC() && Token::Match(tok, "[(,] %varid% [,)]", varid)) {
+        if (!mCheck.mTokenizer->isC() && Token::Match(tok, "[(,] %varid% [,)]", varid)) {
             return No;
         }
         if (Token::Match(tok, "[(,] & %varid% [.,)]", varid)) {
