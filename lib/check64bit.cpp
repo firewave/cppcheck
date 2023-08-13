@@ -37,9 +37,7 @@ static const struct CWE CWE398(398U);   // Indicator of Poor Code Quality
 static const struct CWE CWE758(758U);   // Reliance on Undefined, Unspecified, or Implementation-Defined Behavior
 
 // Register this check class (by creating a static instance of it)
-namespace {
-    Check64BitPortability instance;
-}
+Check64BitPortability Check64BitPortability::instance;
 
 void Check64BitPortability::pointerassignment()
 {

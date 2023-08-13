@@ -39,13 +39,14 @@ class Token;
 /** @brief checks dealing with suspicious usage of boolean type (not for evaluating conditions) */
 
 class CPPCHECKLIB CheckBool : public Check {
-public:
+private:
+    static CheckBool instance;
+
     friend class TestFixture;
 
     /** @brief This constructor is used when registering the CheckClass */
     CheckBool() : Check(myName()) {}
 
-private:
     /** @brief This constructor is used when running checks. */
     CheckBool(const Tokenizer *tokenizer, const Settings *settings, ErrorLogger *errorLogger)
         : Check(myName(), tokenizer, settings, errorLogger) {}

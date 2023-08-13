@@ -48,13 +48,14 @@ namespace ValueFlow {
  */
 
 class CPPCHECKLIB CheckCondition : public Check {
-public:
+private:
+    static CheckCondition instance;
+
     friend class TestFixture;
 
     /** This constructor is used when registering the CheckAssignIf */
     CheckCondition() : Check(myName()) {}
 
-private:
     /** This constructor is used when running checks. */
     CheckCondition(const Tokenizer *tokenizer, const Settings *settings, ErrorLogger *errorLogger)
         : Check(myName(), tokenizer, settings, errorLogger) {}

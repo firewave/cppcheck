@@ -42,13 +42,12 @@ class ErrorLogger;
 class CPPCHECKLIB CheckIO : public Check {
     friend class TestIO;
 
-public:
-    friend class TestIO;
+    static CheckIO instance;
 
+public:
     /** @brief This constructor is used when registering CheckIO */
     CheckIO() : Check(myName()) {}
 
-private:
     /** @brief This constructor is used when running checks. */
     CheckIO(const Tokenizer *tokenizer, const Settings *settings, ErrorLogger *errorLogger)
         : Check(myName(), tokenizer, settings, errorLogger) {}

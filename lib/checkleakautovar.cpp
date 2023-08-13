@@ -46,9 +46,7 @@
 //---------------------------------------------------------------------------
 
 // Register this check class (by creating a static instance of it)
-namespace {
-    CheckLeakAutoVar instance;
-}
+CheckLeakAutoVar CheckLeakAutoVar::instance;
 
 static const CWE CWE672(672U);
 static const CWE CWE415(415U);

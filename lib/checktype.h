@@ -42,13 +42,14 @@ class ValueType;
 /** @brief Various small checks */
 
 class CPPCHECKLIB CheckType : public Check {
-public:
+private:
+    static CheckType instance;
+
     friend class TestFixture;
 
     /** @brief This constructor is used when registering the CheckClass */
     CheckType() : Check(myName()) {}
 
-private:
     /** @brief This constructor is used when running checks. */
     CheckType(const Tokenizer *tokenizer, const Settings *settings, ErrorLogger *errorLogger)
         : Check(myName(), tokenizer, settings, errorLogger) {}

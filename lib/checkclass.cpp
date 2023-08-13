@@ -48,9 +48,7 @@ namespace CTU {
 //---------------------------------------------------------------------------
 
 // Register CheckClass..
-namespace {
-    CheckClass instance;
-}
+CheckClass CheckClass::instance;
 
 static const CWE CWE398(398U);  // Indicator of Poor Code Quality
 static const CWE CWE404(404U);  // Improper Resource Shutdown or Release

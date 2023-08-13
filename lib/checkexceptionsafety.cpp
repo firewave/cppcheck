@@ -33,9 +33,7 @@
 //---------------------------------------------------------------------------
 
 // Register CheckExceptionSafety..
-namespace {
-    CheckExceptionSafety instance;
-}
+CheckExceptionSafety CheckExceptionSafety::instance;
 
 static const struct CWE CWE398(398U);   // Indicator of Poor Code Quality
 static const struct CWE CWE703(703U);   // Improper Check or Handling of Exceptional Conditions

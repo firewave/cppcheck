@@ -107,13 +107,14 @@ public:
  */
 
 class CPPCHECKLIB CheckLeakAutoVar : public Check {
-public:
+private:
+    static CheckLeakAutoVar instance;
+
     friend class TestFixture;
 
     /** This constructor is used when registering the CheckLeakAutoVar */
     CheckLeakAutoVar() : Check(myName()) {}
 
-private:
     /** This constructor is used when running checks. */
     CheckLeakAutoVar(const Tokenizer *tokenizer, const Settings *settings, ErrorLogger *errorLogger)
         : Check(myName(), tokenizer, settings, errorLogger) {}

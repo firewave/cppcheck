@@ -34,12 +34,10 @@
 //---------------------------------------------------------------------------
 
 // Register this check class (by creating a static instance of it)
-namespace {
-    CheckMemoryLeakInFunction instance1;
-    CheckMemoryLeakInClass instance2;
-    CheckMemoryLeakStructMember instance3;
-    CheckMemoryLeakNoVar instance4;
-}
+CheckMemoryLeakInFunction CheckMemoryLeakInFunction::instance;
+CheckMemoryLeakInClass CheckMemoryLeakInClass::instance;
+CheckMemoryLeakStructMember CheckMemoryLeakStructMember::instance;
+CheckMemoryLeakNoVar CheckMemoryLeakNoVar::instance;
 
 // CWE ID used:
 static const CWE CWE398(398U);  // Indicator of Poor Code Quality

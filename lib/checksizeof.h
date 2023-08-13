@@ -39,13 +39,14 @@ class Token;
 /** @brief checks on usage of sizeof() operator */
 
 class CPPCHECKLIB CheckSizeof : public Check {
-public:
+private:
+    static CheckSizeof instance;
+
     friend class TestFixture;
 
     /** @brief This constructor is used when registering the CheckClass */
     CheckSizeof() : Check(myName()) {}
 
-private:
     /** @brief This constructor is used when running checks. */
     CheckSizeof(const Tokenizer* tokenizer, const Settings* settings, ErrorLogger* errorLogger)
         : Check(myName(), tokenizer, settings, errorLogger) {}

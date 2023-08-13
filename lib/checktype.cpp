@@ -38,9 +38,7 @@
 //---------------------------------------------------------------------------
 
 // Register this check class (by creating a static instance of it)
-namespace {
-    CheckType instance;
-}
+CheckType CheckType::instance;
 
 //---------------------------------------------------------------------------
 // Checking for shift by too many bits

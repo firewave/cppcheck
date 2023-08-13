@@ -49,13 +49,9 @@ namespace tinyxml2 {
 class CPPCHECKLIB CheckNullPointer : public Check {
     friend class TestNullPointer;
 
+    static CheckNullPointer instance;
+
 public:
-    friend class TestNullPointer;
-    friend class TestFixture;
-
-    /** @brief This constructor is used when registering the CheckNullPointer */
-    CheckNullPointer() : Check(myName()) {}
-
     /**
      * Is there a pointer dereference? Everything that should result in
      * a nullpointer dereference error message will result in a true
@@ -70,15 +66,12 @@ public:
     static bool isPointerDeRef(const Token *tok, bool &unknown, const Settings *settings);
 
 private:
-    /**
-     * @brief parse a function call and extract information about variable usage
-     * @param tok first token
-     * @param var variables that the function read / write.
-     * @param library --library files data
-     */
-    static void parseFunctionCall(const Token &tok,
-                                  std::list<const Token *> &var,
-                                  const Library *library);
+    friend class TestNullPointer;
+    friend class TestFixture;
+
+    /** @brief This constructor is used when registering the CheckNullPointer */
+    CheckNullPointer() : Check(myName()) {}
+
 
 private:
     /**

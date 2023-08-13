@@ -51,7 +51,16 @@ class CPPCHECKLIB CheckOther : public Check {
     friend class TestIncompleteStatement;
     friend class TestOther;
 
+    static CheckOther instance;
+
 public:
+    /** Is expression a comparison that checks if a nonzero (unsigned/pointer) expression is less than zero? */
+    static bool comparisonNonZeroExpressionLessThanZero(const Token *tok, const ValueFlow::Value **zeroValue, const Token **nonZeroExpr);
+
+    /** Is expression a comparison that checks if a nonzero (unsigned/pointer) expression is positive? */
+    static bool testIfNonZeroExpressionIsPositive(const Token *tok, const ValueFlow::Value **zeroValue, const Token **nonZeroExpr);
+
+private:
     friend class TestCharVar;
     friend class TestIncompleteStatement;
     friend class TestOther;
@@ -60,13 +69,6 @@ public:
     /** @brief This constructor is used when registering the CheckClass */
     CheckOther() : Check(myName()) {}
 
-    /** Is expression a comparison that checks if a nonzero (unsigned/pointer) expression is less than zero? */
-    static bool comparisonNonZeroExpressionLessThanZero(const Token *tok, const ValueFlow::Value **zeroValue, const Token **nonZeroExpr);
-
-    /** Is expression a comparison that checks if a nonzero (unsigned/pointer) expression is positive? */
-    static bool testIfNonZeroExpressionIsPositive(const Token *tok, const ValueFlow::Value **zeroValue, const Token **nonZeroExpr);
-
-private:
     /** @brief This constructor is used when running checks. */
     CheckOther(const Tokenizer *tokenizer, const Settings *settings, ErrorLogger *errorLogger)
         : Check(myName(), tokenizer, settings, errorLogger) {}

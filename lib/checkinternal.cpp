@@ -31,9 +31,7 @@
 
 // Register this check class (by creating a static instance of it).
 // Disabled in release builds
-namespace {
-    CheckInternal instance;
-}
+CheckInternal CheckInternal::instance;
 
 void CheckInternal::checkTokenMatchPatterns()
 {

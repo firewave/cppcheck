@@ -42,9 +42,7 @@
 
 
 // Register this check class (by creating a static instance of it)
-namespace {
-    CheckFunctions instance;
-}
+CheckFunctions CheckFunctions::instance;
 
 static const CWE CWE252(252U);  // Unchecked Return Value
 static const CWE CWE477(477U);  // Use of Obsolete Functions

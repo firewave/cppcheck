@@ -47,13 +47,12 @@ class Function;
 class CPPCHECKLIB CheckUnusedVar : public Check {
     friend class TestUnusedVar;
 
-public:
-    friend class TestUnusedVar;
+    static CheckUnusedVar instance;
 
+public:
     /** @brief This constructor is used when registering the CheckClass */
     CheckUnusedVar() : Check(myName()) {}
 
-private:
     /** @brief This constructor is used when running checks. */
     CheckUnusedVar(const Tokenizer *tokenizer, const Settings *settings, ErrorLogger *errorLogger)
         : Check(myName(), tokenizer, settings, errorLogger) {}

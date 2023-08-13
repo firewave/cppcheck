@@ -25,9 +25,7 @@
 #include <vector>
 
 // Register this check class (by creating a static instance of it)
-namespace {
-    CheckBoost instance;
-}
+CheckBoost CheckBoost::instance;
 
 static const CWE CWE664(664);
 

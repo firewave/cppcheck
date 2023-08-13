@@ -55,18 +55,16 @@ class CPPCHECKLIB CheckClass : public Check {
     friend class TestConstructors;
     friend class TestUnusedPrivateFunction;
 
+    static CheckClass instance;
+
 public:
-    friend class TestClass;
-    friend class TestConstructors;
-    friend class TestUnusedPrivateFunction;
-
-    /** @brief This constructor is used when registering the CheckClass */
-    CheckClass() : Check(myName()) {}
-
     /** @brief Set of the STL types whose operator[] is not const */
     static const std::set<std::string> stl_containers_not_const;
 
 private:
+    /** @brief This constructor is used when registering the CheckClass */
+    CheckClass() : Check(myName()) {}
+
     /** @brief This constructor is used when running checks. */
     CheckClass(const Tokenizer *tokenizer, const Settings *settings, ErrorLogger *errorLogger);
 

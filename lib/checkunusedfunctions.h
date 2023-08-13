@@ -44,6 +44,9 @@ namespace CTU {
 /// @{
 
 class CPPCHECKLIB CheckUnusedFunctions : public Check {
+private:
+    static CheckUnusedFunctions instance;
+
 public:
     friend class TestUnusedFunctions;
 

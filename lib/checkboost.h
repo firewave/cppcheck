@@ -38,13 +38,14 @@ class Token;
 
 /** @brief %Check Boost usage */
 class CPPCHECKLIB CheckBoost : public Check {
-public:
+private:
+    static CheckBoost instance;
+
     friend class TestFixture;
 
     /** This constructor is used when registering the CheckClass */
     CheckBoost() : Check(myName()) {}
 
-private:
     /** This constructor is used when running checks. */
     CheckBoost(const Tokenizer *tokenizer, const Settings *settings, ErrorLogger *errorLogger)
         : Check(myName(), tokenizer, settings, errorLogger) {}

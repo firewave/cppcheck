@@ -166,11 +166,12 @@ public:
 class CPPCHECKLIB CheckMemoryLeakInFunction : public Check, public CheckMemoryLeak {
     friend class TestMemleakInFunction;
 
+    static CheckMemoryLeakInFunction instance;
+
 public:
     /** @brief This constructor is used when registering this class */
     CheckMemoryLeakInFunction() : Check(myName()), CheckMemoryLeak(nullptr, nullptr, nullptr) {}
 
-private:
     /** @brief This constructor is used when running checks */
     CheckMemoryLeakInFunction(const Tokenizer *tokenizer, const Settings *settings, ErrorLogger *errorLogger)
         : Check(myName(), tokenizer, settings, errorLogger), CheckMemoryLeak(tokenizer, errorLogger, settings) {}
@@ -222,10 +223,11 @@ private:
 class CPPCHECKLIB CheckMemoryLeakInClass : public Check, private CheckMemoryLeak {
     friend class TestMemleakInClass;
 
+    static CheckMemoryLeakInClass instance;
+
 public:
     CheckMemoryLeakInClass() : Check(myName()), CheckMemoryLeak(nullptr, nullptr, nullptr) {}
 
-private:
     CheckMemoryLeakInClass(const Tokenizer *tokenizer, const Settings *settings, ErrorLogger *errorLogger)
         : Check(myName(), tokenizer, settings, errorLogger), CheckMemoryLeak(tokenizer, errorLogger, settings) {}
 
@@ -269,10 +271,11 @@ private:
 class CPPCHECKLIB CheckMemoryLeakStructMember : public Check, private CheckMemoryLeak {
     friend class TestMemleakStructMember;
 
+    static CheckMemoryLeakStructMember instance;
+
 public:
     CheckMemoryLeakStructMember() : Check(myName()), CheckMemoryLeak(nullptr, nullptr, nullptr) {}
 
-private:
     CheckMemoryLeakStructMember(const Tokenizer *tokenizer, const Settings *settings, ErrorLogger *errorLogger)
         : Check(myName(), tokenizer, settings, errorLogger), CheckMemoryLeak(tokenizer, errorLogger, settings) {}
 
@@ -306,10 +309,11 @@ private:
 class CPPCHECKLIB CheckMemoryLeakNoVar : public Check, private CheckMemoryLeak {
     friend class TestMemleakNoVar;
 
+    static CheckMemoryLeakNoVar instance;
+
 public:
     CheckMemoryLeakNoVar() : Check(myName()), CheckMemoryLeak(nullptr, nullptr, nullptr) {}
 
-private:
     CheckMemoryLeakNoVar(const Tokenizer *tokenizer, const Settings *settings, ErrorLogger *errorLogger)
         : Check(myName(), tokenizer, settings, errorLogger), CheckMemoryLeak(tokenizer, errorLogger, settings) {}
 

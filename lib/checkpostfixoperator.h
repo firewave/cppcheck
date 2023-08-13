@@ -42,13 +42,12 @@ class Token;
 class CPPCHECKLIB CheckPostfixOperator : public Check {
     friend class TestPostfixOperator;
 
-public:
-    friend class TestPostfixOperator;
+    static CheckPostfixOperator instance;
 
+public:
     /** This constructor is used when registering the CheckPostfixOperator */
     CheckPostfixOperator() : Check(myName()) {}
 
-private:
     /** This constructor is used when running checks. */
     CheckPostfixOperator(const Tokenizer *tokenizer, const Settings *settings, ErrorLogger *errorLogger)
         : Check(myName(), tokenizer, settings, errorLogger) {}
