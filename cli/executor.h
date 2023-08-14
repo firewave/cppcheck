@@ -26,7 +26,6 @@
 #include <string>
 
 class Settings;
-class ErrorLogger;
 class ErrorMessage;
 class Suppressions;
 
@@ -39,23 +38,13 @@ class Suppressions;
  */
 class Executor {
 public:
-    Executor(const std::map<std::string, std::size_t> &files, const Settings &settings, Suppressions &suppressions, ErrorLogger &errorLogger);
+    Executor(const std::map<std::string, std::size_t> &files, const Settings &settings, Suppressions &suppressions);
     virtual ~Executor();
 
     Executor(const Executor &) = delete;
     void operator=(const Executor &) = delete;
 
     virtual unsigned int check() = 0;
-
-    /**
-     * Information about how many files have been checked
-     *
-     * @param fileindex This many files have been checked.
-     * @param filecount This many files there are in total.
-     * @param sizedone The sum of sizes of the files checked.
-     * @param sizetotal The total sizes of the files.
-     */
-    void reportStatus(std::size_t fileindex, std::size_t filecount, std::size_t sizedone, std::size_t sizetotal);
 
 protected:
     /**
@@ -68,7 +57,6 @@ protected:
     const std::map<std::string, std::size_t> &mFiles;
     const Settings &mSettings;
     Suppressions &mSuppressions;
-    ErrorLogger &mErrorLogger;
 
 private:
     std::mutex mErrorListSync;

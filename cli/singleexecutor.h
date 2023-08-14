@@ -25,7 +25,6 @@
 #include <map>
 #include <string>
 
-class ErrorLogger;
 class Settings;
 class CppCheck;
 class Suppressions;
@@ -33,7 +32,7 @@ class Suppressions;
 class SingleExecutor : public Executor
 {
 public:
-    SingleExecutor(CppCheck &cppcheck, const std::map<std::string, std::size_t> &files, const Settings &settings, Suppressions &suppressions, ErrorLogger &errorLogger);
+    SingleExecutor(CppCheck &cppcheck, const std::map<std::string, std::size_t> &files, const Settings &settings, Suppressions &suppressions);
     SingleExecutor(const SingleExecutor &) = delete;
     ~SingleExecutor() override;
     void operator=(const SingleExecutor &) = delete;

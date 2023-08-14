@@ -1829,3 +1829,15 @@ void CppCheck::removeCtuInfoFiles(const std::map<std::string, std::size_t> &file
         }
     }
 }
+
+void CppCheck::reportStatus(std::size_t fileindex, std::size_t filecount, std::size_t sizedone, std::size_t sizetotal)
+{
+    if (filecount > 1) {
+        std::ostringstream oss;
+        const unsigned long percentDone = (sizetotal > 0) ? (100 * sizedone) / sizetotal : 0;
+        oss << fileindex << '/' << filecount
+            << " files checked " << percentDone
+            << "% done";
+        mErrorLogger.reportOut(oss.str(), Color::FgBlue);
+    }
+}

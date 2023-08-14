@@ -28,6 +28,7 @@
 class Settings;
 class ErrorLogger;
 class Suppressions;
+class CppCheck;
 
 /// @addtogroup CLI
 /// @{
@@ -38,7 +39,7 @@ class Suppressions;
  */
 class ThreadExecutor : public Executor {
 public:
-    ThreadExecutor(const std::map<std::string, std::size_t> &files, const Settings &settings, Suppressions &suppressions, ErrorLogger &errorLogger);
+    ThreadExecutor(CppCheck &cppcheck, const std::map<std::string, std::size_t> &files, const Settings &settings, Suppressions &suppressions, ErrorLogger &errorLogger);
     ThreadExecutor(const ThreadExecutor &) = delete;
     ~ThreadExecutor() override;
     void operator=(const ThreadExecutor &) = delete;
@@ -46,6 +47,9 @@ public:
     unsigned int check() override;
 
     friend class SyncLogForwarder;
+private:
+    CppCheck &mCppcheck;
+    ErrorLogger &mErrorLogger;
 };
 
 /// @}

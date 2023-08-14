@@ -40,8 +40,10 @@
 
 enum class Color;
 
-ThreadExecutor::ThreadExecutor(const std::map<std::string, std::size_t> &files, const Settings &settings, Suppressions &suppressions, ErrorLogger &errorLogger)
-    : Executor(files, settings, suppressions, errorLogger)
+ThreadExecutor::ThreadExecutor(CppCheck &cppcheck, const std::map<std::string, std::size_t> &files, const Settings &settings, Suppressions &suppressions, ErrorLogger &errorLogger)
+    : Executor(files, settings, suppressions)
+    , mCppcheck(cppcheck)
+    , mErrorLogger(errorLogger)
 {
     assert(mSettings.jobs > 1);
 }
@@ -72,7 +74,7 @@ public:
 
     void reportStatus(std::size_t fileindex, std::size_t filecount, std::size_t sizedone, std::size_t sizetotal) {
         std::lock_guard<std::mutex> lg(mReportSync);
-        mThreadExecutor.reportStatus(fileindex, filecount, sizedone, sizetotal);
+        mThreadExecutor.mCppcheck.reportStatus(fileindex, filecount, sizedone, sizetotal);
     }
 
 private:

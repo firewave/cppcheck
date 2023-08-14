@@ -28,6 +28,7 @@
 class Settings;
 class ErrorLogger;
 class Suppressions;
+class CppCheck;
 
 /// @addtogroup CLI
 /// @{
@@ -38,7 +39,7 @@ class Suppressions;
  */
 class ProcessExecutor : public Executor {
 public:
-    ProcessExecutor(const std::map<std::string, std::size_t> &files, const Settings &settings, Suppressions &suppressions, ErrorLogger &errorLogger);
+    ProcessExecutor(CppCheck &cppcheck, const std::map<std::string, std::size_t> &files, const Settings &settings, Suppressions &suppressions, ErrorLogger &errorLogger);
     ProcessExecutor(const ProcessExecutor &) = delete;
     ~ProcessExecutor() override;
     void operator=(const ProcessExecutor &) = delete;
@@ -64,6 +65,9 @@ private:
      * @param msg The error message
      */
     void reportInternalChildErr(const std::string &childname, const std::string &msg);
+
+    CppCheck &mCppcheck;
+    ErrorLogger &mErrorLogger;
 };
 
 /// @}

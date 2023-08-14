@@ -28,10 +28,8 @@
 #include <numeric>
 #include <utility>
 
-class ErrorLogger;
-
-SingleExecutor::SingleExecutor(CppCheck &cppcheck, const std::map<std::string, std::size_t> &files, const Settings &settings, Suppressions &suppressions, ErrorLogger &errorLogger)
-    : Executor(files, settings, suppressions, errorLogger)
+SingleExecutor::SingleExecutor(CppCheck &cppcheck, const std::map<std::string, std::size_t> &files, const Settings &settings, Suppressions &suppressions)
+    : Executor(files, settings, suppressions)
     , mCppcheck(cppcheck)
 {
     assert(mSettings.jobs == 1);
@@ -60,7 +58,7 @@ unsigned int SingleExecutor::check()
                 result += mCppcheck.check(i->first);
                 processedsize += i->second;
                 if (!mSettings.quiet)
-                    reportStatus(c + 1, mFiles.size(), processedsize, totalfilesize);
+                    mCppcheck.reportStatus(c + 1, mFiles.size(), processedsize, totalfilesize);
                 // TODO: call analyseClangTidy()?
                 c++;
             }
@@ -74,7 +72,7 @@ unsigned int SingleExecutor::check()
                 result += mCppcheck.check(fs);
                 ++c;
                 if (!mSettings.quiet)
-                    reportStatus(c, mSettings.project.fileSettings.size(), c, mSettings.project.fileSettings.size());
+                    mCppcheck.reportStatus(c, mSettings.project.fileSettings.size(), c, mSettings.project.fileSettings.size());
                 if (mSettings.clangTidy)
                     mCppcheck.analyseClangTidy(fs);
             }
@@ -91,7 +89,7 @@ unsigned int SingleExecutor::check()
                 result += mCppcheck.check(i->first);
                 processedsize += i->second;
                 if (!mSettings.quiet)
-                    reportStatus(c + 1, mFiles.size(), processedsize, totalfilesize);
+                    mCppcheck.reportStatus(c + 1, mFiles.size(), processedsize, totalfilesize);
                 // TODO: call analyseClangTidy()?
                 c++;
             }
@@ -104,7 +102,7 @@ unsigned int SingleExecutor::check()
                 result += mCppcheck.check(fs);
                 ++c;
                 if (!mSettings.quiet)
-                    reportStatus(c, mSettings.project.fileSettings.size(), c, mSettings.project.fileSettings.size());
+                    mCppcheck.reportStatus(c, mSettings.project.fileSettings.size(), c, mSettings.project.fileSettings.size());
                 if (mSettings.clangTidy)
                     mCppcheck.analyseClangTidy(fs);
             }

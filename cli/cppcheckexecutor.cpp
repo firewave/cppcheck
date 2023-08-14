@@ -299,13 +299,13 @@ int CppCheckExecutor::check_internal(CppCheck& cppcheck)
     unsigned int returnValue = 0;
     if (settings.useSingleJob()) {
         // Single process
-        SingleExecutor executor(cppcheck, mFiles, settings, settings.nomsg, *this);
+        SingleExecutor executor(cppcheck, mFiles, settings, settings.nomsg);
         returnValue = executor.check();
     } else {
 #if defined(THREADING_MODEL_THREAD)
-        ThreadExecutor executor(mFiles, settings, settings.nomsg, *this);
+        ThreadExecutor executor(cppcheck, mFiles, settings, settings.nomsg, *this);
 #elif defined(THREADING_MODEL_FORK)
-        ProcessExecutor executor(mFiles, settings, settings.nomsg, *this);
+        ProcessExecutor executor(cppcheck, mFiles, settings, settings.nomsg, *this);
 #endif
         returnValue = executor.check();
     }
