@@ -38,8 +38,8 @@
 #include <utility>
 #include <vector>
 
-ThreadExecutor::ThreadExecutor(const std::list<FileWithDetails> &files, const std::list<FileSettings>& fileSettings, const Settings &settings, Suppressions &suppressions, ErrorLogger &errorLogger, CppCheck::ExecuteCmdFn executeCommand)
-    : Executor(files, fileSettings, settings, suppressions, errorLogger)
+ThreadExecutor::ThreadExecutor(CppCheck &cppcheck, const std::list<FileWithDetails> &files, const std::list<FileSettings>& fileSettings, const Settings &settings, Suppressions &suppressions, ErrorLogger &errorLogger, CppCheck::ExecuteCmdFn executeCommand)
+    : Executor(cppcheck, files, fileSettings, settings, suppressions, errorLogger)
     , mExecuteCommand(std::move(executeCommand))
 {
     assert(mSettings.jobs > 1);
@@ -68,7 +68,7 @@ public:
 
     void reportStatus(std::size_t fileindex, std::size_t filecount, std::size_t sizedone, std::size_t sizetotal) {
         std::lock_guard<std::mutex> lg(mReportSync);
-        mThreadExecutor.reportStatus(fileindex, filecount, sizedone, sizetotal);
+        mThreadExecutor.mCppcheck.reportStatus(fileindex, filecount, sizedone, sizetotal);
     }
 
 private:

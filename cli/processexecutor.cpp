@@ -68,8 +68,8 @@ enum class Color : std::uint8_t;
 using std::memset;
 
 
-ProcessExecutor::ProcessExecutor(const std::list<FileWithDetails> &files, const std::list<FileSettings>& fileSettings, const Settings &settings, Suppressions &suppressions, ErrorLogger &errorLogger, CppCheck::ExecuteCmdFn executeCommand)
-    : Executor(files, fileSettings, settings, suppressions, errorLogger)
+ProcessExecutor::ProcessExecutor(CppCheck &cppcheck, const std::list<FileWithDetails> &files, const std::list<FileSettings>& fileSettings, const Settings &settings, Suppressions &suppressions, ErrorLogger &errorLogger, CppCheck::ExecuteCmdFn executeCommand)
+    : Executor(cppcheck, files, fileSettings, settings, suppressions, errorLogger)
     , mExecuteCommand(std::move(executeCommand))
 {
     assert(mSettings.jobs > 1);
@@ -397,7 +397,7 @@ unsigned int ProcessExecutor::check()
                             fileCount++;
                             processedsize += size;
                             if (!mSettings.quiet)
-                                Executor::reportStatus(fileCount, mFiles.size() + mFileSettings.size(), processedsize, totalfilesize);
+                                mCppcheck.reportStatus(fileCount, mFiles.size() + mFileSettings.size(), processedsize, totalfilesize);
 
                             close(*rp);
                             rp = rpipes.erase(rp);

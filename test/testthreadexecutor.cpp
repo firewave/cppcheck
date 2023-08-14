@@ -120,7 +120,8 @@ private:
         if (useFS)
             filelist.clear();
 
-        ThreadExecutor executor(filelist, fileSettings, s, supprs, *this, executeFn);
+        CppCheck cppcheck(settings, supprs, *this, false, executeFn);
+        ThreadExecutor executor(cppcheck, filelist, fileSettings, s, supprs, *this, executeFn);
         ASSERT_EQUALS(result, executor.check());
         ASSERT_EQUALS(opt.executeCommandCalled, executeCommandCalled);
         ASSERT_EQUALS(opt.exe, exe);

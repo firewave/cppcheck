@@ -41,7 +41,7 @@ class FileWithDetails;
  */
 class ProcessExecutor : public Executor {
 public:
-    ProcessExecutor(const std::list<FileWithDetails> &files, const std::list<FileSettings>& fileSettings, const Settings &settings, Suppressions &suppressions, ErrorLogger &errorLogger, CppCheck::ExecuteCmdFn executeCommand);
+    ProcessExecutor(CppCheck &cppcheck, const std::list<FileWithDetails> &files, const std::list<FileSettings>& fileSettings, const Settings &settings, Suppressions &suppressions, ErrorLogger &errorLogger, CppCheck::ExecuteCmdFn executeCommand);
     ProcessExecutor(const ProcessExecutor &) = delete;
     ProcessExecutor& operator=(const ProcessExecutor &) = delete;
 

@@ -38,9 +38,6 @@ public:
     SingleExecutor& operator=(const SingleExecutor &) = delete;
 
     unsigned int check() override;
-
-private:
-    CppCheck &mCppcheck;
 };
 
 #endif // SINGLEEXECUTOR_H

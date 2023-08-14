@@ -319,7 +319,8 @@ private:
         if (useFS)
             filelist.clear();
 
-        ThreadExecutor executor(filelist, fileSettings, settings, supprs, *this, CppCheckExecutor::executeCommand);
+        CppCheck cppcheck(settings, supprs, *this, false, {});
+        ThreadExecutor executor(cppcheck, filelist, fileSettings, settings, supprs, *this, {});
         const unsigned int exitCode = executor.check();
 
         CppCheckExecutor::reportSuppressions(settings, supprs.nomsg, false, filelist, fileSettings, *this); // TODO: check result
@@ -366,7 +367,8 @@ private:
         if (useFS)
             filelist.clear();
 
-        ProcessExecutor executor(filelist, fileSettings, settings, supprs, *this, CppCheckExecutor::executeCommand);
+        CppCheck cppcheck(settings, supprs, *this, false, {});
+        ProcessExecutor executor(cppcheck, filelist, fileSettings, settings, supprs, *this, {});
         const unsigned int exitCode = executor.check();
 
         CppCheckExecutor::reportSuppressions(settings, supprs.nomsg, false, filelist, fileSettings, *this); // TODO: check result

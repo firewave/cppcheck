@@ -19,7 +19,6 @@
 #ifndef EXECUTOR_H
 #define EXECUTOR_H
 
-#include <cstddef>
 #include <list>
 #include <mutex>
 #include <string>
@@ -31,6 +30,7 @@ class ErrorMessage;
 struct Suppressions;
 struct FileSettings;
 class FileWithDetails;
+class CppCheck;
 
 /// @addtogroup CLI
 /// @{
@@ -41,23 +41,13 @@ class FileWithDetails;
  */
 class Executor {
 public:
-    Executor(const std::list<FileWithDetails> &files, const std::list<FileSettings>& fileSettings, const Settings &settings, Suppressions &suppressions, ErrorLogger &errorLogger);
+    Executor(CppCheck& cppcheck, const std::list<FileWithDetails> &files, const std::list<FileSettings>& fileSettings, const Settings &settings, Suppressions &suppressions, ErrorLogger &errorLogger);
     virtual ~Executor() = default;
 
     Executor(const Executor &) = delete;
     Executor& operator=(const Executor &) = delete;
 
     virtual unsigned int check() = 0;
-
-    /**
-     * Information about how many files have been checked
-     *
-     * @param fileindex This many files have been checked.
-     * @param filecount This many files there are in total.
-     * @param sizedone The sum of sizes of the files checked.
-     * @param sizetotal The total sizes of the files.
-     */
-    void reportStatus(std::size_t fileindex, std::size_t filecount, std::size_t sizedone, std::size_t sizetotal);
 
 protected:
     /**
@@ -67,6 +57,7 @@ protected:
      */
     bool hasToLog(const ErrorMessage &msg);
 
+    CppCheck& mCppcheck;
     const std::list<FileWithDetails> &mFiles;
     const std::list<FileSettings>& mFileSettings;
     const Settings &mSettings;

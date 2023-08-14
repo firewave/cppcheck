@@ -31,8 +31,7 @@
 class ErrorLogger;
 
 SingleExecutor::SingleExecutor(CppCheck &cppcheck, const std::list<FileWithDetails> &files, const std::list<FileSettings>& fileSettings, const Settings &settings, Suppressions &suppressions, ErrorLogger &errorLogger)
-    : Executor(files, fileSettings, settings, suppressions, errorLogger)
-    , mCppcheck(cppcheck)
+    : Executor(cppcheck, files, fileSettings, settings, suppressions, errorLogger)
 {
     assert(mSettings.jobs == 1);
 }
@@ -54,7 +53,7 @@ unsigned int SingleExecutor::check()
         processedsize += i->size();
         ++c;
         if (!mSettings.quiet)
-            reportStatus(c, mFiles.size(), processedsize, totalfilesize);
+            mCppcheck.reportStatus(c, mFiles.size(), processedsize, totalfilesize);
         // TODO: call analyseClangTidy()?
     }
 
@@ -64,7 +63,7 @@ unsigned int SingleExecutor::check()
         result += mCppcheck.check(fs);
         ++c;
         if (!mSettings.quiet)
-            reportStatus(c, mFileSettings.size(), c, mFileSettings.size());
+            mCppcheck.reportStatus(c, mFileSettings.size(), c, mFileSettings.size());
         if (mSettings.clangTidy)
             mCppcheck.analyseClangTidy(fs);
     }

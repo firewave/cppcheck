@@ -18,20 +18,18 @@
 
 #include "executor.h"
 
-#include "color.h"
 #include "errorlogger.h"
 #include "errortypes.h"
 #include "settings.h"
 #include "suppressions.h"
 
 #include <cassert>
-#include <sstream>
 #include <utility>
 
 struct FileSettings;
 
-Executor::Executor(const std::list<FileWithDetails> &files, const std::list<FileSettings>& fileSettings, const Settings &settings, Suppressions &suppressions, ErrorLogger &errorLogger)
-    : mFiles(files), mFileSettings(fileSettings), mSettings(settings), mSuppressions(suppressions), mErrorLogger(errorLogger)
+Executor::Executor(CppCheck& cppcheck, const std::list<FileWithDetails> &files, const std::list<FileSettings>& fileSettings, const Settings &settings, Suppressions &suppressions, ErrorLogger &errorLogger)
+    : mCppcheck(cppcheck), mFiles(files), mFileSettings(fileSettings), mSettings(settings), mSuppressions(suppressions), mErrorLogger(errorLogger)
 {
     // the two inputs may only be used exclusively
     assert(!(!files.empty() && !fileSettings.empty()));
@@ -61,15 +59,5 @@ bool Executor::hasToLog(const ErrorMessage &msg)
     return false;
 }
 
-void Executor::reportStatus(std::size_t fileindex, std::size_t filecount, std::size_t sizedone, std::size_t sizetotal)
-{
-    if (filecount > 1) {
-        std::ostringstream oss;
-        const unsigned long percentDone = (sizetotal > 0) ? (100 * sizedone) / sizetotal : 0;
-        oss << fileindex << '/' << filecount
-            << " files checked " << percentDone
-            << "% done";
-        mErrorLogger.reportOut(oss.str(), Color::FgBlue);
-    }
-}
+
 

@@ -16,6 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "cppcheck.h"
 #include "errorlogger.h"
 #include "errortypes.h"
 #include "executor.h"
@@ -33,8 +34,8 @@
 class DummyExecutor : public Executor
 {
 public:
-    DummyExecutor(const std::list<FileWithDetails> &files, const std::list<FileSettings>& fileSettings, const Settings &settings, Suppressions &suppressions, ErrorLogger &errorLogger)
-        : Executor(files, fileSettings, settings, suppressions, errorLogger)
+    DummyExecutor(CppCheck& cppcheck, const std::list<FileWithDetails> &files, const std::list<FileSettings>& fileSettings, const Settings &settings, Suppressions &suppressions, ErrorLogger &errorLogger)
+        : Executor(cppcheck, files, fileSettings, settings, suppressions, errorLogger)
     {}
 
     unsigned int check() override
@@ -64,7 +65,8 @@ private:
         const auto settings = dinit(Settings,
                                     $.templateFormat = "{file}:{line}:{column}: {severity}:{inconclusive:inconclusive:} {message} [{id}]");
         Suppressions supprs;
-        DummyExecutor executor(files, fileSettings, settings, supprs, *this);
+        CppCheck cppcheck(settings, supprs, *this, false, {});
+        DummyExecutor executor(cppcheck, files, fileSettings, settings, supprs, *this);
 
         ErrorMessage::FileLocation loc1("test.c", 1, 2);
         ErrorMessage msg({std::move(loc1)}, "test.c", Severity::error, "error", "id", Certainty::normal);

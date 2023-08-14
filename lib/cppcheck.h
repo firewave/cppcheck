@@ -24,6 +24,7 @@
 #include "check.h"
 #include "config.h"
 
+#include <cstddef>
 #include <cstdint>
 #include <fstream>
 #include <functional>
@@ -149,6 +150,16 @@ public:
     std::string getDumpFileContentsRawTokens(const std::vector<std::string>& files, const simplecpp::TokenList& tokens1) const;
 
     std::string getLibraryDumpData() const;
+
+    /**
+     * Information about how many files have been checked
+     *
+     * @param fileindex This many files have been checked.
+     * @param filecount This many files there are in total.
+     * @param sizedone The sum of sizes of the files checked.
+     * @param sizetotal The total sizes of the files.
+     */
+    void reportStatus(std::size_t fileindex, std::size_t filecount, std::size_t sizedone, std::size_t sizetotal);
 
 private:
 #ifdef HAVE_RULES
