@@ -238,7 +238,7 @@ bool Token::isUpperCaseName() const
 {
     if (!isName())
         return false;
-    return std::none_of(mStr.begin(), mStr.end(), [](char c) {
+    return std::none_of(mStr.cbegin(), mStr.cend(), [](char c) {
         return std::islower(c);
     });
 }
@@ -1834,7 +1834,7 @@ void Token::printValueFlow(bool xml, std::ostream &out) const
         line = tok->linenr();
         if (!xml) {
             ValueFlow::Value::ValueKind valueKind = values.front().valueKind;
-            const bool same = std::all_of(values.begin(), values.end(), [&](const ValueFlow::Value& value) {
+            const bool same = std::all_of(values.cbegin(), values.cend(), [&](const ValueFlow::Value& value) {
                 return value.valueKind == valueKind;
             });
             outs += "  ";
@@ -1997,7 +1997,7 @@ const ValueFlow::Value * Token::getInvalidValue(const Token *ftok, nonneg int ar
     if (values().empty() || !settings)
         return nullptr;
     const ValueFlow::Value *ret = nullptr;
-    for (std::list<ValueFlow::Value>::const_iterator it = values().begin(); it != values().end(); ++it) {
+    for (std::list<ValueFlow::Value>::const_iterator it = values().cbegin(); it != values().cend(); ++it) {
         if (it->isImpossible())
             continue;
         if ((it->isIntValue() && !settings->library.isIntArgValid(ftok, argnr, it->intvalue)) ||
@@ -2023,7 +2023,7 @@ const Token *Token::getValueTokenMinStrSize(const Settings &settings, MathLib::b
         return nullptr;
     const Token *ret = nullptr;
     int minsize = INT_MAX;
-    for (std::list<ValueFlow::Value>::const_iterator it = values().begin(); it != values().end(); ++it) {
+    for (std::list<ValueFlow::Value>::const_iterator it = values().cbegin(); it != values().cend(); ++it) {
         if (it->isTokValue() && it->tokvalue && it->tokvalue->tokType() == Token::eString) {
             const int size = getStrSize(it->tokvalue, settings);
             if (!ret || size < minsize) {
@@ -2043,7 +2043,7 @@ const Token *Token::getValueTokenMaxStrLength() const
         return nullptr;
     const Token *ret = nullptr;
     int maxlength = 0;
-    for (std::list<ValueFlow::Value>::const_iterator it = values().begin(); it != values().end(); ++it) {
+    for (std::list<ValueFlow::Value>::const_iterator it = values().cbegin(); it != values().cend(); ++it) {
         if (it->isTokValue() && it->tokvalue && it->tokvalue->tokType() == Token::eString) {
             const int length = getStrLength(it->tokvalue);
             if (!ret || length > maxlength) {
@@ -2552,19 +2552,19 @@ bool Token::hasKnownIntValue() const
 {
     if (values().empty())
         return false;
-    return std::any_of(values().begin(), values().end(), [](const ValueFlow::Value& value) {
+    return std::any_of(values().cbegin(), values().cend(), [](const ValueFlow::Value& value) {
         return value.isKnown() && value.isIntValue();
     });
 }
 
 bool Token::hasKnownValue() const
 {
-    return !values().empty() && std::any_of(values().begin(), values().end(), std::mem_fn(&ValueFlow::Value::isKnown));
+    return !values().empty() && std::any_of(values().cbegin(), values().cend(), std::mem_fn(&ValueFlow::Value::isKnown));
 }
 
 bool Token::hasKnownValue(ValueFlow::Value::ValueType t) const
 {
-    return !values().empty() && std::any_of(values().begin(), values().end(), [&](const ValueFlow::Value& value) {
+    return !values().empty() && std::any_of(values().cbegin(), values().cend(), [&](const ValueFlow::Value& value) {
         return value.isKnown() && value.valueType == t;
     });
 }
@@ -2574,7 +2574,7 @@ bool Token::hasKnownSymbolicValue(const Token* tok) const
     if (tok->exprId() == 0)
         return false;
     return !values().empty() &&
-           std::any_of(values().begin(), values().end(), [&](const ValueFlow::Value& value) {
+           std::any_of(values().cbegin(), values().cend(), [&](const ValueFlow::Value& value) {
         return value.isKnown() && value.isSymbolicValue() && value.tokvalue &&
         value.tokvalue->exprId() == tok->exprId();
     });
@@ -2584,20 +2584,20 @@ const ValueFlow::Value* Token::getKnownValue(ValueFlow::Value::ValueType t) cons
 {
     if (values().empty())
         return nullptr;
-    auto it = std::find_if(values().begin(), values().end(), [&](const ValueFlow::Value& value) {
+    auto it = std::find_if(values().cbegin(), values().cend(), [&](const ValueFlow::Value& value) {
         return value.isKnown() && value.valueType == t;
     });
-    return it == values().end() ? nullptr : &*it;
+    return it == values().cend() ? nullptr : &*it;
 }
 
 const ValueFlow::Value* Token::getValue(const MathLib::bigint val) const
 {
     if (values().empty())
         return nullptr;
-    const auto it = std::find_if(values().begin(), values().end(), [=](const ValueFlow::Value& value) {
+    const auto it = std::find_if(values().cbegin(), values().cend(), [=](const ValueFlow::Value& value) {
         return value.isIntValue() && !value.isImpossible() && value.intvalue == val;
     });
-    return it == values().end() ? nullptr : &*it;
+    return it == values().cend() ? nullptr : &*it;
 }
 
 template<class Compare>
@@ -2638,11 +2638,11 @@ const ValueFlow::Value* Token::getMovedValue() const
 {
     if (values().empty())
         return nullptr;
-    const auto it = std::find_if(values().begin(), values().end(), [](const ValueFlow::Value& value) {
+    const auto it = std::find_if(values().cbegin(), values().cend(), [](const ValueFlow::Value& value) {
         return value.isMovedValue() && !value.isImpossible() &&
         value.moveKind != ValueFlow::Value::MoveKind::NonMovedVariable;
     });
-    return it == values().end() ? nullptr : &*it;
+    return it == values().cend() ? nullptr : &*it;
 }
 
 // cppcheck-suppress unusedFunction
@@ -2650,10 +2650,10 @@ const ValueFlow::Value* Token::getContainerSizeValue(const MathLib::bigint val) 
 {
     if (values().empty())
         return nullptr;
-    const auto it = std::find_if(values().begin(), values().end(), [=](const ValueFlow::Value& value) {
+    const auto it = std::find_if(values().cbegin(), values().cend(), [=](const ValueFlow::Value& value) {
         return value.isContainerSizeValue() && !value.isImpossible() && value.intvalue == val;
     });
-    return it == values().end() ? nullptr : &*it;
+    return it == values().cend() ? nullptr : &*it;
 }
 
 TokenImpl::~TokenImpl()
