@@ -79,7 +79,7 @@ class XMLErrorMessagesLogger : public ErrorLogger
         reportOut(msg.toXML());
     }
 
-    void reportProgress(const std::string & /*filename*/, const char /*stage*/[], const std::size_t /*value*/) override
+    void reportProgress(const std::string & /*filename*/, const char /*stage*/[], const int /*value*/) override
     {}
 };
 
@@ -276,7 +276,7 @@ int CppCheckExecutor::check_internal(CppCheck& cppcheck)
 {
     Settings& settings = cppcheck.settings();
 
-    if (settings.reportProgress)
+    if (settings.reportProgress >= 0)
         mLatestProgressOutputTime = std::time(nullptr);
 
     if (!settings.outputFile.empty()) {
@@ -399,23 +399,27 @@ void CppCheckExecutor::reportOut(const std::string &outmsg, Color c)
         std::cout << c << ansiToOEM(outmsg, true) << Color::Reset << std::endl;
 }
 
-void CppCheckExecutor::reportProgress(const std::string &filename, const char stage[], const std::size_t value)
+// TODO: remove filename parameter?
+void CppCheckExecutor::reportProgress(const std::string &filename, const char stage[], const int value)
 {
     (void)filename;
 
     if (!mLatestProgressOutputTime)
         return;
 
-    // Report progress messages every 10 seconds
+    // Report progress messages every x seconds
     const std::time_t currentTime = std::time(nullptr);
-    if (currentTime >= (mLatestProgressOutputTime + 10)) {
+    if (mSettings->reportProgress == 0 || (currentTime >= (mLatestProgressOutputTime + mSettings->reportProgress)))
+    {
         mLatestProgressOutputTime = currentTime;
 
         // format a progress message
         std::ostringstream ostr;
         ostr << "progress: "
-             << stage
-             << ' ' << value << '%';
+             // << "[" << currentTime << "] "
+             << stage;
+        if (value >= 0)
+            ostr << ' ' << value << '%';
 
         // Report progress message
         reportOut(ostr.str());

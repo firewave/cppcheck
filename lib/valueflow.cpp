@@ -9316,6 +9316,7 @@ struct ValueFlowPassRunner {
         std::size_t values = 0;
         std::size_t n = state.settings->valueFlowMaxIterations;
         while (n > 0 && values != getTotalValues()) {
+            state.errorLogger->reportProgress("", ("ValueFlow (iteration " + std::to_string(state.settings->valueFlowMaxIterations+1 - n) + ")").c_str(), -1);
             values = getTotalValues();
             if (std::any_of(passes.begin(), passes.end(), [&](const ValuePtr<ValueFlowPass>& pass) {
                 return run(pass);
@@ -9422,6 +9423,7 @@ struct ValueFlowPassAdaptor : ValueFlowPass {
     }
     void run(const ValueFlowState& state) const override
     {
+        state.errorLogger->reportProgress("", ("ValueFlow (" + std::string(mName) + ")").c_str(), -1);
         mRun(state.tokenlist, state.symboldatabase, state.errorLogger, state.settings, state.skippedFunctions);
     }
     bool cpp() const override {

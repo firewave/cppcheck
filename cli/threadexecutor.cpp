@@ -67,6 +67,11 @@ public:
         mErrorLogger.reportErr(msg);
     }
 
+    void reportProgress(const std::string &/*filename*/, const char /*stage*/[], const int /*value*/) override
+    {
+        // progress is only reported for single-threaded execution
+    }
+
     void reportStatus(std::size_t fileindex, std::size_t filecount, std::size_t sizedone, std::size_t sizetotal) {
         std::lock_guard<std::mutex> lg(mReportSync);
         mThreadExecutor.reportStatus(fileindex, filecount, sizedone, sizetotal);

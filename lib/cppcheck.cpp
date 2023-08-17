@@ -1622,7 +1622,7 @@ void CppCheck::reportOut(const std::string &outmsg, Color c)
     mErrorLogger.reportOut(outmsg, c);
 }
 
-void CppCheck::reportProgress(const std::string &filename, const char stage[], const std::size_t value)
+void CppCheck::reportProgress(const std::string &filename, const char stage[], const int value)
 {
     mErrorLogger.reportProgress(filename, stage, value);
 }

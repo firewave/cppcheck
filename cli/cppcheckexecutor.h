@@ -79,7 +79,7 @@ public:
     /** xml output of errors */
     void reportErr(const ErrorMessage &msg) override;
 
-    void reportProgress(const std::string &filename, const char stage[], const std::size_t value) override;
+    void reportProgress(const std::string &filename, const char stage[], const int value) override;
 
     /**
      * @param exceptionOutput Output file

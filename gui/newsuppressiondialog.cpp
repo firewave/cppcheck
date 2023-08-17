@@ -39,12 +39,14 @@ NewSuppressionDialog::NewSuppressionDialog(QWidget *parent) :
 {
     mUI->setupUi(this);
 
+    // TODO
     class QErrorLogger : public ErrorLogger {
     public:
         void reportOut(const std::string & /*outmsg*/, Color /*c*/) override {}
         void reportErr(const ErrorMessage &msg) override {
             errorIds << QString::fromStdString(msg.id);
         }
+        void reportProgress(const std::string &/*filename*/, const char /*stage*/[], const int /*value*/) override {}
         QStringList errorIds;
     };
 
