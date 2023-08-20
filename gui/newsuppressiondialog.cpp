@@ -45,6 +45,7 @@ NewSuppressionDialog::NewSuppressionDialog(QWidget *parent) :
         void reportErr(const ErrorMessage &msg) override {
             errorIds << QString::fromStdString(msg.id);
         }
+        void reportProgress(const std::string &/*filename*/, const char /*stage*/[], const std::size_t /*value*/) override {}
         QStringList errorIds;
     };
 

@@ -80,6 +80,7 @@ public:
      */
     void reportOut(const std::string &outmsg, Color c = Color::Reset) override;
     void reportErr(const ErrorMessage &msg) override;
+    void reportProgress(const std::string &/*filename*/, const char /*stage*/[], const std::size_t /*value*/) override;
 
 public slots:
 

@@ -241,11 +241,7 @@ public:
      * @param stage for example preprocess / tokenize / simplify / check
      * @param value progress value (0-100)
      */
-    virtual void reportProgress(const std::string &filename, const char stage[], const std::size_t value) {
-        (void)filename;
-        (void)stage;
-        (void)value;
-    }
+    virtual void reportProgress(const std::string &filename, const char stage[], const std::size_t value) = 0;
 
     static std::string callStackToString(const std::list<ErrorMessage::FileLocation> &callStack);
 
