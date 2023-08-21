@@ -39,6 +39,38 @@
 
 #include <tinyxml2.h>
 
+Progress Progress::instance;
+
+void Progress::reportProgress(const std::string &filename, const char *stage, const std::size_t value)
+{
+    // TODO: remove?
+    (void)filename;
+
+    if (!mErrorLogger || !mLatestProgressOutputTime)
+        return;
+
+    // Report progress messages every x seconds
+    const std::time_t currentTime = std::time(nullptr);
+    if (mReportProgress == 0 || (currentTime >= (mLatestProgressOutputTime + mReportProgress)))
+    {
+        mLatestProgressOutputTime = currentTime;
+
+        // format a progress message
+        std::ostringstream ostr;
+        ostr << "progress: "
+             << stage
+             << ' ' << value << '%';
+
+        // Report progress message
+        mErrorLogger->reportOut(ostr.str());
+    }
+}
+
+void Progress::reset()
+{
+    mLatestProgressOutputTime = std::time(nullptr);
+}
+
 ErrorMessage::ErrorMessage()
     : severity(Severity::none), cwe(0U), certainty(Certainty::normal), hash(0)
 {}

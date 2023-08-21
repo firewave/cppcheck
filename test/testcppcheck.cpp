@@ -41,8 +41,6 @@ private:
         void reportErr(const ErrorMessage &msg) override {
             id.push_back(msg.id);
         }
-
-        void reportProgress(const std::string &/*filename*/, const char /*stage*/[], const std::size_t /*value*/) override {}
     };
 
     void run() override {

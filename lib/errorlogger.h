@@ -26,6 +26,7 @@
 #include "color.h"
 
 #include <cstddef>
+#include <ctime>
 #include <list>
 #include <string>
 #include <utility>
@@ -33,6 +34,7 @@
 
 class Token;
 class TokenList;
+class ErrorLogger;
 
 namespace tinyxml2 {
     class XMLElement;
@@ -40,6 +42,41 @@ namespace tinyxml2 {
 
 /// @addtogroup Core
 /// @{
+
+class Progress
+{
+public:
+    static Progress instance;
+
+    void setErrorLogger(ErrorLogger *errorLogger)
+    {
+        mErrorLogger = errorLogger;
+    }
+
+    void set(int i)
+    {
+        mReportProgress = i;
+    }
+
+    void reset();
+
+    /**
+     * Report progress to client
+     * @param filename main file that is checked
+     * @param stage for example preprocess / tokenize / simplify / check
+     * @param value progress value (0-100)
+     */
+    void reportProgress(const std::string &filename, const char stage[], const std::size_t value);
+
+private:
+    ErrorLogger *mErrorLogger{};
+    /**
+     * Report progress time
+     */
+    std::time_t mLatestProgressOutputTime{};
+
+    int mReportProgress{};
+};
 
 /**
  * Wrapper for error messages, provided by reportErr()
@@ -234,14 +271,6 @@ public:
      * @param msg Location and other information about the found error.
      */
     virtual void reportErr(const ErrorMessage &msg) = 0;
-
-    /**
-     * Report progress to client
-     * @param filename main file that is checked
-     * @param stage for example preprocess / tokenize / simplify / check
-     * @param value progress value (0-100)
-     */
-    virtual void reportProgress(const std::string &filename, const char stage[], const std::size_t value) = 0;
 
     static std::string callStackToString(const std::list<ErrorMessage::FileLocation> &callStack);
 

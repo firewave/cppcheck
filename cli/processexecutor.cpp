@@ -81,11 +81,6 @@ public:
         writeToPipe(REPORT_ERROR, msg.serialize());
     }
 
-    void reportProgress(const std::string &/*filename*/, const char /*stage*/[], const std::size_t /*value*/) override
-    {
-        // progress is only reported for single-threaded execution
-    }
-
     void writeEnd(const std::string& str) const {
         writeToPipe(CHILD_END, str);
     }

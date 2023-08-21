@@ -58,11 +58,6 @@ void ThreadResult::reportErr(const ErrorMessage &msg)
         emit debugError(item);
 }
 
-void ThreadResult::reportProgress(const std::string &/*filename*/, const char /*stage*/[], const std::size_t /*value*/)
-{
-    // TODO: display in GUI
-}
-
 QString ThreadResult::getNextFile()
 {
     QMutexLocker locker(&mutex);

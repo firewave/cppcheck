@@ -78,9 +78,6 @@ class XMLErrorMessagesLogger : public ErrorLogger
     {
         reportOut(msg.toXML());
     }
-
-    void reportProgress(const std::string & /*filename*/, const char /*stage*/[], const std::size_t /*value*/) override
-    {}
 };
 
 // TODO: do not directly write to stdout
@@ -276,7 +273,7 @@ int CppCheckExecutor::check_internal(CppCheck& cppcheck)
     Settings& settings = cppcheck.settings();
 
     if (settings.reportProgress >= 0)
-        mLatestProgressOutputTime = std::time(nullptr);
+        Progress::instance.reset();
 
     if (!settings.outputFile.empty()) {
         mErrorOutput = new std::ofstream(settings.outputFile);
@@ -396,31 +393,6 @@ void CppCheckExecutor::reportOut(const std::string &outmsg, Color c)
         std::cout << ansiToOEM(outmsg, true) << std::endl;
     else
         std::cout << c << ansiToOEM(outmsg, true) << Color::Reset << std::endl;
-}
-
-// TODO: remove filename parameter?
-void CppCheckExecutor::reportProgress(const std::string &filename, const char stage[], const std::size_t value)
-{
-    (void)filename;
-
-    if (!mLatestProgressOutputTime)
-        return;
-
-    // Report progress messages every x seconds
-    const std::time_t currentTime = std::time(nullptr);
-    if (mSettings->reportProgress == 0 || (currentTime >= (mLatestProgressOutputTime + mSettings->reportProgress)))
-    {
-        mLatestProgressOutputTime = currentTime;
-
-        // format a progress message
-        std::ostringstream ostr;
-        ostr << "progress: "
-             << stage
-             << ' ' << value << '%';
-
-        // Report progress message
-        reportOut(ostr.str());
-    }
 }
 
 void CppCheckExecutor::reportErr(const ErrorMessage &msg)
