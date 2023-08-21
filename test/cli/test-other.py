@@ -110,6 +110,7 @@ def test_progress(tmpdir):
     assert(pos != -1)
     pos += 1
     assert stdout[:pos] == "Checking {} ...\n".format(test_file)
+    # TODO: TemplateSimplifier::simplifyTemplateInstantiations()
     assert (stdout[pos:] ==
             "progress: Tokenize (typedef) 0%\n"
             "progress: Tokenize (typedef) 12%\n"

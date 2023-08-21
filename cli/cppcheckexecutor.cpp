@@ -119,7 +119,6 @@ bool CppCheckExecutor::parseFromArgs(Settings &settings, int argc, const char* c
         }
 
         if (parser.exitAfterPrinting()) {
-            Settings::terminate();
             return true;
         }
     } else {
