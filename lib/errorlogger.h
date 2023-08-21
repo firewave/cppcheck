@@ -27,6 +27,7 @@
 
 #include <cstddef>
 #include <ctime>
+#include <functional>
 #include <list>
 #include <string>
 #include <utility>
@@ -34,7 +35,6 @@
 
 class Token;
 class TokenList;
-class ErrorLogger;
 
 namespace tinyxml2 {
     class XMLElement;
@@ -48,9 +48,9 @@ class Progress
 public:
     static Progress instance;
 
-    void setErrorLogger(ErrorLogger *errorLogger)
+    void setCallback(std::function<void(std::string)> f)
     {
-        mErrorLogger = errorLogger;
+        mCallback = std::move(f);
     }
 
     void set(int i)
@@ -69,7 +69,7 @@ public:
     void reportProgress(const std::string &filename, const char stage[], const std::size_t value);
 
 private:
-    ErrorLogger *mErrorLogger{};
+    std::function<void(std::string)> mCallback;
     /**
      * Report progress time
      */

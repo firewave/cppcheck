@@ -46,7 +46,7 @@ void Progress::reportProgress(const std::string &filename, const char *stage, co
     // TODO: remove?
     (void)filename;
 
-    if (!mErrorLogger || !mLatestProgressOutputTime)
+    if (!mCallback || !mLatestProgressOutputTime)
         return;
 
     // Report progress messages every x seconds
@@ -62,7 +62,7 @@ void Progress::reportProgress(const std::string &filename, const char *stage, co
              << ' ' << value << '%';
 
         // Report progress message
-        mErrorLogger->reportOut(ostr.str());
+        mCallback(ostr.str());
     }
 }
 

@@ -294,6 +294,10 @@ int CppCheckExecutor::check_internal(CppCheck& cppcheck)
 
     unsigned int returnValue = 0;
     if (settings.useSingleJob()) {
+        Progress::instance.set(mSettings->reportProgress);
+        Progress::instance.setCallback([this](std::string msg) {
+            reportOut(msg);
+        });
         // Single process
         SingleExecutor executor(cppcheck, mFiles, settings, settings.nomsg, *this);
         returnValue = executor.check();
