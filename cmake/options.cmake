@@ -37,6 +37,8 @@ else()
     set(USE_MATCHCOMPILER_OPT ${USE_MATCHCOMPILER})
 endif()
 
+option(USE_LTO_THIN         "Use ThinLTO with CLang in Release builds"                      OFF)
+
 option(BUILD_CORE_DLL       "Build lib as cppcheck-core.dll with Visual Studio"             OFF)
 if (NOT MSVC)
     set(BUILD_CORE_DLL OFF)

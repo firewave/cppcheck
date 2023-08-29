@@ -88,6 +88,13 @@ elseif (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
         set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -lc++")
     endif()
 
+    if (USE_LTO_THIN)
+        if (CMAKE_BUILD_TYPE STREQUAL "Release" OR CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
+            add_compile_options(-flto=thin)
+            add_link_options(-flto=thin)
+        endif()
+    endif()
+
     # TODO: fix and enable these warnings - or move to suppression list below
     add_compile_options_safe(-Wno-documentation-unknown-command) # TODO: Clang currently does not support all commands
     add_compile_options_safe(-Wno-unused-exception-parameter)
