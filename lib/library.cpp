@@ -1180,6 +1180,9 @@ const Library::Container* Library::detectContainerInternal(const Token* const ty
             continue;
 
         const bool isStd = container.startPattern2.find("std :: ") == 0;
+        // bail out because we want to match containers in std namespace but we know it is not utilized
+        if (!withoutStd && (tokIsStd != isStd))
+            continue;
         const int offset = (withoutStd && isStd) ? 7 : 0;
 
         // If endPattern is undefined, it will always match, but itEndPattern has to be defined.
