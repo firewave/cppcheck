@@ -1160,6 +1160,11 @@ bool Library::isScopeNoReturn(const Token *end, std::string *unknownFunc) const
 
 const Library::Container* Library::detectContainerInternal(const Token* const typeStart, DetectContainer detect, bool* isIterator, bool withoutStd) const
 {
+    const bool tokIsStd = Token::simpleMatch(typeStart, "std ::");
+    // bail out because we want to match with std namespace but token utilizes it
+    if (withoutStd && tokIsStd)
+        return nullptr;
+
     const Token* firstLinkedTok = nullptr;
     for (const Token* tok = typeStart; tok && !tok->varId(); tok = tok->next()) {
         if (!tok->link())
@@ -1174,7 +1179,8 @@ const Library::Container* Library::detectContainerInternal(const Token* const ty
         if (container.startPattern.empty())
             continue;
 
-        const int offset = (withoutStd && container.startPattern2.find("std :: ") == 0) ? 7 : 0;
+        const bool isStd = container.startPattern2.find("std :: ") == 0;
+        const int offset = (withoutStd && isStd) ? 7 : 0;
 
         // If endPattern is undefined, it will always match, but itEndPattern has to be defined.
         if (detect != IteratorOnly && container.endPattern.empty()) {
