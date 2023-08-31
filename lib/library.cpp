@@ -1184,6 +1184,7 @@ const Library::Container* Library::detectContainerInternal(const Token* const ty
         if (!withoutStd && (tokIsStd != isStd))
             continue;
         const int offset = (withoutStd && isStd) ? 7 : 0;
+        // TODO: avoid matching std:: twice - start with typeStart->tokAt(2) in that case
 
         // If endPattern is undefined, it will always match, but itEndPattern has to be defined.
         if (detect != IteratorOnly && container.endPattern.empty()) {
