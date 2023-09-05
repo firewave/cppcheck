@@ -72,6 +72,7 @@ namespace {
         const bool isExecutable{};
         const bool isStructInit{};
         const bool isEnum{};
+        long long : 8; // padding
         const nonneg int startVarid{};
     };
 }
@@ -413,6 +414,7 @@ namespace {
         const Token* bodyEnd{};  // for body contains typedef define
         const Token* bodyEnd2{}; // for body contains typedef using
         bool isNamespace{};
+        long long : 56; // padding
         std::set<std::string> recordTypes;
     };
 }
@@ -1076,6 +1078,8 @@ namespace {
             }
             std::cout << "\n";
         }
+
+        long long : 40; // padding
     };
 }
 
@@ -2446,6 +2450,7 @@ namespace {
         ScopeInfo3 *parent;
         std::list<ScopeInfo3> children;
         Type type;
+        long long : 56; // padding
         std::string fullName;
         std::string name;
         const Token * bodyStart;
@@ -4148,6 +4153,8 @@ namespace {
         nonneg int& getVarId() {
             return mVarId;
         }
+
+        long long : 32; // padding
     };
 }
 

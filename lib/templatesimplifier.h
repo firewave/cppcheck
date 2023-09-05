@@ -252,6 +252,8 @@ public:
             // This works because at most only one flag will be set.
             return ((mFlags & fFamilyMask) && (decl.mFlags & fFamilyMask));
         }
+
+        long long : 32; // padding
     };
 
     /**
@@ -497,6 +499,8 @@ private:
     const Settings &mSettings;
     ErrorLogger &mErrorLogger;
     bool mChanged{};
+
+    long long : 56; // padding
 
     std::list<TokenAndName> mTemplateDeclarations;
     std::list<TokenAndName> mTemplateForwardDeclarations;

@@ -44,6 +44,7 @@ struct CPPCHECKLIB InternalError {
     std::string errorMessage;
     std::string details;
     Type type;
+    long long : 56; // padding
     std::string id;
 };
 

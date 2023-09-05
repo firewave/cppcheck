@@ -246,6 +246,8 @@ private:
     /** Are there too many configs? */
     bool mTooManyConfigs{};
 
+    long long : 16; // padding
+
     /** File info used for whole program analysis */
     std::list<Check::FileInfo*> mFileInfo;
 

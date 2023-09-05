@@ -61,6 +61,8 @@ struct Dimension {
     const Token* tok{};    ///< size token
     MathLib::bigint num{}; ///< (assumed) dimension length when size is a number, 0 if not known
     bool known = true;     ///< Known size
+
+    long long : 56; // padding
 };
 
 /** @brief Information about a class type. */
@@ -83,6 +85,7 @@ public:
         bool operator<(const BaseInfo& rhs) const {
             return this->type < rhs.type;
         }
+        long long : 48; // padding
     };
 
     struct FriendInfo {
@@ -91,6 +94,7 @@ public:
         const Type* type{};
     };
 
+    long long : 56; // padding
     std::vector<BaseInfo> derivedFrom;
     std::vector<FriendInfo> friendList;
 
@@ -160,6 +164,8 @@ struct CPPCHECKLIB Enumerator {
     const Token* start{};
     const Token* end{};
     bool value_known{};
+
+    long long : 56; // padding
 };
 
 /** @brief Information about a member variable. */
@@ -678,8 +684,12 @@ private:
     /** @brief what section is this variable declared in? */
     AccessControl mAccess;  // public/protected/private
 
+    long long : 24; // padding
+
     /** @brief flags */
     unsigned int mFlags;
+
+    long long : 32; // padding
 
     /** @brief pointer to user defined type info (for known types) */
     const Type *mType;
@@ -913,6 +923,7 @@ public:
     std::list<Variable> argumentList; ///< argument list, must remain list due to clangimport usage!
     nonneg int initArgCount{};        ///< number of args with default values
     Type type = eFunction;            ///< constructor, destructor, ...
+    long long : 24; // padding
     const Token* noexceptArg{};       ///< noexcept token
     const Token* throwArg{};          ///< throw token
     const Token* templateDef{};       ///< points to 'template <' before function
@@ -946,6 +957,8 @@ public:
 private:
     /** Recursively determine if this function overrides a virtual function in a base class */
     const Function * getOverriddenFunctionRecursive(const ::Type* baseType, bool *foundAllBaseClasses) const;
+
+    long long : 24; // padding
 
     unsigned int mFlags{};
 
@@ -1041,6 +1054,7 @@ public:
     nonneg int numCopyOrMoveConstructors{};
     std::vector<UsingInfo> usingList;
     ScopeType type{};
+    long long : 56; // padding
     Type* definedType{};
     std::map<std::string, Type*> definedTypesMap;
     std::vector<const Token *> bodyStartList;
@@ -1052,6 +1066,8 @@ public:
     // enum specific fields
     const Token* enumType{};
     bool enumClass{};
+
+    long long : 56; // padding
 
     std::vector<Enumerator> enumeratorList;
 
@@ -1230,11 +1246,13 @@ public:
         DOUBLE,
         LONGDOUBLE
     } type = UNKNOWN_TYPE;
+    long long : 16; // padding
     nonneg int bits{};                         ///< bitfield bitcount
     nonneg int pointer{};                      ///< 0=>not pointer, 1=>*, 2=>**, 3=>***, etc
     nonneg int constness{};                    ///< bit 0=data, bit 1=*, bit 2=**
     nonneg int volatileness{};                 ///< bit 0=data, bit 1=*, bit 2=**
     Reference reference = Reference::None;     ///< Is the outermost indirection of this type a reference or rvalue
+    long long : 24; // padding
     ///< reference or not? pointer=2, Reference=LValue would be a T**&
     const Scope* typeScope{};                  ///< if the type definition is seen this point out the type scope
     const ::Type* smartPointerType{};          ///< Smart pointer type
@@ -1315,7 +1333,6 @@ public:
 
     void setDebugPath(const Token* tok, SourceLocation ctx, const SourceLocation &local = SourceLocation::current());
 };
-
 
 class CPPCHECKLIB SymbolDatabase {
     friend class TestSymbolDatabase;
@@ -1477,8 +1494,9 @@ private:
     std::list<Type> mBlankTypes;
 
     ValueType::Sign mDefaultSignedness;
-};
 
+    long long : 56; // padding
+};
 
 //---------------------------------------------------------------------------
 #endif // symboldatabaseH

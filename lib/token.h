@@ -83,6 +83,8 @@ struct TokenImpl {
     /** Bitfield bit count. */
     unsigned char mBits{};
 
+    long long : 24; // padding
+
     // AST..
     Token* mAstOperand1{};
     Token* mAstOperand2{};
@@ -119,6 +121,7 @@ struct TokenImpl {
     // __cppcheck_in_range__
     struct CppcheckAttributes {
         enum Type : std::uint8_t { LOW, HIGH } type = LOW;
+        long long : 56; // padding
         MathLib::bigint value{};
         CppcheckAttributes* next{};
     };
@@ -146,6 +149,8 @@ struct TokenImpl {
     TokenImpl() : mFunction(nullptr) {}
 
     ~TokenImpl();
+
+    long long : 48; // padding
 };
 
 /// @addtogroup Core
@@ -1401,6 +1406,8 @@ private:
     };
 
     Token::Type mTokType = eNone;
+
+    long long : 56; // padding
 
     uint64_t mFlags{};
 

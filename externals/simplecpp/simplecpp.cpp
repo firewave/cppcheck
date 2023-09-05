@@ -348,6 +348,8 @@ private:
     unsigned short bom;
 protected:
     bool isUtf16;
+
+    long long : 40; // padding
 };
 
 class StdIStream : public simplecpp::TokenList::Stream {
@@ -2267,6 +2269,8 @@ namespace simplecpp {
 
         /** was the value of this macro actually defined in the code? */
         bool valueDefinedInCode_;
+
+        long long : 48; // padding
     };
 }
 

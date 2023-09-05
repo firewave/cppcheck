@@ -81,6 +81,8 @@ public:
 
     std::list<std::string> getVSConfigs();
 
+    long long : 56; // padding
+
     // Cppcheck GUI output
     struct {
         std::string analyzeAllVsConfigs;
@@ -104,6 +106,7 @@ protected:
 private:
     struct SharedItemsProject {
         bool successful = false;
+        long long : 56; // padding
         std::string pathToProjectFile;
         std::vector<std::string> includePaths;
         std::vector<std::string> sourceFiles;

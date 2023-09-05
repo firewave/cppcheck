@@ -76,6 +76,8 @@ private:
         unsigned int fileIndex{};
         bool usedSameFile{};
         bool usedOtherFile{};
+
+        long long : 48; // padding
     };
 
     std::unordered_map<std::string, FunctionUsage> mFunctions;
@@ -85,6 +87,8 @@ private:
         explicit FunctionDecl(const Function *f);
         std::string functionName;
         unsigned int lineNumber;
+
+        long long : 32; // padding
     };
     std::list<FunctionDecl> mFunctionDecl;
     std::set<std::string> mFunctionCalls;

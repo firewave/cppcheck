@@ -1760,6 +1760,8 @@ struct ExpressionAnalyzer : SingleValueFlowAnalyzer {
             indirect = 0;
         return SingleValueFlowAnalyzer::isAliasModified(tok, indirect);
     }
+
+    long long : 32; // padding
 };
 
 struct SameExpressionAnalyzer : ExpressionAnalyzer {
@@ -1791,6 +1793,8 @@ struct OppositeExpressionAnalyzer : ExpressionAnalyzer {
     bool match(const Token* tok) const override {
         return isOppositeCond(isNot, expr, tok, getSettings(), true, true);
     }
+
+    long long : 56; // padding
 };
 
 struct SubExpressionAnalyzer : ExpressionAnalyzer {
@@ -2492,6 +2496,7 @@ struct LifetimeStore {
     const Token* argtok{};
     std::string message;
     ValueFlow::Value::LifetimeKind type = ValueFlow::Value::LifetimeKind::Object;
+    long long : 56; // padding
     ErrorPath errorPath;
     bool inconclusive{};
     bool forward = true;
@@ -2761,6 +2766,7 @@ struct LifetimeStore {
     }
 
 private:
+    long long : 48; // padding
     // cppcheck-suppress naming-privateMemberVariable
     Token* forwardTok{};
     void forwardLifetime(Token* tok, const TokenList& tokenlist, ErrorLogger& errorLogger, const Settings& settings) {
@@ -3267,6 +3273,8 @@ struct Lambda {
     bool isLambda() const {
         return capture && bodyTok;
     }
+
+    long long : 56; // padding
 };
 
 static bool isDecayedPointer(const Token *tok)
@@ -4699,6 +4707,8 @@ struct ConditionHandler {
 
             return ctx;
         }
+
+        long long : 48; // padding
     };
 
     virtual std::vector<Condition> parse(const Token* tok, const Settings& settings) const = 0;
@@ -7661,6 +7671,8 @@ struct ValueFlowPassAdaptor : ValueFlowPass {
     bool cpp() const override {
         return mCPP;
     }
+
+    long long : 48; // padding
 };
 
 template<class F>

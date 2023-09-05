@@ -62,6 +62,7 @@ public:
 
     struct KnownAndToken {
         bool known{};
+        long long : 56; // padding
         const Token* token{};
     };
 
@@ -77,6 +78,7 @@ private:
         enum class Type : std::uint8_t { NONE, READ, WRITE, BREAK, RETURN, BAILOUT } type;
         explicit Result(Type type) : type(type) {}
         Result(Type type, const Token *token) : type(type), token(token) {}
+        long long : 56; // padding
         const Token* token{};
     };
 
@@ -85,8 +87,11 @@ private:
 
     const Settings &mSettings;
     enum class What : std::uint8_t { Reassign, UnusedValue, ValueFlow } mWhat = What::Reassign;
+    long long : 56; // padding
     std::vector<KnownAndToken> mValueFlow;
     bool mValueFlowKnown = true;
+
+    long long : 56; // padding
 };
 
 #endif // fwdanalysisH

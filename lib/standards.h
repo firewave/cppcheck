@@ -43,6 +43,8 @@ struct Standards {
     /** C++ code standard */
     enum cppstd_t : std::uint8_t { CPP03, CPP11, CPP14, CPP17, CPP20, CPP23, CPP26, CPPLatest = CPP26 } cpp = CPPLatest;
 
+    long long : 48; // padding
+
     /** --std value given on command line */
     std::string stdValue;
 

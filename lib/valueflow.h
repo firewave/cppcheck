@@ -98,6 +98,8 @@ namespace ValueFlow {
                 x.inconclusive = b;
             return v;
         }
+
+        long long : 48; // padding
     };
 
     const Token *parseCompareInt(const Token *tok, Value &true_value, Value &false_value, const std::function<std::vector<MathLib::bigint>(const Token*)>& evaluate);

@@ -142,6 +142,7 @@ public:
         bool _write;
         bool _modified; // read/modify/write
         bool _allocateMemory;
+        long long : 24; // padding
     };
 
     void clear() {

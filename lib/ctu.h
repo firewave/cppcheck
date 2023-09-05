@@ -70,6 +70,7 @@ namespace CTU {
             UnsafeUsage(std::string myId, nonneg int myArgNr, std::string myArgumentName, Location location, MathLib::bigint value) : myId(std::move(myId)), myArgNr(myArgNr), myArgumentName(std::move(myArgumentName)), location(std::move(location)), value(value) {}
             std::string myId;
             nonneg int myArgNr{};
+            long long : 32; // padding
             std::string myArgumentName;
             Location location;
             MathLib::bigint value{};
@@ -87,6 +88,7 @@ namespace CTU {
             CallBase(const CallBase&) = default;
             std::string callId;
             int callArgNr{};
+            long long : 32; // padding
             std::string callFunctionName;
             Location location;
         protected:
@@ -99,11 +101,14 @@ namespace CTU {
             std::string callArgumentExpression;
             MathLib::bigint callArgValue;
             ValueFlow::Value::ValueType callValueType;
+            long long : 56; // padding
             std::vector<ErrorMessage::FileLocation> callValuePath;
             bool warning;
 
             std::string toXmlString() const;
             bool loadFromXml(const tinyxml2::XMLElement *xmlElement);
+
+            long long : 56; // padding
         };
 
         class NestedCall : public CallBase {
@@ -122,6 +127,8 @@ namespace CTU {
 
             std::string myId;
             nonneg int myArgNr{};
+
+            long long : 32; // padding
         };
 
         std::list<FunctionCall> functionCalls;

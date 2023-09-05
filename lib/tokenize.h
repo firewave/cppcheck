@@ -668,6 +668,7 @@ private:
         int column;
         bool used;
         bool isFunctionPointer;
+        long long : 48; // padding
     };
     std::vector<TypedefInfo> mTypedefInfo;
 

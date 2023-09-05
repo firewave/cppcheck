@@ -43,12 +43,14 @@ public:
     enum AllocStatus : std::int8_t { REALLOC = -3, OWNED = -2, DEALLOC = -1, NOALLOC = 0, ALLOC = 1 };
     struct AllocInfo {
         AllocStatus status;
+        long long : 24; // padding
         /** Allocation type. If it is a positive value then it corresponds to
          * a Library allocation id. A negative value is a builtin
          * checkleakautovar allocation type.
          */
         int type;
         int reallocedFromType = -1;
+        long long : 32; // padding
         const Token * allocTok;
         explicit AllocInfo(int type_ = 0, AllocStatus status_ = NOALLOC, const Token* allocTok_ = nullptr) : status(status_), type(type_), allocTok(allocTok_) {}
 

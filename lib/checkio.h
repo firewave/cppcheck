@@ -97,6 +97,8 @@ private:
         bool _template{};
         bool address{};
         bool isCPP{};
+
+        long long : 32; // padding
     };
 
     void checkFormatString(const Token * tok,

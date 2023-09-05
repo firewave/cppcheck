@@ -111,11 +111,14 @@ static OpenMode getMode(const std::string& str)
 namespace {
     struct Filepointer {
         OpenMode mode;
+        long long : 24; // padding
         nonneg int mode_indent{};
         enum class Operation : std::uint8_t {NONE, UNIMPORTANT, READ, WRITE, POSITIONING, OPEN, CLOSE, UNKNOWN_OP} lastOperation = Operation::NONE;
+        long long : 24; // padding
         nonneg int op_indent{};
         enum class AppendMode : std::uint8_t { UNKNOWN_AM, APPEND, APPEND_EX };
         AppendMode append_mode = AppendMode::UNKNOWN_AM;
+        long long : 56; // padding
         std::string filename;
         explicit Filepointer(OpenMode mode_ = OpenMode::UNKNOWN_OM)
             : mode(mode_) {}

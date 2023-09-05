@@ -146,6 +146,8 @@ struct Analyzer {
                 terminate = rhs.terminate;
             action |= rhs.action;
         }
+
+        long long : 24; // padding
     };
 
     enum class Direction : std::uint8_t { Forward, Reverse };

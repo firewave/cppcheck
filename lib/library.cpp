@@ -105,6 +105,7 @@ struct Library::LibraryData
         std::string mStart;
         std::string mEnd;
         int mOffset{};
+        long long : 32; // padding
         std::set<std::string> mBlocks;
     };
 
@@ -118,6 +119,7 @@ struct Library::LibraryData
     std::unordered_map<std::string, SmartPointer> mSmartPointers;
 
     int mAllocId{};
+    long long : 32; // padding
     std::set<std::string> mFiles;
     std::map<std::string, AllocFunc> mAlloc; // allocation functions
     std::map<std::string, AllocFunc> mDealloc; // deallocation functions

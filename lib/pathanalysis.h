@@ -45,6 +45,8 @@ struct PathAnalysis {
         const Token* tok;
         ErrorPath errorPath;
         bool known;
+
+        long long : 56; // padding
     };
 
     void forward(const std::function<Progress(const Info&)>& f) const;

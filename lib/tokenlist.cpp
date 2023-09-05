@@ -445,9 +445,11 @@ namespace {
         int depth{};
         int inArrayAssignment{};
         bool cpp;
+        long long : 24; // padding
         int assign{};
         bool inCase{}; // true from case to :
         bool stopAtColon{}; // help to properly parse ternary operators
+        long long : 48; // padding
         const Token* functionCallEndPar{};
         explicit AST_state(bool cpp) : cpp(cpp) {}
     };

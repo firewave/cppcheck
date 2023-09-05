@@ -220,6 +220,8 @@ private:
 
     /** File is known to be C/C++ code */
     Standards::Language mLang{Standards::Language::None};
+
+    long long : 56; // padding
 };
 
 /// @}

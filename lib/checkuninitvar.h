@@ -55,6 +55,8 @@ struct VariableValue {
     explicit VariableValue(MathLib::bigint val = 0) : value(val) {}
     MathLib::bigint value;
     bool notEqual{};
+
+    long long : 56; // padding
 };
 
 /// @addtogroup Checks

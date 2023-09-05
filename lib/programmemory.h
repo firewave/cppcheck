@@ -95,6 +95,8 @@ struct ExprIdToken {
     struct Hash {
         std::size_t operator()(ExprIdToken etok) const;
     };
+
+    long long : 32; // padding
 };
 
 struct CPPCHECKLIB ProgramMemory {

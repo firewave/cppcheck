@@ -124,6 +124,8 @@ namespace {
         }
 
         const int mWpipe;
+
+        long long : 32; // padding
     };
 }
 

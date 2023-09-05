@@ -64,6 +64,8 @@ public:
         value add(int v) const;
         value shiftLeft(const value &v) const;
         value shiftRight(const value &v) const;
+
+        long long : 48; // padding
     };
 
     using bigint = long long;

@@ -410,6 +410,8 @@ namespace {
         Location(std::string f, const int l) : fileName(std::move(f)), lineNumber(l) {}
         std::string fileName;
         int lineNumber;
+
+        long long : 32; // padding
     };
 }
 

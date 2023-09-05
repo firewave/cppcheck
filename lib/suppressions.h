@@ -57,6 +57,7 @@ public:
         }
         int lineNumber;
         Certainty certainty;
+        long long : 24; // padding
         std::string symbolNames;
         std::set<std::string> macroNames;
 
@@ -142,6 +143,7 @@ public:
         int lineBegin = NO_LINE;
         int lineEnd = NO_LINE;
         Type type = Type::unique;
+        long long : 24; // padding
         std::string symbolName;
         std::string macroName;
         std::size_t hash{};
@@ -150,6 +152,8 @@ public:
         bool checked{}; // for inline suppressions, checked or not
 
         enum : std::int8_t { NO_LINE = -1 };
+
+        long long : 40; // padding
     };
 
     /**

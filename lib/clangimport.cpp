@@ -296,6 +296,8 @@ namespace clangimport {
             return (it == mDeclMap.end() ? nullptr : it->second.scope);
         }
 
+        long long : 32; // padding
+
         // "}" tokens that are not end-of-scope
         std::set<Token *> mNotScope;
 
@@ -313,6 +315,8 @@ namespace clangimport {
         std::map<std::string, Decl> mDeclMap;
         std::map<std::string, std::vector<Token *>> mNotFound;
         int mVarId = 0;
+
+        long long : 32; // padding
     };
 
     class AstNode;
@@ -377,6 +381,7 @@ namespace clangimport {
         int mFile  = 0;
         int mLine  = 1;
         int mCol   = 1;
+        long long : 32; // padding
         std::vector<std::string> mExtTokens;
         Data *mData;
     };

@@ -89,6 +89,8 @@ public:
     nonneg int long_bit;       /// bits in long
     nonneg int long_long_bit;  /// bits in long long
 
+    long long : 32; // padding
+
     /** size of standard types */
     std::size_t sizeof_bool;
     std::size_t sizeof_short;
@@ -189,6 +191,8 @@ public:
     std::string getLimitsDefines(Standards::cstd_t cstd) const;
     /** provides list of defines specified by the limit.h/climits includes */
     std::string getLimitsDefines(Standards::cppstd_t cppstd) const;
+
+    long long : 48; // padding
 };
 
 /// @}

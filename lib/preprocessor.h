@@ -55,6 +55,8 @@ struct CPPCHECKLIB Directive {
     /** line number in (possibly included) file where directive is defined */
     unsigned int linenr;
 
+    long long : 32; // padding
+
     /** the actual directive text */
     std::string str;
 
@@ -85,6 +87,8 @@ public:
 
     /** line number for the code that the remark comment is about */
     unsigned int lineNumber;
+
+    long long : 32; // padding
 
     /** remark text */
     std::string str;

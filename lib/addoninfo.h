@@ -30,6 +30,7 @@ struct CPPCHECKLIB AddonInfo {
     std::string args;       // special extra arguments
     std::string python;     // script interpreter
     bool ctu = false;
+    long long : 56; // padding
     std::string runScript;
 
     std::string getAddonInfo(const std::string &fileName, const std::string &exename, bool debug = false);

@@ -77,6 +77,7 @@ namespace {
         BadInlineSuppression(std::string file, const int line, std::string msg) : file(std::move(file)), line(line), errmsg(std::move(msg)) {}
         std::string file;
         int line;
+        long long : 32; // padding
         std::string errmsg;
     };
 }

@@ -97,6 +97,7 @@ public:
         }
 
     private:
+        long long : 32; // padding
         std::string mOrigFileName;
         std::string mFileName;
         std::string mInfo;
@@ -168,8 +169,11 @@ public:
     std::string file0;
 
     Severity severity;
+    long long : 8; // padding
     CWE cwe;
     Certainty certainty;
+
+    long long : 24; // padding
 
     /** remark from REMARK comment */
     std::string remark;

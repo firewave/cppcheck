@@ -72,6 +72,7 @@ public:
         template<typename T>
         Error(ErrorCode e, T&& r) : errorcode(e), reason(r) {}
         ErrorCode errorcode;
+        long long : 56; // padding
         std::string reason;
     };
 
@@ -82,10 +83,12 @@ public:
         int arg;
         enum class BufferSize : std::uint8_t {none,malloc,calloc,strdup};
         BufferSize bufferSize;
+        long long : 24; // padding
         int bufferSizeArg1;
         int bufferSizeArg2;
         int reallocArg;
         bool initData;
+        long long : 24; // padding
     };
 
     /** get allocation info for function */
@@ -158,6 +161,8 @@ public:
         std::string message;
         Standards standards;
         Severity severity;
+
+        long long : 56; // padding
     };
     const std::map<std::string, WarnInfo>& functionwarn() const;
 
@@ -214,16 +219,21 @@ public:
         struct Function {
             Action action;
             Yield yield;
+            long long : 48; // padding
             std::string returnType;
         };
         struct RangeItemRecordTypeItem {
             std::string name;
             int templateParameter; // TODO: use this
+
+            long long : 32; // padding
         };
         std::string startPattern, startPattern2, endPattern, itEndPattern;
         std::map<std::string, Function> functions;
         int type_templateArgNo = -1;
+        long long : 32; // padding
         std::vector<RangeItemRecordTypeItem> rangeItemRecordType;
+        long long : 32; // padding
         int size_templateArgNo = -1;
         bool arrayLike_indexOp{};
         bool stdStringLike{};
@@ -264,11 +274,13 @@ public:
     struct ArgumentChecks {
         bool notbool{};
         bool notnull{};
+        long long : 16; // padding
         int notuninit = -1;
         bool formatstr{};
         bool strz{};
         bool optional{};
         bool variadic{};
+        long long : 32; // padding
         std::string valid;
 
         struct IteratorInfo {
@@ -276,6 +288,8 @@ public:
             bool it{};
             bool first{};
             bool last{};
+
+            long long : 8; // padding
         };
         IteratorInfo iteratorInfo;
 
@@ -283,8 +297,10 @@ public:
             enum class Type : std::uint8_t { NONE, STRLEN, ARGVALUE, SIZEOF, MUL, VALUE };
             MinSize(Type t, int a) : type(t), arg(a) {}
             Type type;
+            long long : 24; // padding
             int arg;
             int arg2 = 0;
+            long long : 32; // padding
             long long value = 0;
             std::string baseType;
         };
@@ -298,6 +314,8 @@ public:
         };
         // argument directions up to ** indirect level (only one can be configured explicitly at the moment)
         std::array<Direction, 3> direction = { { Direction::DIR_UNKNOWN, Direction::DIR_UNKNOWN, Direction::DIR_UNKNOWN } };
+
+        long long : 40; // padding
     };
 
     struct Function {
@@ -313,6 +331,7 @@ public:
         bool formatstr_secure{};
         Container::Action containerAction = Container::Action::NO_ACTION;
         Container::Yield containerYield = Container::Yield::NO_YIELD;
+        long long : 40; // padding
         std::string returnType;
     };
 
@@ -407,6 +426,8 @@ public:
     struct SmartPointer {
         std::string name;
         bool unique = false;
+
+        long long : 56;
     };
 
     const std::unordered_map<std::string, SmartPointer>& smartPointers() const;
@@ -417,6 +438,7 @@ public:
         unsigned int size;
         char sign;
         enum class Type : std::uint8_t { NO, BOOL, CHAR, SHORT, INT, LONG, LONGLONG } stdtype;
+        long long : 16; // padding
     };
     const PodType *podtype(const std::string &name) const;
 
@@ -440,6 +462,7 @@ public:
         bool mPointer{};
         bool mPtrPtr{};
         bool mConstPtr{};
+        long long : 16;
     };
 
     const PlatformType *platform_type(const std::string &name, const std::string & platform) const;

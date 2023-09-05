@@ -1965,6 +1965,7 @@ void CheckStl::string_c_str()
     // Find all functions that take std::string as argument
     struct StrArg {
         nonneg int n;
+        long long : 32; // padding
         std::string argtype;
     };
     std::multimap<const Function*, StrArg> c_strFuncParam;

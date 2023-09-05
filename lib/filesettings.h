@@ -100,6 +100,8 @@ struct CPPCHECKLIB FileSettings {
     // TODO: get rid of these
     bool msc{};
     bool useMfc{};
+
+    long long : 40; // padding
 };
 
 #endif // fileSettingsH

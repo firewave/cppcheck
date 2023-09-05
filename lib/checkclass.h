@@ -324,6 +324,8 @@ private:
 
         /** @brief has this variable been initialized? */
         bool init{};
+
+        long long : 48; // padding
     };
 
     static bool isBaseClassMutableMemberFunc(const Token *tok, const Scope *scope);

@@ -60,6 +60,7 @@ protected:
 private:
     std::vector<std::string> mPaths;
     bool mCaseSensitive;
+    long long : 56; // padding
     std::vector<std::string> mWorkingDirectory;
 };
 

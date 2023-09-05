@@ -34,12 +34,15 @@ namespace checkers {
         int b;
         const char* str;
         int amendment;
+
+        long long : 32; // padding
     };
 
     struct CPPCHECKLIB MisraCppInfo {
         int a;
         int b;
         int c;
+        long long : 32; // padding
         const char* classification;
     };
 

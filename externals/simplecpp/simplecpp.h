@@ -86,6 +86,8 @@ namespace simplecpp {
         unsigned int col;
     private:
         static const std::string emptyFileName;
+
+        long long : 32; // padding
     };
 
     /**
@@ -132,6 +134,7 @@ namespace simplecpp {
         bool comment;
         bool name;
         bool number;
+        long long : 32; // padding
         Location location;
         Token *previous;
         Token *next;
@@ -184,6 +187,7 @@ namespace simplecpp {
             FILE_NOT_FOUND
         } type;
         explicit Output(const std::vector<std::string>& files, Type type, const std::string& msg) : type(type), location(files), msg(msg) {}
+        long long : 32; // padding
         Location location;
         std::string msg;
     };
@@ -309,6 +313,7 @@ namespace simplecpp {
         Location    macroLocation;
         Location    useLocation;
         bool        macroValueKnown;
+        long long : 56; // padding
     };
 
     /** Tracking #if/#elif expressions */
@@ -332,6 +337,7 @@ namespace simplecpp {
         std::string std;
         bool clearIncludeCache;
         bool removeComments; /** remove comment tokens from included files */
+        long long : 48; // padding
     };
 
     SIMPLECPP_LIB long long characterLiteralToLL(const std::string& str);

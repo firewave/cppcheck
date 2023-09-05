@@ -502,6 +502,7 @@ namespace {
         std::string name;
         std::string configuration;
         enum : std::uint8_t { Win32, x64, Unknown } platform = Unknown;
+        long long : 56; // padding
         std::string platformStr;
     };
 
@@ -603,6 +604,8 @@ namespace {
         std::string additionalIncludePaths;
         std::string entryPointSymbol; // TODO: use this
         Standards::cppstd_t cppstd = Standards::CPPLatest;
+
+        long long : 56; // padding
     };
 }
 

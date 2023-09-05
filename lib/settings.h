@@ -87,6 +87,7 @@ public:
     }
 };
 
+SUPPRESS_WARNING_CLANG_PUSH("-Wpadded")
 
 /**
  * @brief This is just a container for general settings so that we don't need
@@ -522,6 +523,8 @@ private:
     std::string applyEnabled(const std::string &str, bool enable);
     std::map<std::string, std::string> mMisraRuleTexts;
 };
+
+SUPPRESS_WARNING_CLANG_POP
 
 /// @}
 //---------------------------------------------------------------------------

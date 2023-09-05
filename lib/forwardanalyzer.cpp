@@ -59,6 +59,7 @@ namespace {
         bool analyzeOnly{};
         bool analyzeTerminate{};
         Analyzer::Terminate terminate = Analyzer::Terminate::None;
+        long long : 8; // padding
         std::vector<Token*> loopEnds;
         int branchCount = 0;
 
@@ -905,6 +906,8 @@ namespace {
                 return nullptr;
             return getStepTok(end->link());
         }
+
+        long long : 32; // padding
     };
 }
 
