@@ -360,7 +360,7 @@ jobs:
       # requires "gnu-sed" installed on macos
       - name: Run extra tests
         run: |
-          tools/generate_and_run_more_tests.sh
+          test/scripts/generate_and_run_more_tests.sh
 
       # do not use pushd in this step since we go below the working directory
       - name: Run test/cli
@@ -386,7 +386,7 @@ jobs:
 
       - name: Run showtimetop5 tests
         run: |
-          ./tools/test_showtimetop5.sh
+          ./test/scripts/test_showtimetop5.sh
 
       - name: Run --dump test
         run: |
