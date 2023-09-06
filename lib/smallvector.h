@@ -65,6 +65,12 @@ public:
     {
         this->reserve(N);
     }
+
+    SmallVector(std::initializer_list<T> init)
+            : std::vector<T, TaggedAllocator<T, N>>(std::move(init))
+    {
+        //this->reserve(N);
+    }
 };
 #endif
 

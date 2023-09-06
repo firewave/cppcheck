@@ -1213,29 +1213,21 @@ SmallVector<ReferenceToken> followAllReferences(const Token* tok,
     if (!tok)
         return {};
     if (depth < 0) {
-        SmallVector<ReferenceToken> refs_result;
-        refs_result.emplace_back(ReferenceToken{tok, std::move(errors)});
-        return refs_result;
+        return {{tok, std::move(errors)}};
     }
     const Variable *var = tok->variable();
     if (var && var->declarationId() == tok->varId()) {
         if (var->nameToken() == tok || isStructuredBindingVariable(var)) {
-            SmallVector<ReferenceToken> refs_result;
-            refs_result.push_back({tok, std::move(errors)});
-            return refs_result;
+            return {{tok, std::move(errors)}};
         }
         if (var->isReference() || var->isRValueReference()) {
             const Token * const varDeclEndToken = var->declEndToken();
             if (!varDeclEndToken) {
-                SmallVector<ReferenceToken> refs_result;
-                refs_result.push_back({tok, std::move(errors)});
-                return refs_result;
+                return {{tok, std::move(errors)}};
             }
             if (var->isArgument()) {
                 errors.emplace_back(varDeclEndToken, "Passed to reference.");
-                SmallVector<ReferenceToken> refs_result;
-                refs_result.push_back({tok, std::move(errors)});
-                return refs_result;
+                return {{tok, std::move(errors)}};
             }
             if (Token::simpleMatch(varDeclEndToken, "=")) {
                 if (astHasToken(varDeclEndToken, tok))
@@ -1244,16 +1236,12 @@ SmallVector<ReferenceToken> followAllReferences(const Token* tok,
                 const Token *vartok = varDeclEndToken->astOperand2();
                 if (vartok == tok || (!temporary && isTemporary(true, vartok, nullptr, true) &&
                                       (var->isConst() || var->isRValueReference()))) {
-                    SmallVector<ReferenceToken> refs_result;
-                    refs_result.push_back({tok, std::move(errors)});
-                    return refs_result;
+                    return {{tok, std::move(errors)}};
                 }
                 if (vartok)
                     return followAllReferences(vartok, temporary, inconclusive, std::move(errors), depth - 1);
             } else {
-                SmallVector<ReferenceToken> refs_result;
-                refs_result.push_back({tok, std::move(errors)});
-                return refs_result;
+                return {{tok, std::move(errors)}};
             }
         }
     } else if (Token::simpleMatch(tok, "?") && Token::simpleMatch(tok->astOperand2(), ":")) {
@@ -1266,9 +1254,7 @@ SmallVector<ReferenceToken> followAllReferences(const Token* tok,
         result.insert(refs.cbegin(), refs.cend());
 
         if (!inconclusive && result.size() != 1) {
-            SmallVector<ReferenceToken> refs_result;
-            refs_result.push_back({tok, std::move(errors)});
-            return refs_result;
+            return {{tok, std::move(errors)}};
         }
 
         if (!result.empty()) {
@@ -1280,9 +1266,7 @@ SmallVector<ReferenceToken> followAllReferences(const Token* tok,
     } else if (tok->previous() && tok->previous()->function() && Token::Match(tok->previous(), "%name% (")) {
         const Function *f = tok->previous()->function();
         if (!Function::returnsReference(f)) {
-            SmallVector<ReferenceToken> refs_result;
-            refs_result.push_back({tok, std::move(errors)});
-            return refs_result;
+            return {{tok, std::move(errors)}};
         }
         std::set<ReferenceToken, ReferenceTokenLess> result;
         std::vector<const Token*> returns = Function::findReturns(f);
@@ -1293,22 +1277,16 @@ SmallVector<ReferenceToken> followAllReferences(const Token* tok,
                  followAllReferences(returnTok, temporary, inconclusive, errors, depth - returns.size())) {
                 const Variable* argvar = rt.token->variable();
                 if (!argvar) {
-                    SmallVector<ReferenceToken> refs_result;
-                    refs_result.push_back({tok, std::move(errors)});
-                    return refs_result;
+                    return {{tok, std::move(errors)}};
                 }
                 if (argvar->isArgument() && (argvar->isReference() || argvar->isRValueReference())) {
                     const int n = getArgumentPos(argvar, f);
                     if (n < 0) {
-                        SmallVector<ReferenceToken> refs_result;
-                        refs_result.push_back({tok, std::move(errors)});
-                        return refs_result;
+                        return {{tok, std::move(errors)}};
                     }
                     std::vector<const Token*> args = getArguments(tok->previous());
                     if (n >= args.size()) {
-                        SmallVector<ReferenceToken> refs_result;
-                        refs_result.push_back({tok, std::move(errors)});
-                        return refs_result;
+                        return {{tok, std::move(errors)}};
                     }
                     const Token* argTok = args[n];
                     ErrorPath er = errors;
@@ -1318,9 +1296,7 @@ SmallVector<ReferenceToken> followAllReferences(const Token* tok,
                         followAllReferences(argTok, temporary, inconclusive, std::move(er), depth - returns.size());
                     result.insert(refs.cbegin(), refs.cend());
                     if (!inconclusive && result.size() > 1) {
-                        SmallVector<ReferenceToken> refs_result;
-                        refs_result.push_back({tok, std::move(errors)});
-                        return refs_result;
+                        return {{tok, std::move(errors)}};
                     }
                 }
             }
@@ -1331,9 +1307,7 @@ SmallVector<ReferenceToken> followAllReferences(const Token* tok,
             return refs_result;
         }
     }
-    SmallVector<ReferenceToken> refs_result;
-    refs_result.push_back({tok, std::move(errors)});
-    return refs_result;
+    return {{tok, std::move(errors)}};
 }
 
 const Token* followReferences(const Token* tok, ErrorPath* errors)
