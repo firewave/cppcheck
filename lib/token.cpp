@@ -605,8 +605,10 @@ int multiCompareImpl(const Token *tok, const char *haystack, nonneg int varid)
             do {
                 ++haystack;
 
-                if (*haystack == ' ' || *haystack == '\0') {
-                    return -1;
+                switch (*haystack) {
+                    case ' ':
+                    case '\0':
+                        return -1;
                 }
                 if (*haystack == '|') {
                     break;
