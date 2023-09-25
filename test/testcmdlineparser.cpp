@@ -415,6 +415,9 @@ private:
         TEST_CASE(debugLookupConfig);
         TEST_CASE(debugLookupLibrary);
         TEST_CASE(debugLookupPlatform);
+        TEST_CASE(defines);
+        TEST_CASE(definesEmpty);
+        TEST_CASE(definesMissing);
 
         TEST_CASE(ignorepaths1);
         TEST_CASE(ignorepaths2);
@@ -2843,6 +2846,33 @@ private:
         const char * const argv[] = {"cppcheck", "--debug-lookup=platform", "file.cpp"};
         ASSERT_EQUALS_ENUM(CmdLineParser::Result::Success, parser->parseFromArgs(3, argv));
         ASSERT_EQUALS(true, settings->debuglookupPlatform);
+    }
+
+    void defines() {
+        REDIRECT;
+        ScopedFile file("defines.txt",
+                        "DEF_1\n"
+                        "DEF_2=0\n"
+                        "DEF_3=\"0\"\n");
+        const char * const argv[] = {"cppcheck", "--defines=defines.txt", "file.cpp"};
+        settings->userDefines.clear();
+        ASSERT(parser->parseFromArgs(3, argv));
+        ASSERT_EQUALS("DEF_1=1;DEF_2=0;DEF_3=\"0\"", settings->userDefines);
+        ASSERT_EQUALS("", GET_REDIRECT_OUTPUT);
+    }
+
+    void definesEmpty() {
+        REDIRECT;
+        const char * const argv[] = {"cppcheck", "--defines=", "file.cpp"};
+        ASSERT(!parser->parseFromArgs(3, argv));
+        ASSERT_EQUALS("cppcheck: error: couldn't open the file: \"\".\n", GET_REDIRECT_OUTPUT);
+    }
+
+    void definesMissing() {
+        REDIRECT;
+        const char * const argv[] = {"cppcheck", "--defines=defines_missing.txt", "file.cpp"};
+        ASSERT(!parser->parseFromArgs(3, argv));
+        ASSERT_EQUALS("cppcheck: error: couldn't open the file: \"defines_missing.txt\".\n", GET_REDIRECT_OUTPUT);
     }
 
     void ignorepaths1() {

@@ -578,6 +578,22 @@ CmdLineParser::Result CmdLineParser::parseFromArgs(int argc, const char* const a
             else if (std::strcmp(argv[i], "--debug-warnings") == 0)
                 mSettings.debugwarnings = true;
 
+            else if (std::strncmp(argv[i], "--defines=", 10) == 0) {
+                const std::string filename = 10 + argv[i];
+
+                std::ifstream f(filename);
+                if (!f.is_open()) {
+                    printError("couldn't open the file: \"" + filename + "\".");
+                    return false;
+                }
+                std::string line;
+                while (std::getline(f, line))
+                {
+                    // TODO: add some validation?
+                    addDefine(std::move(line));
+                }
+            }
+
             else if (std::strncmp(argv[i], "--disable=", 10) == 0) {
                 const std::string errmsg = mSettings.removeEnabled(argv[i] + 10);
                 if (!errmsg.empty()) {
