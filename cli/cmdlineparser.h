@@ -112,6 +112,8 @@ protected:
 private:
     bool isCppcheckPremium() const;
 
+    void addDefine(std::string define);
+
     template<typename T>
     static bool parseNumberArg(const char* const arg, std::size_t offset, T& num, bool mustBePositive = false)
     {

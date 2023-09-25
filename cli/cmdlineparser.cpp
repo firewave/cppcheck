@@ -155,13 +155,7 @@ bool CmdLineParser::parseFromArgs(int argc, const char* const argv[])
                     define = 2 + argv[i];
                 }
 
-                // No "=", append a "=1"
-                if (define.find('=') == std::string::npos)
-                    define += "=1";
-
-                if (!mSettings.userDefines.empty())
-                    mSettings.userDefines += ";";
-                mSettings.userDefines += define;
+                addDefine(std::move(define));
 
                 def = true;
             }
@@ -1373,6 +1367,16 @@ void CmdLineParser::printHelp()
         " * picojson -- loading compile database.\n"
         " * pcre -- rules.\n"
         " * qt -- used in GUI\n";
+}
+
+void CmdLineParser::addDefine(std::string define) {
+    // No "=", append a "=1"
+    if (define.find('=') == std::string::npos)
+        define += "=1";
+
+    if (!mSettings.userDefines.empty())
+        mSettings.userDefines += ";";
+    mSettings.userDefines += define;
 }
 
 bool CmdLineParser::isCppcheckPremium() const {
