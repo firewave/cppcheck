@@ -390,13 +390,7 @@ CmdLineParser::Result CmdLineParser::parseFromArgs(int argc, const char* const a
                     define = 2 + argv[i];
                 }
 
-                // No "=", append a "=1"
-                if (define.find('=') == std::string::npos)
-                    define += "=1";
-
-                if (!mSettings.userDefines.empty())
-                    mSettings.userDefines += ";";
-                mSettings.userDefines += define;
+                addDefine(std::move(define));
 
                 def = true;
             }
@@ -1853,6 +1847,16 @@ std::string CmdLineParser::getVersion() const {
     if (*extraVersion != '\0')
         return std::string("Cppcheck ") + CppCheck::version() + " ("+ extraVersion + ')';
     return std::string("Cppcheck ") + CppCheck::version();
+}
+
+void CmdLineParser::addDefine(std::string define) {
+    // No "=", append a "=1"
+    if (define.find('=') == std::string::npos)
+        define += "=1";
+
+    if (!mSettings.userDefines.empty())
+        mSettings.userDefines += ";";
+    mSettings.userDefines += define;
 }
 
 bool CmdLineParser::isCppcheckPremium() const {
