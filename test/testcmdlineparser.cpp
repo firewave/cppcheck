@@ -229,6 +229,9 @@ private:
         TEST_CASE(typedefMaxTimeInvalid2);
         TEST_CASE(templateMaxTime);
         TEST_CASE(templateMaxTime);
+        TEST_CASE(defines);
+        TEST_CASE(definesEmpty);
+        TEST_CASE(definesMissing);
 
         TEST_CASE(ignorepaths1);
         TEST_CASE(ignorepaths2);
@@ -1820,6 +1823,33 @@ private:
         const char * const argv[] = {"cppcheck", "--typedef-max-time=-1", "file.cpp"};
         ASSERT(!parser->parseFromArgs(3, argv));
         ASSERT_EQUALS("cppcheck: error: argument to '--typedef-max-time=' is not valid - needs to be positive.\n", GET_REDIRECT_OUTPUT);
+    }
+
+    void defines() {
+        REDIRECT;
+        ScopedFile file("defines.txt",
+                        "DEF_1\n"
+                        "DEF_2=0\n"
+                        "DEF_3=\"0\"\n");
+        const char * const argv[] = {"cppcheck", "--defines=defines.txt", "file.cpp"};
+        settings->userDefines.clear();
+        ASSERT(parser->parseFromArgs(3, argv));
+        ASSERT_EQUALS("DEF_1=1;DEF_2=0;DEF_3=\"0\"", settings->userDefines);
+        ASSERT_EQUALS("", GET_REDIRECT_OUTPUT);
+    }
+
+    void definesEmpty() {
+        REDIRECT;
+        const char * const argv[] = {"cppcheck", "--defines=", "file.cpp"};
+        ASSERT(!parser->parseFromArgs(3, argv));
+        ASSERT_EQUALS("cppcheck: error: couldn't open the file: \"\".\n", GET_REDIRECT_OUTPUT);
+    }
+
+    void definesMissing() {
+        REDIRECT;
+        const char * const argv[] = {"cppcheck", "--defines=defines_missing.txt", "file.cpp"};
+        ASSERT(!parser->parseFromArgs(3, argv));
+        ASSERT_EQUALS("cppcheck: error: couldn't open the file: \"defines_missing.txt\".\n", GET_REDIRECT_OUTPUT);
     }
 
     void ignorepaths1() {
