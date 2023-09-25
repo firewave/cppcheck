@@ -71,13 +71,13 @@ private:
         TEST_CASE(relativePaths4);
         TEST_CASE(quietshort);
         TEST_CASE(quietlong);
-        TEST_CASE(defines_noarg);
-        TEST_CASE(defines_noarg2);
-        TEST_CASE(defines_noarg3);
-        TEST_CASE(defines);
-        TEST_CASE(defines2);
-        TEST_CASE(defines3);
-        TEST_CASE(defines4);
+        TEST_CASE(define_noarg);
+        TEST_CASE(define_noarg2);
+        TEST_CASE(define_noarg3);
+        TEST_CASE(define);
+        TEST_CASE(define2);
+        TEST_CASE(define3);
+        TEST_CASE(define4);
         TEST_CASE(enforceLanguage1);
         TEST_CASE(enforceLanguage2);
         TEST_CASE(enforceLanguage3);
@@ -424,7 +424,7 @@ private:
         ASSERT_EQUALS("", GET_REDIRECT_OUTPUT);
     }
 
-    void defines_noarg() {
+    void define_noarg() {
         REDIRECT;
         const char * const argv[] = {"cppcheck", "-D"};
         // Fails since -D has no param
@@ -432,7 +432,7 @@ private:
         ASSERT_EQUALS("cppcheck: error: argument to '-D' is missing.\n", GET_REDIRECT_OUTPUT);
     }
 
-    void defines_noarg2() {
+    void define_noarg2() {
         REDIRECT;
         const char * const argv[] = {"cppcheck", "-D", "-v", "file.cpp"};
         // Fails since -D has no param
@@ -440,7 +440,7 @@ private:
         ASSERT_EQUALS("cppcheck: error: argument to '-D' is missing.\n", GET_REDIRECT_OUTPUT);
     }
 
-    void defines_noarg3() {
+    void define_noarg3() {
         REDIRECT;
         const char * const argv[] = {"cppcheck", "-D", "--quiet", "file.cpp"};
         // Fails since -D has no param
@@ -448,7 +448,7 @@ private:
         ASSERT_EQUALS("cppcheck: error: argument to '-D' is missing.\n", GET_REDIRECT_OUTPUT);
     }
 
-    void defines() {
+    void define() {
         REDIRECT;
         const char * const argv[] = {"cppcheck", "-D_WIN32", "file.cpp"};
         settings->userDefines.clear();
@@ -457,7 +457,7 @@ private:
         ASSERT_EQUALS("", GET_REDIRECT_OUTPUT);
     }
 
-    void defines2() {
+    void define2() {
         REDIRECT;
         const char * const argv[] = {"cppcheck", "-D_WIN32", "-DNODEBUG", "file.cpp"};
         settings->userDefines.clear();
@@ -466,7 +466,7 @@ private:
         ASSERT_EQUALS("", GET_REDIRECT_OUTPUT);
     }
 
-    void defines3() {
+    void define3() {
         REDIRECT;
         const char * const argv[] = {"cppcheck", "-D", "DEBUG", "file.cpp"};
         settings->userDefines.clear();
@@ -475,7 +475,7 @@ private:
         ASSERT_EQUALS("", GET_REDIRECT_OUTPUT);
     }
 
-    void defines4() {
+    void define4() {
         REDIRECT;
         const char * const argv[] = {"cppcheck", "-DDEBUG=", "file.cpp"}; // #5137 - defining empty macro
         settings->userDefines.clear();
