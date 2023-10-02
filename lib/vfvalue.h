@@ -43,7 +43,7 @@ namespace ValueFlow
         using ErrorPath = std::list<ErrorPathItem>;
         enum class Bound { Upper, Lower, Point };
 
-        explicit Value(long long val = 0, Bound b = Bound::Point) :
+        explicit Value(MathLib::bigint val = 0, Bound b = Bound::Point) :
             bound(b),
             intvalue(val),
             varvalue(val),
@@ -261,7 +261,7 @@ namespace ValueFlow
         Bound bound = Bound::Point;
 
         /** int value (or sometimes bool value?) */
-        long long intvalue{};
+        MathLib::bigint intvalue{};
 
         /** token value - the token that has the value. this is used for pointer aliases, strings, etc. */
         const Token* tokvalue{};
@@ -270,7 +270,7 @@ namespace ValueFlow
         double floatValue{};
 
         /** For calculated values - variable value that calculated value depends on */
-        long long varvalue{};
+        MathLib::bigint varvalue{};
 
         /** Condition that this value depends on */
         const Token* condition{};
@@ -303,7 +303,7 @@ namespace ValueFlow
         MathLib::bigint path{};
 
         /** int value before implicit truncation */
-        long long wideintvalue{};
+        MathLib::bigint wideintvalue{};
 
         std::vector<std::string> subexpressions;
 

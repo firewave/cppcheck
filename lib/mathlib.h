@@ -25,6 +25,10 @@
 
 #include <string>
 
+#ifdef HAVE_BOOST
+#include <boost/multiprecision/cpp_int.hpp>
+#endif
+
 /// @addtogroup Core
 /// @{
 
@@ -65,8 +69,13 @@ public:
         value shiftRight(const value &v) const;
     };
 
+#ifdef HAVE_BOOST
+    using bigint = boost::multiprecision::int128_t;
+    using biguint = boost::multiprecision::uint128_t;
+#else
     using bigint = long long;
     using biguint = unsigned long long;
+#endif
     static const int bigint_bits;
 
     /** @brief for conversion of numeric literals - for atoi-like conversions please use strToInt() */

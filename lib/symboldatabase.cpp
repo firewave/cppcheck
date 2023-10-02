@@ -1584,7 +1584,7 @@ void SymbolDatabase::createSymbolDatabaseExprIds()
     for (const Variable *var : mVariableList) {
         if (!var)
             continue;
-        base = std::max<MathLib::bigint>(base, var->declarationId());
+        base = std::max<nonneg int>(base, var->declarationId());
     }
     nonneg int id = base + 1;
     // Find incomplete vars that are used in constant context

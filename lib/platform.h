@@ -22,6 +22,7 @@
 //---------------------------------------------------------------------------
 
 #include "config.h"
+#include "mathlib.h"
 
 #include <climits>
 #include <stdexcept>
@@ -54,16 +55,16 @@ private:
 public:
     Platform();
 
-    bool isIntValue(long long value) const {
+    bool isIntValue(MathLib::bigint value) const {
         return value >= min_value(int_bit) && value <= max_value(int_bit);
     }
 
-    bool isIntValue(unsigned long long value) const {
+    bool isIntValue(MathLib::biguint value) const {
         const unsigned long long intMax = max_value(int_bit);
         return value <= intMax;
     }
 
-    bool isLongValue(long long value) const {
+    bool isLongValue(MathLib::bigint value) const {
         return value >= min_value(long_bit) && value <= max_value(long_bit);
     }
 
@@ -72,7 +73,7 @@ public:
         return value <= longMax;
     }
 
-    bool isLongLongValue(unsigned long long value) const {
+    bool isLongLongValue(MathLib::biguint value) const {
         const unsigned long long longLongMax = max_value(long_long_bit);
         return value <= longLongMax;
     }

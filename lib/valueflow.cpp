@@ -400,7 +400,7 @@ static ValueFlow::Value castValue(ValueFlow::Value value, const ValueType::Sign 
     if (value.isFloatValue()) {
         value.valueType = ValueFlow::Value::ValueType::INT;
         if (value.floatValue >= std::numeric_limits<int>::min() && value.floatValue <= std::numeric_limits<int>::max()) {
-            value.intvalue = value.floatValue;
+            value.intvalue = static_cast<MathLib::bigint>(value.floatValue);
         } else { // don't perform UB
             value.intvalue = 0;
         }
@@ -873,8 +873,8 @@ static void setTokenValue(Token* tok,
                         continue;
                     result.valueType = ValueFlow::Value::ValueType::FLOAT;
                 }
-                const double floatValue1 = value1.isFloatValue() ? value1.floatValue : value1.intvalue;
-                const double floatValue2 = value2.isFloatValue() ? value2.floatValue : value2.intvalue;
+                const double floatValue1 = value1.isFloatValue() ? value1.floatValue : static_cast<double>(value1.intvalue);
+                const double floatValue2 = value2.isFloatValue() ? value2.floatValue : static_cast<double>(value2.intvalue);
                 const auto intValue1 = [&]() -> MathLib::bigint {
                     return value1.isFloatValue() ? static_cast<MathLib::bigint>(value1.floatValue) : value1.intvalue;
                 };
@@ -1082,7 +1082,7 @@ static void setTokenValueCast(Token *parent, const ValueType &valueType, const V
         ValueFlow::Value floatValue = value;
         floatValue.valueType = ValueFlow::Value::ValueType::FLOAT;
         if (value.isIntValue())
-            floatValue.floatValue = value.intvalue;
+            floatValue.floatValue = static_cast<double>(value.intvalue);
         setTokenValue(parent, std::move(floatValue), settings);
     } else if (value.isIntValue()) {
         const long long charMax = settings->platform.signedCharMax();
@@ -1256,7 +1256,7 @@ static Token * valueFlowSetConstantValue(Token *tok, const Settings *settings, b
                     size = getSizeOfType(var->typeStartToken(), settings);
                 }
                 // find the number of elements
-                size_t count = 1;
+                MathLib::biguint count = 1;
                 for (size_t i = 0; i < var->dimensions().size(); ++i) {
                     if (var->dimensionKnown(i))
                         count *= var->dimension(i);
@@ -1300,7 +1300,7 @@ static Token * valueFlowSetConstantValue(Token *tok, const Settings *settings, b
             }
         } else if (!tok2->type()) {
             const ValueType& vt = ValueType::parseDecl(tok2, *settings);
-            size_t sz = ValueFlow::getSizeOf(vt, settings);
+            MathLib::biguint sz = ValueFlow::getSizeOf(vt, settings);
             const Token* brac = tok2->astParent();
             while (Token::simpleMatch(brac, "[")) {
                 const Token* num = brac->astOperand2();
@@ -6312,7 +6312,7 @@ struct ConditionHandler {
             if (Token::Match(tok->astParent(), "==|!=")) {
                 const Token* sibling = tok->astSibling();
                 if (sibling->hasKnownIntValue() && (astIsBool(tok) || astIsBool(sibling))) {
-                    const bool value = sibling->values().front().intvalue;
+                    const bool value = !!sibling->values().front().intvalue;
                     if (inverted)
                         *inverted ^= value == Token::simpleMatch(tok->astParent(), "!=");
                     continue;
@@ -8067,7 +8067,7 @@ struct ContainerExpressionAnalyzer : ExpressionAnalyzer {
             return;
         const Token* parent = tok->astParent();
         const Library::Container* container = getLibraryContainer(tok);
-        int n = 0;
+        MathLib::bigint n = 0;
 
         if (container->stdStringLike && Token::simpleMatch(parent, "+=") && parent->astOperand2()) {
             const Token* rhs = parent->astOperand2();
@@ -8461,7 +8461,7 @@ static std::vector<ValueFlow::Value> getContainerValues(const Token* tok)
     return values;
 }
 
-static ValueFlow::Value makeContainerSizeValue(std::size_t s, bool known = true)
+static ValueFlow::Value makeContainerSizeValue(MathLib::biguint s, bool known = true)
 {
     ValueFlow::Value value(s);
     value.valueType = ValueFlow::Value::ValueType::CONTAINER_SIZE;
@@ -8636,7 +8636,7 @@ static void valueFlowContainerSize(TokenList& tokenlist,
             continue;
 
         bool known = true;
-        int size = 0;
+        MathLib::bigint size = 0;
         const bool nonLocal = !var->isLocal() || var->isPointer() || var->isReference() || var->isStatic();
         bool constSize = var->isConst() && !nonLocal;
         bool staticSize = false;
@@ -9069,12 +9069,12 @@ static void valueFlowSafeFunctions(TokenList& tokenlist, const SymbolDatabase& s
                     std::list<ValueFlow::Value> argValues;
                     argValues.emplace_back(0);
                     argValues.back().valueType = ValueFlow::Value::ValueType::FLOAT;
-                    argValues.back().floatValue = isLow ? low : -1E25;
+                    argValues.back().floatValue = isLow ? static_cast<double>(low) : -1E25;
                     argValues.back().errorPath.emplace_back(arg.nameToken(), "Safe checks: Assuming argument has value " + MathLib::toString(argValues.back().floatValue));
                     argValues.back().safe = true;
                     argValues.emplace_back(0);
                     argValues.back().valueType = ValueFlow::Value::ValueType::FLOAT;
-                    argValues.back().floatValue = isHigh ? high : 1E25;
+                    argValues.back().floatValue = isHigh ? static_cast<double>(high) : 1E25;
                     argValues.back().errorPath.emplace_back(arg.nameToken(), "Safe checks: Assuming argument has value " + MathLib::toString(argValues.back().floatValue));
                     argValues.back().safe = true;
                     valueFlowForward(const_cast<Token*>(functionScope->bodyStart->next()),

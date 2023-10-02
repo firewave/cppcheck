@@ -105,7 +105,7 @@ bool findTokensSkipDeadCodeImpl(const Library* library,
             if (Token::simpleMatch(thenStart->link(), "} else {"))
                 elseStart = thenStart->link()->tokAt(2);
 
-            int r = result.front();
+            MathLib::bigint r = result.front();
             if (r == 0) {
                 if (elseStart) {
                     if (findTokensSkipDeadCodeImpl(library, elseStart, elseStart->link(), pred, found, evaluate))
@@ -153,7 +153,7 @@ bool findTokensSkipDeadCodeImpl(const Library* library,
                 continue;
             if (isReturnScope(tok->link(), library))
                 return true;
-            int r = result.front();
+            MathLib::bigint r = result.front();
             if (r != 0) {
                 tok = tok->linkAt(2);
             }
