@@ -51,7 +51,7 @@ protected:
     void highlightBlock(const QString &text) override;
 
 private:
-    enum RuleRole {
+    enum class RuleRole {
         Keyword = 1,
         Class   = 2,
         Comment = 3,

@@ -100,7 +100,7 @@ namespace cppcheck {
 
         char defaultSign;  // unsigned:'u', signed:'s', unknown:'\0'
 
-        enum Type {
+        enum class Type {
             Unspecified, // No platform specified
             Native, // whatever system this code was compiled on
             Win32A,

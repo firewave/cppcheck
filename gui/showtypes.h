@@ -41,7 +41,7 @@ public:
     /**
      * @brief Show types we have (i.e. severities in the GUI).
      */
-    enum ShowType {
+    enum class ShowType {
         ShowStyle = 0,
         ShowWarnings,
         ShowPerformance,

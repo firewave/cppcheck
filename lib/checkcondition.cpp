@@ -687,7 +687,7 @@ void CheckCondition::multiCondition2()
         });
 
         // parse until second condition is reached..
-        enum MULTICONDITIONTYPE { INNER, AFTER };
+        enum class MULTICONDITIONTYPE { INNER, AFTER };
         const Token *tok;
 
         // Parse inner condition first and then early return condition

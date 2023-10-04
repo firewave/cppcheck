@@ -747,7 +747,7 @@ class CPPCHECKLIB Function {
     }
 
 public:
-    enum Type { eConstructor, eCopyConstructor, eMoveConstructor, eOperatorEqual, eDestructor, eFunction, eLambda };
+    enum class Type { eConstructor, eCopyConstructor, eMoveConstructor, eOperatorEqual, eDestructor, eFunction, eLambda };
 
     Function(const Tokenizer *mTokenizer, const Token *tok, const Scope *scope, const Token *tokDef, const Token *tokArgDef);
     Function(const Token *tokenDef, const std::string &clangType);
@@ -911,7 +911,7 @@ public:
     const Scope* nestedIn{};          ///< Scope the function is declared in
     std::list<Variable> argumentList; ///< argument list, must remain list due to clangimport usage!
     nonneg int initArgCount{};        ///< number of args with default values
-    Type type = eFunction;            ///< constructor, destructor, ...
+    Type type = eFunction;      ///< constructor, destructor, ...
     const Token* noexceptArg{};       ///< noexcept token
     const Token* throwArg{};          ///< throw token
     const Token* templateDef{};       ///< points to 'template <' before function
@@ -1021,10 +1021,10 @@ public:
         const Scope *scope;
     };
 
-    enum ScopeType { eGlobal, eClass, eStruct, eUnion, eNamespace, eFunction, eIf, eElse, eFor, eWhile, eDo, eSwitch, eUnconditional, eTry, eCatch, eLambda, eEnum };
+    enum class Type { eGlobal, eClass, eStruct, eUnion, eNamespace, eFunction, eIf, eElse, eFor, eWhile, eDo, eSwitch, eUnconditional, eTry, eCatch, eLambda, eEnum };
 
     Scope(const SymbolDatabase *check_, const Token *classDef_, const Scope *nestedIn_);
-    Scope(const SymbolDatabase *check_, const Token *classDef_, const Scope *nestedIn_, ScopeType type_, const Token *start_);
+    Scope(const SymbolDatabase *check_, const Token *classDef_, const Scope *nestedIn_, Type type_, const Token *start_);
 
     const SymbolDatabase* check{};
     std::string className;
@@ -1039,7 +1039,7 @@ public:
     nonneg int numConstructors{};
     nonneg int numCopyOrMoveConstructors{};
     std::vector<UsingInfo> usingList;
-    ScopeType type{};
+    Type type{};
     Type* definedType{};
     std::map<std::string, Type*> definedTypesMap;
     std::vector<const Token *> bodyStartList;
@@ -1086,7 +1086,7 @@ public:
 
     static Function* nestedInFunction(const Scope* scope) {
         while (scope) {
-            if (scope->type == Scope::eFunction)
+            if (scope->type == Scope::Type::eFunction)
                 break;
             scope = scope->nestedIn;
         }
@@ -1211,8 +1211,8 @@ enum class Reference {
 /** Value type */
 class CPPCHECKLIB ValueType {
 public:
-    enum Sign { UNKNOWN_SIGN, SIGNED, UNSIGNED } sign = UNKNOWN_SIGN;
-    enum Type {
+    enum class Sign { UNKNOWN_SIGN, SIGNED, UNSIGNED } sign = UNKNOWN_SIGN;
+    enum class Type {
         UNKNOWN_TYPE,
         POD,
         NONSTD,

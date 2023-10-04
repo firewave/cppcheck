@@ -72,7 +72,7 @@ public:
     struct Function {
         QString comments;
         QString name;
-        enum TrueFalseUnknown { False, True, Unknown } noreturn = Unknown;
+        enum class TrueFalseUnknown { False, True, Unknown } noreturn = Unknown;
         bool gccPure{};
         bool gccConst{};
         bool leakignore{};

@@ -221,12 +221,12 @@ static int write_vcxproj(const std::string &proj_name, const std::function<void(
     return EXIT_SUCCESS;
 }
 
-enum ClType { Compile, Include, Precompile };
+enum class ClType { Compile, Include, Precompile };
 
 static std::string make_vcxproj_cl_entry(const std::string& file, ClType type)
 {
     std::string outstr;
-    if (type == Precompile) {
+    if (type == ClType::Precompile) {
         outstr += R"(    <ClCompile Include=")";
         outstr += file;
         outstr += R"(">)";
@@ -243,7 +243,7 @@ static std::string make_vcxproj_cl_entry(const std::string& file, ClType type)
         return outstr;
     }
     outstr += "    <";
-    outstr += (type == Compile) ? "ClCompile" : "ClInclude";
+    outstr += (type == ClType::Compile) ? "ClCompile" : "ClInclude";
     outstr += R"( Include=")";
     outstr += file;
     outstr += R"(" />)";
@@ -358,28 +358,28 @@ int main(int argc, char **argv)
     write_vcxproj("cli/cli.vcxproj", [&](std::string &outstr){
         for (const std::string &clifile: clifiles) {
             const std::string c = clifile.substr(4);
-            outstr += make_vcxproj_cl_entry(c, c == "executor.cpp" ? Precompile : Compile);
+            outstr += make_vcxproj_cl_entry(c, c == "executor.cpp" ? ClType::Precompile : ClType::Compile);
         }
     }, [&](std::string &outstr){
         for (const std::string &clifile_h: clifiles_h) {
-            outstr += make_vcxproj_cl_entry(clifile_h, Include);
+            outstr += make_vcxproj_cl_entry(clifile_h, ClType::Include);
         }
     });
 
     write_vcxproj("lib/cppcheck.vcxproj", [&](std::string &outstr){
-        outstr += make_vcxproj_cl_entry(R"(..\externals\simplecpp\simplecpp.cpp)", Compile);
-        outstr += make_vcxproj_cl_entry(R"(..\externals\tinyxml2\tinyxml2.cpp)", Compile);
+        outstr += make_vcxproj_cl_entry(R"(..\externals\simplecpp\simplecpp.cpp)", ClType::Compile);
+        outstr += make_vcxproj_cl_entry(R"(..\externals\tinyxml2\tinyxml2.cpp)", ClType::Compile);
 
         for (const std::string &libfile: libfiles_prio) {
             const std::string l = libfile.substr(4);
-            outstr += make_vcxproj_cl_entry(l, l == "check.cpp" ? Precompile : Compile);
+            outstr += make_vcxproj_cl_entry(l, l == "check.cpp" ? ClType::Precompile : ClType::Compile);
         }
     }, [&](std::string &outstr){
-        outstr += make_vcxproj_cl_entry(R"(..\externals\simplecpp\simplecpp.h)", Include);
-        outstr += make_vcxproj_cl_entry(R"(..\externals\tinyxml2\tinyxml2.h)", Include);
+        outstr += make_vcxproj_cl_entry(R"(..\externals\simplecpp\simplecpp.h)", ClType::Include);
+        outstr += make_vcxproj_cl_entry(R"(..\externals\tinyxml2\tinyxml2.h)", ClType::Include);
 
         for (const std::string &libfile_h: libfiles_h) {
-            outstr += make_vcxproj_cl_entry(libfile_h, Include);
+            outstr += make_vcxproj_cl_entry(libfile_h, ClType::Include);
         }
     });
 
@@ -388,21 +388,21 @@ int main(int argc, char **argv)
             if (clifile == "cli/main.cpp")
                 continue;
             const std::string c = R"(..\cli\)" + clifile.substr(4);
-            outstr += make_vcxproj_cl_entry(c, Compile);
+            outstr += make_vcxproj_cl_entry(c, ClType::Compile);
         }
 
         for (const std::string &testfile: testfiles) {
             const std::string t = testfile.substr(5);
-            outstr += make_vcxproj_cl_entry(t, t == "fixture.cpp" ? Precompile : Compile);
+            outstr += make_vcxproj_cl_entry(t, t == "fixture.cpp" ? ClType::Precompile : ClType::Compile);
         }
     }, [&](std::string &outstr){
         for (const std::string &clifile_h: clifiles_h) {
             const std::string c = R"(..\cli\)" + clifile_h;
-            outstr += make_vcxproj_cl_entry(c, Include);
+            outstr += make_vcxproj_cl_entry(c, ClType::Include);
         }
 
         for (const std::string &testfile_h: testfiles_h) {
-            outstr += make_vcxproj_cl_entry(testfile_h, Include);
+            outstr += make_vcxproj_cl_entry(testfile_h, ClType::Include);
         }
     });
 

@@ -179,7 +179,7 @@ public:
     bool dump{};
     std::string dumpFile;
 
-    enum Language {
+    enum class Language {
         None, C, CPP
     };
 
@@ -278,7 +278,7 @@ public:
         std::string pattern;
         std::string id = "rule"; // default id
         std::string summary;
-        Severity::SeverityType severity = Severity::style; // default severity
+        Severity::Type severity = Severity::Type::style; // default severity
     };
 
 #ifdef HAVE_RULES
@@ -331,7 +331,7 @@ public:
 
     SafeChecks safeChecks;
 
-    SimpleEnableGroup<Severity::SeverityType> severity;
+    SimpleEnableGroup<Severity::Type> severity;
     SimpleEnableGroup<Certainty> certainty;
     SimpleEnableGroup<Checks> checks;
 
@@ -435,7 +435,7 @@ public:
     void setCheckLevelNormal();
 
 private:
-    static std::string parseEnabled(const std::string &str, std::tuple<SimpleEnableGroup<Severity::SeverityType>, SimpleEnableGroup<Checks>> &groups);
+    static std::string parseEnabled(const std::string &str, std::tuple<SimpleEnableGroup<Severity::Type>, SimpleEnableGroup<Checks>> &groups);
     std::string applyEnabled(const std::string &str, bool enable);
 };
 

@@ -2389,7 +2389,7 @@ void Tokenizer::simplifyTypedefCpp()
 
 namespace {
     struct ScopeInfo3 {
-        enum Type { Global, Namespace, Record, MemberFunction, Other };
+        enum class Type { Global, Namespace, Record, MemberFunction, Other };
         ScopeInfo3() : parent(nullptr), type(Global), bodyStart(nullptr), bodyEnd(nullptr) {}
         ScopeInfo3(ScopeInfo3 *parent_, Type type_, std::string name_, const Token *bodyStart_, const Token *bodyEnd_)
             : parent(parent_), type(type_), name(std::move(name_)), bodyStart(bodyStart_), bodyEnd(bodyEnd_) {

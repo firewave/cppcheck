@@ -165,7 +165,7 @@ public:
     struct WarnInfo {
         std::string message;
         Standards standards;
-        Severity::SeverityType severity;
+        Severity::Type severity;
     };
     std::map<std::string, WarnInfo> functionwarn;
 
@@ -595,7 +595,7 @@ private:
         return (it == data.end()) ? nullptr : &it->second;
     }
 
-    enum DetectContainer { ContainerOnly, IteratorOnly, Both };
+    enum class DetectContainer { ContainerOnly, IteratorOnly, Both };
     const Library::Container* detectContainerInternal(const Token* typeStart, DetectContainer detect, bool* isIterator = nullptr, bool withoutStd = false) const;
 };
 

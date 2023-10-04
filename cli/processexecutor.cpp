@@ -389,7 +389,7 @@ void ProcessExecutor::reportInternalChildErr(const std::string &childname, const
     locations.emplace_back(childname, 0, 0);
     const ErrorMessage errmsg(locations,
                               emptyString,
-                              Severity::error,
+                              Severity::Type::error,
                               "Internal error: " + msg,
                               "cppcheckError",
                               Certainty::normal);

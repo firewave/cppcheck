@@ -103,7 +103,7 @@ static bool isRaiiClass(const ValueType *valueType, bool cpp, bool defaultReturn
  */
 class Variables {
 public:
-    enum VariableType { standard, array, pointer, reference, pointerArray, referenceArray, pointerPointer, none };
+    enum class VariableType { standard, array, pointer, reference, pointerArray, referenceArray, pointerPointer, none };
 
     /** Store information about variable usage */
     class VariableUsage {

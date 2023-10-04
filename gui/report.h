@@ -33,7 +33,7 @@ class ErrorItem;
  */
 class Report : public QObject {
 public:
-    enum Type {
+    enum class Type {
         TXT,
         XMLV2,
         CSV,

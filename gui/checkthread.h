@@ -111,7 +111,7 @@ protected:
      * has been completed. Thread must be stopped cleanly, just terminating thread
      * likely causes unpredictable side-effects.
      */
-    enum State {
+    enum class State {
         Running, /**< The thread is checking. */
         Stopping, /**< The thread will stop after current work. */
         Stopped, /**< The thread has been stopped. */

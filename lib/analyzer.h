@@ -147,7 +147,7 @@ struct Analyzer {
     enum class Direction { Forward, Reverse };
 
     struct Assume {
-        enum Flags {
+        enum class Flags {
             None = 0,
             Quiet = (1 << 0),
             Absolute = (1 << 1),

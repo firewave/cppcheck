@@ -121,7 +121,7 @@ struct TokenImpl {
 
     // __cppcheck_in_range__
     struct CppcheckAttributes {
-        enum Type { LOW, HIGH } type = LOW;
+        enum class Type { LOW, HIGH } type = Type::LOW;
         MathLib::bigint value{};
         CppcheckAttributes* next{};
     };
@@ -163,7 +163,7 @@ public:
     Token(const Token &) = delete;
     Token& operator=(const Token &) = delete;
 
-    enum Type {
+    enum class Type {
         eVariable, eType, eFunction, eKeyword, eName, // Names: Variable (varId), Type (typeId, later), Function (FuncId, later), Language keyword, Name (unknown identifier)
         eNumber, eString, eChar, eBoolean, eLiteral, eEnumerator, // Literals: Number, String, Character, Boolean, User defined literal (C++11), Enumerator
         eArithmeticalOp, eComparisonOp, eAssignmentOp, eLogicalOp, eBitOp, eIncDecOp, eExtendedOp, // Operators: Arithmetical, Comparison, Assignment, Logical, Bitwise, ++/--, Extended
@@ -354,66 +354,66 @@ public:
     void tokType(Token::Type t) {
         mTokType = t;
 
-        const bool memoizedIsName = (mTokType == eName || mTokType == eType || mTokType == eVariable ||
-                                     mTokType == eFunction || mTokType == eKeyword || mTokType == eBoolean ||
-                                     mTokType == eEnumerator); // TODO: "true"/"false" aren't really a name...
+        const bool memoizedIsName = (mTokType == Type::eName || mTokType == Type::eType || mTokType == Type::eVariable ||
+                                     mTokType == Type::eFunction || mTokType == Type::eKeyword || mTokType == Type::eBoolean ||
+                                     mTokType == Type::eEnumerator); // TODO: "true"/"false" aren't really a name...
         setFlag(fIsName, memoizedIsName);
 
-        const bool memoizedIsLiteral = (mTokType == eNumber || mTokType == eString || mTokType == eChar ||
-                                        mTokType == eBoolean || mTokType == eLiteral || mTokType == eEnumerator);
+        const bool memoizedIsLiteral = (mTokType == Type::eNumber || mTokType == Type::eString || mTokType == Type::eChar ||
+                                        mTokType == Type::eBoolean || mTokType == Type::eLiteral || mTokType == Type::eEnumerator);
         setFlag(fIsLiteral, memoizedIsLiteral);
     }
     bool isKeyword() const {
-        return mTokType == eKeyword;
+        return mTokType == Type::eKeyword;
     }
     bool isName() const {
         return getFlag(fIsName);
     }
     bool isNameOnly() const {
-        return mFlags == fIsName && mTokType == eName;
+        return mFlags == fIsName && mTokType == Type::eName;
     }
     bool isUpperCaseName() const;
     bool isLiteral() const {
         return getFlag(fIsLiteral);
     }
     bool isNumber() const {
-        return mTokType == eNumber;
+        return mTokType == Type::eNumber;
     }
     bool isEnumerator() const {
-        return mTokType == eEnumerator;
+        return mTokType == Type::eEnumerator;
     }
     bool isVariable() const {
-        return mTokType == eVariable;
+        return mTokType == Type::eVariable;
     }
     bool isOp() const {
         return (isConstOp() ||
                 isAssignmentOp() ||
-                mTokType == eIncDecOp);
+                mTokType == Type::eIncDecOp);
     }
     bool isConstOp() const {
         return (isArithmeticalOp() ||
-                mTokType == eLogicalOp ||
-                mTokType == eComparisonOp ||
-                mTokType == eBitOp);
+                mTokType == Type::eLogicalOp ||
+                mTokType == Type::eComparisonOp ||
+                mTokType == Type::eBitOp);
     }
     bool isExtendedOp() const {
         return isConstOp() ||
-               mTokType == eExtendedOp;
+               mTokType == Type::eExtendedOp;
     }
     bool isArithmeticalOp() const {
-        return mTokType == eArithmeticalOp;
+        return mTokType == Type::eArithmeticalOp;
     }
     bool isComparisonOp() const {
-        return mTokType == eComparisonOp;
+        return mTokType == Type::eComparisonOp;
     }
     bool isAssignmentOp() const {
-        return mTokType == eAssignmentOp;
+        return mTokType == Type::eAssignmentOp;
     }
     bool isBoolean() const {
-        return mTokType == eBoolean;
+        return mTokType == Type::eBoolean;
     }
     bool isIncDecOp() const {
-        return mTokType == eIncDecOp;
+        return mTokType == Type::eIncDecOp;
     }
     bool isBinaryOp() const {
         return astOperand1() != nullptr && astOperand2() != nullptr;
@@ -716,27 +716,27 @@ public:
     }
 
     bool isUtf8() const {
-        return (((mTokType == eString) && isPrefixStringCharLiteral(mStr, '"', "u8")) ||
-                ((mTokType == eChar) && isPrefixStringCharLiteral(mStr, '\'', "u8")));
+        return (((mTokType == Type::eString) && isPrefixStringCharLiteral(mStr, '"', "u8")) ||
+                ((mTokType == Type::eChar) && isPrefixStringCharLiteral(mStr, '\'', "u8")));
     }
 
     bool isUtf16() const {
-        return (((mTokType == eString) && isPrefixStringCharLiteral(mStr, '"', "u")) ||
-                ((mTokType == eChar) && isPrefixStringCharLiteral(mStr, '\'', "u")));
+        return (((mTokType == Type::eString) && isPrefixStringCharLiteral(mStr, '"', "u")) ||
+                ((mTokType == Type::eChar) && isPrefixStringCharLiteral(mStr, '\'', "u")));
     }
 
     bool isUtf32() const {
-        return (((mTokType == eString) && isPrefixStringCharLiteral(mStr, '"', "U")) ||
-                ((mTokType == eChar) && isPrefixStringCharLiteral(mStr, '\'', "U")));
+        return (((mTokType == Type::eString) && isPrefixStringCharLiteral(mStr, '"', "U")) ||
+                ((mTokType == Type::eChar) && isPrefixStringCharLiteral(mStr, '\'', "U")));
     }
 
     bool isCChar() const {
-        return (((mTokType == eString) && isPrefixStringCharLiteral(mStr, '"', emptyString)) ||
-                ((mTokType ==  eChar) && isPrefixStringCharLiteral(mStr, '\'', emptyString) && mStr.length() == 3));
+        return (((mTokType == Type::eString) && isPrefixStringCharLiteral(mStr, '"', emptyString)) ||
+                ((mTokType ==  Type::eChar) && isPrefixStringCharLiteral(mStr, '\'', emptyString) && mStr.length() == 3));
     }
 
     bool isCMultiChar() const {
-        return (((mTokType ==  eChar) && isPrefixStringCharLiteral(mStr, '\'', emptyString)) &&
+        return (((mTokType ==  Type::eChar) && isPrefixStringCharLiteral(mStr, '\'', emptyString)) &&
                 (mStr.length() > 3));
     }
     /**
@@ -885,7 +885,7 @@ public:
     void varId(nonneg int id) {
         mImpl->mVarId = id;
         if (id != 0) {
-            tokType(eVariable);
+            tokType(Type::eVariable);
             isStandardType(false);
         } else {
             update_property_info();
@@ -1075,7 +1075,7 @@ public:
      * @return a pointer to the Function associated with this token.
      */
     const Function *function() const {
-        return mTokType == eFunction || mTokType == eLambda ? mImpl->mFunction : nullptr;
+        return mTokType == Type::eFunction || mTokType == Type::eLambda ? mImpl->mFunction : nullptr;
     }
 
     /**
@@ -1085,16 +1085,16 @@ public:
     void variable(const Variable *v) {
         mImpl->mVariable = v;
         if (v || mImpl->mVarId)
-            tokType(eVariable);
-        else if (mTokType == eVariable)
-            tokType(eName);
+            tokType(Type::eVariable);
+        else if (mTokType == Type::eVariable)
+            tokType(Type::eName);
     }
 
     /**
      * @return a pointer to the variable associated with this token.
      */
     const Variable *variable() const {
-        return mTokType == eVariable ? mImpl->mVariable : nullptr;
+        return mTokType == Type::eVariable ? mImpl->mVariable : nullptr;
     }
 
     /**
@@ -1107,7 +1107,7 @@ public:
      * @return a pointer to the type associated with this token.
      */
     const ::Type *type() const {
-        return mTokType == eType ? mImpl->mType : nullptr;
+        return mTokType == Type::eType ? mImpl->mType : nullptr;
     }
 
     static const ::Type* typeOf(const Token* tok, const Token** typeTok = nullptr);
@@ -1124,7 +1124,7 @@ public:
      * @return a pointer to the Enumerator associated with this token.
      */
     const Enumerator *enumerator() const {
-        return mTokType == eEnumerator ? mImpl->mEnumerator : nullptr;
+        return mTokType == Type::eEnumerator ? mImpl->mEnumerator : nullptr;
     }
 
     /**
@@ -1134,9 +1134,9 @@ public:
     void enumerator(const Enumerator *e) {
         mImpl->mEnumerator = e;
         if (e)
-            tokType(eEnumerator);
-        else if (mTokType == eEnumerator)
-            tokType(eName);
+            tokType(Type::eEnumerator);
+        else if (mTokType == Type::eEnumerator)
+            tokType(Type::eName);
     }
 
     /**
@@ -1350,7 +1350,7 @@ private:
         efIsUnique = efMaxSize - 2,
     };
 
-    Token::Type mTokType = eNone;
+    Token::Type mTokType = Type::eNone;
 
     uint64_t mFlags{};
 

@@ -113,7 +113,7 @@ public:
         bool matched{};
         bool checked{}; // for inline suppressions, checked or not
 
-        enum { NO_LINE = -1 };
+        static constexpr int NO_LINE = -1;
     };
 
     /**

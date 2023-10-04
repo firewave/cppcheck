@@ -1624,7 +1624,7 @@ void CheckOther::checkConstPointer()
             continue;
         pointers.emplace_back(var);
         const Token* parent = tok->astParent();
-        enum Deref { NONE, DEREF, MEMBER } deref = NONE;
+        enum { NONE, DEREF, MEMBER } deref = NONE;
         bool hasIncDec = false;
         if (parent && (parent->isUnaryOp("*") || (hasIncDec = parent->isIncDecOp() && parent->astParent() && parent->astParent()->isUnaryOp("*"))))
             deref = DEREF;

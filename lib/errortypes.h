@@ -34,10 +34,10 @@ class Token;
 
 /** @brief Simple container to be thrown when internal error is detected. */
 struct CPPCHECKLIB InternalError {
-    enum Type {AST, SYNTAX, UNKNOWN_MACRO, INTERNAL, LIMIT, INSTANTIATION};
+    enum class Type {AST, SYNTAX, UNKNOWN_MACRO, INTERNAL, LIMIT, INSTANTIATION};
 
-    InternalError(const Token *tok, std::string errorMsg, Type type = INTERNAL);
-    InternalError(const Token *tok, std::string errorMsg, std::string details, Type type = INTERNAL);
+    InternalError(const Token *tok, std::string errorMsg, Type type = Type::INTERNAL);
+    InternalError(const Token *tok, std::string errorMsg, std::string details, Type type = Type::INTERNAL);
 
     const Token *token;
     std::string errorMessage;
@@ -65,7 +65,7 @@ public:
     /**
      * Message severities.
      */
-    enum SeverityType {
+    enum Type {
         /**
          * No severity (default value).
          */
@@ -117,8 +117,8 @@ public:
         debug
     };
 
-    static std::string toString(SeverityType severity);
-    static SeverityType fromString(const std::string &severity);
+    static std::string toString(Type severity);
+    static Type fromString(const std::string &severity);
 };
 
 struct CWE {

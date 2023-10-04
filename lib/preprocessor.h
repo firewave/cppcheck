@@ -79,7 +79,7 @@ public:
     /**
      * Include file types.
      */
-    enum HeaderTypes {
+    enum class HeaderTypes {
         UserHeader = 1,
         SystemHeader
     };
