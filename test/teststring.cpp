@@ -68,15 +68,7 @@ private:
         // Clear the error buffer..
         errout.str("");
 
-        std::vector<std::string> files(1, filename);
-        Tokenizer tokenizer(&settings, this);
-        PreprocessorHelper::preprocess(code, files, tokenizer);
-
-        // Tokenize..
-        ASSERT_LOC(tokenizer.simplifyTokens1(""), file, line);
-
-        // Check char variable usage..
-        runChecks<CheckString>(tokenizer, this);
+        runChecks<CheckString>(file, line, settings, filename, code, this);
     }
 
     void stringLiteralWrite() {

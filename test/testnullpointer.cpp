@@ -200,17 +200,8 @@ private:
 
         const Settings settings1 = settingsBuilder(settings).certainty(Certainty::inconclusive, false).build();
 
-        std::vector<std::string> files(1, "test.cpp");
-        Tokenizer tokenizer(&settings1, this);
-        PreprocessorHelper::preprocess(code, files, tokenizer);
-
-        // Tokenizer..
-        ASSERT_LOC(tokenizer.simplifyTokens1(""), file, line);
-
-        // Check for null pointer dereferences..
-        runChecks<CheckNullPointer>(tokenizer, this);
+        runChecks<CheckNullPointer>(file, line, settings1, "test.cpp", code, this);
     }
-
 
 
     void nullpointerAfterLoop() {

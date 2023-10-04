@@ -25,6 +25,7 @@
 #include "config.h"
 #include "errorlogger.h"
 #include "errortypes.h"
+#include "helpers.h"
 #include "library.h"
 #include "platform.h"
 #include "settings.h"
@@ -128,6 +129,20 @@ protected:
     template<typename T>
     static void runChecks(const Tokenizer &tokenizer, ErrorLogger *errorLogger)
     {
+        Check& check = getCheck<T>();
+        check.runChecks(tokenizer, errorLogger);
+    }
+
+    template<typename T>
+    void runChecks(const char* file, int line, const Settings& settings, const std::string& filename, const char code[], ErrorLogger *errorLogger) const
+    {
+        std::vector<std::string> files(1, filename);
+        Tokenizer tokenizer(&settings, errorLogger);
+        PreprocessorHelper::preprocess(code, files, tokenizer);
+
+        // Tokenizer..
+        assert_(file, line, tokenizer.simplifyTokens1(""));
+
         Check& check = getCheck<T>();
         check.runChecks(tokenizer, errorLogger);
     }

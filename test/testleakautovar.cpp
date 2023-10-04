@@ -2843,15 +2843,7 @@ private:
         // Clear the error buffer..
         errout.str("");
 
-        std::vector<std::string> files(1, cpp?"test.cpp":"test.c");
-        Tokenizer tokenizer(&settings, this);
-        PreprocessorHelper::preprocess(code, files, tokenizer);
-
-        // Tokenizer..
-        ASSERT_LOC(tokenizer.simplifyTokens1(""), file, line);
-
-        // Check for leaks..
-        runChecks<CheckLeakAutoVar>(tokenizer, this);
+        runChecks<CheckLeakAutoVar>(file, line, settings, cpp?"test.cpp":"test.c", code, this);
     }
 
     void run() override {

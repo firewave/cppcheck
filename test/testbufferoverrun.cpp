@@ -81,15 +81,7 @@ private:
         const Settings settings = settingsBuilder(settings0).severity(Severity::performance)
                                   .c(Standards::CLatest).cpp(Standards::CPPLatest).certainty(Certainty::inconclusive).build();
 
-        std::vector<std::string> files(1, filename);
-        Tokenizer tokenizer(&settings, this);
-        PreprocessorHelper::preprocess(code, files, tokenizer);
-
-        // Tokenizer..
-        ASSERT_LOC(tokenizer.simplifyTokens1(""), file, line);
-
-        // Check for buffer overruns..
-        runChecks<CheckBufferOverrun>(tokenizer, this);
+        runChecks<CheckBufferOverrun>(file, line, settings, filename, code, this);
     }
 
     void run() override {

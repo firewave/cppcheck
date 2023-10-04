@@ -71,15 +71,7 @@ private:
         // Clear the error buffer..
         errout.str("");
 
-        std::vector<std::string> files(1, "test.cpp");
-        Tokenizer tokenizer(&settings, this);
-        PreprocessorHelper::preprocess(code, files, tokenizer);
-
-        // Tokenize..
-        ASSERT_LOC(tokenizer.simplifyTokens1(""), file, line);
-
-        // Check...
-        runChecks<CheckSizeof>(tokenizer, this);
+        runChecks<CheckSizeof>(file, line, settings, "test.cpp", code, this);
     }
 
     void sizeofsizeof() {
