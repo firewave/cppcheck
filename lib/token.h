@@ -343,15 +343,15 @@ public:
 
     const ValueType *argumentType() const {
         const Token *top = this;
-        while (top && !Token::Match(top->astParent(), ",|("))
+        while (top && !Match(top->astParent(), ",|("))
             top = top->astParent();
         return top ? top->mImpl->mValueType : nullptr;
     }
 
-    Token::Type tokType() const {
+    Type tokType() const {
         return mTokType;
     }
-    void tokType(Token::Type t) {
+    void tokType(Type t) {
         mTokType = t;
 
         const bool memoizedIsName = (mTokType == eName || mTokType == eType || mTokType == eVariable ||
@@ -1350,7 +1350,7 @@ private:
         efIsUnique = efMaxSize - 2,
     };
 
-    Token::Type mTokType = eNone;
+    Type mTokType = eNone;
 
     uint64_t mFlags{};
 

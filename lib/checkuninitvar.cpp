@@ -1324,7 +1324,7 @@ const Token* CheckUninitVar::isVariableUsage(bool cpp, const Token *vartok, cons
 
 const Token* CheckUninitVar::isVariableUsage(const Token *vartok, bool pointer, Alloc alloc, int indirect) const
 {
-    return CheckUninitVar::isVariableUsage(mTokenizer->isCPP(), vartok, mSettings->library, pointer, alloc, indirect);
+    return isVariableUsage(mTokenizer->isCPP(), vartok, mSettings->library, pointer, alloc, indirect);
 }
 
 /***
@@ -1403,7 +1403,7 @@ int CheckUninitVar::isFunctionParUsage(const Token *vartok, const Library& libra
 
 int CheckUninitVar::isFunctionParUsage(const Token *vartok, bool pointer, Alloc alloc, int indirect) const
 {
-    return CheckUninitVar::isFunctionParUsage(vartok, mSettings->library, pointer, alloc, indirect);
+    return isFunctionParUsage(vartok, mSettings->library, pointer, alloc, indirect);
 }
 
 bool CheckUninitVar::isMemberVariableAssignment(const Token *tok, const std::string &membervar) const

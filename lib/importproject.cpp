@@ -187,7 +187,7 @@ ImportProject::Type ImportProject::import(const std::string &filename, Settings 
 {
     std::ifstream fin(filename);
     if (!fin.is_open())
-        return ImportProject::Type::MISSING;
+        return Type::MISSING;
 
     mPath = Path::getPathFromFilename(Path::fromNativeSeparators(filename));
     if (!mPath.empty() && !endsWith(mPath,'/'))
@@ -199,33 +199,33 @@ ImportProject::Type ImportProject::import(const std::string &filename, Settings 
     if (endsWith(filename, ".json")) {
         if (importCompileCommands(fin)) {
             setRelativePaths(filename);
-            return ImportProject::Type::COMPILE_DB;
+            return Type::COMPILE_DB;
         }
     } else if (endsWith(filename, ".sln")) {
         if (importSln(fin, mPath, fileFilters)) {
             setRelativePaths(filename);
-            return ImportProject::Type::VS_SLN;
+            return Type::VS_SLN;
         }
     } else if (endsWith(filename, ".vcxproj")) {
         std::map<std::string, std::string, cppcheck::stricmp> variables;
         if (importVcxproj(filename, variables, emptyString, fileFilters)) {
             setRelativePaths(filename);
-            return ImportProject::Type::VS_VCXPROJ;
+            return Type::VS_VCXPROJ;
         }
     } else if (endsWith(filename, ".bpr")) {
         if (importBcb6Prj(filename)) {
             setRelativePaths(filename);
-            return ImportProject::Type::BORLAND;
+            return Type::BORLAND;
         }
     } else if (settings && endsWith(filename, ".cppcheck")) {
         if (importCppcheckGuiProject(fin, settings)) {
             setRelativePaths(filename);
-            return ImportProject::Type::CPPCHECK_GUI;
+            return Type::CPPCHECK_GUI;
         }
     } else {
-        return ImportProject::Type::UNKNOWN;
+        return Type::UNKNOWN;
     }
-    return ImportProject::Type::FAILURE;
+    return Type::FAILURE;
 }
 
 static std::string readUntil(const std::string &command, std::string::size_type *pos, const char until[])
@@ -1274,12 +1274,12 @@ bool ImportProject::importCppcheckGuiProject(std::istream &istr, Settings *setti
 void ImportProject::selectOneVsConfig(cppcheck::Platform::Type platform)
 {
     std::set<std::string> filenames;
-    for (std::list<ImportProject::FileSettings>::iterator it = fileSettings.begin(); it != fileSettings.end();) {
+    for (std::list<FileSettings>::iterator it = fileSettings.begin(); it != fileSettings.end();) {
         if (it->cfg.empty()) {
             ++it;
             continue;
         }
-        const ImportProject::FileSettings &fs = *it;
+        const FileSettings &fs = *it;
         bool remove = false;
         if (!startsWith(fs.cfg,"Debug"))
             remove = true;
@@ -1300,12 +1300,12 @@ void ImportProject::selectOneVsConfig(cppcheck::Platform::Type platform)
 
 void ImportProject::selectVsConfigurations(cppcheck::Platform::Type platform, const std::vector<std::string> &configurations)
 {
-    for (std::list<ImportProject::FileSettings>::iterator it = fileSettings.begin(); it != fileSettings.end();) {
+    for (std::list<FileSettings>::iterator it = fileSettings.begin(); it != fileSettings.end();) {
         if (it->cfg.empty()) {
             ++it;
             continue;
         }
-        const ImportProject::FileSettings &fs = *it;
+        const FileSettings &fs = *it;
         const auto config = fs.cfg.substr(0, fs.cfg.find('|'));
         bool remove = false;
         if (std::find(configurations.begin(), configurations.end(), config) == configurations.end())

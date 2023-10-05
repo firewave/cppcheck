@@ -3464,7 +3464,7 @@ Check::FileInfo *CheckClass::getFileInfo(const Tokenizer *tokenizer, const Setti
 std::string CheckClass::MyFileInfo::toString() const
 {
     std::string ret;
-    for (const MyFileInfo::NameLoc &nameLoc: classDefinitions) {
+    for (const NameLoc &nameLoc: classDefinitions) {
         ret += "<class name=\"" + ErrorLogger::toxml(nameLoc.className) +
                "\" file=\"" + ErrorLogger::toxml(nameLoc.fileName) +
                "\" line=\"" + std::to_string(nameLoc.lineNumber) +

@@ -133,7 +133,7 @@ bool AnalyzerInformation::analyzeFile(const std::string &buildDir, const std::st
         return true;
     close();
 
-    mAnalyzerInfoFile = AnalyzerInformation::getAnalyzerInfoFile(buildDir,sourcefile,cfg);
+    mAnalyzerInfoFile = getAnalyzerInfoFile(buildDir,sourcefile,cfg);
 
     if (skipAnalysis(mAnalyzerInfoFile, hash, errors))
         return false;

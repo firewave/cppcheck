@@ -44,7 +44,7 @@ InternalError::InternalError(const Token *tok, std::string errorMsg, std::string
     token(tok), errorMessage(std::move(errorMsg)), details(std::move(details)), type(type), id(typeToString(type))
 {}
 
-std::string Severity::toString(Severity::SeverityType severity)
+std::string Severity::toString(SeverityType severity)
 {
     switch (severity) {
     case none:

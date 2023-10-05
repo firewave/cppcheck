@@ -143,48 +143,48 @@ Library::Error Library::load(const char exename[], const char path[])
 Library::Container::Yield Library::Container::yieldFrom(const std::string& yieldName)
 {
     if (yieldName == "at_index")
-        return Container::Yield::AT_INDEX;
+        return Yield::AT_INDEX;
     if (yieldName == "item")
-        return Container::Yield::ITEM;
+        return Yield::ITEM;
     if (yieldName == "buffer")
-        return Container::Yield::BUFFER;
+        return Yield::BUFFER;
     if (yieldName == "buffer-nt")
-        return Container::Yield::BUFFER_NT;
+        return Yield::BUFFER_NT;
     if (yieldName == "start-iterator")
-        return Container::Yield::START_ITERATOR;
+        return Yield::START_ITERATOR;
     if (yieldName == "end-iterator")
-        return Container::Yield::END_ITERATOR;
+        return Yield::END_ITERATOR;
     if (yieldName == "iterator")
-        return Container::Yield::ITERATOR;
+        return Yield::ITERATOR;
     if (yieldName == "size")
-        return Container::Yield::SIZE;
+        return Yield::SIZE;
     if (yieldName == "empty")
-        return Container::Yield::EMPTY;
-    return Container::Yield::NO_YIELD;
+        return Yield::EMPTY;
+    return Yield::NO_YIELD;
 }
 Library::Container::Action Library::Container::actionFrom(const std::string& actionName)
 {
     if (actionName == "resize")
-        return Container::Action::RESIZE;
+        return Action::RESIZE;
     if (actionName == "clear")
-        return Container::Action::CLEAR;
+        return Action::CLEAR;
     if (actionName == "push")
-        return Container::Action::PUSH;
+        return Action::PUSH;
     if (actionName == "pop")
-        return Container::Action::POP;
+        return Action::POP;
     if (actionName == "find")
-        return Container::Action::FIND;
+        return Action::FIND;
     if (actionName == "insert")
-        return Container::Action::INSERT;
+        return Action::INSERT;
     if (actionName == "erase")
-        return Container::Action::ERASE;
+        return Action::ERASE;
     if (actionName == "change-content")
-        return Container::Action::CHANGE_CONTENT;
+        return Action::CHANGE_CONTENT;
     if (actionName == "change-internal")
-        return Container::Action::CHANGE_INTERNAL;
+        return Action::CHANGE_INTERNAL;
     if (actionName == "change")
-        return Container::Action::CHANGE;
-    return Container::Action::NO_ACTION;
+        return Action::CHANGE;
+    return Action::NO_ACTION;
 }
 
 Library::Error Library::load(const tinyxml2::XMLDocument &doc)
@@ -692,10 +692,10 @@ Library::Error Library::loadFunction(const tinyxml2::XMLElement * const node, co
             nonOverlappingData.strlenArg = functionnode->IntAttribute("strlen-arg", -1);
             mNonOverlappingData[name] = nonOverlappingData;
         } else if (functionnodename == "use-retval") {
-            func.useretval = Library::UseRetValType::DEFAULT;
+            func.useretval = UseRetValType::DEFAULT;
             if (const char *type = functionnode->Attribute("type"))
                 if (std::strcmp(type, "error-code") == 0)
-                    func.useretval = Library::UseRetValType::ERROR_CODE;
+                    func.useretval = UseRetValType::ERROR_CODE;
         } else if (functionnodename == "returnValue") {
             if (const char *expr = functionnode->GetText())
                 mReturnValue[name] = expr;
@@ -1075,21 +1075,21 @@ const Library::AllocFunc* Library::getReallocFuncInfo(const Token *tok) const
 /** get allocation id for function */
 int Library::getAllocId(const Token *tok, int arg) const
 {
-    const Library::AllocFunc* af = getAllocFuncInfo(tok);
+    const AllocFunc* af = getAllocFuncInfo(tok);
     return (af && af->arg == arg) ? af->groupId : 0;
 }
 
 /** get deallocation id for function */
 int Library::getDeallocId(const Token *tok, int arg) const
 {
-    const Library::AllocFunc* af = getDeallocFuncInfo(tok);
+    const AllocFunc* af = getDeallocFuncInfo(tok);
     return (af && af->arg == arg) ? af->groupId : 0;
 }
 
 /** get reallocation id for function */
 int Library::getReallocId(const Token *tok, int arg) const
 {
-    const Library::AllocFunc* af = getReallocFuncInfo(tok);
+    const AllocFunc* af = getReallocFuncInfo(tok);
     return (af && af->arg == arg) ? af->groupId : 0;
 }
 
@@ -1162,7 +1162,7 @@ const Library::Container* Library::detectContainerInternal(const Token* const ty
         break;
     }
 
-    for (const std::pair<const std::string, Library::Container> & c : containers) {
+    for (const std::pair<const std::string, Container> & c : containers) {
         const Container& container = c.second;
         if (container.startPattern.empty())
             continue;
@@ -1213,13 +1213,13 @@ const Library::Container* Library::detectIterator(const Token* typeStart) const
 const Library::Container* Library::detectContainerOrIterator(const Token* typeStart, bool* isIterator, bool withoutStd) const
 {
     bool res;
-    const Library::Container* c = detectContainerInternal(typeStart, Both, &res, withoutStd);
+    const Container* c = detectContainerInternal(typeStart, Both, &res, withoutStd);
     if (c && isIterator)
         *isIterator = res;
     return c;
 }
 
-bool Library::isContainerYield(const Token * const cond, Library::Container::Yield y, const std::string& fallback)
+bool Library::isContainerYield(const Token * const cond, Container::Yield y, const std::string& fallback)
 {
     if (!cond)
         return false;
@@ -1227,7 +1227,7 @@ bool Library::isContainerYield(const Token * const cond, Library::Container::Yie
         const Token* tok = cond->astOperand1();
         if (tok && tok->str() == ".") {
             if (tok->astOperand1() && tok->astOperand1()->valueType()) {
-                if (const Library::Container *container = tok->astOperand1()->valueType()->container) {
+                if (const Container *container = tok->astOperand1()->valueType()->container) {
                     return tok->astOperand2() && y == container->getYield(tok->astOperand2()->str());
                 }
             } else if (!fallback.empty()) {
@@ -1264,7 +1264,7 @@ bool Library::matchArguments(const Token *ftok, const std::string &functionName)
         return false;
     int args = 0;
     int firstOptionalArg = -1;
-    for (const std::pair<const int, Library::ArgumentChecks> & argCheck : it->second.argumentChecks) {
+    for (const std::pair<const int, ArgumentChecks> & argCheck : it->second.argumentChecks) {
         if (argCheck.first > args)
             args = argCheck.first;
         if (argCheck.second.optional && (firstOptionalArg == -1 || firstOptionalArg > argCheck.first))
@@ -1342,8 +1342,8 @@ bool Library::formatstr_function(const Token* ftok) const
 
 int Library::formatstr_argno(const Token* ftok) const
 {
-    const std::map<int, Library::ArgumentChecks>& argumentChecksFunc = functions.at(getFunctionName(ftok)).argumentChecks;
-    auto it = std::find_if(argumentChecksFunc.cbegin(), argumentChecksFunc.cend(), [](const std::pair<const int, Library::ArgumentChecks>& a) {
+    const std::map<int, ArgumentChecks>& argumentChecksFunc = functions.at(getFunctionName(ftok)).argumentChecks;
+    auto it = std::find_if(argumentChecksFunc.cbegin(), argumentChecksFunc.cend(), [](const std::pair<const int, ArgumentChecks>& a) {
         return a.second.formatstr;
     });
     return it == argumentChecksFunc.cend() ? -1 : it->first - 1;
@@ -1372,19 +1372,19 @@ Library::UseRetValType Library::getUseRetValType(const Token *ftok) const
     if (isNotLibraryFunction(ftok)) {
         if (Token::simpleMatch(ftok->astParent(), ".")) {
             const Token* contTok = ftok->astParent()->astOperand1();
-            using Yield = Library::Container::Yield;
+            using Yield = Container::Yield;
             const Yield yield = astContainerYield(contTok);
             if (yield == Yield::START_ITERATOR || yield == Yield::END_ITERATOR || yield == Yield::AT_INDEX ||
                 yield == Yield::SIZE || yield == Yield::EMPTY || yield == Yield::BUFFER || yield == Yield::BUFFER_NT ||
-                ((yield == Yield::ITEM || yield == Yield::ITERATOR) && astContainerAction(contTok) == Library::Container::Action::NO_ACTION))
-                return Library::UseRetValType::DEFAULT;
+                ((yield == Yield::ITEM || yield == Yield::ITERATOR) && astContainerAction(contTok) == Container::Action::NO_ACTION))
+                return UseRetValType::DEFAULT;
         }
-        return Library::UseRetValType::NONE;
+        return UseRetValType::NONE;
     }
     const std::unordered_map<std::string, Function>::const_iterator it = functions.find(getFunctionName(ftok));
     if (it != functions.cend())
         return it->second.useretval;
-    return Library::UseRetValType::NONE;
+    return UseRetValType::NONE;
 }
 
 const std::string& Library::returnValue(const Token *ftok) const
@@ -1443,7 +1443,7 @@ bool Library::hasminsize(const Token *ftok) const
     const std::unordered_map<std::string, Function>::const_iterator it = functions.find(getFunctionName(ftok));
     if (it == functions.cend())
         return false;
-    return std::any_of(it->second.argumentChecks.cbegin(), it->second.argumentChecks.cend(), [](const std::pair<const int, Library::ArgumentChecks>& a) {
+    return std::any_of(it->second.argumentChecks.cbegin(), it->second.argumentChecks.cend(), [](const std::pair<const int, ArgumentChecks>& a) {
         return !a.second.minsizes.empty();
     });
 }
@@ -1498,7 +1498,7 @@ bool Library::isFunctionConst(const Token *ftok) const
         return true;
     if (isNotLibraryFunction(ftok)) {
         if (Token::simpleMatch(ftok->astParent(), ".")) {
-            using Yield = Library::Container::Yield;
+            using Yield = Container::Yield;
             const Yield yield = astContainerYield(ftok->astParent()->astOperand1());
             if (yield == Yield::EMPTY || yield == Yield::SIZE || yield == Yield::BUFFER_NT)
                 return true;
@@ -1516,8 +1516,8 @@ bool Library::isnoreturn(const Token *ftok) const
     if (isNotLibraryFunction(ftok)) {
         if (Token::simpleMatch(ftok->astParent(), ".")) {
             const Token* contTok = ftok->astParent()->astOperand1();
-            if (astContainerAction(contTok) != Library::Container::Action::NO_ACTION ||
-                astContainerYield(contTok) != Library::Container::Yield::NO_YIELD)
+            if (astContainerAction(contTok) != Container::Action::NO_ACTION ||
+                astContainerYield(contTok) != Container::Yield::NO_YIELD)
                 return false;
         }
         return false;
@@ -1615,7 +1615,7 @@ bool Library::isimporter(const std::string& file, const std::string &importer) c
     return (it != mImporters.end() && it->second.count(importer) > 0);
 }
 
-const Token* Library::getContainerFromYield(const Token* tok, Library::Container::Yield yield) const
+const Token* Library::getContainerFromYield(const Token* tok, Container::Yield yield) const
 {
     if (!tok)
         return nullptr;
@@ -1626,12 +1626,12 @@ const Token* Library::getContainerFromYield(const Token* tok, Library::Container
         if (containerTok->valueType()->container &&
             containerTok->valueType()->container->getYield(tok->strAt(-1)) == yield)
             return containerTok;
-        if (yield == Library::Container::Yield::EMPTY && Token::simpleMatch(tok->tokAt(-1), "empty ( )"))
+        if (yield == Container::Yield::EMPTY && Token::simpleMatch(tok->tokAt(-1), "empty ( )"))
             return containerTok;
-        if (yield == Library::Container::Yield::SIZE && Token::Match(tok->tokAt(-1), "size|length ( )"))
+        if (yield == Container::Yield::SIZE && Token::Match(tok->tokAt(-1), "size|length ( )"))
             return containerTok;
     } else if (Token::Match(tok->previous(), "%name% (")) {
-        if (const Library::Function* f = this->getFunction(tok->previous())) {
+        if (const Function* f = this->getFunction(tok->previous())) {
             if (f->containerYield == yield) {
                 return tok->astOperand2();
             }
@@ -1641,7 +1641,7 @@ const Token* Library::getContainerFromYield(const Token* tok, Library::Container
 }
 
 // cppcheck-suppress unusedFunction
-const Token* Library::getContainerFromAction(const Token* tok, Library::Container::Action action) const
+const Token* Library::getContainerFromAction(const Token* tok, Container::Action action) const
 {
     if (!tok)
         return nullptr;
@@ -1655,7 +1655,7 @@ const Token* Library::getContainerFromAction(const Token* tok, Library::Containe
         if (Token::simpleMatch(tok->tokAt(-1), "empty ( )"))
             return containerTok;
     } else if (Token::Match(tok->previous(), "%name% (")) {
-        if (const Library::Function* f = this->getFunction(tok->previous())) {
+        if (const Function* f = this->getFunction(tok->previous())) {
             if (f->containerAction == action) {
                 return tok->astOperand2();
             }
@@ -1710,7 +1710,7 @@ Library::TypeCheck Library::getTypeCheck(std::string check,  std::string typeNam
 
 bool Library::hasAnyTypeCheck(const std::string& typeName) const
 {
-    return std::any_of(mTypeChecks.begin(), mTypeChecks.end(), [&](const std::pair<std::pair<std::string, std::string>, Library::TypeCheck>& tc) {
+    return std::any_of(mTypeChecks.begin(), mTypeChecks.end(), [&](const std::pair<std::pair<std::string, std::string>, TypeCheck>& tc) {
         return tc.first.second == typeName;
     });
 }

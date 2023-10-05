@@ -53,7 +53,7 @@ namespace ValueFlow
 
         static Value unknown();
 
-        bool equalValue(const ValueFlow::Value& rhs) const {
+        bool equalValue(const Value& rhs) const {
             if (valueType != rhs.valueType)
                 return false;
             switch (valueType) {

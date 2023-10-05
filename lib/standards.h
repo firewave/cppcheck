@@ -72,15 +72,15 @@ struct Standards {
     }
     static cstd_t getC(const std::string &std) {
         if (std == "c89") {
-            return Standards::C89;
+            return C89;
         }
         if (std == "c99") {
-            return Standards::C99;
+            return C99;
         }
         if (std == "c11") {
-            return Standards::C11;
+            return C11;
         }
-        return Standards::CLatest;
+        return CLatest;
     }
     bool setCPP(std::string str) {
         stdValue = str;
@@ -110,24 +110,24 @@ struct Standards {
     }
     static cppstd_t getCPP(const std::string &std) {
         if (std == "c++03") {
-            return Standards::CPP03;
+            return CPP03;
         }
         if (std == "c++11") {
-            return Standards::CPP11;
+            return CPP11;
         }
         if (std == "c++14") {
-            return Standards::CPP14;
+            return CPP14;
         }
         if (std == "c++17") {
-            return Standards::CPP17;
+            return CPP17;
         }
         if (std == "c++20") {
-            return Standards::CPP20;
+            return CPP20;
         }
         if (std == "c++23") {
-            return Standards::CPP23;
+            return CPP23;
         }
-        return Standards::CPPLatest;
+        return CPPLatest;
     }
 };
 

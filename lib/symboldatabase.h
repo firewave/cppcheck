@@ -1086,7 +1086,7 @@ public:
 
     static Function* nestedInFunction(const Scope* scope) {
         while (scope) {
-            if (scope->type == Scope::eFunction)
+            if (scope->type == eFunction)
                 break;
             scope = scope->nestedIn;
         }
@@ -1108,7 +1108,7 @@ public:
     }
 
     bool isLoopScope() const {
-        return type == Scope::ScopeType::eFor || type == Scope::ScopeType::eWhile || type == Scope::ScopeType::eDo;
+        return type == ScopeType::eFor || type == ScopeType::eWhile || type == ScopeType::eDo;
     }
 
     bool isLocal() const {
@@ -1279,15 +1279,15 @@ public:
     static MatchResult matchParameter(const ValueType *call, const Variable *callVar, const Variable *funcVar);
 
     bool isPrimitive() const {
-        return (type >= ValueType::Type::BOOL);
+        return (type >= Type::BOOL);
     }
 
     bool isIntegral() const {
-        return (type >= ValueType::Type::BOOL && type <= ValueType::Type::UNKNOWN_INT);
+        return (type >= Type::BOOL && type <= Type::UNKNOWN_INT);
     }
 
     bool isFloat() const {
-        return (type >= ValueType::Type::FLOAT && type <= ValueType::Type::LONGDOUBLE);
+        return (type >= Type::FLOAT && type <= Type::LONGDOUBLE);
     }
 
     bool fromLibraryType(const std::string &typestr, const Settings &settings);

@@ -238,15 +238,15 @@ ErrorMessage ErrorMessage::fromInternalError(const InternalError &internalError,
     if (internalError.token)
         assert(tokenList != nullptr); // we need to make sure we can look up the provided token
 
-    std::list<ErrorMessage::FileLocation> locationList;
+    std::list<FileLocation> locationList;
     if (tokenList && internalError.token) {
-        ErrorMessage::FileLocation loc(internalError.token, tokenList);
+        FileLocation loc(internalError.token, tokenList);
         locationList.push_back(std::move(loc));
     } else {
-        ErrorMessage::FileLocation loc2(filename, 0, 0);
+        FileLocation loc2(filename, 0, 0);
         locationList.push_back(std::move(loc2));
         if (tokenList && (filename != tokenList->getSourceFilePath())) {
-            ErrorMessage::FileLocation loc(tokenList->getSourceFilePath(), 0, 0);
+            FileLocation loc(tokenList->getSourceFilePath(), 0, 0);
             locationList.push_back(std::move(loc));
         }
     }
@@ -284,7 +284,7 @@ std::string ErrorMessage::serialize() const
     oss += std::to_string(callStack.size());
     oss += " ";
 
-    for (std::list<ErrorMessage::FileLocation>::const_iterator loc = callStack.cbegin(); loc != callStack.cend(); ++loc) {
+    for (std::list<FileLocation>::const_iterator loc = callStack.cbegin(); loc != callStack.cend(); ++loc) {
         std::string frame;
         frame += std::to_string((*loc).line);
         frame += '\t';
@@ -409,7 +409,7 @@ void ErrorMessage::deserialize(const std::string &data)
 
         // (*loc).line << '\t' << (*loc).column << '\t' << (*loc).getfile(false) << '\t' << loc->getOrigFile(false) << '\t' << loc->getinfo();
 
-        ErrorMessage::FileLocation loc(substrings[3], strToInt<int>(substrings[0]), strToInt<unsigned int>(substrings[1]));
+        FileLocation loc(substrings[3], strToInt<int>(substrings[0]), strToInt<unsigned int>(substrings[1]));
         loc.setfile(std::move(substrings[2]));
         if (substrings.size() == 5)
             loc.setinfo(substrings[4]);
@@ -807,7 +807,7 @@ std::string ErrorLogger::plistHeader(const std::string &version, const std::vect
          << " <key>files</key>\r\n"
          << " <array>\r\n";
     for (const std::string & file : files)
-        ostr << "  <string>" << ErrorLogger::toxml(file) << "</string>\r\n";
+        ostr << "  <string>" << toxml(file) << "</string>\r\n";
     ostr << " </array>\r\n"
          << " <key>diagnostics</key>\r\n"
          << " <array>\r\n";
@@ -874,16 +874,16 @@ std::string ErrorLogger::plistData(const ErrorMessage &msg)
               << "     </array>\r\n"
               << "     <key>depth</key><integer>0</integer>\r\n"
               << "     <key>extended_message</key>\r\n"
-              << "     <string>" << ErrorLogger::toxml(message) << "</string>\r\n"
+              << "     <string>" << toxml(message) << "</string>\r\n"
               << "     <key>message</key>\r\n"
-              << "     <string>" << ErrorLogger::toxml(message) << "</string>\r\n"
+              << "     <string>" << toxml(message) << "</string>\r\n"
               << "    </dict>\r\n";
     }
 
     plist << "   </array>\r\n"
-          << "   <key>description</key><string>" << ErrorLogger::toxml(msg.shortMessage()) << "</string>\r\n"
+          << "   <key>description</key><string>" << toxml(msg.shortMessage()) << "</string>\r\n"
           << "   <key>category</key><string>" << Severity::toString(msg.severity) << "</string>\r\n"
-          << "   <key>type</key><string>" << ErrorLogger::toxml(msg.shortMessage()) << "</string>\r\n"
+          << "   <key>type</key><string>" << toxml(msg.shortMessage()) << "</string>\r\n"
           << "   <key>check_name</key><string>" << msg.id << "</string>\r\n"
           << "   <!-- This hash is experimental and going to change! -->\r\n"
           << "   <key>issue_hash_content_of_line_in_context</key><string>" << 0 << "</string>\r\n"

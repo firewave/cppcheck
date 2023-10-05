@@ -220,7 +220,7 @@ void Variables::alias(nonneg int varid1, nonneg int varid2, bool replace)
     var2->_aliases.insert(varid1);
     var1->_aliases.insert(varid2);
 
-    if (var2->mType == Variables::pointer) {
+    if (var2->mType == pointer) {
         var2->_read = true;
     }
 }

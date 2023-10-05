@@ -346,33 +346,33 @@ static void parseCompareEachInt(
 }
 
 const Token* ValueFlow::parseCompareInt(const Token* tok,
-                                        ValueFlow::Value& true_value,
-                                        ValueFlow::Value& false_value,
+                                        Value& true_value,
+                                        Value& false_value,
                                         const std::function<std::vector<MathLib::bigint>(const Token*)>& evaluate)
 {
     const Token* result = nullptr;
     parseCompareEachInt(
         tok,
-        [&](const Token* vartok, ValueFlow::Value true_value2, ValueFlow::Value false_value2) {
+        [&](const Token* vartok, Value true_value2, Value false_value2) {
         if (result)
             return;
         result = vartok;
         true_value = std::move(true_value2);
         false_value = std::move(false_value2);
     },
-        [&](const Token* t) -> std::vector<ValueFlow::Value> {
-        std::vector<ValueFlow::Value> r;
+        [&](const Token* t) -> std::vector<Value> {
+        std::vector<Value> r;
         std::vector<MathLib::bigint> v = evaluate(t);
 
         std::transform(v.cbegin(), v.cend(), std::back_inserter(r), [&](MathLib::bigint i) {
-            return ValueFlow::Value{i};
+            return Value{i};
         });
         return r;
     });
     return result;
 }
 
-const Token *ValueFlow::parseCompareInt(const Token *tok, ValueFlow::Value &true_value, ValueFlow::Value &false_value)
+const Token *ValueFlow::parseCompareInt(const Token *tok, Value &true_value, Value &false_value)
 {
     return parseCompareInt(tok, true_value, false_value, [](const Token* t) -> std::vector<MathLib::bigint> {
         if (t->hasKnownIntValue())
@@ -419,7 +419,7 @@ static bool isNumeric(const ValueFlow::Value& value) {
     return value.isIntValue() || value.isFloatValue();
 }
 
-void ValueFlow::combineValueProperties(const ValueFlow::Value &value1, const ValueFlow::Value &value2, ValueFlow::Value &result)
+void ValueFlow::combineValueProperties(const Value &value1, const Value &value2, Value &result)
 {
     if (value1.isKnown() && value2.isKnown())
         result.setKnown();
@@ -450,11 +450,11 @@ void ValueFlow::combineValueProperties(const ValueFlow::Value &value1, const Val
     result.varvalue = (result.varId == value1.varId) ? value1.varvalue : value2.varvalue;
     result.errorPath = (value1.errorPath.empty() ? value2 : value1).errorPath;
     result.safe = value1.safe || value2.safe;
-    if (value1.bound == ValueFlow::Value::Bound::Point || value2.bound == ValueFlow::Value::Bound::Point) {
-        if (value1.bound == ValueFlow::Value::Bound::Upper || value2.bound == ValueFlow::Value::Bound::Upper)
-            result.bound = ValueFlow::Value::Bound::Upper;
-        if (value1.bound == ValueFlow::Value::Bound::Lower || value2.bound == ValueFlow::Value::Bound::Lower)
-            result.bound = ValueFlow::Value::Bound::Lower;
+    if (value1.bound == Value::Bound::Point || value2.bound == Value::Bound::Point) {
+        if (value1.bound == Value::Bound::Upper || value2.bound == Value::Bound::Upper)
+            result.bound = Value::Bound::Upper;
+        if (value1.bound == Value::Bound::Lower || value2.bound == Value::Bound::Lower)
+            result.bound = Value::Bound::Lower;
     }
     if (value1.path != value2.path)
         result.path = -1;
@@ -3365,18 +3365,18 @@ std::string ValueFlow::lifetimeMessage(const Token *tok, const ValueFlow::Value 
         if (var) {
             std::string submessage;
             switch (val->lifetimeKind) {
-            case ValueFlow::Value::LifetimeKind::SubObject:
-            case ValueFlow::Value::LifetimeKind::Object:
-            case ValueFlow::Value::LifetimeKind::Address:
+            case Value::LifetimeKind::SubObject:
+            case Value::LifetimeKind::Object:
+            case Value::LifetimeKind::Address:
                 if (type == "pointer")
                     submessage = " to local variable";
                 else
                     submessage = " that points to local variable";
                 break;
-            case ValueFlow::Value::LifetimeKind::Lambda:
+            case Value::LifetimeKind::Lambda:
                 submessage = " that captures local variable";
                 break;
-            case ValueFlow::Value::LifetimeKind::Iterator:
+            case Value::LifetimeKind::Iterator:
                 submessage = " to local container";
                 break;
             }
@@ -3390,8 +3390,8 @@ std::string ValueFlow::lifetimeMessage(const Token *tok, const ValueFlow::Value 
 
 std::vector<ValueFlow::Value> ValueFlow::getLifetimeObjValues(const Token* tok, bool inconclusive, MathLib::bigint path)
 {
-    std::vector<ValueFlow::Value> result;
-    auto pred = [&](const ValueFlow::Value& v) {
+    std::vector<Value> result;
+    auto pred = [&](const Value& v) {
         if (!v.isLocalLifetimeValue() && !(path != 0 && v.isSubFunctionLifetimeValue()))
             return false;
         if (!inconclusive && v.isInconclusive())
@@ -3437,7 +3437,7 @@ static bool derefShared(const Token* tok)
 
 ValueFlow::Value ValueFlow::getLifetimeObjValue(const Token *tok, bool inconclusive)
 {
-    std::vector<ValueFlow::Value> values = ValueFlow::getLifetimeObjValues(tok, inconclusive);
+    std::vector<Value> values = getLifetimeObjValues(tok, inconclusive);
     // There should only be one lifetime
     if (values.size() != 1)
         return ValueFlow::Value{};
@@ -3618,7 +3618,7 @@ static const Token* getLifetimeToken(const Token* tok, ValueFlow::Value::ErrorPa
     return lts.front().token;
 }
 
-const Variable* ValueFlow::getLifetimeVariable(const Token* tok, ValueFlow::Value::ErrorPath& errorPath, bool* addressOf)
+const Variable* ValueFlow::getLifetimeVariable(const Token* tok, Value::ErrorPath& errorPath, bool* addressOf)
 {
     const Token* tok2 = getLifetimeToken(tok, errorPath, addressOf);
     if (tok2 && tok2->variable())
@@ -3628,7 +3628,7 @@ const Variable* ValueFlow::getLifetimeVariable(const Token* tok, ValueFlow::Valu
 
 const Variable* ValueFlow::getLifetimeVariable(const Token* tok)
 {
-    ValueFlow::Value::ErrorPath errorPath;
+    Value::ErrorPath errorPath;
     return getLifetimeVariable(tok, errorPath, nullptr);
 }
 
@@ -6031,7 +6031,7 @@ static bool isBreakScope(const Token* const endToken)
     return Token::findmatch(endToken->link(), "break|goto", endToken);
 }
 
-ValueFlow::Value ValueFlow::asImpossible(ValueFlow::Value v)
+ValueFlow::Value ValueFlow::asImpossible(Value v)
 {
     v.invertRange();
     v.setImpossible();
@@ -8145,7 +8145,7 @@ static const Token* parseBinaryIntOp(const Token* expr,
 
 const Token* ValueFlow::solveExprValue(const Token* expr,
                                        const std::function<std::vector<MathLib::bigint>(const Token*)>& eval,
-                                       ValueFlow::Value& value)
+                                       Value& value)
 {
     if (!value.isIntValue() && !value.isIteratorValue() && !value.isSymbolicValue())
         return expr;
@@ -8161,24 +8161,24 @@ const Token* ValueFlow::solveExprValue(const Token* expr,
         switch (expr->str()[0]) {
         case '+': {
             value.intvalue -= intval;
-            return ValueFlow::solveExprValue(binaryTok, eval, value);
+            return solveExprValue(binaryTok, eval, value);
         }
         case '-': {
             if (rhs)
                 value.intvalue = intval - value.intvalue;
             else
                 value.intvalue += intval;
-            return ValueFlow::solveExprValue(binaryTok, eval, value);
+            return solveExprValue(binaryTok, eval, value);
         }
         case '*': {
             if (intval == 0)
                 break;
             value.intvalue /= intval;
-            return ValueFlow::solveExprValue(binaryTok, eval, value);
+            return solveExprValue(binaryTok, eval, value);
         }
         case '^': {
             value.intvalue ^= intval;
-            return ValueFlow::solveExprValue(binaryTok, eval, value);
+            return solveExprValue(binaryTok, eval, value);
         }
         }
     }
@@ -9447,12 +9447,12 @@ std::string ValueFlow::eitherTheConditionIsRedundant(const Token *condition)
     return "Either the condition '" + condition->expressionString() + "' is redundant";
 }
 
-const ValueFlow::Value* ValueFlow::findValue(const std::list<ValueFlow::Value>& values,
+const ValueFlow::Value* ValueFlow::findValue(const std::list<Value>& values,
                                              const Settings* settings,
-                                             const std::function<bool(const ValueFlow::Value&)> &pred)
+                                             const std::function<bool(const Value&)> &pred)
 {
-    const ValueFlow::Value* ret = nullptr;
-    for (const ValueFlow::Value& v : values) {
+    const Value* ret = nullptr;
+    for (const Value& v : values) {
         if (pred(v)) {
             if (!ret || ret->isInconclusive() || (ret->condition && !v.isInconclusive()))
                 ret = &v;
@@ -9510,10 +9510,10 @@ static std::vector<ValueFlow::Value> isOutOfBoundsImpl(const ValueFlow::Value& s
 // TODO: return single value at most - no need for std::vector
 std::vector<ValueFlow::Value> ValueFlow::isOutOfBounds(const Value& size, const Token* indexTok, bool possible)
 {
-    ValueFlow::Value inBoundsValue = inferCondition("<", indexTok, size.intvalue);
+    Value inBoundsValue = inferCondition("<", indexTok, size.intvalue);
     if (inBoundsValue.isKnown() && inBoundsValue.intvalue != 0)
         return {};
-    std::vector<ValueFlow::Value> result = isOutOfBoundsImpl(size, indexTok, false);
+    std::vector<Value> result = isOutOfBoundsImpl(size, indexTok, false);
     if (!result.empty())
         return result;
     if (!possible)

@@ -415,12 +415,12 @@ public:
 
     /** @brief Request termination of checking */
     static void terminate(bool t = true) {
-        Settings::mTerminated = t;
+        mTerminated = t;
     }
 
     /** @brief termination requested? */
     static bool terminated() {
-        return Settings::mTerminated;
+        return mTerminated;
     }
 
     std::set<std::string> summaryReturn;

@@ -491,7 +491,7 @@ public:
      */
     std::string getFunctionName(const Token *ftok) const;
 
-    static bool isContainerYield(const Token * const cond, Library::Container::Yield y, const std::string& fallback=emptyString);
+    static bool isContainerYield(const Token * const cond, Container::Yield y, const std::string& fallback=emptyString);
 
     /** Suppress/check a type */
     enum class TypeCheck { def,
@@ -596,7 +596,7 @@ private:
     }
 
     enum DetectContainer { ContainerOnly, IteratorOnly, Both };
-    const Library::Container* detectContainerInternal(const Token* typeStart, DetectContainer detect, bool* isIterator = nullptr, bool withoutStd = false) const;
+    const Container* detectContainerInternal(const Token* typeStart, DetectContainer detect, bool* isIterator = nullptr, bool withoutStd = false) const;
 };
 
 CPPCHECKLIB const Library::Container * getLibraryContainer(const Token * tok);

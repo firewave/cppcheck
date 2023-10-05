@@ -267,10 +267,10 @@ bool CheckMemoryLeak::isOpenDevNull(const Token *tok) const
 
 void CheckMemoryLeak::memoryLeak(const Token *tok, const std::string &varname, AllocType alloctype) const
 {
-    if (alloctype == CheckMemoryLeak::File ||
-        alloctype == CheckMemoryLeak::Pipe ||
-        alloctype == CheckMemoryLeak::Fd ||
-        alloctype == CheckMemoryLeak::OtherRes)
+    if (alloctype == File ||
+        alloctype == Pipe ||
+        alloctype == Fd ||
+        alloctype == OtherRes)
         resourceLeakError(tok, varname);
     else
         memleakError(tok, varname);

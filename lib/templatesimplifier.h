@@ -247,7 +247,7 @@ public:
          * @param decl declaration to compare to
          * @return true if same family, false if different family
          */
-        bool isSameFamily(const TemplateSimplifier::TokenAndName &decl) const {
+        bool isSameFamily(const TokenAndName &decl) const {
             // Make sure a family flag is set and matches.
             // This works because at most only one flag will be set.
             return ((mFlags & fFamilyMask) && (decl.mFlags & fFamilyMask));

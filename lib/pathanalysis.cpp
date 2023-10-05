@@ -68,7 +68,7 @@ std::pair<bool, bool> PathAnalysis::checkCond(const Token * tok, bool& known)
     return std::make_pair(true, true);
 }
 
-PathAnalysis::Progress PathAnalysis::forwardRecursive(const Token* tok, Info info, const std::function<PathAnalysis::Progress(const Info&)>& f)
+PathAnalysis::Progress PathAnalysis::forwardRecursive(const Token* tok, Info info, const std::function<Progress(const Info&)>& f)
 {
     if (!tok)
         return Progress::Continue;
@@ -82,7 +82,7 @@ PathAnalysis::Progress PathAnalysis::forwardRecursive(const Token* tok, Info inf
     return Progress::Continue;
 }
 
-PathAnalysis::Progress PathAnalysis::forwardRange(const Token* startToken, const Token* endToken, Info info, const std::function<PathAnalysis::Progress(const Info&)>& f) const
+PathAnalysis::Progress PathAnalysis::forwardRange(const Token* startToken, const Token* endToken, Info info, const std::function<Progress(const Info&)>& f) const
 {
     for (const Token *tok = startToken; precedes(tok, endToken); tok = tok->next()) {
         if (Token::Match(tok, "asm|goto|break|continue"))

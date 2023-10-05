@@ -150,7 +150,7 @@ struct Interval {
                 result.setMinValue(minValue->intvalue, minValue);
             if (!minValue->isImpossible() && (minValue->bound == ValueFlow::Value::Bound::Point || minValue->isKnown()) &&
                 std::count_if(values.begin(), values.end(), predicate) == 1)
-                return Interval::fromInt(minValue->intvalue, minValue);
+                return fromInt(minValue->intvalue, minValue);
         }
         const ValueFlow::Value* maxValue = getCompareValue(values, predicate, std::greater<MathLib::bigint>{});
         if (maxValue) {
@@ -165,7 +165,7 @@ struct Interval {
 
     static Interval fromValues(const std::list<ValueFlow::Value>& values)
     {
-        return Interval::fromValues(values, [](const ValueFlow::Value&) {
+        return fromValues(values, [](const ValueFlow::Value&) {
             return true;
         });
     }
@@ -192,8 +192,8 @@ struct Interval {
     friend Interval operator-(const Interval& lhs, const Interval& rhs)
     {
         Interval result;
-        result.minvalue = Interval::apply(lhs.minvalue, rhs.maxvalue, std::minus<MathLib::bigint>{});
-        result.maxvalue = Interval::apply(lhs.maxvalue, rhs.minvalue, std::minus<MathLib::bigint>{});
+        result.minvalue = apply(lhs.minvalue, rhs.maxvalue, std::minus<MathLib::bigint>{});
+        result.maxvalue = apply(lhs.maxvalue, rhs.minvalue, std::minus<MathLib::bigint>{});
         if (!result.minvalue.empty())
             result.minRef = merge(lhs.minRef, rhs.maxRef);
         if (!result.maxvalue.empty())
@@ -223,7 +223,7 @@ struct Interval {
             return {1};
         if (diff.isLessThan(0, ref))
             return {-1};
-        std::vector<int> eq = Interval::equal(lhs, rhs, ref);
+        std::vector<int> eq = equal(lhs, rhs, ref);
         if (!eq.empty()) {
             if (eq.front() == 0)
                 return {1, -1};
