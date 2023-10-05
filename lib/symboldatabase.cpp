@@ -1202,7 +1202,7 @@ void SymbolDatabase::fixVarId(VarIdMap & varIds, const Token * vartok, Token * m
     if (varId == varIds.end()) {
         MemberIdMap memberId;
         if (membertok->varId() == 0) {
-            memberId[membervar->nameToken()->varId()] = const_cast<Tokenizer &>(mTokenizer).newVarId();
+            memberId[membervar->nameToken()->varId()] = mTokenizer.newVarId();
             mVariableList.push_back(membervar);
         } else
             mVariableList[membertok->varId()] = membervar;
@@ -1212,7 +1212,7 @@ void SymbolDatabase::fixVarId(VarIdMap & varIds, const Token * vartok, Token * m
     MemberIdMap::iterator memberId = varId->second.find(membervar->nameToken()->varId());
     if (memberId == varId->second.end()) {
         if (membertok->varId() == 0) {
-            varId->second.insert(std::make_pair(membervar->nameToken()->varId(), const_cast<Tokenizer &>(mTokenizer).newVarId()));
+            varId->second.insert(std::make_pair(membervar->nameToken()->varId(), mTokenizer.newVarId()));
             mVariableList.push_back(membervar);
             memberId = varId->second.find(membervar->nameToken()->varId());
         } else
@@ -7114,7 +7114,7 @@ static const Function* getFunction(const Token* tok) {
 void SymbolDatabase::setValueTypeInTokenList(bool reportDebugWarnings, Token *tokens)
 {
     if (!tokens)
-        tokens = const_cast<Tokenizer &>(mTokenizer).list.front();
+        tokens = mTokenizer.list.front();
 
     for (Token *tok = tokens; tok; tok = tok->next())
         tok->setValueType(nullptr);

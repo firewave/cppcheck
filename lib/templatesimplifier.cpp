@@ -564,7 +564,7 @@ unsigned int TemplateSimplifier::templateParameters(const Token *tok)
 
 const Token *TemplateSimplifier::findTemplateDeclarationEnd(const Token *tok)
 {
-    return const_cast<const Token *>(findTemplateDeclarationEnd(const_cast<Token *>(tok)));
+    return findTemplateDeclarationEnd(const_cast<Token *>(tok));
 }
 
 Token *TemplateSimplifier::findTemplateDeclarationEnd(Token *tok)
