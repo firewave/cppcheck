@@ -750,7 +750,7 @@ void CheckMemoryLeakStructMember::checkStructVariable(const Variable* const vari
                 deallocated = true;
                 break;
             }
-        };
+        }
 
         return deallocated;
     };
