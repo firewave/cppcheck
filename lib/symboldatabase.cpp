@@ -6420,7 +6420,7 @@ static const Token* parsedecl(const Token* type,
                               bool isCpp,
                               SourceLocation loc = SourceLocation::current());
 
-void SymbolDatabase::setValueType(Token* tok, const Variable& var, SourceLocation loc)
+void SymbolDatabase::setValueType(Token* tok, const Variable& var, const SourceLocation& loc)
 {
     ValueType valuetype;
     if (mSettings.debugnormal || mSettings.debugwarnings)
@@ -6451,7 +6451,7 @@ void SymbolDatabase::setValueType(Token* tok, const Variable& var, SourceLocatio
 
 static ValueType::Type getEnumType(const Scope* scope, const Platform& platform);
 
-void SymbolDatabase::setValueType(Token* tok, const Enumerator& enumerator, SourceLocation loc)
+void SymbolDatabase::setValueType(Token* tok, const Enumerator& enumerator, const SourceLocation& loc)
 {
     ValueType valuetype;
     if (mSettings.debugnormal || mSettings.debugwarnings)
@@ -6997,7 +6997,7 @@ static const Token* parsedecl(const Token* type,
                               ValueType::Sign defaultSignedness,
                               const Settings& settings,
                               bool isCpp,
-                              SourceLocation loc)
+                              const SourceLocation& loc)
 {
     if (settings.debugnormal || settings.debugwarnings)
         valuetype->setDebugPath(type, loc);
@@ -8024,7 +8024,7 @@ std::string ValueType::str() const
     return ret.empty() ? ret : ret.substr(1);
 }
 
-void ValueType::setDebugPath(const Token* tok, SourceLocation ctx, SourceLocation local)
+void ValueType::setDebugPath(const Token* tok, const SourceLocation& ctx, const SourceLocation& local)
 {
     std::string file = ctx.file_name();
     if (file.empty())

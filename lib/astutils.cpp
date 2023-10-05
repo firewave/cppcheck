@@ -3202,7 +3202,7 @@ bool isCPPCast(const Token* tok)
     return tok && Token::simpleMatch(tok->previous(), "> (") && tok->astOperand2() && tok->astOperand1() && isCPPCastKeyword(tok->astOperand1());
 }
 
-bool isConstVarExpression(const Token *tok, std::function<bool(const Token*)> skipPredicate)
+bool isConstVarExpression(const Token *tok, const std::function<bool(const Token*)>& skipPredicate)
 {
     if (!tok)
         return false;
