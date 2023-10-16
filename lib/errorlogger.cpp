@@ -576,7 +576,7 @@ static void replaceSpecialChars(std::string& source)
     while ((index = source.find('\\', index)) != std::string::npos) {
         const char searchFor = source[index+1];
         const auto it = substitutionMap.find(searchFor);
-        if (it == substitutionMap.end()) {
+        if (it == substitutionMap.cend()) {
             index += 1;
             continue;
         }
@@ -595,7 +595,7 @@ static void replace(std::string& source, const std::unordered_map<std::string, s
             break;
         const std::string searchFor = source.substr(index, end-index+1);
         const auto it = substitutionMap.find(searchFor);
-        if (it == substitutionMap.end()) {
+        if (it == substitutionMap.cend()) {
             index += 1;
             continue;
         }

@@ -90,8 +90,8 @@ public:
     ThreadData(ThreadExecutor &threadExecutor, ErrorLogger &errorLogger, TimerResults *timerResults, const Settings &settings, Suppressions& supprs, const std::list<FileWithDetails> &files, const std::list<FileSettings> &fileSettings, CppCheck::ExecuteCmdFn executeCommand)
         : mFiles(files), mFileSettings(fileSettings), mTimerResults(timerResults), mSettings(settings), mSuppressions(supprs), mExecuteCommand(std::move(executeCommand)), mLogForwarder(threadExecutor, errorLogger)
     {
-        mItNextFile = mFiles.begin();
-        mItNextFileSettings = mFileSettings.begin();
+        mItNextFile = mFiles.cbegin();
+        mItNextFileSettings = mFileSettings.cbegin();
 
         mTotalFiles = mFiles.size() + mFileSettings.size();
         mTotalFileSize = std::accumulate(mFiles.cbegin(), mFiles.cend(), std::size_t(0), [](std::size_t v, const FileWithDetails& p) {
@@ -108,7 +108,7 @@ public:
             ++mItNextFile;
             return true;
         }
-        if (mItNextFileSettings != mFileSettings.end()) {
+        if (mItNextFileSettings != mFileSettings.cend()) {
             file = nullptr;
             fs = &(*mItNextFileSettings);
             fileSize = 0;

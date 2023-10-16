@@ -136,7 +136,7 @@ Tokenizer::~Tokenizer()
 nonneg int Tokenizer::sizeOfType(const std::string& type) const
 {
     const auto it = mTypeSize.find(type);
-    if (it == mTypeSize.end()) {
+    if (it == mTypeSize.cend()) {
         const Library::PodType* podtype = mSettings.library.podtype(type);
         if (!podtype)
             return 0;
@@ -155,7 +155,7 @@ nonneg int Tokenizer::sizeOfType(const Token *type) const
         return Token::getStrLength(type) + 1U;
 
     const auto it = mTypeSize.find(type->str());
-    if (it == mTypeSize.end()) {
+    if (it == mTypeSize.cend()) {
         const Library::PodType* podtype = mSettings.library.podtype(type->str());
         if (!podtype)
             return 0;
@@ -648,7 +648,7 @@ namespace {
             if (!Token::Match(mTypedefToken, "typedef const %name% %name% ;"))
                 return false;
             const auto it = m.find(mTypedefToken->strAt(2));
-            if (it == m.end())
+            if (it == m.cend())
                 return false;
             return Token::Match(it->second.mNameToken, "%name% (");
         }
@@ -2478,7 +2478,7 @@ namespace {
                 auto it = std::find_if(tempScope->children.cbegin(), tempScope->children.cend(), [&](const ScopeInfo3& child) {
                     return &child != this && child.type == Record && (child.name == scope || child.fullName == scope);
                 });
-                if (it != tempScope->children.end())
+                if (it != tempScope->children.cend())
                     return &*it;
                 // check siblings for same name
                 if (tempScope->parent) {
@@ -2499,7 +2499,7 @@ namespace {
             if (scope.empty())
                 return false;
             // check in base types first
-            if (baseTypes.find(scope) != baseTypes.end())
+            if (baseTypes.find(scope) != baseTypes.cend())
                 return true;
             // check in base types base types
             for (const std::string & base : baseTypes) {
@@ -2788,7 +2788,7 @@ namespace {
             const std::set<std::string>& usingNS = tempScope->usingNamespaces;
             if (!usingNS.empty()) {
                 if (qualification.empty()) {
-                    if (usingNS.find(scope) != usingNS.end())
+                    if (usingNS.find(scope) != usingNS.cend())
                         return true;
                 } else {
                     const std::string suffix = " :: " + qualification;
@@ -3395,7 +3395,7 @@ bool Tokenizer::simplifyUsing()
                     if (scopesMatch(removed1, scope, &scopeInfo1)) {
                         ScopeInfo3 * tempScope = currentScope;
                         while (tempScope->parent) {
-                            if (tempScope->recordTypes.find(start->str()) != tempScope->recordTypes.end()) {
+                            if (tempScope->recordTypes.find(start->str()) != tempScope->recordTypes.cend()) {
                                 std::string::size_type spaceIdx = 0;
                                 std::string::size_type startIdx = 0;
                                 while ((spaceIdx = removed1.find(' ', startIdx)) != std::string::npos) {
@@ -4257,7 +4257,7 @@ namespace {
         bool leaveScope();
         void addVariable(const std::string& varname, bool globalNamespace);
         bool hasVariable(const std::string& varname) const {
-            return mVariableId.find(varname) != mVariableId.end();
+            return mVariableId.find(varname) != mVariableId.cend();
         }
 
         const std::unordered_map<std::string, nonneg int>& map(bool global) const {
@@ -4645,7 +4645,7 @@ void Tokenizer::setVarIdClassFunction(const std::string &classname,
             continue;
 
         const auto it = varlist.find(tok2->str());
-        if (it != varlist.end()) {
+        if (it != varlist.cend()) {
             tok2->varId(it->second);
             setVarIdStructMembers(tok2, structMembers, varId_);
         }
@@ -4846,7 +4846,7 @@ void Tokenizer::setVarIdPass1()
                 break;
 
             // Variable declaration can't start with "return", etc
-            if (notstart.find(tok2->str()) != notstart.end())
+            if (notstart.find(tok2->str()) != notstart.cend())
                 continue;
 
             if (!isC() && Token::simpleMatch(tok2, "const new"))
@@ -4942,7 +4942,7 @@ void Tokenizer::setVarIdPass1()
                                                         (tok3->strAt(-1) == "(" && Token::simpleMatch(tok3->next(), "(") && !Token::simpleMatch(tok3->linkAt(1)->next(), "(")))) ||
                                     tok3->isOp() ||
                                     tok3->str() == "(" ||
-                                    notstart.find(tok3->str()) != notstart.end()) {
+                                    notstart.find(tok3->str()) != notstart.cend()) {
                                     decl = true;
                                     break;
                                 }
@@ -5108,7 +5108,7 @@ static Token * matchMemberName(const std::list<std::string> &scope, const Token 
     // using namespace..
     if (nsToken) {
         while (Token::Match(nsToken, "%name% ::")) {
-            if (scopeIt != scopeInfo.end() && nsToken->str() == scopeIt->name) {
+            if (scopeIt != scopeInfo.cend() && nsToken->str() == scopeIt->name) {
                 nsToken = nsToken->tokAt(2);
                 ++scopeIt;
             } else {
@@ -5117,13 +5117,13 @@ static Token * matchMemberName(const std::list<std::string> &scope, const Token 
         }
         if (!Token::Match(nsToken, "%name% ;"))
             return nullptr;
-        if (scopeIt == scopeInfo.end() || nsToken->str() != scopeIt->name)
+        if (scopeIt == scopeInfo.cend() || nsToken->str() != scopeIt->name)
             return nullptr;
         ++scopeIt;
     }
 
     // Parse member tokens..
-    while (scopeIt != scopeInfo.end()) {
+    while (scopeIt != scopeInfo.cend()) {
         if (!Token::Match(memberToken, "%name% ::|<"))
             return nullptr;
         if (memberToken->str() != scopeIt->name)
@@ -5424,7 +5424,7 @@ void Tokenizer::setVarIdPass2()
 
                 // set varid
                 const auto varpos = utils::as_const(thisClassVars).find(tok3->str());
-                if (varpos != thisClassVars.end())
+                if (varpos != thisClassVars.cend())
                     tok3->varId(varpos->second);
 
                 // goto end of var
@@ -6490,9 +6490,9 @@ void Tokenizer::simplifyHeadersAndUnusedTemplates()
             if (isIncluded && removeUnusedIncludedFunctions) {
                 while (true) {
                     Token *start = tok;
-                    while (start && functionStart.find(start->str()) != functionStart.end())
+                    while (start && functionStart.find(start->str()) != functionStart.cend())
                         start = start->next();
-                    if (Token::Match(start, "%name% (") && Token::Match(start->linkAt(1), ") const| ;") && keep.find(start->str()) == keep.end()) {
+                    if (Token::Match(start, "%name% (") && Token::Match(start->linkAt(1), ") const| ;") && keep.find(start->str()) == keep.cend()) {
                         Token::eraseTokens(tok, start->linkAt(1)->tokAt(2));
                         tok->deleteThis();
                     } else
@@ -6501,7 +6501,7 @@ void Tokenizer::simplifyHeadersAndUnusedTemplates()
             }
 
             if (isIncluded && removeUnusedIncludedClasses) {
-                if (Token::Match(tok, "class|struct %name% [:{]") && keep.find(tok->strAt(1)) == keep.end()) {
+                if (Token::Match(tok, "class|struct %name% [:{]") && keep.find(tok->strAt(1)) == keep.cend()) {
                     // Remove this class/struct
                     const Token *endToken = tok->tokAt(2);
                     if (endToken->str() == ":") {
@@ -6519,7 +6519,7 @@ void Tokenizer::simplifyHeadersAndUnusedTemplates()
             if (removeUnusedTemplates || (isIncluded && removeUnusedIncludedTemplates)) {
                 if (Token::Match(tok, "template < %name%")) {
                     const Token *closingBracket = tok->next()->findClosingBracket();
-                    if (Token::Match(closingBracket, "> class|struct %name% [;:{]") && keep.find(closingBracket->strAt(2)) == keep.end()) {
+                    if (Token::Match(closingBracket, "> class|struct %name% [;:{]") && keep.find(closingBracket->strAt(2)) == keep.cend()) {
                         const Token *endToken = closingBracket->tokAt(3);
                         if (endToken->str() == ":") {
                             endToken = endToken->next();
@@ -6532,7 +6532,7 @@ void Tokenizer::simplifyHeadersAndUnusedTemplates()
                             Token::eraseTokens(tok, endToken);
                             tok->deleteThis();
                         }
-                    } else if (Token::Match(closingBracket, "> %type% %name% (") && Token::simpleMatch(closingBracket->linkAt(3), ") {") && keep.find(closingBracket->strAt(2)) == keep.end()) {
+                    } else if (Token::Match(closingBracket, "> %type% %name% (") && Token::simpleMatch(closingBracket->linkAt(3), ") {") && keep.find(closingBracket->strAt(2)) == keep.cend()) {
                         const Token *endToken = closingBracket->linkAt(3)->linkAt(1)->next();
                         Token::eraseTokens(tok, endToken);
                         tok->deleteThis();
@@ -7003,7 +7003,7 @@ void Tokenizer::simplifyFunctionParameters()
                 }
 
                 //same parameters: take note of the parameter
-                if (argumentNames.find(tok1->str()) != argumentNames.end())
+                if (argumentNames.find(tok1->str()) != argumentNames.cend())
                     tokparam = tok1;
                 else if (tok1->str() != funcName)
                     argumentNames[tok1->str()] = tok1;
@@ -7080,13 +7080,13 @@ void Tokenizer::simplifyFunctionParameters()
                         break;
                     }
 
-                    if (argumentNames2.find(tok2->str()) != argumentNames2.end()) {
+                    if (argumentNames2.find(tok2->str()) != argumentNames2.cend()) {
                         //same parameter names...
                         syntaxError(tok1);
                     } else
                         argumentNames2[tok2->str()] = tok2;
 
-                    if (argumentNames.find(tok2->str()) == argumentNames.end()) {
+                    if (argumentNames.find(tok2->str()) == argumentNames.cend()) {
                         //non-matching parameter... bailout
                         bailOut = true;
                         break;
@@ -7106,7 +7106,7 @@ void Tokenizer::simplifyFunctionParameters()
                 //move back 'tok1' to the last ';'
                 tok1 = tok1->previous();
                 for (const std::pair<const std::string, Token *>& argumentName : argumentNames) {
-                    if (argumentNames2.find(argumentName.first) == argumentNames2.end()) {
+                    if (argumentNames2.find(argumentName.first) == argumentNames2.cend()) {
                         //add the missing parameter argument declaration
                         tok1->insertToken(";");
                         tok1->insertToken(argumentName.first);
@@ -7815,7 +7815,7 @@ bool Tokenizer::simplifyCAlternativeTokens()
             continue;
 
         const auto cOpIt = cAlternativeTokens.find(tok->str());
-        if (cOpIt != cAlternativeTokens.end()) {
+        if (cOpIt != cAlternativeTokens.cend()) {
             alt.push_back(tok);
 
             // Is this a variable declaration..
@@ -7857,7 +7857,7 @@ bool Tokenizer::simplifyCAlternativeTokens()
 
     for (Token *tok: alt) {
         const auto cOpIt = cAlternativeTokens.find(tok->str());
-        if (cOpIt != cAlternativeTokens.end())
+        if (cOpIt != cAlternativeTokens.cend())
             tok->str(cOpIt->second);
         else if (tok->str() == "not")
             tok->str("!");
@@ -8244,7 +8244,7 @@ void Tokenizer::simplifyTypeIntrinsics()
         if (!Token::Match(tok, "%name% ("))
             continue;
         auto p = intrinsics.find(tok->str());
-        if (p == intrinsics.end())
+        if (p == intrinsics.cend())
             continue;
         Token * end = tok->linkAt(1);
         Token * prev = tok->previous();
@@ -8269,7 +8269,7 @@ bool Tokenizer::isScopeNoReturn(const Token *endScopeToken, bool *unknown) const
 {
     std::string unknownFunc;
     const bool ret = mSettings.library.isScopeNoReturn(endScopeToken,&unknownFunc);
-    if (!unknownFunc.empty() && mSettings.summaryReturn.find(unknownFunc) != mSettings.summaryReturn.end()) {
+    if (!unknownFunc.empty() && mSettings.summaryReturn.find(unknownFunc) != mSettings.summaryReturn.cend()) {
         return false;
     }
     if (unknown)
@@ -9844,7 +9844,7 @@ void Tokenizer::simplifyKeyword()
     const bool cpp20 = isCPP() && mSettings.standards.cpp >= Standards::CPP20;
 
     for (Token *tok = list.front(); tok; tok = tok->next()) {
-        if (keywords.find(tok->str()) != keywords.end()) {
+        if (keywords.find(tok->str()) != keywords.cend()) {
             // Don't remove struct members
             if (!Token::simpleMatch(tok->previous(), ".")) {
                 const bool isinline = (tok->str().find("inline") != std::string::npos);
@@ -9981,7 +9981,7 @@ void Tokenizer::simplifyDebug()
         if (!Token::Match(tok, "%name% ("))
             continue;
         auto it = m.find(tok->str());
-        if (it != m.end()) {
+        if (it != m.cend()) {
             tok->deleteThis();
             tok = setTokenDebug(tok, it->second);
         }
@@ -10186,7 +10186,7 @@ void Tokenizer::simplifyAt()
                     }
                 }
                 end = end ? end->next() : nullptr;
-            } else if (var.find(end->str()) != var.end())
+            } else if (var.find(end->str()) != var.cend())
                 end = end->next();
             else
                 continue;
@@ -10335,7 +10335,7 @@ void Tokenizer::simplifyNamespaceStd()
                 if (start != tok && start->isName() && !start->isKeyword() && (!start->previous() || Token::Match(start->previous(), "[;{}]")))
                     userFunctions.insert(tok->str());
             }
-            if (userFunctions.find(tok->str()) == userFunctions.end() && mSettings.library.matchArguments(tok, "std::" + tok->str()))
+            if (userFunctions.find(tok->str()) == userFunctions.cend() && mSettings.library.matchArguments(tok, "std::" + tok->str()))
                 insert = true;
         } else if (Token::simpleMatch(tok->next(), "<") &&
                    (isStdContainerOrIterator(tok, mSettings) || isStdSmartPointer(tok, mSettings)))
@@ -10469,7 +10469,7 @@ void Tokenizer::simplifyMicrosoftStringFunctions()
             continue;
 
         const auto match = apis.find(tok->str());
-        if (match!=apis.end()) {
+        if (match!=apis.cend()) {
             tok->str(ansi ? match->second.mbcs : match->second.unicode);
             tok->originalName(match->first);
         } else if (Token::Match(tok, "_T|_TEXT|TEXT ( %char%|%str% )")) {
@@ -10763,7 +10763,7 @@ void Tokenizer::simplifyOverloadedOperators()
         }
 
         // Get variables that have operator() member
-        if (Token::Match(tok, "%type% &| %var%") && classNames.find(tok->str()) != classNames.end()) {
+        if (Token::Match(tok, "%type% &| %var%") && classNames.find(tok->str()) != classNames.cend()) {
             tok = tok->next();
             while (!tok->isName())
                 tok = tok->next();
@@ -10771,7 +10771,7 @@ void Tokenizer::simplifyOverloadedOperators()
         }
 
         // Simplify operator() calls
-        if (Token::Match(tok, "%var% (") && classVars.find(tok->varId()) != classVars.end()) {
+        if (Token::Match(tok, "%var% (") && classVars.find(tok->varId()) != classVars.cend()) {
             // constructor init list..
             if (Token::Match(tok->previous(), "[:,]")) {
                 const Token *start = tok->previous();

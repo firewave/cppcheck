@@ -108,7 +108,7 @@ std::list<const Token*> CheckNullPointer::parseFunctionCall(const Token &tok, co
                             argnr++;
                     }
                     ++i;
-                    if (i == formatString.end())
+                    if (i == formatString.cend())
                         return var;
                 }
                 if (_continue)

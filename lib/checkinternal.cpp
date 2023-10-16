@@ -279,7 +279,7 @@ void CheckInternal::checkUnknownPattern()
                     const std::string::size_type end = pattern.find('%', j + 1);
                     if (end != std::string::npos) {
                         const std::string s = pattern.substr(j, end - j + 1);
-                        if (knownPatterns.find(s) == knownPatterns.end())
+                        if (knownPatterns.find(s) == knownPatterns.cend())
                             unknownPatternError(tok, s);
                     }
                 }

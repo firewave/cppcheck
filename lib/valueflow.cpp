@@ -645,7 +645,7 @@ static void valueFlowArray(TokenList& tokenlist, const Settings& settings)
         if (tok->varId() > 0) {
             // array
             const auto it = utils::as_const(constantArrays).find(tok->varId());
-            if (it != constantArrays.end()) {
+            if (it != constantArrays.cend()) {
                 ValueFlow::Value value;
                 value.valueType = ValueFlow::Value::ValueType::TOK;
                 value.tokvalue = it->second;
@@ -719,7 +719,7 @@ static void valueFlowArrayBool(TokenList& tokenlist, const Settings& settings)
         bool known = false;
         const auto val =
             std::find_if(tok->values().cbegin(), tok->values().cend(), std::mem_fn(&ValueFlow::Value::isTokValue));
-        if (val == tok->values().end()) {
+        if (val == tok->values().cend()) {
             var = tok->variable();
             known = true;
         } else {
@@ -1237,7 +1237,7 @@ static void valueFlowGlobalConstVar(TokenList& tokenList, const Settings& settin
         if (!tok->variable())
             continue;
         const auto var = utils::as_const(vars).find(tok->variable());
-        if (var == vars.end())
+        if (var == vars.cend())
             continue;
         setTokenValue(tok, var->second, settings);
     }
@@ -1279,7 +1279,7 @@ static void valueFlowGlobalStaticVar(TokenList& tokenList, const Settings& setti
         if (!tok->variable())
             continue;
         const auto var = utils::as_const(vars).find(tok->variable());
-        if (var == vars.end())
+        if (var == vars.cend())
             continue;
         setTokenValue(tok, var->second, settings);
     }
@@ -3818,7 +3818,7 @@ static void valueFlowForwardConst(Token* start,
                 auto it = std::find_if(refs.cbegin(), refs.cend(), [&](const ReferenceToken& ref) {
                     return ref.token->varId() == var->declarationId();
                 });
-                if (it != refs.end()) {
+                if (it != refs.cend()) {
                     for (ValueFlow::Value value : values) {
                         if (refs.size() > 1)
                             value.setInconclusive();
@@ -4101,7 +4101,7 @@ static bool intersects(const C1& c1, const C2& c2)
         return intersects(c2, c1);
     // NOLINTNEXTLINE(readability-use-anyofallof) - TODO: fix if possible / also Cppcheck false negative
     for (auto&& x : c1) {
-        if (c2.find(x) != c2.end())
+        if (c2.find(x) != c2.cend())
             return true;
     }
     return false;
@@ -4339,7 +4339,7 @@ struct ConditionHandler {
             auto it = std::find_if(values.cbegin(), values.cend(), [](const ValueFlow::Value& v) {
                 return v.path > 0;
             });
-            if (it == values.end())
+            if (it == values.cend())
                 return 0;
             assert(std::all_of(it, values.cend(), [&](const ValueFlow::Value& v) {
                 return v.path == 0 || v.path == it->path;
@@ -5749,7 +5749,7 @@ static const ValueFlow::Value* getKnownValueFromToken(const Token* tok)
     auto it = std::find_if(tok->values().cbegin(), tok->values().cend(), [&](const ValueFlow::Value& v) {
         return (v.isIntValue() || v.isContainerSizeValue() || v.isFloatValue()) && v.isKnown();
     });
-    if (it == tok->values().end())
+    if (it == tok->values().cend())
         return nullptr;
     return std::addressof(*it);
 }
