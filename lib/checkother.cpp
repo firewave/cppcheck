@@ -119,12 +119,12 @@ void CheckOther::checkCastIntToCharAndBack()
                     vars[tok->varId()] = "cin.get";
                 }
             } else if (Token::Match(tok, "%var% %comp% EOF")) {
-                if (vars.find(tok->varId()) != vars.end()) {
+                if (vars.find(tok->varId()) != vars.cend()) {
                     checkCastIntToCharAndBackError(tok, vars[tok->varId()]);
                 }
             } else if (Token::Match(tok, "EOF %comp% %var%")) {
                 tok = tok->tokAt(2);
-                if (vars.find(tok->varId()) != vars.end()) {
+                if (vars.find(tok->varId()) != vars.cend()) {
                     checkCastIntToCharAndBackError(tok, vars[tok->varId()]);
                 }
             }
@@ -627,7 +627,7 @@ void CheckOther::redundantBitwiseOperationInSwitchError()
                 const std::map<int, const Token*>::const_iterator i2 = varsWithBitsSet.find(tok2->varId());
 
                 // This variable has not had a bit operation performed on it yet, so just make a note of it
-                if (i2 == varsWithBitsSet.end()) {
+                if (i2 == varsWithBitsSet.cend()) {
                     varsWithBitsSet[tok2->varId()] = tok2;
                     bitOperations[tok2->varId()] = bitOp;
                 }
@@ -652,7 +652,7 @@ void CheckOther::redundantBitwiseOperationInSwitchError()
                 const std::map<int, const Token*>::const_iterator i2 = varsWithBitsSet.find(tok2->varId());
 
                 // This variable has not had a bit operation performed on it yet, so just make a note of it
-                if (i2 == varsWithBitsSet.end()) {
+                if (i2 == varsWithBitsSet.cend()) {
                     varsWithBitsSet[tok2->varId()] = tok2;
                     bitOperations[tok2->varId()] = bitOp;
                 }
@@ -2285,7 +2285,7 @@ void CheckOther::checkInvalidFree()
             // report an inconclusive result.
             else if (Token::Match(tok, "%var% = %name% +|-") &&
                      tok->varId() == tok->tokAt(2)->varId() &&
-                     allocation.find(tok->varId()) != allocation.end()) {
+                     allocation.find(tok->varId()) != allocation.cend()) {
                 if (printInconclusive)
                     inconclusive[tok->varId()] = true;
                 else {
@@ -2313,9 +2313,9 @@ void CheckOther::checkInvalidFree()
                 const int var2 = tok->tokAt(varIndex + 2)->varId();
                 const std::map<int, bool>::const_iterator alloc1 = inconclusive.find(var1);
                 const std::map<int, bool>::const_iterator alloc2 = inconclusive.find(var2);
-                if (alloc1 != inconclusive.end()) {
+                if (alloc1 != inconclusive.cend()) {
                     invalidFreeError(tok, allocation[var1], alloc1->second);
-                } else if (alloc2 != inconclusive.end()) {
+                } else if (alloc2 != inconclusive.cend()) {
                     invalidFreeError(tok, allocation[var2], alloc2->second);
                 }
             }
@@ -2803,7 +2803,7 @@ void CheckOther::pointerPositiveError(const Token *tok, const ValueFlow::Value *
 /* check if a constructor in given class scope takes a reference */
 static bool constructorTakesReference(const Scope * const classScope)
 {
-    return std::any_of(classScope->functionList.begin(), classScope->functionList.end(), [&](const Function& constructor) {
+    return std::any_of(classScope->functionList.cbegin(), classScope->functionList.cend(), [&](const Function& constructor) {
         if (constructor.isConstructor()) {
             for (int argnr = 0U; argnr < constructor.argCount(); argnr++) {
                 const Variable * const argVar = constructor.getArgumentVar(argnr);
@@ -3534,7 +3534,7 @@ static const Token *findShadowed(const Scope *scope, const std::string &varname,
     auto it = std::find_if(scope->functionList.cbegin(), scope->functionList.cend(), [&](const Function& f) {
         return f.type == Function::Type::eFunction && f.name() == varname;
     });
-    if (it != scope->functionList.end())
+    if (it != scope->functionList.cend())
         return it->tokenDef;
 
     if (scope->type == Scope::eLambda)
@@ -3566,7 +3566,7 @@ void CheckOther::checkShadowVariables()
                 auto it = std::find_if(argList.cbegin(), argList.cend(), [&](const Variable& arg) {
                     return arg.nameToken() && var.name() == arg.name();
                 });
-                if (it != argList.end()) {
+                if (it != argList.cend()) {
                     shadowError(var.nameToken(), it->nameToken(), "argument");
                     continue;
                 }

@@ -1758,9 +1758,9 @@ void TokenList::validateAst(bool print) const
             std::set<const Token*> astTokens;    // list of ancestors
             astTokens.insert(tok);
             do {
-                if (safeAstTokens.find(parent) != safeAstTokens.end())
+                if (safeAstTokens.find(parent) != safeAstTokens.cend())
                     break;
-                if (astTokens.find(parent) != astTokens.end())
+                if (astTokens.find(parent) != astTokens.cend())
                     throw InternalError(tok, "AST broken: endless recursion from '" + tok->str() + "'", InternalError::AST);
                 astTokens.insert(parent);
             } while ((parent = parent->astParent()) != nullptr);
@@ -2070,29 +2070,29 @@ bool TokenList::isKeyword(const std::string &str) const
         // TODO: integrate into keywords?
         // types and literals are not handled as keywords
         static const std::unordered_set<std::string> cpp_types = {"bool", "false", "true"};
-        if (cpp_types.find(str) != cpp_types.end())
+        if (cpp_types.find(str) != cpp_types.cend())
             return false;
 
         if (mSettings) {
             const auto &cpp_keywords = Keywords::getAll(mSettings->standards.cpp);
-            return cpp_keywords.find(str) != cpp_keywords.end();
+            return cpp_keywords.find(str) != cpp_keywords.cend();
         }
 
         static const auto& latest_cpp_keywords = Keywords::getAll(Standards::cppstd_t::CPPLatest);
-        return latest_cpp_keywords.find(str) != latest_cpp_keywords.end();
+        return latest_cpp_keywords.find(str) != latest_cpp_keywords.cend();
     }
 
     // TODO: integrate into Keywords?
     // types are not handled as keywords
     static const std::unordered_set<std::string> c_types = {"char", "double", "float", "int", "long", "short"};
-    if (c_types.find(str) != c_types.end())
+    if (c_types.find(str) != c_types.cend())
         return false;
 
     if (mSettings) {
         const auto &c_keywords = Keywords::getAll(mSettings->standards.c);
-        return c_keywords.find(str) != c_keywords.end();
+        return c_keywords.find(str) != c_keywords.cend();
     }
 
     static const auto& latest_c_keywords = Keywords::getAll(Standards::cstd_t::CLatest);
-    return latest_c_keywords.find(str) != latest_c_keywords.end();
+    return latest_c_keywords.find(str) != latest_c_keywords.cend();
 }

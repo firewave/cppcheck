@@ -148,7 +148,7 @@ void ProgramMemory::setUnknown(const Token* expr) {
 
 bool ProgramMemory::hasValue(nonneg int exprid)
 {
-    return mValues.find(exprid) != mValues.end();
+    return mValues.find(exprid) != mValues.cend();
 }
 
 const ValueFlow::Value& ProgramMemory::at(nonneg int exprid) const {
@@ -1199,7 +1199,7 @@ static BuiltinLibraryFunction getBuiltinLibraryFunction(const std::string& name)
 {
     static const std::unordered_map<std::string, BuiltinLibraryFunction> functions = createBuiltinLibraryFunctions();
     auto it = functions.find(name);
-    if (it == functions.end())
+    if (it == functions.cend())
         return nullptr;
     return it->second;
 }
@@ -1631,10 +1631,10 @@ namespace {
                 }
             }
             auto it =
-                std::max_element(values.begin(), values.end(), [](const ValueFlow::Value* x, const ValueFlow::Value* y) {
+                std::max_element(values.cbegin(), values.cend(), [](const ValueFlow::Value* x, const ValueFlow::Value* y) {
                 return x->intvalue < y->intvalue;
             });
-            if (it == values.end())
+            if (it == values.cend())
                 return nullptr;
             return *it;
         }
@@ -1768,7 +1768,7 @@ ValueFlow::Value evaluateLibraryFunction(const std::unordered_map<nonneg int, Va
             ProgramMemory pm{};
             for (const auto& p : xargs) {
                 auto it = lookupVarId.find(p.first);
-                if (it != lookupVarId.end())
+                if (it != lookupVarId.cend())
                     pm.setValue(it->second, p.second);
             }
             return execute(expr.get(), pm, settings);

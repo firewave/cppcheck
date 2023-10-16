@@ -550,7 +550,7 @@ static bool isCompatibleValueTypes(ValueFlow::Value::ValueType x, ValueFlow::Val
     if (x == y)
         return true;
     auto it = compatibleTypes.find(x);
-    if (it == compatibleTypes.end())
+    if (it == compatibleTypes.cend())
         return false;
     return it->second.count(y) > 0;
 }
@@ -906,13 +906,13 @@ static void setTokenValue(Token* tok,
                             std::vector<const Token*> args1 = getArguments(tok1);
                             std::vector<const Token*> args2 = getArguments(tok2);
                             if (args1.size() == args2.size()) {
-                                if (!std::all_of(args1.begin(), args1.end(), std::mem_fn(&Token::hasKnownIntValue)))
+                                if (!std::all_of(args1.cbegin(), args1.cend(), std::mem_fn(&Token::hasKnownIntValue)))
                                     continue;
-                                if (!std::all_of(args2.begin(), args2.end(), std::mem_fn(&Token::hasKnownIntValue)))
+                                if (!std::all_of(args2.cbegin(), args2.cend(), std::mem_fn(&Token::hasKnownIntValue)))
                                     continue;
-                                equal = std::equal(args1.begin(),
-                                                   args1.end(),
-                                                   args2.begin(),
+                                equal = std::equal(args1.cbegin(),
+                                                   args1.cend(),
+                                                   args2.cbegin(),
                                                    [&](const Token* atok, const Token* btok) {
                                     return atok->values().front().intvalue ==
                                     btok->values().front().intvalue;
@@ -1402,7 +1402,7 @@ static void valueFlowArray(TokenList &tokenlist, const Settings &settings)
         if (tok->varId() > 0) {
             // array
             const std::map<nonneg int, const Token *>::const_iterator it = constantArrays.find(tok->varId());
-            if (it != constantArrays.end()) {
+            if (it != constantArrays.cend()) {
                 ValueFlow::Value value;
                 value.valueType = ValueFlow::Value::ValueType::TOK;
                 value.tokvalue = it->second;
@@ -1477,7 +1477,7 @@ static void valueFlowArrayBool(TokenList &tokenlist, const Settings &settings)
         bool known = false;
         const std::list<ValueFlow::Value>::const_iterator val =
             std::find_if(tok->values().cbegin(), tok->values().cend(), std::mem_fn(&ValueFlow::Value::isTokValue));
-        if (val == tok->values().end()) {
+        if (val == tok->values().cend()) {
             var = tok->variable();
             known = true;
         } else {
@@ -1985,7 +1985,7 @@ static void valueFlowGlobalConstVar(TokenList& tokenList, const Settings &settin
         if (!tok->variable())
             continue;
         const std::map<const Variable*, ValueFlow::Value>::const_iterator var = vars.find(tok->variable());
-        if (var == vars.end())
+        if (var == vars.cend())
             continue;
         setTokenValue(tok, var->second, settings);
     }
@@ -2033,7 +2033,7 @@ static void valueFlowGlobalStaticVar(TokenList &tokenList, const Settings &setti
         if (!tok->variable())
             continue;
         const std::map<const Variable *, ValueFlow::Value>::const_iterator var = vars.find(tok->variable());
-        if (var == vars.end())
+        if (var == vars.cend())
             continue;
         setTokenValue(tok, var->second, settings);
     }
@@ -2161,7 +2161,7 @@ static const std::string& invertAssign(const std::string& assign)
         {">>=", "<<="},
         {"^=", "^="}};
     auto it = lookup.find(assign);
-    if (it == lookup.end()) {
+    if (it == lookup.cend()) {
         return emptyString;
     }
     return it->second;
@@ -3596,7 +3596,7 @@ static std::vector<ValueFlow::LifetimeToken> getLifetimeTokens(const Token* tok,
         auto it = std::find_if(vts.cbegin(), vts.cend(), [&](const ValueType& vt) {
             return vt.isTypeEqual(vartok->valueType());
         });
-        if (it != vts.end())
+        if (it != vts.cend())
             return getLifetimeTokens(vartok, escape, std::move(errorPath), pred, depth - 1);
     }
     return {{tok, std::move(errorPath)}};
@@ -4269,7 +4269,7 @@ static bool hasBorrowingVariables(const std::list<Variable>& vars, const std::ve
     return std::any_of(vars.cbegin(), vars.cend(), [&](const Variable& var) {
         if (const ValueType* vt = var.valueType()) {
             if (vt->pointer > 0 &&
-                std::none_of(args.begin(), args.end(), [vt](const Token* arg) {
+                std::none_of(args.cbegin(), args.cend(), [vt](const Token* arg) {
                 return arg->valueType() && arg->valueType()->type == vt->type;
             }))
                 return false;
@@ -5638,7 +5638,7 @@ static void valueFlowForwardConst(Token* start,
                 auto it = std::find_if(refs.cbegin(), refs.cend(), [&](const ReferenceToken& ref) {
                     return ref.token->varId() == var->declarationId();
                 });
-                if (it != refs.end()) {
+                if (it != refs.cend()) {
                     for (ValueFlow::Value value : values) {
                         if (refs.size() > 1)
                             value.setInconclusive();
@@ -5817,12 +5817,12 @@ static void valueFlowForwardAssign(Token* const tok,
         // Check if variable is only incremented or decremented
         ValueFlow::Value::Bound b = findVarBound(expr->variable(), nextExpression, endOfVarScope, &settings);
         if (b != ValueFlow::Value::Bound::Point) {
-            auto knownValueIt = std::find_if(values.begin(), values.end(), [](const ValueFlow::Value& value) {
+            auto knownValueIt = std::find_if(values.cbegin(), values.cend(), [](const ValueFlow::Value& value) {
                 if (!value.isKnown())
                     return false;
                 return value.isIntValue();
             });
-            if (knownValueIt != values.end()) {
+            if (knownValueIt != values.cend()) {
                 ValueFlow::Value value = *knownValueIt;
                 value.bound = b;
                 value.invertRange();
@@ -5914,7 +5914,7 @@ static bool intersects(const C1& c1, const C2& c2)
         return intersects(c2, c1);
     // NOLINTNEXTLINE(readability-use-anyofallof) - TODO: fix if possible / also Cppcheck false negative
     for (auto&& x : c1) {
-        if (c2.find(x) != c2.end())
+        if (c2.find(x) != c2.cend())
             return true;
     }
     return false;
@@ -6147,7 +6147,7 @@ struct ConditionHandler {
             auto it = std::find_if(values.cbegin(), values.cend(), [](const ValueFlow::Value& v) {
                 return v.path > 0;
             });
-            if (it == values.end())
+            if (it == values.cend())
                 return 0;
             assert(std::all_of(it, values.end(), [&](const ValueFlow::Value& v) {
                 return v.path == 0 || v.path == it->path;
@@ -7267,7 +7267,7 @@ struct MultiValueFlowAnalyzer : ValueFlowAnalyzer {
         if (tok->varId() == 0)
             return nullptr;
         auto it = values.find(tok->varId());
-        if (it == values.end())
+        if (it == values.cend())
             return nullptr;
         return &it->second;
     }
@@ -7414,7 +7414,7 @@ static bool productParams(const Settings& settings, const std::unordered_map<Key
         }
         if (p.second.empty())
             continue;
-        std::for_each(std::next(p.second.begin()), p.second.end(), [&](const ValueFlow::Value& value) {
+        std::for_each(std::next(p.second.cbegin()), p.second.cend(), [&](const ValueFlow::Value& value) {
             Args new_args;
             for (auto arg:args) {
                 if (value.path != 0) {
@@ -7745,10 +7745,10 @@ static const ValueFlow::Value* getKnownValueFromToken(const Token* tok)
 {
     if (!tok)
         return nullptr;
-    auto it = std::find_if(tok->values().begin(), tok->values().end(), [&](const ValueFlow::Value& v) {
+    auto it = std::find_if(tok->values().cbegin(), tok->values().cend(), [&](const ValueFlow::Value& v) {
         return (v.isIntValue() || v.isContainerSizeValue() || v.isFloatValue()) && v.isKnown();
     });
-    if (it == tok->values().end())
+    if (it == tok->values().cend())
         return nullptr;
     return std::addressof(*it);
 }
@@ -7760,8 +7760,8 @@ static const ValueFlow::Value* getKnownValueFromTokens(const std::vector<const T
     const ValueFlow::Value* result = getKnownValueFromToken(toks.front());
     if (!result)
         return nullptr;
-    if (!std::all_of(std::next(toks.begin()), toks.end(), [&](const Token* tok) {
-        return std::any_of(tok->values().begin(), tok->values().end(), [&](const ValueFlow::Value& v) {
+    if (!std::all_of(std::next(toks.cbegin()), toks.cend(), [&](const Token* tok) {
+        return std::any_of(tok->values().cbegin(), tok->values().cend(), [&](const ValueFlow::Value& v) {
             return v.equalValue(*result) && v.valueKind == result->valueKind;
         });
     }))
@@ -7931,7 +7931,7 @@ static Token* findStartToken(const Variable* var, Token* start, const Library* l
         return isLoopExpression ? start : first->previous();
     }
     // If all uses are in the same scope
-    if (std::all_of(uses.begin() + 1, uses.end(), [&](const Token* tok) {
+    if (std::all_of(uses.cbegin() + 1, uses.cend(), [&](const Token* tok) {
         return tok->scope() == scope;
     }))
         return first->previous();
@@ -8156,10 +8156,10 @@ struct ContainerExpressionAnalyzer : ExpressionAnalyzer {
             if (rhs->tokType() == Token::eString)
                 n = Token::getStrLength(rhs);
             else if (rhsContainer && rhsContainer->stdStringLike) {
-                auto it = std::find_if(rhs->values().begin(), rhs->values().end(), [&](const ValueFlow::Value& rhsval) {
+                auto it = std::find_if(rhs->values().cbegin(), rhs->values().cend(), [&](const ValueFlow::Value& rhsval) {
                     return rhsval.isKnown() && rhsval.isContainerSizeValue();
                 });
-                if (it != rhs->values().end())
+                if (it != rhs->values().cend())
                     n = it->intvalue;
             }
         } else if (astIsLHS(tok) && Token::Match(tok->astParent(), ". %name% (")) {
@@ -9199,7 +9199,7 @@ static void valueFlowUnknownFunctionReturn(TokenList &tokenlist, const Settings 
     for (Token *tok = tokenlist.front(); tok; tok = tok->next()) {
         if (!tok->astParent() || tok->str() != "(" || !tok->previous()->isName())
             continue;
-        if (settings.checkUnknownFunctionReturn.find(tok->previous()->str()) == settings.checkUnknownFunctionReturn.end())
+        if (settings.checkUnknownFunctionReturn.find(tok->previous()->str()) == settings.checkUnknownFunctionReturn.cend())
             continue;
         std::vector<MathLib::bigint> unknownValues = settings.library.unknownReturnValues(tok->astOperand1());
         if (unknownValues.empty())

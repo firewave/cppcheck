@@ -1902,10 +1902,10 @@ private:
 
         // Compare results..
         ASSERT_EQUALS(4, (int)actual.size());
-        ASSERT(actual.find("") != actual.end());
-        ASSERT(actual.find("BAR") != actual.end());
-        ASSERT(actual.find("FOO") != actual.end());
-        ASSERT(actual.find("BAR;FOO") != actual.end());
+        ASSERT(actual.find("") != actual.cend());
+        ASSERT(actual.find("BAR") != actual.cend());
+        ASSERT(actual.find("FOO") != actual.cend());
+        ASSERT(actual.find("BAR;FOO") != actual.cend());
     }
 
 

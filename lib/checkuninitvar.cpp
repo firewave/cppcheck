@@ -166,7 +166,7 @@ void CheckUninitVar::checkScope(const Scope* scope, const std::set<std::string> 
                 continue;
         }
 
-        bool stdtype = mTokenizer->isC() && arrayTypeDefs.find(var.typeStartToken()->str()) == arrayTypeDefs.end();
+        bool stdtype = mTokenizer->isC() && arrayTypeDefs.find(var.typeStartToken()->str()) == arrayTypeDefs.cend();
         const Token* tok = var.typeStartToken();
         for (; tok != var.nameToken() && tok->str() != "<"; tok = tok->next()) {
             if (tok->isStandardType() || tok->isEnumType())
@@ -307,7 +307,7 @@ static void conditionAlwaysTrueOrFalse(const Token *tok, const std::map<nonneg i
         while (tok && tok->str() == ".")
             tok = tok->astOperand2();
         const std::map<nonneg int, VariableValue>::const_iterator it = variableValue.find(tok ? tok->varId() : ~0U);
-        if (it != variableValue.end()) {
+        if (it != variableValue.cend()) {
             *alwaysTrue = (it->second != 0LL);
             *alwaysFalse = (it->second == 0LL);
         }
@@ -333,7 +333,7 @@ static void conditionAlwaysTrueOrFalse(const Token *tok, const std::map<nonneg i
             vartok = vartok->astOperand2();
 
         const std::map<nonneg int, VariableValue>::const_iterator it = variableValue.find(vartok ? vartok->varId() : ~0U);
-        if (it == variableValue.end())
+        if (it == variableValue.cend())
             return;
 
         if (tok->str() == "==")

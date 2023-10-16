@@ -506,7 +506,7 @@ static bool findPath(const std::string &callId,
         return false;
 
     const std::map<std::string, std::list<const CTU::FileInfo::CallBase *>>::const_iterator it = callsMap.find(callId);
-    if (it == callsMap.end())
+    if (it == callsMap.cend())
         return false;
 
     for (const CTU::FileInfo::CallBase *c : it->second) {

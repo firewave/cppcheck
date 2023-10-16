@@ -287,7 +287,7 @@ namespace clangimport {
         }
 
         bool hasDecl(const std::string &addr) const {
-            return mDeclMap.find(addr) != mDeclMap.end();
+            return mDeclMap.find(addr) != mDeclMap.cend();
         }
 
         const Scope *getScope(const std::string &addr) {
@@ -611,7 +611,7 @@ const Scope *clangimport::AstNode::getNestedInScope(TokenList &tokenList)
 {
     if (!tokenList.back())
         return &mData->mSymbolDatabase->scopeList.front();
-    if (tokenList.back()->str() == "}" && mData->mNotScope.find(tokenList.back()) == mData->mNotScope.end())
+    if (tokenList.back()->str() == "}" && mData->mNotScope.find(tokenList.back()) == mData->mNotScope.cend())
         return tokenList.back()->scope()->nestedIn;
     return tokenList.back()->scope();
 }
@@ -670,12 +670,12 @@ Scope *clangimport::AstNode::createScope(TokenList &tokenList, Scope::ScopeType 
                 replaceVar[from] = to;
                 mData->replaceVarDecl(from, to);
             }
-            if (replaceVar.find(vartok->variable()) != replaceVar.end())
+            if (replaceVar.find(vartok->variable()) != replaceVar.cend())
                 const_cast<Token *>(vartok)->variable(replaceVar[vartok->variable()]);
         }
         std::list<Variable> &varlist = const_cast<Scope *>(def->scope())->varlist;
         for (std::list<Variable>::iterator var = varlist.begin(); var != varlist.end();) {
-            if (replaceVar.find(&(*var)) != replaceVar.end())
+            if (replaceVar.find(&(*var)) != replaceVar.cend())
                 var = varlist.erase(var);
             else
                 ++var;
@@ -1347,7 +1347,7 @@ void clangimport::AstNode::createTokensFunctionDecl(TokenList &tokenList)
 
     if (!prev) {
         auto accessControl = mData->scopeAccessControl.find(tokenList.back()->scope());
-        if (accessControl != mData->scopeAccessControl.end())
+        if (accessControl != mData->scopeAccessControl.cend())
             function->access = accessControl->second;
     }
 

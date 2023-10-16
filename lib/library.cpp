@@ -124,7 +124,7 @@ Library::Error Library::load(const char exename[], const char path[])
         absolute_path = Path::getAbsoluteFilePath(path);
 
     if (error == tinyxml2::XML_SUCCESS) {
-        if (mFiles.find(absolute_path) == mFiles.end()) {
+        if (mFiles.find(absolute_path) == mFiles.cend()) {
             Error err = load(doc);
             if (err.errorcode == ErrorCode::OK)
                 mFiles.insert(absolute_path);
@@ -217,7 +217,7 @@ Library::Error Library::load(const tinyxml2::XMLDocument &doc)
             for (const tinyxml2::XMLElement *memorynode = node->FirstChildElement(); memorynode; memorynode = memorynode->NextSiblingElement()) {
                 if (strcmp(memorynode->Name(),"dealloc")==0) {
                     const std::map<std::string, AllocFunc>::const_iterator it = mDealloc.find(memorynode->GetText());
-                    if (it != mDealloc.end()) {
+                    if (it != mDealloc.cend()) {
                         allocationId = it->second.groupId;
                         break;
                     }
@@ -418,7 +418,7 @@ Library::Error Library::load(const tinyxml2::XMLDocument &doc)
             const char* const inherits = node->Attribute("inherits");
             if (inherits) {
                 const std::unordered_map<std::string, Container>::const_iterator i = containers.find(inherits);
-                if (i != containers.end())
+                if (i != containers.cend())
                     container = i->second; // Take values from parent and overwrite them if necessary
                 else
                     return Error(ErrorCode::BAD_ATTRIBUTE_VALUE, inherits);
@@ -656,7 +656,7 @@ Library::Error Library::load(const tinyxml2::XMLDocument &doc)
         std::string str;
         for (std::set<std::string>::const_iterator i = unknown_elements.cbegin(); i != unknown_elements.cend();) {
             str += *i;
-            if (++i != unknown_elements.end())
+            if (++i != unknown_elements.cend())
                 str += ", ";
         }
         return Error(ErrorCode::UNKNOWN_ELEMENT, str);
@@ -977,7 +977,7 @@ std::string Library::getFunctionName(const Token *ftok, bool &error) const
                     tok = tok->next();
                 }
                 name += "::" + ftok->str();
-                if (functions.find(name) != functions.end() && matchArguments(ftok, name))
+                if (functions.find(name) != functions.cend() && matchArguments(ftok, name))
                     return name;
             }
         }
@@ -1065,21 +1065,21 @@ bool Library::isuninitargbad(const Token *ftok, int argnr, int indirect, bool *h
 const Library::AllocFunc* Library::getAllocFuncInfo(const Token *tok) const
 {
     const std::string funcname = getFunctionName(tok);
-    return isNotLibraryFunction(tok) && functions.find(funcname) != functions.end() ? nullptr : getAllocDealloc(mAlloc, funcname);
+    return isNotLibraryFunction(tok) && functions.find(funcname) != functions.cend() ? nullptr : getAllocDealloc(mAlloc, funcname);
 }
 
 /** get deallocation info for function */
 const Library::AllocFunc* Library::getDeallocFuncInfo(const Token *tok) const
 {
     const std::string funcname = getFunctionName(tok);
-    return isNotLibraryFunction(tok) && functions.find(funcname) != functions.end() ? nullptr : getAllocDealloc(mDealloc, funcname);
+    return isNotLibraryFunction(tok) && functions.find(funcname) != functions.cend() ? nullptr : getAllocDealloc(mDealloc, funcname);
 }
 
 /** get reallocation info for function */
 const Library::AllocFunc* Library::getReallocFuncInfo(const Token *tok) const
 {
     const std::string funcname = getFunctionName(tok);
-    return isNotLibraryFunction(tok) && functions.find(funcname) != functions.end() ? nullptr : getAllocDealloc(mRealloc, funcname);
+    return isNotLibraryFunction(tok) && functions.find(funcname) != functions.cend() ? nullptr : getAllocDealloc(mRealloc, funcname);
 }
 
 /** get allocation id for function */
@@ -1535,7 +1535,7 @@ bool Library::isnoreturn(const Token *ftok) const
         return false;
     }
     const std::unordered_map<std::string, FalseTrueMaybe>::const_iterator it = mNoReturn.find(getFunctionName(ftok));
-    if (it == mNoReturn.end())
+    if (it == mNoReturn.cend())
         return false;
     if (it->second == FalseTrueMaybe::Maybe)
         return true;
@@ -1549,7 +1549,7 @@ bool Library::isnotnoreturn(const Token *ftok) const
     if (isNotLibraryFunction(ftok))
         return false;
     const std::unordered_map<std::string, FalseTrueMaybe>::const_iterator it = mNoReturn.find(getFunctionName(ftok));
-    if (it == mNoReturn.end())
+    if (it == mNoReturn.cend())
         return false;
     if (it->second == FalseTrueMaybe::Maybe)
         return false;
@@ -1558,7 +1558,7 @@ bool Library::isnotnoreturn(const Token *ftok) const
 
 bool Library::markupFile(const std::string &path) const
 {
-    return mMarkupExtensions.find(Path::getFilenameExtensionInLowerCase(path)) != mMarkupExtensions.end();
+    return mMarkupExtensions.find(Path::getFilenameExtensionInLowerCase(path)) != mMarkupExtensions.cend();
 }
 
 bool Library::processMarkupAfterCode(const std::string &path) const
@@ -1585,7 +1585,7 @@ int Library::blockstartoffset(const std::string &file) const
     const std::unordered_map<std::string, CodeBlock>::const_iterator map_it
         = mExecutableBlocks.find(Path::getFilenameExtensionInLowerCase(file));
 
-    if (map_it != mExecutableBlocks.end()) {
+    if (map_it != mExecutableBlocks.cend()) {
         offset = map_it->second.offset();
     }
     return offset;
@@ -1596,7 +1596,7 @@ const std::string& Library::blockstart(const std::string &file) const
     const std::unordered_map<std::string, CodeBlock>::const_iterator map_it
         = mExecutableBlocks.find(Path::getFilenameExtensionInLowerCase(file));
 
-    if (map_it != mExecutableBlocks.end()) {
+    if (map_it != mExecutableBlocks.cend()) {
         return map_it->second.start();
     }
     return emptyString;
@@ -1607,7 +1607,7 @@ const std::string& Library::blockend(const std::string &file) const
     const std::unordered_map<std::string, CodeBlock>::const_iterator map_it
         = mExecutableBlocks.find(Path::getFilenameExtensionInLowerCase(file));
 
-    if (map_it != mExecutableBlocks.end()) {
+    if (map_it != mExecutableBlocks.cend()) {
         return map_it->second.end();
     }
     return emptyString;
@@ -1617,14 +1617,14 @@ bool Library::iskeyword(const std::string &file, const std::string &keyword) con
 {
     const std::map<std::string, std::set<std::string>>::const_iterator it =
         mKeywords.find(Path::getFilenameExtensionInLowerCase(file));
-    return (it != mKeywords.end() && it->second.count(keyword));
+    return (it != mKeywords.cend() && it->second.count(keyword));
 }
 
 bool Library::isimporter(const std::string& file, const std::string &importer) const
 {
     const std::map<std::string, std::set<std::string>>::const_iterator it =
         mImporters.find(Path::getFilenameExtensionInLowerCase(file));
-    return (it != mImporters.end() && it->second.count(importer) > 0);
+    return (it != mImporters.cend() && it->second.count(importer) > 0);
 }
 
 const Token* Library::getContainerFromYield(const Token* tok, Library::Container::Yield yield) const
@@ -1689,7 +1689,7 @@ const Library::SmartPointer* Library::detectSmartPointer(const Token* tok, bool 
         tok = tok->next();
     }
     auto it = smartPointers.find(typestr);
-    if (it == smartPointers.end())
+    if (it == smartPointers.cend())
         return nullptr;
     return &it->second;
 }
@@ -1717,12 +1717,12 @@ const Library::Container * getLibraryContainer(const Token * tok)
 Library::TypeCheck Library::getTypeCheck(std::string check,  std::string typeName) const
 {
     auto it = mTypeChecks.find(std::pair<std::string, std::string>(std::move(check), std::move(typeName)));
-    return it == mTypeChecks.end() ? TypeCheck::def : it->second;
+    return it == mTypeChecks.cend() ? TypeCheck::def : it->second;
 }
 
 bool Library::hasAnyTypeCheck(const std::string& typeName) const
 {
-    return std::any_of(mTypeChecks.begin(), mTypeChecks.end(), [&](const std::pair<std::pair<std::string, std::string>, Library::TypeCheck>& tc) {
+    return std::any_of(mTypeChecks.cbegin(), mTypeChecks.cend(), [&](const std::pair<std::pair<std::string, std::string>, Library::TypeCheck>& tc) {
         return tc.first.second == typeName;
     });
 }

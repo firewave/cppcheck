@@ -84,8 +84,8 @@ public:
     ThreadData(ThreadExecutor &threadExecutor, ErrorLogger &errorLogger, const Settings &settings, const std::list<std::pair<std::string, std::size_t>> &files, const std::list<FileSettings> &fileSettings, CppCheck::ExecuteCmdFn executeCommand)
         : mFiles(files), mFileSettings(fileSettings), mSettings(settings), mExecuteCommand(std::move(executeCommand)), logForwarder(threadExecutor, errorLogger)
     {
-        mItNextFile = mFiles.begin();
-        mItNextFileSettings = mFileSettings.begin();
+        mItNextFile = mFiles.cbegin();
+        mItNextFileSettings = mFileSettings.cbegin();
 
         mTotalFiles = mFiles.size() + mFileSettings.size();
         mTotalFileSize = std::accumulate(mFiles.cbegin(), mFiles.cend(), std::size_t(0), [](std::size_t v, const std::pair<std::string, std::size_t>& p) {
@@ -95,14 +95,14 @@ public:
 
     bool next(const std::string *&file, const FileSettings *&fs, std::size_t &fileSize) {
         std::lock_guard<std::mutex> l(mFileSync);
-        if (mItNextFile != mFiles.end()) {
+        if (mItNextFile != mFiles.cend()) {
             file = &mItNextFile->first;
             fs = nullptr;
             fileSize = mItNextFile->second;
             ++mItNextFile;
             return true;
         }
-        if (mItNextFileSettings != mFileSettings.end()) {
+        if (mItNextFileSettings != mFileSettings.cend()) {
             file = nullptr;
             fs = &(*mItNextFileSettings);
             fileSize = 0;

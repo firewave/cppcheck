@@ -242,21 +242,21 @@ public:
 
         Action getAction(const std::string& function) const {
             const std::map<std::string, Function>::const_iterator i = functions.find(function);
-            if (i != functions.end())
+            if (i != functions.cend())
                 return i->second.action;
             return Action::NO_ACTION;
         }
 
         Yield getYield(const std::string& function) const {
             const std::map<std::string, Function>::const_iterator i = functions.find(function);
-            if (i != functions.end())
+            if (i != functions.cend())
                 return i->second.yield;
             return Yield::NO_YIELD;
         }
 
         const std::string& getReturnType(const std::string& function) const {
             auto i = functions.find(function);
-            return (i != functions.end()) ? i->second.returnType : emptyString;
+            return (i != functions.cend()) ? i->second.returnType : emptyString;
         }
 
         static Yield yieldFrom(const std::string& yieldName);
@@ -390,17 +390,17 @@ public:
     bool iskeyword(const std::string &file, const std::string &keyword) const;
 
     bool isexporter(const std::string &prefix) const {
-        return mExporters.find(prefix) != mExporters.end();
+        return mExporters.find(prefix) != mExporters.cend();
     }
 
     bool isexportedprefix(const std::string &prefix, const std::string &token) const {
         const std::map<std::string, ExportedFunctions>::const_iterator it = mExporters.find(prefix);
-        return (it != mExporters.end() && it->second.isPrefix(token));
+        return (it != mExporters.cend() && it->second.isPrefix(token));
     }
 
     bool isexportedsuffix(const std::string &prefix, const std::string &token) const {
         const std::map<std::string, ExportedFunctions>::const_iterator it = mExporters.find(prefix);
-        return (it != mExporters.end() && it->second.isSuffix(token));
+        return (it != mExporters.cend() && it->second.isSuffix(token));
     }
 
     bool isimporter(const std::string& file, const std::string &importer) const;
@@ -409,18 +409,18 @@ public:
     const Token* getContainerFromAction(const Token* tok, Container::Action action) const;
 
     bool isreflection(const std::string &token) const {
-        return mReflection.find(token) != mReflection.end();
+        return mReflection.find(token) != mReflection.cend();
     }
 
     int reflectionArgument(const std::string &token) const {
         const std::map<std::string, int>::const_iterator it = mReflection.find(token);
-        if (it != mReflection.end())
+        if (it != mReflection.cend())
             return it->second;
         return -1;
     }
 
     bool isentrypoint(const std::string &func) const {
-        return func == "main" || mEntrypoints.find(func) != mEntrypoints.end();
+        return func == "main" || mEntrypoints.find(func) != mEntrypoints.cend();
     }
 
     std::vector<std::string> defines; // to provide some library defines
@@ -441,7 +441,7 @@ public:
     };
     const PodType *podtype(const std::string &name) const {
         const std::unordered_map<std::string, PodType>::const_iterator it = mPodTypes.find(name);
-        return (it != mPodTypes.end()) ? &(it->second) : nullptr;
+        return (it != mPodTypes.cend()) ? &(it->second) : nullptr;
     }
 
     struct PlatformType {
@@ -469,21 +469,21 @@ public:
     struct Platform {
         const PlatformType *platform_type(const std::string &name) const {
             const std::map<std::string, PlatformType>::const_iterator it = mPlatformTypes.find(name);
-            return (it != mPlatformTypes.end()) ? &(it->second) : nullptr;
+            return (it != mPlatformTypes.cend()) ? &(it->second) : nullptr;
         }
         std::map<std::string, PlatformType> mPlatformTypes;
     };
 
     const PlatformType *platform_type(const std::string &name, const std::string & platform) const {
         const std::map<std::string, Platform>::const_iterator it = mPlatforms.find(platform);
-        if (it != mPlatforms.end()) {
+        if (it != mPlatforms.cend()) {
             const PlatformType * const type = it->second.platform_type(name);
             if (type)
                 return type;
         }
 
         const std::map<std::string, PlatformType>::const_iterator it2 = mPlatformTypes.find(name);
-        return (it2 != mPlatformTypes.end()) ? &(it2->second) : nullptr;
+        return (it2 != mPlatformTypes.cend()) ? &(it2->second) : nullptr;
     }
 
     /**
@@ -515,10 +515,10 @@ private:
             mSuffixes.insert(std::move(suffix));
         }
         bool isPrefix(const std::string& prefix) const {
-            return (mPrefixes.find(prefix) != mPrefixes.end());
+            return (mPrefixes.find(prefix) != mPrefixes.cend());
         }
         bool isSuffix(const std::string& suffix) const {
-            return (mSuffixes.find(suffix) != mSuffixes.end());
+            return (mSuffixes.find(suffix) != mSuffixes.cend());
         }
 
     private:
@@ -551,7 +551,7 @@ private:
             return mOffset;
         }
         bool isBlock(const std::string& blockName) const {
-            return mBlocks.find(blockName) != mBlocks.end();
+            return mBlocks.find(blockName) != mBlocks.cend();
         }
 
     private:
@@ -592,7 +592,7 @@ private:
 
     static const AllocFunc* getAllocDealloc(const std::map<std::string, AllocFunc> &data, const std::string &name) {
         const std::map<std::string, AllocFunc>::const_iterator it = data.find(name);
-        return (it == data.end()) ? nullptr : &it->second;
+        return (it == data.cend()) ? nullptr : &it->second;
     }
 
     enum DetectContainer { ContainerOnly, IteratorOnly, Both };

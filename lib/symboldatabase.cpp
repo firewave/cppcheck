@@ -1168,7 +1168,7 @@ void SymbolDatabase::createSymbolDatabaseSetTypePointers()
         if (!tok->isName() || tok->varId() || tok->function() || tok->type() || tok->enumerator())
             continue;
 
-        if (typenames.find(tok->str()) == typenames.end())
+        if (typenames.find(tok->str()) == typenames.cend())
             continue;
 
         const Type *type = findVariableType(tok->scope(), tok);
@@ -1514,7 +1514,7 @@ void SymbolDatabase::createSymbolDatabaseIncompleteVars()
             fstr.insert(0, ftok->previous()->str() + "::");
             ftok = ftok->tokAt(-2);
         }
-        if (mSettings.library.functions.find(fstr) != mSettings.library.functions.end())
+        if (mSettings.library.functions.find(fstr) != mSettings.library.functions.cend())
             continue;
         if (mTokenizer.isCPP()) {
             const Token* parent = tok->astParent();
@@ -3626,7 +3626,7 @@ const Function* Type::getFunction(const std::string& funcName) const
     if (classScope) {
         const std::multimap<std::string, const Function *>::const_iterator it = classScope->functionMap.find(funcName);
 
-        if (it != classScope->functionMap.end())
+        if (it != classScope->functionMap.cend())
             return it->second;
     }
 
@@ -3651,7 +3651,7 @@ bool Type::hasCircularDependencies(std::set<BaseInfo>* ancestors) const
             continue;
         if (this==parent->type)
             return true;
-        if (ancestors->find(*parent)!=ancestors->end())
+        if (ancestors->find(*parent)!=ancestors->cend())
             return true;
 
         ancestors->insert(*parent);
@@ -4572,7 +4572,7 @@ std::vector<const Function*> Function::getOverloadedFunctions() const
     while (scope) {
         const bool isMemberFunction = scope->isClassOrStruct() && !isStatic();
         for (std::multimap<std::string, const Function*>::const_iterator it = scope->functionMap.find(tokenDef->str());
-             it != scope->functionMap.end() && it->first == tokenDef->str();
+             it != scope->functionMap.cend() && it->first == tokenDef->str();
              ++it) {
             const Function* func = it->second;
             if (isMemberFunction && isMemberFunction == func->isStatic())
@@ -4674,7 +4674,7 @@ const Function * Function::getOverriddenFunctionRecursive(const ::Type* baseType
 const Variable* Function::getArgumentVar(nonneg int num) const
 {
     if (num < argumentList.size()) {
-        auto it = argumentList.begin();
+        auto it = argumentList.cbegin();
         std::advance(it, num);
         return &*it;
     }
@@ -4962,10 +4962,10 @@ const Token *Scope::checkVariable(const Token *tok, AccessControl varaccess, con
 
 const Variable *Scope::getVariable(const std::string &varname) const
 {
-    auto it = std::find_if(varlist.begin(), varlist.end(), [&varname](const Variable& var) {
+    auto it = std::find_if(varlist.cbegin(), varlist.cend(), [&varname](const Variable& var) {
         return var.name() == varname;
     });
-    if (it != varlist.end())
+    if (it != varlist.cend())
         return &*it;
 
     if (definedType) {
@@ -5163,7 +5163,7 @@ const Enumerator * SymbolDatabase::findEnumerator(const Token * tok, std::set<st
 
     const std::string& tokStr = tok->str();
 
-    if (tokensThatAreNotEnumeratorValues.find(tokStr) != tokensThatAreNotEnumeratorValues.end())
+    if (tokensThatAreNotEnumeratorValues.find(tokStr) != tokensThatAreNotEnumeratorValues.cend())
         return nullptr;
 
     const Scope* scope = tok->scope();
@@ -5440,7 +5440,7 @@ static bool hasEmptyCaptureList(const Token* tok) {
 
 bool Scope::hasInlineOrLambdaFunction() const
 {
-    return std::any_of(nestedList.begin(), nestedList.end(), [&](const Scope* s) {
+    return std::any_of(nestedList.cbegin(), nestedList.cend(), [&](const Scope* s) {
         // Inline function
         if (s->type == Scope::eUnconditional && Token::simpleMatch(s->bodyStart->previous(), ") {"))
             return true;
@@ -5854,7 +5854,7 @@ const Function* Scope::findFunction(const Token *tok, bool requireConst) const
     auto itPure = std::find_if(matches.begin(), matches.end(), [](const Function* m) {
         return m->isPure();
     });
-    if (itPure != matches.end() && std::any_of(matches.begin(), matches.end(), [&](const Function* m) {
+    if (itPure != matches.end() && std::any_of(matches.cbegin(), matches.cend(), [&](const Function* m) {
         return m->isImplicitlyVirtual() && m != *itPure;
     }))
         matches.erase(itPure);
@@ -6034,7 +6034,7 @@ const Scope *SymbolDatabase::findScopeByName(const std::string& name) const
     auto it = std::find_if(scopeList.cbegin(), scopeList.cend(), [&](const Scope& s) {
         return s.className == name;
     });
-    return it == scopeList.end() ? nullptr : &*it;
+    return it == scopeList.cend() ? nullptr : &*it;
 }
 
 //---------------------------------------------------------------------------
@@ -6083,12 +6083,12 @@ T* findTypeImpl(S& thisScope, const std::string & name)
     auto it = thisScope.definedTypesMap.find(name);
 
     // Type was found
-    if (thisScope.definedTypesMap.end() != it)
+    if (thisScope.definedTypesMap.cend() != it)
         return it->second;
 
     // is type defined in anonymous namespace..
     it = thisScope.definedTypesMap.find(emptyString);
-    if (it != thisScope.definedTypesMap.end()) {
+    if (it != thisScope.definedTypesMap.cend()) {
         for (S *scope : thisScope.nestedList) {
             if (scope->className.empty() && (scope->type == thisScope.eNamespace || scope->isClassOrStructOrUnion())) {
                 T *t = scope->findType(name);
@@ -6137,7 +6137,7 @@ const Function *Scope::getDestructor() const
     auto it = std::find_if(functionList.cbegin(), functionList.cend(), [](const Function& f) {
         return f.type == Function::eDestructor;
     });
-    return it == functionList.end() ? nullptr : &*it;
+    return it == functionList.cend() ? nullptr : &*it;
 }
 
 //---------------------------------------------------------------------------
@@ -6705,10 +6705,10 @@ void SymbolDatabase::setValueType(Token* tok, const ValueType& valuetype, Source
             const Scope *typeScope = vt1->typeScope;
             if (!typeScope)
                 return;
-            auto it = std::find_if(typeScope->varlist.begin(), typeScope->varlist.end(), [&name](const Variable& v) {
+            auto it = std::find_if(typeScope->varlist.cbegin(), typeScope->varlist.cend(), [&name](const Variable& v) {
                 return v.nameToken()->str() == name;
             });
-            if (it != typeScope->varlist.end())
+            if (it != typeScope->varlist.cend())
                 var = &*it;
         }
         if (var) {
@@ -7229,14 +7229,14 @@ static const Function *getOperatorFunction(const Token * const tok)
     const Scope *classScope = getClassScope(tok->astOperand1());
     if (classScope) {
         it = classScope->functionMap.find(functionName);
-        if (it != classScope->functionMap.end())
+        if (it != classScope->functionMap.cend())
             return it->second;
     }
 
     classScope = getClassScope(tok->astOperand2());
     if (classScope) {
         it = classScope->functionMap.find(functionName);
-        if (it != classScope->functionMap.end())
+        if (it != classScope->functionMap.cend())
             return it->second;
     }
 

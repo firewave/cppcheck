@@ -132,7 +132,7 @@ namespace {
                 if (minValue->isPossible() && minValue->bound == ValueFlow::Value::Bound::Lower)
                     result.setMinValue(minValue->intvalue, minValue);
                 if (!minValue->isImpossible() && (minValue->bound == ValueFlow::Value::Bound::Point || minValue->isKnown()) &&
-                    std::count_if(values.begin(), values.end(), predicate) == 1)
+                    std::count_if(values.cbegin(), values.cend(), predicate) == 1)
                     return Interval::fromInt(minValue->intvalue, minValue);
             }
             const ValueFlow::Value* maxValue = getCompareValue(values, predicate, std::greater<MathLib::bigint>{});

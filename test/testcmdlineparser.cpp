@@ -2342,7 +2342,7 @@ private:
         const char * const argv[] = {"cppcheck", "-U_WIN32", "file.cpp"};
         ASSERT_EQUALS(CmdLineParser::Result::Success, parser->parseFromArgs(3, argv));
         ASSERT_EQUALS(1, settings->userUndefs.size());
-        ASSERT(settings->userUndefs.find("_WIN32") != settings->userUndefs.end());
+        ASSERT(settings->userUndefs.find("_WIN32") != settings->userUndefs.cend());
     }
 
     void undefs2() {
@@ -2350,8 +2350,8 @@ private:
         const char * const argv[] = {"cppcheck", "-U_WIN32", "-UNODEBUG", "file.cpp"};
         ASSERT_EQUALS(CmdLineParser::Result::Success, parser->parseFromArgs(4, argv));
         ASSERT_EQUALS(2, settings->userUndefs.size());
-        ASSERT(settings->userUndefs.find("_WIN32") != settings->userUndefs.end());
-        ASSERT(settings->userUndefs.find("NODEBUG") != settings->userUndefs.end());
+        ASSERT(settings->userUndefs.find("_WIN32") != settings->userUndefs.cend());
+        ASSERT(settings->userUndefs.find("NODEBUG") != settings->userUndefs.cend());
     }
 
     void undefs_noarg() {

@@ -120,7 +120,7 @@ static void CppcheckSignalHandler(int signo, siginfo_t * info, void * context)
 #endif
 
     const Signalmap_t::const_iterator it=listofsignals.find(signo);
-    const char * const signame = (it==listofsignals.end()) ? "unknown" : it->second.c_str();
+    const char * const signame = (it==listofsignals.cend()) ? "unknown" : it->second.c_str();
 #ifdef USE_UNIX_BACKTRACE_SUPPORT
     bool lowMem=false; // was low-memory condition detected? Be careful then! Avoid allocating much more memory then.
 #endif

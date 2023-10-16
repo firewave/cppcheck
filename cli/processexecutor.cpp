@@ -278,7 +278,7 @@ unsigned int ProcessExecutor::check()
                 fileChecker.settings() = mSettings;
                 unsigned int resultOfCheck = 0;
 
-                if (iFileSettings != mFileSettings.end()) {
+                if (iFileSettings != mFileSettings.cend()) {
                     resultOfCheck = fileChecker.check(*iFileSettings);
                     if (fileChecker.settings().clangTidy)
                         fileChecker.analyseClangTidy(*iFileSettings);
@@ -294,7 +294,7 @@ unsigned int ProcessExecutor::check()
 
             close(pipes[1]);
             rpipes.push_back(pipes[0]);
-            if (iFileSettings != mFileSettings.end()) {
+            if (iFileSettings != mFileSettings.cend()) {
                 childFile[pid] = iFileSettings->filename + ' ' + iFileSettings->cfg;
                 pipeFile[pipes[0]] = iFileSettings->filename + ' ' + iFileSettings->cfg;
                 ++iFileSettings;
@@ -315,8 +315,8 @@ unsigned int ProcessExecutor::check()
             const int r = select(*std::max_element(rpipes.cbegin(), rpipes.cend()) + 1, &rfds, nullptr, nullptr, &tv);
 
             if (r > 0) {
-                std::list<int>::iterator rp = rpipes.begin();
-                while (rp != rpipes.end()) {
+                std::list<int>::const_iterator rp = rpipes.cbegin();
+                while (rp != rpipes.cend()) {
                     if (FD_ISSET(*rp, &rfds)) {
                         std::string name;
                         const std::map<int, std::string>::iterator p = pipeFile.find(*rp);

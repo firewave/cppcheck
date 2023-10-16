@@ -712,7 +712,7 @@ static ValueFlow::Value getLifetimeIteratorValue(const Token* tok, MathLib::bigi
     auto it = std::find_if(values.cbegin(), values.cend(), [](const ValueFlow::Value& v) {
         return v.lifetimeKind == ValueFlow::Value::LifetimeKind::Iterator;
     });
-    if (it != values.end())
+    if (it != values.cend())
         return *it;
     if (values.size() == 1)
         return values.front();
@@ -953,7 +953,7 @@ namespace {
                 ErrorPathItem epi = std::make_pair(tok, "Calling function " + tok->str());
                 const bool dependsOnThis = exprDependsOnThis(tok->next());
                 auto it = invalidMethods.find(f);
-                if (it != invalidMethods.end()) {
+                if (it != invalidMethods.cend()) {
                     std::vector<Info::Reference> refs = it->second.invalidTokens();
                     std::copy_if(refs.cbegin(), refs.cend(), std::back_inserter(result), [&](const Info::Reference& r) {
                         const Variable* var = r.tok->variable();
@@ -3062,7 +3062,7 @@ static bool isKnownEmptyContainer(const Token* tok)
 {
     if (!tok)
         return false;
-    return std::any_of(tok->values().begin(), tok->values().end(), [&](const ValueFlow::Value& v) {
+    return std::any_of(tok->values().cbegin(), tok->values().cend(), [&](const ValueFlow::Value& v) {
         if (!v.isKnown())
             return false;
         if (!v.isContainerSizeValue())

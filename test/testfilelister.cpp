@@ -81,14 +81,14 @@ private:
         };
 
         // Make sure source files are added..
-        ASSERT(find_file(dirprefix + "cli/main.cpp") != files.end());
-        ASSERT(find_file(dirprefix + "lib/token.cpp") != files.end());
-        ASSERT(find_file(dirprefix + "lib/tokenize.cpp") != files.end());
-        ASSERT(find_file(dirprefix + "gui/main.cpp") != files.end());
-        ASSERT(find_file(dirprefix + "test/testfilelister.cpp") != files.end());
+        ASSERT(find_file(dirprefix + "cli/main.cpp") != files.cend());
+        ASSERT(find_file(dirprefix + "lib/token.cpp") != files.cend());
+        ASSERT(find_file(dirprefix + "lib/tokenize.cpp") != files.cend());
+        ASSERT(find_file(dirprefix + "gui/main.cpp") != files.cend());
+        ASSERT(find_file(dirprefix + "test/testfilelister.cpp") != files.cend());
 
         // Make sure headers are not added..
-        ASSERT(find_file(dirprefix + "lib/tokenize.h") == files.end());
+        ASSERT(find_file(dirprefix + "lib/tokenize.h") == files.cend());
     }
 
     void recursiveAddFilesEmptyPath() const {
@@ -117,7 +117,7 @@ private:
         std::string err = FileLister::recursiveAddFiles(files, basedir + "lib/token.cpp", matcher);
         ASSERT_EQUALS("", err);
         ASSERT_EQUALS(1, files.size());
-        ASSERT_EQUALS(basedir + "lib/token.cpp", files.begin()->first);
+        ASSERT_EQUALS(basedir + "lib/token.cpp", files.cbegin()->first);
     }
 
     // TODO: test errors

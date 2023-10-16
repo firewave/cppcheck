@@ -3360,7 +3360,7 @@ void TemplateSimplifier::replaceTemplateUsage(
         // check if instantiation matches token instantiation from pointer
         if (pointers && !pointers->empty()) {
             // check full name
-            if (instantiation.fullName() != (*pointers->begin())->fullName()) {
+            if (instantiation.fullName() != (*pointers->cbegin())->fullName()) {
                 // FIXME:  fallback to just matching name
                 if (nameTok->str() != instantiation.name())
                     continue;
@@ -3873,10 +3873,10 @@ void TemplateSimplifier::simplifyTemplates(const std::time_t maxtime)
                     return xargs.size() < yargs.size();
                 if (isConstMethod(x.nameToken()) != isConstMethod(y.nameToken()))
                     return isConstMethod(x.nameToken());
-                return std::lexicographical_compare(xargs.begin(),
-                                                    xargs.end(),
-                                                    yargs.begin(),
-                                                    yargs.end(),
+                return std::lexicographical_compare(xargs.cbegin(),
+                                                    xargs.cend(),
+                                                    yargs.cbegin(),
+                                                    yargs.cend(),
                                                     [&](const Token* xarg, const Token* yarg) {
                     if (xarg != yarg)
                         return score(xarg) < score(yarg);

@@ -234,7 +234,7 @@ bool Path::isCPP(const std::string &path)
 bool Path::acceptFile(const std::string &path, const std::set<std::string> &extra)
 {
     bool header = false;
-    return (identify(path, &header) != Standards::Language::None && !header) || extra.find(getFilenameExtension(path)) != extra.end();
+    return (identify(path, &header) != Standards::Language::None && !header) || extra.find(getFilenameExtension(path)) != extra.cend();
 }
 
 // cppcheck-suppress unusedFunction

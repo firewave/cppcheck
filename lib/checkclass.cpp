@@ -104,7 +104,7 @@ static bool isVclTypeInit(const Type *type)
 {
     if (!type)
         return false;
-    return std::any_of(type->derivedFrom.begin(), type->derivedFrom.end(), [&](const Type::BaseInfo& baseInfo) {
+    return std::any_of(type->derivedFrom.cbegin(), type->derivedFrom.cend(), [&](const Type::BaseInfo& baseInfo) {
         if (!baseInfo.type)
             return true;
         if (isVclTypeInit(baseInfo.type))
@@ -493,7 +493,7 @@ void CheckClass::copyconstructors()
             if (tok->str()==":") {
                 tok=tok->next();
                 while (Token::Match(tok, "%name% (")) {
-                    if (allocatedVars.find(tok->varId()) != allocatedVars.end()) {
+                    if (allocatedVars.find(tok->varId()) != allocatedVars.cend()) {
                         if (tok->varId() && Token::Match(tok->tokAt(2), "%name% . %name% )"))
                             copiedVars.insert(tok);
                         else if (!Token::Match(tok->tokAt(2), "%any% )"))
@@ -506,7 +506,7 @@ void CheckClass::copyconstructors()
                 if ((mTokenizer->isCPP() && Token::Match(tok, "%var% = new")) ||
                     (Token::Match(tok, "%var% = %name% (") && (mSettings->library.getAllocFuncInfo(tok->tokAt(2)) || mSettings->library.getReallocFuncInfo(tok->tokAt(2))))) {
                     allocatedVars.erase(tok->varId());
-                } else if (Token::Match(tok, "%var% = %name% . %name% ;") && allocatedVars.find(tok->varId()) != allocatedVars.end()) {
+                } else if (Token::Match(tok, "%var% = %name% . %name% ;") && allocatedVars.find(tok->varId()) != allocatedVars.cend()) {
                     copiedVars.insert(tok);
                 }
             }
@@ -1444,7 +1444,7 @@ void CheckClass::checkMemset()
 void CheckClass::checkMemsetType(const Scope *start, const Token *tok, const Scope *type, bool allocation, std::set<const Scope *> parsedTypes)
 {
     // If type has been checked there is no need to check it again
-    if (parsedTypes.find(type) != parsedTypes.end())
+    if (parsedTypes.find(type) != parsedTypes.cend())
         return;
     parsedTypes.insert(type);
 
@@ -1629,7 +1629,7 @@ void CheckClass::checkReturnPtrThis(const Scope *scope, const Function *func, co
                         if (!it->isConst()) {
                             /** @todo make sure argument types match */
                             // avoid endless recursions
-                            if (analyzedFunctions.find(&*it) == analyzedFunctions.end()) {
+                            if (analyzedFunctions.find(&*it) == analyzedFunctions.cend()) {
                                 analyzedFunctions.insert(&*it);
                                 checkReturnPtrThis(scope, &*it, it->arg->link()->next(), it->arg->link()->next()->link(),
                                                    analyzedFunctions);
@@ -1977,7 +1977,7 @@ void CheckClass::virtualDestructor()
 
                     for (const Token *tok = mTokenizer->tokens(); tok; tok = tok->next()) {
                         if (Token::Match(tok, "[;{}] %var% =") &&
-                            baseClassPointers.find(tok->next()->varId()) != baseClassPointers.end()) {
+                            baseClassPointers.find(tok->next()->varId()) != baseClassPointers.cend()) {
                             // new derived class..
                             const std::string tmp("new " + derivedClass->str());
                             if (Token::simpleMatch(tok->tokAt(3), tmp.c_str(), tmp.size())) {
@@ -1987,7 +1987,7 @@ void CheckClass::virtualDestructor()
 
                         // Delete base class pointer that might point at derived class
                         else if (Token::Match(tok, "delete %var% ;") &&
-                                 dontDelete.find(tok->next()->varId()) != dontDelete.end()) {
+                                 dontDelete.find(tok->next()->varId()) != dontDelete.cend()) {
                             ok = false;
                             break;
                         }
@@ -2504,10 +2504,10 @@ bool CheckClass::checkConstFunc(const Scope *scope, const Function *func, Member
                 if (!end || !scope || !Token::simpleMatch(end->astParent(), "."))
                     return false;
                 const std::string op = "operator" + end->astParent()->originalName();
-                auto it = std::find_if(scope->functionList.begin(), scope->functionList.end(), [&op](const Function& f) {
+                auto it = std::find_if(scope->functionList.cbegin(), scope->functionList.cend(), [&op](const Function& f) {
                     return f.isConst() && f.name() == op;
                 });
-                if (it == scope->functionList.end() || !it->retType || !it->retType->classScope)
+                if (it == scope->functionList.cend() || !it->retType || !it->retType->classScope)
                     return false;
                 const Function* func = it->retType->classScope->findFunction(end, /*requireConst*/ true);
                 return func && func->isConst();
@@ -2806,7 +2806,7 @@ const std::list<const Token *> & CheckClass::getVirtualFunctionCalls(const Funct
                                                                      std::map<const Function *, std::list<const Token *>> & virtualFunctionCallsMap)
 {
     const std::map<const Function *, std::list<const Token *>>::const_iterator found = virtualFunctionCallsMap.find(&function);
-    if (found != virtualFunctionCallsMap.end())
+    if (found != virtualFunctionCallsMap.cend())
         return found->second;
 
     virtualFunctionCallsMap[&function] = std::list<const Token *>();
@@ -2988,7 +2988,7 @@ static std::vector<DuplMemberInfo> getDuplInheritedMembersRecursive(const Type* 
         }
         if (typeCurrent != parentClassIt.type) {
             const auto recursive = getDuplInheritedMembersRecursive(typeCurrent, parentClassIt.type, skipPrivate);
-            results.insert(results.end(), recursive.begin(), recursive.end());
+            results.insert(results.end(), recursive.cbegin(), recursive.cend());
         }
     }
     return results;
@@ -3019,7 +3019,7 @@ static std::vector<DuplMemberFuncInfo> getDuplInheritedMemberFunctionsRecursive(
         }
         if (typeCurrent != parentClassIt.type) {
             const auto recursive = getDuplInheritedMemberFunctionsRecursive(typeCurrent, parentClassIt.type);
-            results.insert(results.end(), recursive.begin(), recursive.end());
+            results.insert(results.end(), recursive.cbegin(), recursive.cend());
         }
     }
     return results;
@@ -3084,7 +3084,7 @@ void CheckClass::checkCopyCtorAndEqOperator()
 
     for (const Scope * scope : mSymbolDatabase->classAndStructScopes) {
 
-        const bool hasNonStaticVars = std::any_of(scope->varlist.begin(), scope->varlist.end(), [](const Variable& var) {
+        const bool hasNonStaticVars = std::any_of(scope->varlist.cbegin(), scope->varlist.cend(), [](const Variable& var) {
             return !var.isStatic();
         });
         if (!hasNonStaticVars)
@@ -3253,7 +3253,7 @@ void CheckClass::checkUselessOverride()
             const Function* baseFunc = func.getOverriddenFunction();
             if (!baseFunc || baseFunc->isPure() || baseFunc->access != func.access)
                 continue;
-            if (std::any_of(classScope->functionList.begin(), classScope->functionList.end(), [&func](const Function& f) { // check for overloads
+            if (std::any_of(classScope->functionList.cbegin(), classScope->functionList.cend(), [&func](const Function& f) { // check for overloads
                 if (&f == &func)
                     return false;
                 return f.name() == func.name();
@@ -3284,7 +3284,7 @@ void CheckClass::checkUselessOverride()
                 std::vector<const Token*> funcArgs = getArguments(func.tokenDef);
                 std::vector<const Token*> callArgs = getArguments(call);
                 if (funcArgs.size() != callArgs.size() ||
-                    !std::equal(funcArgs.begin(), funcArgs.end(), callArgs.begin(), [](const Token* t1, const Token* t2) {
+                    !std::equal(funcArgs.cbegin(), funcArgs.cend(), callArgs.cbegin(), [](const Token* t1, const Token* t2) {
                     return t1->str() == t2->str();
                 }))
                     continue;

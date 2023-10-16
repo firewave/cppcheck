@@ -915,7 +915,7 @@ unsigned int CppCheck::checkFile(const std::string& filename, const std::string 
                 // Skip if we already met the same simplified token list
                 if (mSettings.force || mSettings.maxConfigs > 1) {
                     const std::size_t hash = tokenizer.list.calculateHash();
-                    if (hashes.find(hash) != hashes.end()) {
+                    if (hashes.find(hash) != hashes.cend()) {
                         if (mSettings.debugwarnings)
                             purgedConfigurationMessage(filename, mCurrentConfig);
                         continue;

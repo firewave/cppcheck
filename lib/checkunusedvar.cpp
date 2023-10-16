@@ -522,7 +522,7 @@ static const Token* doAssignment(Variables &variables, const Token *tok, bool de
                             // not in same scope as declaration
                             else {
                                 // no other assignment in this scope
-                                if (var1->_assignments.find(scope) == var1->_assignments.end() ||
+                                if (var1->_assignments.find(scope) == var1->_assignments.cend() ||
                                     scope->type == Scope::eSwitch) {
                                     // nothing to replace
                                     // cppcheck-suppress duplicateBranch - remove when TODO below is address
@@ -577,7 +577,7 @@ static const Token* doAssignment(Variables &variables, const Token *tok, bool de
                         variables.clearAliases(varid1);
                     } else {
                         // no other assignment in this scope
-                        if (var1->_assignments.find(scope) == var1->_assignments.end()) {
+                        if (var1->_assignments.find(scope) == var1->_assignments.cend()) {
                             /**
                              * @todo determine if existing aliases should be discarded
                              */
@@ -1694,7 +1694,7 @@ bool CheckUnusedVar::isFunctionWithoutSideEffects(const Function& func, const To
                 return false;
             }
             // check if global variable is changed
-            if (bodyVariable->isGlobal() || (pointersToGlobals.find(bodyVariable) != pointersToGlobals.end())) {
+            if (bodyVariable->isGlobal() || (pointersToGlobals.find(bodyVariable) != pointersToGlobals.cend())) {
                 const int indirect = bodyVariable->isArray() ? bodyVariable->dimensions().size() : bodyVariable->isPointer();
                 if (isVariableChanged(bodyToken, indirect, mSettings, mTokenizer->isCPP())) {
                     return false;

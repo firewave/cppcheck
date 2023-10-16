@@ -450,14 +450,14 @@ static double myStod(const std::string& str, std::string::const_iterator from, s
         positivesign = false;
     } else
         it = from;
-    const std::size_t decimalsep = str.find('.', it-str.begin());
+    const std::size_t decimalsep = str.find('.', it-str.cbegin());
     int distance;
     if (std::string::npos == decimalsep) {
         distance = to - it;
-    } else if (decimalsep > (to - str.begin()))
+    } else if (decimalsep > (to - str.cbegin()))
         return 0.; // error handling??
     else
-        distance = int(decimalsep)-(from - str.begin());
+        distance = int(decimalsep)-(from - str.cbegin());
     auto digitval = [&](char c) {
         if ((10 < base) && (c > '9'))
             return 10 + std::tolower(c) - 'a';
@@ -796,7 +796,7 @@ bool MathLib::isOct(const std::string& str)
             if (isOctalDigit(static_cast<unsigned char>(*it)))
                 state = Status::DIGITS;
             else
-                return isValidIntegerSuffixIt(it,str.end());
+                return isValidIntegerSuffixIt(it,str.cend());
             break;
         }
     }
@@ -837,7 +837,7 @@ bool MathLib::isIntHex(const std::string& str)
             if (isxdigit(static_cast<unsigned char>(*it)))
                 ; //  state = Status::DIGIT;
             else
-                return isValidIntegerSuffixIt(it,str.end());
+                return isValidIntegerSuffixIt(it,str.cend());
             break;
         }
     }
@@ -968,7 +968,7 @@ bool MathLib::isBin(const std::string& str)
             if (*it == '0' || *it == '1')
                 ; //  state = Status::DIGIT;
             else
-                return isValidIntegerSuffixIt(it,str.end());
+                return isValidIntegerSuffixIt(it,str.cend());
             break;
         }
     }
@@ -997,7 +997,7 @@ bool MathLib::isDec(const std::string & str)
             if (isdigit(static_cast<unsigned char>(*it)))
                 state = Status::DIGIT;
             else
-                return isValidIntegerSuffixIt(it,str.end());
+                return isValidIntegerSuffixIt(it,str.cend());
             break;
         }
     }

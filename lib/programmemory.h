@@ -142,11 +142,11 @@ struct ProgramMemory {
     }
 
     Map::const_iterator begin() const {
-        return mValues.begin();
+        return mValues.cbegin();
     }
 
     Map::const_iterator end() const {
-        return mValues.end();
+        return mValues.cend();
     }
 
     friend bool operator==(const ProgramMemory& x, const ProgramMemory& y) {
