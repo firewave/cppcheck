@@ -624,7 +624,7 @@ public:
      * @return true if it is an stl type and its type matches any of the types in 'stlTypes'
      */
     bool isStlType(const std::set<std::string>& stlTypes) const {
-        return isStlType() && stlTypes.find(mTypeStartToken->strAt(2))!=stlTypes.end();
+        return isStlType() && stlTypes.find(mTypeStartToken->strAt(2))!=stlTypes.cend();
     }
 
     /**
@@ -1085,7 +1085,7 @@ public:
         auto it = std::find_if(enumeratorList.cbegin(), enumeratorList.cend(), [&](const Enumerator& i) {
             return i.name->str() == name;
         });
-        return it == enumeratorList.end() ? nullptr : &*it;
+        return it == enumeratorList.cend() ? nullptr : &*it;
     }
 
     bool isNestedIn(const Scope * outer) const {

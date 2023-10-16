@@ -385,22 +385,22 @@ static std::string readcondition(const simplecpp::Token *iftok, const std::set<s
         return "0";
 
     if (len == 1 && cond->name) {
-        if (defined.find(cond->str()) == defined.end())
+        if (defined.find(cond->str()) == defined.cend())
             return cond->str();
     }
 
     if (len == 2 && cond->op == '!' && next1->name) {
-        if (defined.find(next1->str()) == defined.end())
+        if (defined.find(next1->str()) == defined.cend())
             return next1->str() + "=0";
     }
 
     if (len == 3 && cond->op == '(' && next1->name && next2->op == ')') {
-        if (defined.find(next1->str()) == defined.end() && undefined.find(next1->str()) == undefined.end())
+        if (defined.find(next1->str()) == defined.cend() && undefined.find(next1->str()) == undefined.cend())
             return next1->str();
     }
 
     if (len == 3 && cond->name && next1->str() == "==" && next2->number) {
-        if (defined.find(cond->str()) == defined.end())
+        if (defined.find(cond->str()) == defined.cend())
             return cond->str() + '=' + cond->next->next->str();
     }
 
@@ -421,7 +421,7 @@ static std::string readcondition(const simplecpp::Token *iftok, const std::set<s
             break;
         if (dtok->op == '(')
             dtok = dtok->next;
-        if (sameline(iftok,dtok) && dtok->name && defined.find(dtok->str()) == defined.end() && undefined.find(dtok->str()) == undefined.end())
+        if (sameline(iftok,dtok) && dtok->name && defined.find(dtok->str()) == defined.cend() && undefined.find(dtok->str()) == undefined.cend())
             configset.insert(dtok->str());
     }
     std::string cfgStr;
@@ -477,9 +477,9 @@ static bool isUndefined(const std::string &cfg, const std::set<std::string> &und
         const std::string def = (pos2 == std::string::npos) ? cfg.substr(pos1) : cfg.substr(pos1, pos2 - pos1);
 
         const std::string::size_type eq = def.find('=');
-        if (eq == std::string::npos && undefined.find(def) != undefined.end())
+        if (eq == std::string::npos && undefined.find(def) != undefined.cend())
             return true;
-        if (eq != std::string::npos && undefined.find(def.substr(0,eq)) != undefined.end() && def.substr(eq) != "=0")
+        if (eq != std::string::npos && undefined.find(def.substr(0,eq)) != undefined.cend() && def.substr(eq) != "=0")
             return true;
 
         pos1 = (pos2 == std::string::npos) ? pos2 : pos2 + 1U;
@@ -530,7 +530,7 @@ static void getConfigs(const simplecpp::TokenList &tokens, std::set<std::string>
                 const simplecpp::Token *expr1 = cmdtok->next;
                 if (sameline(tok,expr1) && expr1->name && !sameline(tok,expr1->next))
                     config = expr1->str();
-                if (defined.find(config) != defined.end())
+                if (defined.find(config) != defined.cend())
                     config.clear();
             } else if (cmdtok->str() == "if") {
                 config = readcondition(cmdtok, defined, undefined);

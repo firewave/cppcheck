@@ -107,12 +107,12 @@ static bool simplifyPathWithVariables(std::string &s, std::map<std::string, std:
         if (end == std::string::npos)
             break;
         const std::string var = s.substr(start+2,end-start-2);
-        if (expanded.find(var) != expanded.end())
+        if (expanded.find(var) != expanded.cend())
             break;
         expanded.insert(var);
         auto it1 = utils::as_const(variables).find(var);
         // variable was not found within defined variables
-        if (it1 == variables.end()) {
+        if (it1 == variables.cend()) {
             const char *envValue = std::getenv(var.c_str());
             if (!envValue) {
                 //! \todo generate a debug/info message about undefined variable
@@ -1116,37 +1116,37 @@ bool ImportProject::importBcb6Prj(const std::string &projectFilename)
             ";__TURBOC__=0x0560";
 
         // Defined if Calling Convention is set to cdecl; otherwise undefined.
-        const bool useCdecl = (cflags.find("-p") == cflags.end()
-                               && cflags.find("-pm") == cflags.end()
-                               && cflags.find("-pr") == cflags.end()
-                               && cflags.find("-ps") == cflags.end());
+        const bool useCdecl = (cflags.find("-p") == cflags.cend()
+                               && cflags.find("-pm") == cflags.cend()
+                               && cflags.find("-pr") == cflags.cend()
+                               && cflags.find("-ps") == cflags.cend());
         if (useCdecl)
             predefines += ";__CDECL=1";
 
         // Defined by default indicating that the default char is unsigned char. Use the -K compiler option to undefine this macro.
-        const bool treatCharAsUnsignedChar = (cflags.find("-K") != cflags.end());
+        const bool treatCharAsUnsignedChar = (cflags.find("-K") != cflags.cend());
         if (treatCharAsUnsignedChar)
             predefines += ";_CHAR_UNSIGNED=1";
 
         // Defined whenever one of the CodeGuard compiler options is used; otherwise it is undefined.
-        const bool codeguardUsed = (cflags.find("-vGd") != cflags.end()
-                                    || cflags.find("-vGt") != cflags.end()
-                                    || cflags.find("-vGc") != cflags.end());
+        const bool codeguardUsed = (cflags.find("-vGd") != cflags.cend()
+                                    || cflags.find("-vGt") != cflags.cend()
+                                    || cflags.find("-vGc") != cflags.cend());
         if (codeguardUsed)
             predefines += ";__CODEGUARD__";
 
         // When defined, the macro indicates that the program is a console application.
-        const bool isConsoleApp = (cflags.find("-WC") != cflags.end());
+        const bool isConsoleApp = (cflags.find("-WC") != cflags.cend());
         if (isConsoleApp)
             predefines += ";__CONSOLE__=1";
 
         // Enable stack unwinding. This is true by default; use -xd- to disable.
-        const bool enableStackUnwinding = (cflags.find("-xd-") == cflags.end());
+        const bool enableStackUnwinding = (cflags.find("-xd-") == cflags.cend());
         if (enableStackUnwinding)
             predefines += ";_CPPUNWIND=1";
 
         // Defined whenever the -WD compiler option is used; otherwise it is undefined.
-        const bool isDLL = (cflags.find("-WD") != cflags.end());
+        const bool isDLL = (cflags.find("-WD") != cflags.cend());
         if (isDLL)
             predefines += ";__DLL__=1";
 
@@ -1155,27 +1155,27 @@ bool ImportProject::importBcb6Prj(const std::string &projectFilename)
         predefines += ";__FLAT__=1";
 
         // Always defined. The default value is 300. You can change the value to 400 or 500 by using the /4 or /5 compiler options.
-        if (cflags.find("-6") != cflags.end())
+        if (cflags.find("-6") != cflags.cend())
             predefines += ";_M_IX86=600";
-        else if (cflags.find("-5") != cflags.end())
+        else if (cflags.find("-5") != cflags.cend())
             predefines += ";_M_IX86=500";
-        else if (cflags.find("-4") != cflags.end())
+        else if (cflags.find("-4") != cflags.cend())
             predefines += ";_M_IX86=400";
         else
             predefines += ";_M_IX86=300";
 
         // Defined only if the -WM option is used. It specifies that the multithread library is to be linked.
-        const bool linkMtLib = (cflags.find("-WM") != cflags.end());
+        const bool linkMtLib = (cflags.find("-WM") != cflags.cend());
         if (linkMtLib)
             predefines += ";__MT__=1";
 
         // Defined if Calling Convention is set to Pascal; otherwise undefined.
-        const bool usePascalCallingConvention = (cflags.find("-p") != cflags.end());
+        const bool usePascalCallingConvention = (cflags.find("-p") != cflags.cend());
         if (usePascalCallingConvention)
             predefines += ";__PASCAL__=1";
 
         // Defined if you compile with the -A compiler option; otherwise, it is undefined.
-        const bool useAnsiKeywordExtensions = (cflags.find("-A") != cflags.end());
+        const bool useAnsiKeywordExtensions = (cflags.find("-A") != cflags.cend());
         if (useAnsiKeywordExtensions)
             predefines += ";__STDC__=1";
 
@@ -1183,17 +1183,17 @@ bool ImportProject::importBcb6Prj(const std::string &projectFilename)
         predefines += ";__TLC__=1";
 
         // Defined for Windows-only code.
-        const bool isWindowsTarget = (cflags.find("-WC") != cflags.end()
-                                      || cflags.find("-WCDR") != cflags.end()
-                                      || cflags.find("-WCDV") != cflags.end()
-                                      || cflags.find("-WD") != cflags.end()
-                                      || cflags.find("-WDR") != cflags.end()
-                                      || cflags.find("-WDV") != cflags.end()
-                                      || cflags.find("-WM") != cflags.end()
-                                      || cflags.find("-WP") != cflags.end()
-                                      || cflags.find("-WR") != cflags.end()
-                                      || cflags.find("-WU") != cflags.end()
-                                      || cflags.find("-WV") != cflags.end());
+        const bool isWindowsTarget = (cflags.find("-WC") != cflags.cend()
+                                      || cflags.find("-WCDR") != cflags.cend()
+                                      || cflags.find("-WCDV") != cflags.cend()
+                                      || cflags.find("-WD") != cflags.cend()
+                                      || cflags.find("-WDR") != cflags.cend()
+                                      || cflags.find("-WDV") != cflags.cend()
+                                      || cflags.find("-WM") != cflags.cend()
+                                      || cflags.find("-WP") != cflags.cend()
+                                      || cflags.find("-WR") != cflags.cend()
+                                      || cflags.find("-WU") != cflags.cend()
+                                      || cflags.find("-WV") != cflags.cend());
         if (isWindowsTarget)
             predefines += ";_Windows";
 
@@ -1220,7 +1220,7 @@ bool ImportProject::importBcb6Prj(const std::string &projectFilename)
     std::map<std::string, std::string, cppcheck::stricmp> variables;
     const std::string defines = predefines + ";" + sysdefines + ";" + userdefines;
     const std::string cppDefines  = cppPredefines + ";" + defines;
-    const bool forceCppMode = (cflags.find("-P") != cflags.end());
+    const bool forceCppMode = (cflags.find("-P") != cflags.cend());
 
     for (const std::string &c : compileList) {
         // C++ compilation is selected by file extension by default, so these

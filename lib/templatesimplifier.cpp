@@ -3423,7 +3423,7 @@ void TemplateSimplifier::replaceTemplateUsage(
         // check if instantiation matches token instantiation from pointer
         if (pointers && !pointers->empty()) {
             // check full name
-            if (instantiation.fullName() != (*pointers->begin())->fullName()) {
+            if (instantiation.fullName() != (*pointers->cbegin())->fullName()) {
                 // FIXME:  fallback to just matching name
                 if (nameTok->str() != instantiation.name())
                     continue;

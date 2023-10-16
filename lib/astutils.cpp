@@ -1414,13 +1414,13 @@ static bool compareKnownValue(const Token * const tok1, const Token * const tok2
     static const auto isKnownFn = std::mem_fn(&ValueFlow::Value::isKnown);
 
     const auto v1 = std::find_if(tok1->values().cbegin(), tok1->values().cend(), isKnownFn);
-    if (v1 == tok1->values().end()) {
+    if (v1 == tok1->values().cend()) {
         return false;
     }
     if (v1->isNonValue() || v1->isContainerSizeValue() || v1->isSymbolicValue())
         return false;
     const auto v2 = std::find_if(tok2->values().cbegin(), tok2->values().cend(), isKnownFn);
-    if (v2 == tok2->values().end()) {
+    if (v2 == tok2->values().cend()) {
         return false;
     }
     if (v1->valueType != v2->valueType) {
@@ -3183,7 +3183,7 @@ int getArgumentPos(const Variable* var, const Function* f)
     auto arg_it = std::find_if(f->argumentList.cbegin(), f->argumentList.cend(), [&](const Variable& v) {
         return v.nameToken() == var->nameToken();
     });
-    if (arg_it == f->argumentList.end())
+    if (arg_it == f->argumentList.cend())
         return -1;
     return std::distance(f->argumentList.cbegin(), arg_it);
 }

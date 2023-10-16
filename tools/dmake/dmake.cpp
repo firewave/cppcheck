@@ -293,7 +293,7 @@ static std::vector<std::string> prioritizelib(const std::vector<std::string>& li
     std::sort(libfiles_prio.begin(), libfiles_prio.end(), [&](const std::string &l1, const std::string &l2) {
         const auto p1 = priorities.find(l1);
         const auto p2 = priorities.find(l2);
-        return (p1 != priorities.end() ? p1->second : 0) > (p2 != priorities.end() ? p2->second : 0);
+        return (p1 != priorities.cend() ? p1->second : 0) > (p2 != priorities.cend() ? p2->second : 0);
     });
     return libfiles_prio;
 }

@@ -1010,7 +1010,7 @@ namespace {
                 ErrorPathItem epi = std::make_pair(tok, "Calling function " + tok->str());
                 const bool dependsOnThis = exprDependsOnThis(tok->next());
                 auto it = invalidMethods.find(f);
-                if (it != invalidMethods.end()) {
+                if (it != invalidMethods.cend()) {
                     std::vector<Info::Reference> refs = it->second.invalidTokens();
                     std::copy_if(refs.cbegin(), refs.cend(), std::back_inserter(result), [&](const Info::Reference& r) {
                         const Variable* var = r.tok->variable();

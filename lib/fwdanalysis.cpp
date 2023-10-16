@@ -36,7 +36,7 @@ static bool isUnchanged(const Token *startToken, const Token *endToken, const st
         if (!local && Token::Match(tok, "%name% (") && !Token::simpleMatch(tok->linkAt(1), ") {"))
             // TODO: this is a quick bailout
             return false;
-        if (tok->varId() == 0 || exprVarIds.find(tok->varId()) == exprVarIds.end())
+        if (tok->varId() == 0 || exprVarIds.find(tok->varId()) == exprVarIds.cend())
             continue;
         const Token *parent = tok;
         while (parent->astParent() && !parent->astParent()->isAssignmentOp() && parent->astParent()->tokType() != Token::Type::eIncDecOp) {
@@ -172,7 +172,7 @@ FwdAnalysis::Result FwdAnalysis::checkRecursive(const Token *expr, const Token *
                 if (conditionStart && conditionEnd) {
                     bool used = false;
                     for (const Token *condTok = conditionStart; condTok != conditionEnd; condTok = condTok->next()) {
-                        if (exprVarIds.find(condTok->varId()) != exprVarIds.end()) {
+                        if (exprVarIds.find(condTok->varId()) != exprVarIds.cend()) {
                             used = true;
                             break;
                         }
@@ -270,7 +270,7 @@ FwdAnalysis::Result FwdAnalysis::checkRecursive(const Token *expr, const Token *
         if (expr->isName() && Token::Match(tok, "%name% (") && tok->str().find('<') != std::string::npos && tok->str().find(expr->str()) != std::string::npos)
             return Result(Result::Type::BAILOUT);
 
-        if (exprVarIds.find(tok->varId()) != exprVarIds.end()) {
+        if (exprVarIds.find(tok->varId()) != exprVarIds.cend()) {
             const Token *parent = tok;
             bool other = false;
             bool same = tok->astParent() && isSameExpression(false, expr, tok, mSettings, true, false, nullptr);

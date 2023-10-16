@@ -576,7 +576,7 @@ static const Token* doAssignment(Variables &variables, const Token *tok, bool de
                         variables.clearAliases(varid1);
                     } else {
                         // no other assignment in this scope
-                        if (var1->_assignments.find(scope) == var1->_assignments.end()) {
+                        if (var1->_assignments.find(scope) == var1->_assignments.cend()) {
                             /**
                              * @todo determine if existing aliases should be discarded
                              */

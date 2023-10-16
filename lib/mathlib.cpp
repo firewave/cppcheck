@@ -834,7 +834,7 @@ bool MathLib::isOct(const std::string& str)
             if (isOctalDigit(static_cast<unsigned char>(*it)))
                 state = Status::DIGITS;
             else
-                return isValidIntegerSuffixIt(it,str.end());
+                return isValidIntegerSuffixIt(it,str.cend());
             break;
         }
     }
@@ -875,7 +875,7 @@ bool MathLib::isIntHex(const std::string& str)
             if (isxdigit(static_cast<unsigned char>(*it)))
                 ; //  state = Status::DIGIT;
             else
-                return isValidIntegerSuffixIt(it,str.end());
+                return isValidIntegerSuffixIt(it,str.cend());
             break;
         }
     }
@@ -1006,7 +1006,7 @@ bool MathLib::isBin(const std::string& str)
             if (*it == '0' || *it == '1')
                 ; //  state = Status::DIGIT;
             else
-                return isValidIntegerSuffixIt(it,str.end());
+                return isValidIntegerSuffixIt(it,str.cend());
             break;
         }
     }
@@ -1035,7 +1035,7 @@ bool MathLib::isDec(const std::string & str)
             if (isdigit(static_cast<unsigned char>(*it)))
                 state = Status::DIGIT;
             else
-                return isValidIntegerSuffixIt(it,str.end());
+                return isValidIntegerSuffixIt(it,str.cend());
             break;
         }
     }

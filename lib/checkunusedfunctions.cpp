@@ -154,7 +154,7 @@ void CheckUnusedFunctions::parseTokens(const Tokenizer &tokenizer, const Setting
                     scope--;
                 else if (!settings.library.iskeyword(FileName, markupVarToken->str())) {
                     mFunctionCalls.insert(markupVarToken->str());
-                    if (mFunctions.find(markupVarToken->str()) != mFunctions.end())
+                    if (mFunctions.find(markupVarToken->str()) != mFunctions.cend())
                         mFunctions[markupVarToken->str()].usedOtherFile = true;
                     else if (markupVarToken->strAt(1) == "(") {
                         FunctionUsage &func = mFunctions[markupVarToken->str()];
@@ -176,7 +176,7 @@ void CheckUnusedFunctions::parseTokens(const Tokenizer &tokenizer, const Setting
                 if (settings.library.isexportedprefix(tok->str(), propToken->str())) {
                     const Token* nextPropToken = propToken->next();
                     const std::string& value = nextPropToken->str();
-                    if (mFunctions.find(value) != mFunctions.end()) {
+                    if (mFunctions.find(value) != mFunctions.cend()) {
                         mFunctions[value].usedOtherFile = true;
                     }
                     mFunctionCalls.insert(value);
@@ -184,7 +184,7 @@ void CheckUnusedFunctions::parseTokens(const Tokenizer &tokenizer, const Setting
                 if (settings.library.isexportedsuffix(tok->str(), propToken->str())) {
                     const Token* prevPropToken = propToken->previous();
                     const std::string& value = prevPropToken->str();
-                    if (value != ")" && mFunctions.find(value) != mFunctions.end()) {
+                    if (value != ")" && mFunctions.find(value) != mFunctions.cend()) {
                         mFunctions[value].usedOtherFile = true;
                     }
                     mFunctionCalls.insert(value);
@@ -513,7 +513,7 @@ void CheckUnusedFunctions::analyseWholeProgram(const Settings &settings, ErrorLo
         if (settings.library.isentrypoint(functionName))
             continue;
 
-        if (calls.find(functionName) == calls.end() && !isOperatorFunction(functionName)) {
+        if (calls.find(functionName) == calls.cend() && !isOperatorFunction(functionName)) {
             const Location &loc = decl->second;
             unusedFunctionError(errorLogger, loc.fileName, /*fileIndex*/ 0, loc.lineNumber, loc.column, functionName);
         }

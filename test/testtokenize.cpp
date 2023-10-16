@@ -6364,7 +6364,7 @@ private:
         std::string ret;
         std::set<const Token *> astTop;
         for (const Token *tok = tokenizer.list.front(); tok; tok = tok->next()) {
-            if (tok->astOperand1() && astTop.find(tok->astTop()) == astTop.end()) {
+            if (tok->astOperand1() && astTop.find(tok->astTop()) == astTop.cend()) {
                 astTop.insert(tok->astTop());
                 if (!ret.empty())
                     ret += " ";

@@ -1884,9 +1884,9 @@ void TokenList::validateAst(bool print) const
             std::set<const Token*> astTokens;    // list of ancestors
             astTokens.insert(tok);
             do {
-                if (safeAstTokens.find(parent) != safeAstTokens.end())
+                if (safeAstTokens.find(parent) != safeAstTokens.cend())
                     break;
-                if (astTokens.find(parent) != astTokens.end())
+                if (astTokens.find(parent) != astTokens.cend())
                     throw InternalError(tok, "AST broken: endless recursion from '" + tok->str() + "'", InternalError::AST);
                 astTokens.insert(parent);
             } while ((parent = parent->astParent()) != nullptr);
@@ -2224,7 +2224,7 @@ bool TokenList::isKeyword(const std::string &str) const
             // TODO: integrate into keywords?
             // types and literals are not handled as keywords
             static const std::unordered_set<std::string> cpp_types = {"bool", "false", "true"};
-            if (cpp_types.find(str) != cpp_types.end())
+        if (cpp_types.find(str) != cpp_types.cend())
                 return false;
         }
         return b;
@@ -2236,7 +2236,7 @@ bool TokenList::isKeyword(const std::string &str) const
         // TODO: integrate into Keywords?
         // types are not handled as keywords
         static const std::unordered_set<std::string> c_types = {"char", "double", "float", "int", "long", "short"};
-        if (c_types.find(str) != c_types.end())
+    if (c_types.find(str) != c_types.cend())
             return false;
     }
     return b;

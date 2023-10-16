@@ -451,7 +451,7 @@ bool CheckLeakAutoVar::checkScope(const Token * const startToken,
                 continue;
 
             // Variable has already been allocated => error
-            if (conditionalAlloc.find(varTok->varId()) == conditionalAlloc.end())
+            if (conditionalAlloc.find(varTok->varId()) == conditionalAlloc.cend())
                 leakIfAllocated(varTok, varInfo);
             varInfo.erase(varTok->varId());
 
@@ -598,7 +598,7 @@ bool CheckLeakAutoVar::checkScope(const Token * const startToken,
                         varInfo2.reallocToAlloc(vartok->varId());
                         varInfo2.erase(vartok->varId());
                         if (astIsVariableComparison(tok3, "!=", "0", &vartok) &&
-                            (notzero.find(vartok->varId()) != notzero.end()))
+                            (notzero.find(vartok->varId()) != notzero.cend()))
                             varInfo2.clear();
 
                         if (std::any_of(varInfo1.alloctype.cbegin(), varInfo1.alloctype.cend(), [&](const std::pair<int, VarInfo::AllocInfo>& info) {
@@ -636,10 +636,10 @@ bool CheckLeakAutoVar::checkScope(const Token * const startToken,
 
                 for (auto it = old.alloctype.cbegin(); it != old.alloctype.cend(); ++it) {
                     const int varId = it->first;
-                    if (old.conditionalAlloc.find(varId) == old.conditionalAlloc.end())
+                    if (old.conditionalAlloc.find(varId) == old.conditionalAlloc.cend())
                         continue;
-                    if (varInfo1.alloctype.find(varId) == varInfo1.alloctype.end() ||
-                        varInfo2.alloctype.find(varId) == varInfo2.alloctype.end()) {
+                    if (varInfo1.alloctype.find(varId) == varInfo1.alloctype.cend() ||
+                        varInfo2.alloctype.find(varId) == varInfo2.alloctype.cend()) {
                         varInfo1.erase(varId);
                         varInfo2.erase(varId);
                     }
@@ -872,7 +872,7 @@ const Token * CheckLeakAutoVar::checkTokenInsideExpression(const Token * const t
     if (tok->varId() > 0) {
         // TODO : Write a separate checker for this that uses valueFlowForward.
         const auto var = utils::as_const(varInfo.alloctype).find(tok->varId());
-        if (var != varInfo.alloctype.end()) {
+        if (var != varInfo.alloctype.cend()) {
             bool unknown = false;
             if (var->second.status == VarInfo::DEALLOC && tok->valueType() && tok->valueType()->pointer &&
                 CheckNullPointer::isPointerDeRef(tok, unknown, *mSettings, /*checkNullArg*/ false) && !unknown) {
@@ -1141,7 +1141,7 @@ void CheckLeakAutoVar::leakIfAllocated(const Token *vartok,
     const auto var = utils::as_const(alloctype).find(vartok->varId());
     if (var != alloctype.cend() && var->second.status == VarInfo::ALLOC) {
         const auto use = possibleUsage.find(vartok->varId());
-        if (use == possibleUsage.end()) {
+        if (use == possibleUsage.cend()) {
             leakError(vartok, vartok->str(), var->second.type);
         } else {
             configurationInfo(vartok, use->second);
@@ -1158,11 +1158,11 @@ void CheckLeakAutoVar::ret(const Token *tok, VarInfo &varInfo, const bool isEndO
     const SymbolDatabase *symbolDatabase = mTokenizer->getSymbolDatabase();
     for (auto it = alloctype.cbegin(); it != alloctype.cend(); ++it) {
         // don't warn if variable is conditionally allocated, unless it leaves the scope
-        if (!isEndOfScope && !it->second.managed() && varInfo.conditionalAlloc.find(it->first) != varInfo.conditionalAlloc.end())
+        if (!isEndOfScope && !it->second.managed() && varInfo.conditionalAlloc.find(it->first) != varInfo.conditionalAlloc.cend())
             continue;
 
         // don't warn if there is a reference of the variable
-        if (varInfo.referenced.find(it->first) != varInfo.referenced.end())
+        if (varInfo.referenced.find(it->first) != varInfo.referenced.cend())
             continue;
 
         const int varid = it->first;
@@ -1238,7 +1238,7 @@ void CheckLeakAutoVar::ret(const Token *tok, VarInfo &varInfo, const bool isEndO
 
             else if (used != PtrUsage::PTR && !it->second.managed() && !var->isReference()) {
                 const auto use = possibleUsage.find(varid);
-                if (use == possibleUsage.end()) {
+                if (use == possibleUsage.cend()) {
                     leakError(tok, var->name(), it->second.type);
                 } else if (!use->second.first->variable()) { // TODO: handle constructors
                     configurationInfo(tok, use->second);

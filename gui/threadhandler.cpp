@@ -270,10 +270,10 @@ std::list<FileWithDetails> ThreadHandler::getReCheckFiles(bool all) const
 
 bool ThreadHandler::needsReCheck(const QString &filename, std::set<QString> &modified, std::set<QString> &unmodified) const
 {
-    if (modified.find(filename) != modified.end())
+    if (modified.find(filename) != modified.cend())
         return true;
 
-    if (unmodified.find(filename) != unmodified.end())
+    if (unmodified.find(filename) != unmodified.cend())
         return false;
 
     if (QFileInfo(filename).lastModified() > mLastCheckTime) {

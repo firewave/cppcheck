@@ -88,7 +88,7 @@ bool CheckCondition::diag(const Token* tok1, const Token* tok2)
 bool CheckCondition::isAliased(const std::set<int> &vars) const
 {
     for (const Token *tok = mTokenizer->tokens(); tok; tok = tok->next()) {
-        if (Token::Match(tok, "= & %var% ;") && vars.find(tok->tokAt(2)->varId()) != vars.end())
+        if (Token::Match(tok, "= & %var% ;") && vars.find(tok->tokAt(2)->varId()) != vars.cend())
             return true;
     }
     return false;
@@ -812,7 +812,7 @@ void CheckCondition::multiCondition2()
                     if (changed)
                         break;
                 }
-                if ((tok->varId() && vars.find(tok->varId()) != vars.end()) ||
+                if ((tok->varId() && vars.find(tok->varId()) != vars.cend()) ||
                     (!tok->varId() && nonlocal) ||
                     (functionCall && tok->variable() && !tok->variable()->isLocal())) {
                     if (Token::Match(tok, "%name% %assign%|++|--"))

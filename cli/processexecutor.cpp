@@ -347,7 +347,7 @@ unsigned int ProcessExecutor::check()
                 CppCheck fileChecker(mSettings, mSuppressions, pipewriter, false, mExecuteCommand);
                 unsigned int resultOfCheck = 0;
 
-                if (iFileSettings != mFileSettings.end()) {
+                if (iFileSettings != mFileSettings.cend()) {
                     resultOfCheck = fileChecker.check(*iFileSettings);
                 } else {
                     // Read file from a file

@@ -398,7 +398,7 @@ Library::Error Library::load(const tinyxml2::XMLDocument &doc)
                     const auto names = getnames(memorynode->GetText());
                     for (const auto& n : names) {
                         const auto it = utils::as_const(mData->mDealloc).find(n);
-                        if (it != mData->mDealloc.end()) {
+                        if (it != mData->mDealloc.cend()) {
                             allocationId = it->second.groupId;
                             break;
                         }
@@ -607,7 +607,7 @@ Library::Error Library::load(const tinyxml2::XMLDocument &doc)
             const char* const inherits = node->Attribute("inherits");
             if (inherits) {
                 const auto i = utils::as_const(mData->mContainers).find(inherits);
-                if (i != mData->mContainers.end())
+                if (i != mData->mContainers.cend())
                     container = i->second; // Take values from parent and overwrite them if necessary
                 else
                     return Error(ErrorCode::BAD_ATTRIBUTE_VALUE, inherits);
@@ -847,7 +847,7 @@ Library::Error Library::load(const tinyxml2::XMLDocument &doc)
         std::string str;
         for (auto i = unknown_elements.cbegin(); i != unknown_elements.cend();) {
             str += *i;
-            if (++i != unknown_elements.end())
+            if (++i != unknown_elements.cend())
                 str += ", ";
         }
         return Error(ErrorCode::UNKNOWN_ELEMENT, str);
@@ -1798,7 +1798,7 @@ bool Library::isnoreturn(const Token *ftok) const
         return false;
     }
     const auto it = utils::as_const(mData->mNoReturn).find(getFunctionName(ftok));
-    if (it == mData->mNoReturn.end())
+    if (it == mData->mNoReturn.cend())
         return false;
     if (it->second == LibraryData::FalseTrueMaybe::Maybe)
         return true;
@@ -1848,7 +1848,7 @@ int Library::blockstartoffset(const std::string &file) const
     const auto map_it
         = utils::as_const(mData->mExecutableBlocks).find(Path::getFilenameExtensionInLowerCase(file));
 
-    if (map_it != mData->mExecutableBlocks.end()) {
+    if (map_it != mData->mExecutableBlocks.cend()) {
         offset = map_it->second.offset();
     }
     return offset;
@@ -1859,7 +1859,7 @@ const std::string& Library::blockstart(const std::string &file) const
     const auto map_it
         = utils::as_const(mData->mExecutableBlocks).find(Path::getFilenameExtensionInLowerCase(file));
 
-    if (map_it != mData->mExecutableBlocks.end()) {
+    if (map_it != mData->mExecutableBlocks.cend()) {
         return map_it->second.start();
     }
     return mEmptyString;
@@ -1870,7 +1870,7 @@ const std::string& Library::blockend(const std::string &file) const
     const auto map_it
         = utils::as_const(mData->mExecutableBlocks).find(Path::getFilenameExtensionInLowerCase(file));
 
-    if (map_it != mData->mExecutableBlocks.end()) {
+    if (map_it != mData->mExecutableBlocks.cend()) {
         return map_it->second.end();
     }
     return mEmptyString;
@@ -1880,14 +1880,14 @@ bool Library::iskeyword(const std::string &file, const std::string &keyword) con
 {
     const auto it =
         utils::as_const(mData->mKeywords).find(Path::getFilenameExtensionInLowerCase(file));
-    return (it != mData->mKeywords.end() && it->second.count(keyword));
+    return (it != mData->mKeywords.cend() && it->second.count(keyword));
 }
 
 bool Library::isimporter(const std::string& file, const std::string &importer) const
 {
     const auto it =
         utils::as_const(mData->mImporters).find(Path::getFilenameExtensionInLowerCase(file));
-    return (it != mData->mImporters.end() && it->second.count(importer) > 0);
+    return (it != mData->mImporters.cend() && it->second.count(importer) > 0);
 }
 
 const Token* Library::getContainerFromYield(const Token* tok, Library::Container::Yield yield) const

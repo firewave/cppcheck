@@ -245,7 +245,7 @@ void CheckIO::checkFileUsage()
                 } else if (tok->str() == "fclose") {
                     fileTok = tok->tokAt(2);
                     operation = Filepointer::Operation::CLOSE;
-                } else if (whitelist.find(tok->str()) != whitelist.end()) {
+                } else if (whitelist.find(tok->str()) != whitelist.cend()) {
                     fileTok = tok->tokAt(2);
                     if ((tok->str() == "ungetc" || tok->str() == "ungetwc") && fileTok)
                         fileTok = fileTok->nextArgument();
@@ -267,7 +267,7 @@ void CheckIO::checkFileUsage()
                         }
                     }
                     for (const Token* tok2 = tok->tokAt(2); tok2 != end2; tok2 = tok2->next()) {
-                        if (tok2->varId() && filepointers.find(tok2->varId()) != filepointers.end()) {
+                        if (tok2->varId() && filepointers.find(tok2->varId()) != filepointers.cend()) {
                             fileTok = tok2;
                             operation = Filepointer::Operation::UNKNOWN_OP; // Assume that repositioning was last operation and that the file is opened now
                             break;
@@ -690,7 +690,7 @@ void CheckIO::checkFormatString(const Token * const tok,
 
                 // Handle parameter positions (POSIX extension) - Ticket #4900
                 if (hasParameterPosition) {
-                    if (parameterPositionsUsed.find(parameterPosition) == parameterPositionsUsed.end())
+                    if (parameterPositionsUsed.find(parameterPosition) == parameterPositionsUsed.cend())
                         parameterPositionsUsed.insert(parameterPosition);
                     else // Parameter already referenced, hence don't consider it a new format
                         --numFormat;

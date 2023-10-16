@@ -513,7 +513,7 @@ static bool findPath(const std::string &callId,
         return false; // TODO: add bailout message?
 
     const auto it = utils::as_const(callsMap).find(callId);
-    if (it == callsMap.end())
+    if (it == callsMap.cend())
         return false;
 
     for (const CTU::FileInfo::CallBase *c : it->second) {

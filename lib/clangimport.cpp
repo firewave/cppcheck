@@ -293,7 +293,7 @@ namespace clangimport {
         }
 
         bool hasDecl(const std::string &addr) const {
-            return mDeclMap.find(addr) != mDeclMap.end();
+            return mDeclMap.find(addr) != mDeclMap.cend();
         }
 
         const Scope *getScope(const std::string &addr) {
@@ -721,7 +721,7 @@ Scope *clangimport::AstNode::createScope(TokenList &tokenList, ScopeType scopeTy
                 replaceVar[from] = to;
                 mData->replaceVarDecl(from, to);
             }
-            if (replaceVar.find(vartok->variable()) != replaceVar.end())
+            if (replaceVar.find(vartok->variable()) != replaceVar.cend())
                 const_cast<Token *>(vartok)->variable(replaceVar[vartok->variable()]);
         }
         std::list<Variable> &varlist = const_cast<Scope *>(def->scope())->varlist;
@@ -1397,7 +1397,7 @@ void clangimport::AstNode::createTokensFunctionDecl(TokenList &tokenList)
 
     if (!prev) {
         auto accessControl = mData->scopeAccessControl.find(tokenList.back()->scope());
-        if (accessControl != mData->scopeAccessControl.end())
+        if (accessControl != mData->scopeAccessControl.cend())
             function->access = accessControl->second;
     }
 

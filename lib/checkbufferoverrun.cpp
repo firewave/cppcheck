@@ -686,7 +686,7 @@ void CheckBufferOverrun::bufferOverflow()
                             continue;
                     }
                 }
-                const bool error = std::none_of(minsizes->begin(), minsizes->end(), [&](const Library::ArgumentChecks::MinSize &minsize) {
+                const bool error = std::none_of(minsizes->cbegin(), minsizes->cend(), [&](const Library::ArgumentChecks::MinSize &minsize) {
                     return checkBufferSize(tok, minsize, args, bufferSize.intvalue, *mSettings, mTokenizer);
                 });
                 if (error)
@@ -787,7 +787,7 @@ void CheckBufferOverrun::stringNotZeroTerminated()
                 auto it = std::find_if(contValues.cbegin(), contValues.cend(), [](const ValueFlow::Value& value) {
                     return value.isContainerSizeValue() && !value.isImpossible();
                 });
-                if (it != contValues.end() && it->intvalue < sizeToken->getKnownIntValue())
+                if (it != contValues.cend() && it->intvalue < sizeToken->getKnownIntValue())
                     continue;
             } else {
                 const Token* srcValue = args[1]->getValueTokenMaxStrLength();

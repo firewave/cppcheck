@@ -3847,7 +3847,7 @@ const Function* Type::getFunction(const std::string& funcName) const
 {
     if (classScope) {
         const auto it = utils::as_const(classScope->functionMap).find(funcName);
-        if (it != classScope->functionMap.end())
+        if (it != classScope->functionMap.cend())
             return it->second;
     }
 
@@ -3872,7 +3872,7 @@ bool Type::hasCircularDependencies(std::set<BaseInfo>* ancestors) const
             continue;
         if (this==parent->type)
             return true;
-        if (ancestors->find(*parent)!=ancestors->end())
+        if (ancestors->find(*parent)!=ancestors->cend())
             return true;
 
         ancestors->insert(*parent);
@@ -4822,7 +4822,7 @@ std::vector<const Function*> Function::getOverloadedFunctions() const
     while (scope) {
         const bool isMemberFunction = scope->isClassOrStruct() && !isStatic();
         for (auto it = utils::as_const(scope->functionMap).find(tokenDef->str());
-             it != scope->functionMap.end() && it->first == tokenDef->str();
+             it != scope->functionMap.cend() && it->first == tokenDef->str();
              ++it) {
             const Function* func = it->second;
             if (isMemberFunction && isMemberFunction == func->isStatic())
@@ -5240,7 +5240,7 @@ const Variable *Scope::getVariable(const std::string &varname) const
     auto it = std::find_if(varlist.cbegin(), varlist.cend(), [&varname](const Variable& var) {
         return var.name() == varname;
     });
-    if (it != varlist.end())
+    if (it != varlist.cend())
         return &*it;
 
     if (definedType) {
@@ -6408,7 +6408,7 @@ const Scope *SymbolDatabase::findScopeByName(const std::string& name) const
     auto it = std::find_if(scopeList.cbegin(), scopeList.cend(), [&](const Scope& s) {
         return s.className == name;
     });
-    return it == scopeList.end() ? nullptr : &*it;
+    return it == scopeList.cend() ? nullptr : &*it;
 }
 
 //---------------------------------------------------------------------------
@@ -6468,12 +6468,12 @@ static T* findTypeImpl(S& thisScope, const std::string & name)
     auto it = thisScope.definedTypesMap.find(name);
 
     // Type was found
-    if (thisScope.definedTypesMap.end() != it)
+    if (thisScope.definedTypesMap.cend() != it)
         return it->second;
 
     // is type defined in anonymous namespace..
     it = thisScope.definedTypesMap.find(emptyString);
-    if (it != thisScope.definedTypesMap.end()) {
+    if (it != thisScope.definedTypesMap.cend()) {
         for (S *scope : thisScope.nestedList) {
             if (scope->className.empty() && (scope->type == ScopeType::eNamespace || scope->isClassOrStructOrUnion())) {
                 T *t = scope->findType(name);
@@ -6522,7 +6522,7 @@ const Function *Scope::getDestructor() const
     auto it = std::find_if(functionList.cbegin(), functionList.cend(), [](const Function& f) {
         return f.type == FunctionType::eDestructor;
     });
-    return it == functionList.end() ? nullptr : &*it;
+    return it == functionList.cend() ? nullptr : &*it;
 }
 
 //---------------------------------------------------------------------------
@@ -7113,7 +7113,7 @@ void SymbolDatabase::setValueType(Token* tok, const ValueType& valuetype, const 
             auto it = std::find_if(typeScope->varlist.cbegin(), typeScope->varlist.cend(), [&name](const Variable& v) {
                 return v.nameToken()->str() == name;
             });
-            if (it != typeScope->varlist.end())
+            if (it != typeScope->varlist.cend())
                 var = &*it;
         }
         if (var) {
@@ -7667,14 +7667,14 @@ static const Function *getOperatorFunction(const Token * const tok)
     const Scope *classScope = getClassScope(tok->astOperand1());
     if (classScope) {
         auto it = utils::as_const(classScope->functionMap).find(functionName);
-        if (it != classScope->functionMap.end())
+        if (it != classScope->functionMap.cend())
             return it->second;
     }
 
     classScope = getClassScope(tok->astOperand2());
     if (classScope) {
         auto it = utils::as_const(classScope->functionMap).find(functionName);
-        if (it != classScope->functionMap.end())
+        if (it != classScope->functionMap.cend())
             return it->second;
     }
 

@@ -115,7 +115,7 @@ void CheckNullPointer::parseFunctionCall(const Token &tok, std::list<const Token
                             argnr++;
                     }
                     ++i;
-                    if (i == formatString.end())
+                    if (i == formatString.cend())
                         return;
                 }
                 if (_continue)

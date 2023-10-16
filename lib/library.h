@@ -242,21 +242,21 @@ public:
 
         Action getAction(const std::string& function) const {
             const auto i = utils::as_const(functions).find(function);
-            if (i != functions.end())
+            if (i != functions.cend())
                 return i->second.action;
             return Action::NO_ACTION;
         }
 
         Yield getYield(const std::string& function) const {
             const auto i = utils::as_const(functions).find(function);
-            if (i != functions.end())
+            if (i != functions.cend())
                 return i->second.yield;
             return Yield::NO_YIELD;
         }
 
         const std::string& getReturnType(const std::string& function) const {
             const auto i = utils::as_const(functions).find(function);
-            return (i != functions.end()) ? i->second.returnType : mEmptyString;
+            return (i != functions.cend()) ? i->second.returnType : mEmptyString;
         }
 
         CPPCHECKLIB static Yield yieldFrom(const std::string& yieldName);

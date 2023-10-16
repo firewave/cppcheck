@@ -519,7 +519,7 @@ void CheckClass::copyconstructors()
             if (tok->str()==":") {
                 tok=tok->next();
                 while (Token::Match(tok, "%name% (")) {
-                    if (allocatedVars.find(tok->varId()) != allocatedVars.end()) {
+                    if (allocatedVars.find(tok->varId()) != allocatedVars.cend()) {
                         if (tok->varId() && Token::Match(tok->tokAt(2), "%name% . %name% )"))
                             copiedVars.insert(tok);
                         else if (!Token::Match(tok->tokAt(2), "%any% )"))
@@ -532,7 +532,7 @@ void CheckClass::copyconstructors()
                 if ((tok->isCpp() && Token::Match(tok, "%var% = new")) ||
                     (Token::Match(tok, "%var% = %name% (") && (mSettings->library.getAllocFuncInfo(tok->tokAt(2)) || mSettings->library.getReallocFuncInfo(tok->tokAt(2))))) {
                     allocatedVars.erase(tok->varId());
-                } else if (Token::Match(tok, "%var% = %name% . %name% ;") && allocatedVars.find(tok->varId()) != allocatedVars.end()) {
+                } else if (Token::Match(tok, "%var% = %name% . %name% ;") && allocatedVars.find(tok->varId()) != allocatedVars.cend()) {
                     copiedVars.insert(tok);
                 }
             }
@@ -1482,7 +1482,7 @@ void CheckClass::checkMemset()
 void CheckClass::checkMemsetType(const Scope *start, const Token *tok, const Scope *type, bool allocation, std::set<const Scope *> parsedTypes)
 {
     // If type has been checked there is no need to check it again
-    if (parsedTypes.find(type) != parsedTypes.end())
+    if (parsedTypes.find(type) != parsedTypes.cend())
         return;
     parsedTypes.insert(type);
 
@@ -1667,7 +1667,7 @@ void CheckClass::checkReturnPtrThis(const Scope *scope, const Function *func, co
                         if (!it->isConst()) {
                             /** @todo make sure argument types match */
                             // avoid endless recursions
-                            if (analyzedFunctions.find(&*it) == analyzedFunctions.end()) {
+                            if (analyzedFunctions.find(&*it) == analyzedFunctions.cend()) {
                                 analyzedFunctions.insert(&*it);
                                 checkReturnPtrThis(scope, &*it, it->arg->link()->next(), it->arg->link()->linkAt(1),
                                                    analyzedFunctions);
@@ -2015,7 +2015,7 @@ void CheckClass::virtualDestructor()
 
                     for (const Token *tok = mTokenizer->tokens(); tok; tok = tok->next()) {
                         if (Token::Match(tok, "[;{}] %var% =") &&
-                            baseClassPointers.find(tok->next()->varId()) != baseClassPointers.end()) {
+                            baseClassPointers.find(tok->next()->varId()) != baseClassPointers.cend()) {
                             // new derived class..
                             const std::string tmp("new " + derivedClass->str());
                             if (Token::simpleMatch(tok->tokAt(3), tmp.c_str(), tmp.size())) {
@@ -2025,7 +2025,7 @@ void CheckClass::virtualDestructor()
 
                         // Delete base class pointer that might point at derived class
                         else if (Token::Match(tok, "delete %var% ;") &&
-                                 dontDelete.find(tok->next()->varId()) != dontDelete.end()) {
+                                 dontDelete.find(tok->next()->varId()) != dontDelete.cend()) {
                             ok = false;
                             break;
                         }
@@ -2586,7 +2586,7 @@ bool CheckClass::checkConstFunc(const Scope *scope, const Function *func, Member
                 auto it = std::find_if(scope->functionList.cbegin(), scope->functionList.cend(), [&op](const Function& f) {
                     return f.isConst() && f.name() == op;
                 });
-                if (it == scope->functionList.end() || !it->retType || !it->retType->classScope)
+                if (it == scope->functionList.cend() || !it->retType || !it->retType->classScope)
                     return false;
                 const Function* func = it->retType->classScope->findFunction(end, /*requireConst*/ true);
                 return func && func->isConst();
@@ -2910,7 +2910,7 @@ const std::list<const Token *> & CheckClass::getVirtualFunctionCalls(const Funct
                                                                      std::map<const Function *, std::list<const Token *>> & virtualFunctionCallsMap)
 {
     const auto found = utils::as_const(virtualFunctionCallsMap).find(&function);
-    if (found != virtualFunctionCallsMap.end())
+    if (found != virtualFunctionCallsMap.cend())
         return found->second;
 
     virtualFunctionCallsMap[&function] = std::list<const Token *>();

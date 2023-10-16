@@ -1208,7 +1208,7 @@ unsigned int CppCheck::checkInternal(const FileWithDetails& file, const std::str
                     // Skip if we already met the same simplified token list
                     if (mSettings.force || mSettings.maxConfigs > 1) {
                         const std::size_t hash = tokenizer.list.calculateHash();
-                        if (hashes.find(hash) != hashes.end()) {
+                    if (hashes.find(hash) != hashes.cend()) {
                             if (mSettings.debugwarnings)
                                 purgedConfigurationMessage(file.spath(), currentConfig);
                             continue;
