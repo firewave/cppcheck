@@ -192,7 +192,7 @@ private:
         ASSERT_LOC(tokenizer.tokenize(code, cpp), file, line);
 
         // result..
-        return tokenizer.tokens()->stringifyList(true);
+        return tokenizer.tokens()->stringifyList(true, false, true, true, true);
     }
 
 
@@ -1311,12 +1311,12 @@ private:
         ASSERT_EQUALS("int f ( ) ;", tok("int __far __syscall f();"));
         ASSERT_EQUALS("int f ( ) ;", tok("int __far __pascal f();"));
         ASSERT_EQUALS("int f ( ) ;", tok("int __far __fortran f();"));
-        ASSERT_EQUALS("int f ( ) ;", tok("int WINAPI f();", true, Platform::Type::Win32A));
-        ASSERT_EQUALS("int f ( ) ;", tok("int APIENTRY f();", true, Platform::Type::Win32A));
-        ASSERT_EQUALS("int f ( ) ;", tok("int CALLBACK f();", true, Platform::Type::Win32A));
+        ASSERT_EQUALS("int f ( ) ;", tok("int WINAPI f();", Platform::Type::Win32A));
+        ASSERT_EQUALS("int f ( ) ;", tok("int APIENTRY f();", Platform::Type::Win32A));
+        ASSERT_EQUALS("int f ( ) ;", tok("int CALLBACK f();", Platform::Type::Win32A));
 
         // don't simplify Microsoft defines in unix code (#7554)
-        ASSERT_EQUALS("enum E { CALLBACK } ;", tok("enum E { CALLBACK } ;", true, Platform::Type::Unix32));
+        ASSERT_EQUALS("enum E { CALLBACK } ;", tok("enum E { CALLBACK } ;", Platform::Type::Unix32));
     }
 
     void simplifyAttribute() {

@@ -950,7 +950,7 @@ public:
             options.files = true;
             return options;
         }
-        // cppcheck-suppress unusedFunction
+        // cppcheck-suppress unusedFunction - used in tests only
         static stringifyOptions forDebugVarId() {
             stringifyOptions options = forDebug();
             options.varid = true;
@@ -982,7 +982,6 @@ public:
 
     std::string stringifyList(const stringifyOptions& options, const std::vector<std::string>* fileNames = nullptr, const Token* end = nullptr) const;
     std::string stringifyList(const Token* end, bool attributes = true) const;
-    std::string stringifyList(bool varid = false) const;
 
     /**
      * Stringify a list of token, from current instance on.
