@@ -8378,7 +8378,7 @@ private:
         // Tokenizer..
         ASSERT_LOC(tokenizer.simplifyTokens1(""), file, line);
 
-        return tokenizer.tokens()->stringifyList();
+        return tokenizer.tokens()->stringifyList(false, false, true, true, true);
     }
 
     void checkHeader1() {
