@@ -213,7 +213,7 @@ def compile_cppcheck(cppcheck_path):
             # TODO: processes still exhaust all threads of the system
             subprocess.check_call([__make_cmd, '-t:cli', os.path.join(cppcheck_path, 'cppcheck.sln'), '/property:Configuration=Release;Platform=x64'], cwd=cppcheck_path, env=build_env)
         else:
-            build_cmd = [__make_cmd, __jobs, 'MATCHCOMPILER=yes', 'CXXFLAGS=-O2 -g -w']
+            build_cmd = [__make_cmd, __jobs, 'MATCHCOMPILER=yes', 'CXXFLAGS=-O2 -g -w -DNO_UNIX_BACKTRACE_SUPPORT']
             build_env = os.environ
             if __make_cmd == 'mingw32-make':
                 # TODO: MinGW will always link even if no changes are present
