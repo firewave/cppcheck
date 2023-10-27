@@ -59,7 +59,7 @@
 #endif
 
 #ifdef USE_WINDOWS_SEH
-#include "cppcheckexecutorseh.h"
+#include "sehwrapper.h"
 #endif
 
 #ifdef _WIN32
@@ -209,8 +209,9 @@ int CppCheckExecutor::check(int argc, const char* const argv[])
 int CppCheckExecutor::check_wrapper(const Settings& settings)
 {
 #ifdef USE_WINDOWS_SEH
-    if (settings.exceptionHandling)
-        return check_wrapper_seh(*this, &CppCheckExecutor::check_internal, settings);
+    if (settings.exceptionHandling) {
+        CALL_WITH_SEH_WRAPPER(check_internal(settings));
+    }
 #elif defined(USE_UNIX_SIGNAL_HANDLING)
     if (settings.exceptionHandling)
         register_signal_handler();
@@ -457,6 +458,9 @@ void CppCheckExecutor::setExceptionOutput(FILE* exceptionOutput)
     mExceptionOutput = exceptionOutput;
 #if defined(USE_UNIX_SIGNAL_HANDLING)
     set_signal_handler_output(mExceptionOutput);
+#endif
+#if defined(USE_WINDOWS_SEH)
+    set_seh_output(mExceptionOutput);
 #endif
 }
 
