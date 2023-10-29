@@ -680,9 +680,6 @@ bool CmdLineParser::parseFromArgs(int argc, const char* const argv[])
                 ImportProject::Type projType = project.import(projectFile, &mSettings);
                 project.projectType = projType;
                 if (projType == ImportProject::Type::CPPCHECK_GUI) {
-                    for (const std::string &lib : project.guiProject.libraries)
-                        mSettings.libraries.emplace_back(lib);
-
                     const auto& excludedPaths = project.guiProject.excludedPaths;
                     std::copy(excludedPaths.cbegin(), excludedPaths.cend(), std::back_inserter(mIgnoredPaths));
 

@@ -1114,8 +1114,6 @@ bool ImportProject::importCppcheckGuiProject(std::istream &istr, Settings *setti
     std::list<Suppressions::Suppression> suppressions;
     Settings temp;
 
-    guiProject.analyzeAllVsConfigs.clear();
-
     bool checkLevelExhaustive = false;
 
     // TODO: this should support all available command-line options
@@ -1150,7 +1148,7 @@ bool ImportProject::importCppcheckGuiProject(std::istream &istr, Settings *setti
         else if (strcmp(node->Name(), CppcheckXml::IgnoreElementName) == 0)
             guiProject.excludedPaths = readXmlStringList(node, "", CppcheckXml::IgnorePathName, CppcheckXml::IgnorePathNameAttrib);
         else if (strcmp(node->Name(), CppcheckXml::LibrariesElementName) == 0)
-            guiProject.libraries = readXmlStringList(node, "", CppcheckXml::LibraryElementName, nullptr);
+            temp.libraries = readXmlStringList(node, "", CppcheckXml::LibraryElementName, nullptr);
         else if (strcmp(node->Name(), CppcheckXml::SuppressionsElementName) == 0) {
             for (const tinyxml2::XMLElement *child = node->FirstChildElement(); child; child = child->NextSiblingElement()) {
                 if (strcmp(child->Name(), CppcheckXml::SuppressionElementName) != 0)
@@ -1241,6 +1239,8 @@ bool ImportProject::importCppcheckGuiProject(std::istream &istr, Settings *setti
     settings->addons = temp.addons;
     settings->clang = temp.clang;
     settings->clangTidy = temp.clangTidy;
+    for (const std::string &lib : temp.libraries)
+        settings->libraries.emplace_back(lib);
 
     if (!settings->premiumArgs.empty())
         settings->premiumArgs += temp.premiumArgs;
