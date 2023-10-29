@@ -1172,13 +1172,10 @@ CmdLineParser::Result CmdLineParser::parseFromArgs(int argc, const char* const a
             std::string projectFile = argv[i]+10;
             projectType = project.import(projectFile, &mSettings, &mSuppressions);
             if (projectType == ImportProject::Type::CPPCHECK_GUI) {
-                for (const std::string &lib : project.guiProject.libraries)
-                    mSettings.libraries.emplace_back(lib);
+                auto& excludedPaths = project.guiProject.excludedPaths;
+                std::move(excludedPaths.begin(), excludedPaths.end(), std::back_inserter(mIgnoredPaths));
 
-                const auto& excludedPaths = project.guiProject.excludedPaths;
-                std::copy(excludedPaths.cbegin(), excludedPaths.cend(), std::back_inserter(mIgnoredPaths));
-
-                std::string platform(project.guiProject.platform);
+                std::string platform = std::move(project.guiProject.platform);
 
                 // keep existing platform from command-line intact
                 if (!platform.empty()) {
@@ -1190,10 +1187,10 @@ CmdLineParser::Result CmdLineParser::parseFromArgs(int argc, const char* const a
                     }
                 }
 
-                const auto& projectFileGui = project.guiProject.projectFile;
+                auto& projectFileGui = project.guiProject.projectFile;
                 if (!projectFileGui.empty()) {
                     // read underlying project
-                    projectFile = projectFileGui;
+                    projectFile = std::move(projectFileGui);
                     projectType = project.import(projectFileGui, &mSettings, &mSuppressions);
                     if (projectType == ImportProject::Type::CPPCHECK_GUI) {
                         mLogger.printError("nested Cppcheck GUI projects are not supported.");
@@ -1638,7 +1635,7 @@ CmdLineParser::Result CmdLineParser::parseFromArgs(int argc, const char* const a
     }
 
     if (!project.guiProject.pathNames.empty())
-        mPathNames = project.guiProject.pathNames;
+        mPathNames = std::move(project.guiProject.pathNames);
 
     if (!project.fileSettings.empty()) {
         project.ignorePaths(mIgnoredPaths, mSettings.debugignore);
@@ -1647,7 +1644,7 @@ CmdLineParser::Result CmdLineParser::parseFromArgs(int argc, const char* const a
             mLogger.printMessage("all paths were ignored"); // TODO: log this differently?
             return Result::Fail;
         }
-        mFileSettings = project.fileSettings;
+        mFileSettings = std::move(project.fileSettings);
     }
 
     if (mSettings.debugnormal && mSettings.outputFormat == Settings::OutputFormat::xml && (mPathNames.size() > 1 || mFileSettings.size() > 1))

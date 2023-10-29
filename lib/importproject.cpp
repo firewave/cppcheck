@@ -1262,8 +1262,6 @@ bool ImportProject::importCppcheckGuiProject(std::istream &istr, Settings &setti
     // default to --check-level=normal for import for now
     temp.setCheckLevel(Settings::CheckLevel::normal);
 
-    guiProject.analyzeAllVsConfigs.clear();
-
     // TODO: this should support all available command-line options
     for (const tinyxml2::XMLElement *node = rootnode->FirstChildElement(); node; node = node->NextSiblingElement()) {
         const char* name = node->Name();
@@ -1290,15 +1288,15 @@ bool ImportProject::importCppcheckGuiProject(std::istream &istr, Settings &setti
         else if (strcmp(name, CppcheckXml::PathsElementName) == 0)
             paths = readXmlStringList(node, path, CppcheckXml::PathName, CppcheckXml::PathNameAttrib);
         else if (strcmp(name, CppcheckXml::ExcludeElementName) == 0)
-            guiProject.excludedPaths = readXmlStringList(node, "", CppcheckXml::ExcludePathName, CppcheckXml::ExcludePathNameAttrib);
+            guiProject.excludedPaths = readXmlStringList(node, "", CppcheckXml::ExcludePathName, CppcheckXml::ExcludePathNameAttrib); // TODO: overwrites IgnorePathName
         else if (strcmp(name, CppcheckXml::FunctionContracts) == 0)
             ;
         else if (strcmp(name, CppcheckXml::VariableContractsElementName) == 0)
             ;
         else if (strcmp(name, CppcheckXml::IgnoreElementName) == 0)
-            guiProject.excludedPaths = readXmlStringList(node, "", CppcheckXml::IgnorePathName, CppcheckXml::IgnorePathNameAttrib);
+            guiProject.excludedPaths = readXmlStringList(node, "", CppcheckXml::IgnorePathName, CppcheckXml::IgnorePathNameAttrib); // TODO: overwrites ExcludePathName
         else if (strcmp(name, CppcheckXml::LibrariesElementName) == 0)
-            guiProject.libraries = readXmlStringList(node, "", CppcheckXml::LibraryElementName, nullptr);
+            temp.libraries = readXmlStringList(node, "", CppcheckXml::LibraryElementName, nullptr);
         else if (strcmp(name, CppcheckXml::SuppressionsElementName) == 0) {
             for (const tinyxml2::XMLElement *child = node->FirstChildElement(); child; child = child->NextSiblingElement()) {
                 if (strcmp(child->Name(), CppcheckXml::SuppressionElementName) != 0)
@@ -1399,6 +1397,8 @@ bool ImportProject::importCppcheckGuiProject(std::istream &istr, Settings &setti
     settings.addons = temp.addons;
     settings.clang = temp.clang;
     settings.clangTidy = temp.clangTidy;
+    for (const std::string &lib : temp.libraries)
+        settings.libraries.emplace_back(lib);
 
     if (!settings.premiumArgs.empty())
         settings.premiumArgs += temp.premiumArgs;
