@@ -2281,15 +2281,15 @@ const ::Type* Token::typeOf(const Token* tok, const Token** typeTok)
             return nullptr;
         return function->retType;
     }
-    if (Token::Match(tok->previous(), "%type%|= (|{"))
+    if (Match(tok->previous(), "%type%|= (|{"))
         return typeOf(tok->previous(), typeTok);
-    if (Token::simpleMatch(tok, "=") && (lhsVarTok = getLHSVariableToken(tok)) != tok->next())
-        return Token::typeOf(lhsVarTok, typeTok);
-    if (Token::simpleMatch(tok, "."))
-        return Token::typeOf(tok->astOperand2(), typeTok);
-    if (Token::simpleMatch(tok, "["))
-        return Token::typeOf(tok->astOperand1(), typeTok);
-    if (Token::simpleMatch(tok, "{")) {
+    if (simpleMatch(tok, "=") && (lhsVarTok = getLHSVariableToken(tok)) != tok->next())
+        return typeOf(lhsVarTok, typeTok);
+    if (simpleMatch(tok, "."))
+        return typeOf(tok->astOperand2(), typeTok);
+    if (simpleMatch(tok, "["))
+        return typeOf(tok->astOperand1(), typeTok);
+    if (simpleMatch(tok, "{")) {
         int argnr;
         const Token* ftok = getTokenArgumentFunction(tok, argnr);
         if (argnr < 0)
@@ -2332,40 +2332,40 @@ std::pair<const Token*, const Token*> Token::typeDecl(const Token* tok, bool poi
                 return { vt->containerTypeToken, vt->containerTypeToken->linkAt(-1) };
         }
         std::pair<const Token*, const Token*> result;
-        if (Token::simpleMatch(var->typeStartToken(), "auto")) {
+        if (simpleMatch(var->typeStartToken(), "auto")) {
             const Token * tok2 = var->declEndToken();
-            if (Token::Match(tok2, "; %varid% =", var->declarationId()))
+            if (Match(tok2, "; %varid% =", var->declarationId()))
                 tok2 = tok2->tokAt(2);
-            if (Token::simpleMatch(tok2, "=") && Token::Match(tok2->astOperand2(), "!!=") && tok != tok2->astOperand2()) {
+            if (simpleMatch(tok2, "=") && Match(tok2->astOperand2(), "!!=") && tok != tok2->astOperand2()) {
                 tok2 = tok2->astOperand2();
 
-                if (Token::simpleMatch(tok2, "[") && tok2->astOperand1()) {
+                if (simpleMatch(tok2, "[") && tok2->astOperand1()) {
                     const ValueType* vt = tok2->astOperand1()->valueType();
                     if (vt && vt->containerTypeToken)
                         return { vt->containerTypeToken, vt->containerTypeToken->linkAt(-1) };
                 }
 
                 const Token* varTok = tok2; // try to find a variable
-                if (Token::Match(varTok, ":: %name%"))
+                if (Match(varTok, ":: %name%"))
                     varTok = varTok->next();
-                while (Token::Match(varTok, "%name% ::"))
+                while (Match(varTok, "%name% ::"))
                     varTok = varTok->tokAt(2);
-                if (Token::simpleMatch(varTok, "(") && Token::simpleMatch(varTok->astOperand1(), "."))
+                if (simpleMatch(varTok, "(") && simpleMatch(varTok->astOperand1(), "."))
                     varTok = varTok->astOperand1()->astOperand1();
                 std::pair<const Token*, const Token*> r = typeDecl(varTok);
                 if (r.first)
                     return r;
 
-                if (pointedToType && tok2->astOperand1() && Token::simpleMatch(tok2, "new")) {
-                    if (Token::simpleMatch(tok2->astOperand1(), "("))
+                if (pointedToType && tok2->astOperand1() && simpleMatch(tok2, "new")) {
+                    if (simpleMatch(tok2->astOperand1(), "("))
                         return { tok2->next(), tok2->astOperand1() };
                     const Token* declEnd = nextAfterAstRightmostLeaf(tok2->astOperand1());
-                    if (Token::simpleMatch(declEnd, "<") && declEnd->link())
+                    if (simpleMatch(declEnd, "<") && declEnd->link())
                         declEnd = declEnd->link()->next();
                     return { tok2->next(), declEnd };
                 }
                 const Token *typeBeg{}, *typeEnd{};
-                if (tok2->str() == "::" && Token::simpleMatch(tok2->astOperand2(), "{")) { // empty initlist
+                if (tok2->str() == "::" && simpleMatch(tok2->astOperand2(), "{")) { // empty initlist
                     typeBeg = previousBeforeAstLeftmostLeaf(tok2);
                     typeEnd = tok2->astOperand2();
                 }
@@ -2386,7 +2386,7 @@ std::pair<const Token*, const Token*> Token::typeDecl(const Token* tok, bool poi
             return result;
         return {var->typeStartToken(), var->typeEndToken()->next()};
     }
-    if (Token::simpleMatch(tok, "return")) {
+    if (simpleMatch(tok, "return")) {
         const Scope* scope = tok->scope();
         if (!scope)
             return {};
@@ -2399,10 +2399,10 @@ std::pair<const Token*, const Token*> Token::typeDecl(const Token* tok, bool poi
         const Function *function = tok->previous()->function();
         return {function->retDef, function->returnDefEnd()};
     }
-    if (Token::simpleMatch(tok, "="))
-        return Token::typeDecl(tok->astOperand1());
-    if (Token::simpleMatch(tok, "."))
-        return Token::typeDecl(tok->astOperand2());
+    if (simpleMatch(tok, "="))
+        return typeDecl(tok->astOperand1());
+    if (simpleMatch(tok, "."))
+        return typeDecl(tok->astOperand2());
 
     const ::Type * t = typeOf(tok);
     if (!t || !t->classDef)
@@ -2417,7 +2417,7 @@ std::string Token::typeStr(const Token* tok)
         if (!ret.empty())
             return ret;
     }
-    std::pair<const Token*, const Token*> r = Token::typeDecl(tok);
+    std::pair<const Token*, const Token*> r = typeDecl(tok);
     if (!r.first || !r.second)
         return "";
     return r.first->stringifyList(r.second, false);
@@ -2561,7 +2561,7 @@ TokenImpl::~TokenImpl()
     }
 }
 
-void TokenImpl::setCppcheckAttribute(TokenImpl::CppcheckAttributes::Type type, MathLib::bigint value)
+void TokenImpl::setCppcheckAttribute(CppcheckAttributes::Type type, MathLib::bigint value)
 {
     CppcheckAttributes *attr = mCppcheckAttributes;
     while (attr && attr->type != type)
@@ -2577,7 +2577,7 @@ void TokenImpl::setCppcheckAttribute(TokenImpl::CppcheckAttributes::Type type, M
     }
 }
 
-bool TokenImpl::getCppcheckAttribute(TokenImpl::CppcheckAttributes::Type type, MathLib::bigint &value) const
+bool TokenImpl::getCppcheckAttribute(CppcheckAttributes::Type type, MathLib::bigint &value) const
 {
     CppcheckAttributes *attr = mCppcheckAttributes;
     while (attr && attr->type != type)

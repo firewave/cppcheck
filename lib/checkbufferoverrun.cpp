@@ -932,12 +932,12 @@ bool CheckBufferOverrun::isCtuUnsafeBufferUsage(const Check *check, const Token 
 
 bool CheckBufferOverrun::isCtuUnsafeArrayIndex(const Check *check, const Token *argtok, MathLib::bigint *offset)
 {
-    return CheckBufferOverrun::isCtuUnsafeBufferUsage(check, argtok, offset, 1);
+    return isCtuUnsafeBufferUsage(check, argtok, offset, 1);
 }
 
 bool CheckBufferOverrun::isCtuUnsafePointerArith(const Check *check, const Token *argtok, MathLib::bigint *offset)
 {
-    return CheckBufferOverrun::isCtuUnsafeBufferUsage(check, argtok, offset, 2);
+    return isCtuUnsafeBufferUsage(check, argtok, offset, 2);
 }
 
 /** @brief Parse current TU and extract file info */

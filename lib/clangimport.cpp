@@ -1573,7 +1573,7 @@ void clangimport::parseClangAstDump(Tokenizer *tokenizer, std::istream &f)
     symbolDatabase->scopeList.back().type = Scope::ScopeType::eGlobal;
     symbolDatabase->scopeList.back().check = symbolDatabase;
 
-    clangimport::Data data;
+    Data data;
     data.mSettings = tokenizer->getSettings();
     data.mSymbolDatabase = symbolDatabase;
     std::string line;

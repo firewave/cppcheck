@@ -37,14 +37,14 @@
 
 Suppressions::ErrorMessage Suppressions::ErrorMessage::fromErrorMessage(const ::ErrorMessage &msg, const std::set<std::string> &macroNames)
 {
-    Suppressions::ErrorMessage ret;
+    ErrorMessage ret;
     ret.hash = msg.hash;
     ret.errorId = msg.id;
     if (!msg.callStack.empty()) {
         ret.setFileName(msg.callStack.back().getfile(false));
         ret.lineNumber = msg.callStack.back().line;
     } else {
-        ret.lineNumber = Suppressions::Suppression::NO_LINE;
+        ret.lineNumber = Suppression::NO_LINE;
     }
     ret.certainty = msg.certainty;
     ret.symbolNames = msg.symbolNames();
@@ -194,7 +194,7 @@ std::vector<Suppressions::Suppression> Suppressions::parseMultiSuppressComment(c
 std::string Suppressions::addSuppressionLine(const std::string &line)
 {
     std::istringstream lineStream;
-    Suppressions::Suppression suppression;
+    Suppression suppression;
 
     // Strip any end of line comments
     std::string::size_type endpos = std::min(line.find('#'), line.find("//"));
@@ -224,10 +224,10 @@ std::string Suppressions::addSuppressionLine(const std::string &line)
                     std::istringstream istr1(suppression.fileName.substr(pos+1));
                     istr1 >> suppression.lineNumber;
                 } catch (...) {
-                    suppression.lineNumber = Suppressions::Suppression::NO_LINE;
+                    suppression.lineNumber = Suppression::NO_LINE;
                 }
 
-                if (suppression.lineNumber != Suppressions::Suppression::NO_LINE) {
+                if (suppression.lineNumber != Suppression::NO_LINE) {
                     suppression.fileName.erase(pos);
                 }
             }
@@ -239,7 +239,7 @@ std::string Suppressions::addSuppressionLine(const std::string &line)
     return addSuppression(std::move(suppression));
 }
 
-std::string Suppressions::addSuppression(Suppressions::Suppression suppression)
+std::string Suppressions::addSuppression(Suppression suppression)
 {
     // Check if suppression is already in list
     auto foundSuppression = std::find_if(mSuppressions.begin(), mSuppressions.end(),
@@ -339,23 +339,23 @@ bool Suppressions::Suppression::parseComment(std::string comment, std::string *e
     return true;
 }
 
-bool Suppressions::Suppression::isSuppressed(const Suppressions::ErrorMessage &errmsg) const
+bool Suppressions::Suppression::isSuppressed(const ErrorMessage &errmsg) const
 {
     if (hash > 0 && hash != errmsg.hash)
         return false;
     if (!errorId.empty() && !matchglob(errorId, errmsg.errorId))
         return false;
-    if (type == Suppressions::Type::macro) {
+    if (type == Type::macro) {
         if (errmsg.macroNames.count(macroName) == 0)
             return false;
     } else {
         if (!fileName.empty() && !matchglob(fileName, errmsg.getFileName()))
             return false;
-        if ((Suppressions::Type::unique == type) && (lineNumber != NO_LINE) && (lineNumber != errmsg.lineNumber)) {
+        if ((Type::unique == type) && (lineNumber != NO_LINE) && (lineNumber != errmsg.lineNumber)) {
             if (!thisAndNextLine || lineNumber + 1 != errmsg.lineNumber)
                 return false;
         }
-        if ((Suppressions::Type::block == type) && ((errmsg.lineNumber < lineBegin) || (errmsg.lineNumber > lineEnd)))
+        if ((Type::block == type) && ((errmsg.lineNumber < lineBegin) || (errmsg.lineNumber > lineEnd)))
             return false;
     }
     if (!symbolName.empty()) {
@@ -377,7 +377,7 @@ bool Suppressions::Suppression::isSuppressed(const Suppressions::ErrorMessage &e
     return true;
 }
 
-bool Suppressions::Suppression::isMatch(const Suppressions::ErrorMessage &errmsg)
+bool Suppressions::Suppression::isMatch(const ErrorMessage &errmsg)
 {
     if (!isSuppressed(errmsg))
         return false;
@@ -404,7 +404,7 @@ std::string Suppressions::Suppression::getText() const
     return ret;
 }
 
-bool Suppressions::isSuppressed(const Suppressions::ErrorMessage &errmsg, bool global)
+bool Suppressions::isSuppressed(const ErrorMessage &errmsg, bool global)
 {
     const bool unmatchedSuppression(errmsg.errorId == "unmatchedSuppression");
     bool returnValue = false;
@@ -423,7 +423,7 @@ bool Suppressions::isSuppressed(const ::ErrorMessage &errmsg, const std::set<std
 {
     if (mSuppressions.empty())
         return false;
-    return isSuppressed(Suppressions::ErrorMessage::fromErrorMessage(errmsg, macroNames));
+    return isSuppressed(ErrorMessage::fromErrorMessage(errmsg, macroNames));
 }
 
 void Suppressions::dump(std::ostream & out) const
@@ -452,7 +452,7 @@ std::list<Suppressions::Suppression> Suppressions::getUnmatchedLocalSuppressions
     for (const Suppression &s : mSuppressions) {
         if (s.matched || ((s.lineNumber != Suppression::NO_LINE) && !s.checked))
             continue;
-        if (s.type == Suppressions::Type::macro)
+        if (s.type == Type::macro)
             continue;
         if (s.hash > 0)
             continue;
@@ -495,11 +495,11 @@ void Suppressions::markUnmatchedInlineSuppressionsAsChecked(const Tokenizer &tok
             currLineNr = tok->linenr();
             currFileIdx = tok->fileIndex();
             for (auto &suppression : mSuppressions) {
-                if (suppression.type == Suppressions::Type::unique) {
+                if (suppression.type == Type::unique) {
                     if (!suppression.checked && (suppression.lineNumber == currLineNr) && (suppression.fileName == tokenizer.list.file(tok))) {
                         suppression.checked = true;
                     }
-                } else if (suppression.type == Suppressions::Type::block) {
+                } else if (suppression.type == Type::block) {
                     if ((!suppression.checked && (suppression.lineBegin <= currLineNr) && (suppression.lineEnd >= currLineNr) && (suppression.fileName == tokenizer.list.file(tok)))) {
                         suppression.checked = true;
                     }
@@ -511,21 +511,21 @@ void Suppressions::markUnmatchedInlineSuppressionsAsChecked(const Tokenizer &tok
     }
 }
 
-bool Suppressions::reportUnmatchedSuppressions(const std::list<Suppressions::Suppression> &unmatched, ErrorLogger &errorLogger)
+bool Suppressions::reportUnmatchedSuppressions(const std::list<Suppression> &unmatched, ErrorLogger &errorLogger)
 {
     bool err = false;
     // Report unmatched suppressions
-    for (const Suppressions::Suppression &s : unmatched) {
+    for (const Suppression &s : unmatched) {
         // don't report "unmatchedSuppression" as unmatched
         if (s.errorId == "unmatchedSuppression")
             continue;
 
         // check if this unmatched suppression is suppressed
         bool suppressed = false;
-        for (const Suppressions::Suppression &s2 : unmatched) {
+        for (const Suppression &s2 : unmatched) {
             if (s2.errorId == "unmatchedSuppression") {
                 if ((s2.fileName.empty() || s2.fileName == "*" || s2.fileName == s.fileName) &&
-                    (s2.lineNumber == Suppressions::Suppression::NO_LINE || s2.lineNumber == s.lineNumber)) {
+                    (s2.lineNumber == Suppression::NO_LINE || s2.lineNumber == s.lineNumber)) {
                     suppressed = true;
                     break;
                 }

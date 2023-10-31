@@ -782,7 +782,7 @@ bool Preprocessor::loadFiles(const simplecpp::TokenList &rawtokens, std::vector<
     const simplecpp::DUI dui = createDUI(mSettings, emptyString, files[0]);
 
     simplecpp::OutputList outputList;
-    mTokenLists = simplecpp::load(rawtokens, files, dui, &outputList);
+    mTokenLists = load(rawtokens, files, dui, &outputList);
     handleErrors(outputList, false);
     return !hasErrors(outputList);
 }
@@ -854,7 +854,7 @@ std::string Preprocessor::getcode(const simplecpp::TokenList &tokens1, const std
             line++;
         }
         if (!tok->macro.empty())
-            ret << Preprocessor::macroChar;
+            ret << macroChar;
         ret << tok->str();
     }
 
@@ -1003,9 +1003,9 @@ std::size_t Preprocessor::calculateHash(const simplecpp::TokenList &tokens1, con
 
 void Preprocessor::simplifyPragmaAsm(simplecpp::TokenList *tokenList) const
 {
-    Preprocessor::simplifyPragmaAsmPrivate(tokenList);
+    simplifyPragmaAsmPrivate(tokenList);
     for (const std::pair<const std::string, simplecpp::TokenList*>& list : mTokenLists) {
-        Preprocessor::simplifyPragmaAsmPrivate(list.second);
+        simplifyPragmaAsmPrivate(list.second);
     }
 }
 

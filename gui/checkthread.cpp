@@ -172,7 +172,7 @@ void CheckThread::runAddonsAndTools(const ImportProject::FileSettings *fileSetti
                 args << QString::fromStdString("-U" + U);
             }
 
-            const QString clangPath = CheckThread::clangTidyCmd();
+            const QString clangPath = clangTidyCmd();
             if (!clangPath.isEmpty()) {
                 QDir dir(clangPath + "/../lib/clang");
                 for (QString ver : dir.entryList()) {

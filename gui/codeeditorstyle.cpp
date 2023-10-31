@@ -97,7 +97,7 @@ CodeEditorStyle CodeEditorStyle::getSystemTheme()
 
 CodeEditorStyle CodeEditorStyle::loadSettings(QSettings *settings)
 {
-    CodeEditorStyle theStyle(CodeEditorStyle::getSystemTheme());
+    CodeEditorStyle theStyle(getSystemTheme());
     if (!settings)
         return theStyle;
 

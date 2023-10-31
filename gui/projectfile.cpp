@@ -776,7 +776,7 @@ void ProjectFile::setVSConfigurations(const QStringList &vsConfigs)
     mVsConfigurations = vsConfigs;
 }
 
-void ProjectFile::setCheckLevel(ProjectFile::CheckLevel checkLevel)
+void ProjectFile::setCheckLevel(CheckLevel checkLevel)
 {
     mCheckLevel = checkLevel;
 }

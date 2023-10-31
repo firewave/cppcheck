@@ -112,7 +112,7 @@ public:
      * @return list of directories.
      */
     QStringList getIncludeDirs() const {
-        return ProjectFile::fromNativeSeparators(mIncludeDirs);
+        return fromNativeSeparators(mIncludeDirs);
     }
 
     /**
@@ -136,7 +136,7 @@ public:
      * @return list of paths.
      */
     QStringList getCheckPaths() const {
-        return ProjectFile::fromNativeSeparators(mPaths);
+        return fromNativeSeparators(mPaths);
     }
 
     /**
@@ -144,7 +144,7 @@ public:
      * @return list of paths.
      */
     QStringList getExcludedPaths() const {
-        return ProjectFile::fromNativeSeparators(mExcludedPaths);
+        return fromNativeSeparators(mExcludedPaths);
     }
 
     /**

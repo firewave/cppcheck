@@ -37,46 +37,46 @@ ShowTypes::ShowType ShowTypes::SeverityToShowType(Severity severity)
 {
     switch (severity) {
     case Severity::none:
-        return ShowTypes::ShowNone;
+        return ShowNone;
     case Severity::error:
-        return ShowTypes::ShowErrors;
+        return ShowErrors;
     case Severity::style:
-        return ShowTypes::ShowStyle;
+        return ShowStyle;
     case Severity::warning:
-        return ShowTypes::ShowWarnings;
+        return ShowWarnings;
     case Severity::performance:
-        return ShowTypes::ShowPerformance;
+        return ShowPerformance;
     case Severity::portability:
-        return ShowTypes::ShowPortability;
+        return ShowPortability;
     case Severity::information:
-        return ShowTypes::ShowInformation;
+        return ShowInformation;
     default:
-        return ShowTypes::ShowNone;
+        return ShowNone;
     }
 }
 
-Severity ShowTypes::ShowTypeToSeverity(ShowTypes::ShowType type)
+Severity ShowTypes::ShowTypeToSeverity(ShowType type)
 {
     switch (type) {
-    case ShowTypes::ShowStyle:
+    case ShowStyle:
         return Severity::style;
 
-    case ShowTypes::ShowErrors:
+    case ShowErrors:
         return Severity::error;
 
-    case ShowTypes::ShowWarnings:
+    case ShowWarnings:
         return Severity::warning;
 
-    case ShowTypes::ShowPerformance:
+    case ShowPerformance:
         return Severity::performance;
 
-    case ShowTypes::ShowPortability:
+    case ShowPortability:
         return Severity::portability;
 
-    case ShowTypes::ShowInformation:
+    case ShowInformation:
         return Severity::information;
 
-    case ShowTypes::ShowNone:
+    case ShowNone:
     default:
         return Severity::none;
     }
@@ -85,10 +85,10 @@ Severity ShowTypes::ShowTypeToSeverity(ShowTypes::ShowType type)
 ShowTypes::ShowType ShowTypes::VariantToShowType(const QVariant &data)
 {
     const int value = data.toInt();
-    if (value < ShowTypes::ShowStyle || value > ShowTypes::ShowErrors) {
-        return ShowTypes::ShowNone;
+    if (value < ShowStyle || value > ShowErrors) {
+        return ShowNone;
     }
-    return (ShowTypes::ShowType)value;
+    return (ShowType)value;
 }
 
 void ShowTypes::load()
@@ -113,17 +113,17 @@ void ShowTypes::save() const
     settings.setValue(SETTINGS_SHOW_INFORMATION, mVisible[ShowInformation]);
 }
 
-bool ShowTypes::isShown(ShowTypes::ShowType category) const
+bool ShowTypes::isShown(ShowType category) const
 {
     return mVisible[category];
 }
 
 bool ShowTypes::isShown(Severity severity) const
 {
-    return isShown(ShowTypes::SeverityToShowType(severity));
+    return isShown(SeverityToShowType(severity));
 }
 
-void ShowTypes::show(ShowTypes::ShowType category, bool showing)
+void ShowTypes::show(ShowType category, bool showing)
 {
     mVisible[category] = showing;
 }

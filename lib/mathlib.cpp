@@ -40,16 +40,16 @@ const int MathLib::bigint_bits = 64;
 MathLib::value::value(const std::string &s)
 {
     if (MathLib::isFloat(s)) {
-        mType = MathLib::value::Type::FLOAT;
-        mDoubleValue = MathLib::toDoubleNumber(s);
+        mType = Type::FLOAT;
+        mDoubleValue = toDoubleNumber(s);
         return;
     }
 
     if (!MathLib::isInt(s))
         throw InternalError(nullptr, "Invalid value: " + s);
 
-    mType = MathLib::value::Type::INT;
-    mIntValue = MathLib::toBigNumber(s);
+    mType = Type::INT;
+    mIntValue = toBigNumber(s);
 
     if (isIntHex(s) && mIntValue < 0)
         mIsUnsigned = true;
@@ -61,12 +61,12 @@ MathLib::value::value(const std::string &s)
             if (c == 'u' || c == 'U')
                 mIsUnsigned = true;
             else if (c == 'l' || c == 'L') {
-                if (mType == MathLib::value::Type::INT)
-                    mType = MathLib::value::Type::LONG;
-                else if (mType == MathLib::value::Type::LONG)
-                    mType = MathLib::value::Type::LONGLONG;
+                if (mType == Type::INT)
+                    mType = Type::LONG;
+                else if (mType == Type::LONG)
+                    mType = Type::LONGLONG;
             } else if (i > 2U && c == '4' && s[i-1] == '6' && s[i-2] == 'i')
-                mType = MathLib::value::Type::LONGLONG;
+                mType = Type::LONGLONG;
         }
     }
 }
@@ -74,7 +74,7 @@ MathLib::value::value(const std::string &s)
 std::string MathLib::value::str() const
 {
     std::ostringstream ostr;
-    if (mType == MathLib::value::Type::FLOAT) {
+    if (mType == Type::FLOAT) {
         if (std::isnan(mDoubleValue))
             return "nan.0";
         if (std::isinf(mDoubleValue))
@@ -98,14 +98,14 @@ std::string MathLib::value::str() const
         ostr << static_cast<biguint>(mIntValue) << "U";
     else
         ostr << mIntValue;
-    if (mType == MathLib::value::Type::LONG)
+    if (mType == Type::LONG)
         ostr << "L";
-    else if (mType == MathLib::value::Type::LONGLONG)
+    else if (mType == Type::LONGLONG)
         ostr << "LL";
     return ostr.str();
 }
 
-void MathLib::value::promote(const MathLib::value &v)
+void MathLib::value::promote(const value &v)
 {
     if (isInt() && v.isInt()) {
         if (mType < v.mType) {
@@ -117,12 +117,12 @@ void MathLib::value::promote(const MathLib::value &v)
     } else if (!isFloat()) {
         mIsUnsigned = false;
         mDoubleValue = mIntValue;
-        mType = MathLib::value::Type::FLOAT;
+        mType = Type::FLOAT;
     }
 }
 
 
-MathLib::value MathLib::value::calc(char op, const MathLib::value &v1, const MathLib::value &v2)
+MathLib::value MathLib::value::calc(char op, const value &v1, const value &v2)
 {
     value temp(v1);
     temp.promote(v2);
@@ -223,7 +223,7 @@ MathLib::value MathLib::value::calc(char op, const MathLib::value &v1, const Mat
 }
 
 
-int MathLib::value::compare(const MathLib::value &v) const
+int MathLib::value::compare(const value &v) const
 {
     value temp(*this);
     temp.promote(v);
@@ -253,7 +253,7 @@ int MathLib::value::compare(const MathLib::value &v) const
 
 MathLib::value MathLib::value::add(int v) const
 {
-    MathLib::value temp(*this);
+    value temp(*this);
     if (temp.isInt())
         temp.mIntValue += v;
     else
@@ -261,24 +261,24 @@ MathLib::value MathLib::value::add(int v) const
     return temp;
 }
 
-MathLib::value MathLib::value::shiftLeft(const MathLib::value &v) const
+MathLib::value MathLib::value::shiftLeft(const value &v) const
 {
     if (!isInt() || !v.isInt())
         throw InternalError(nullptr, "Shift operand is not integer");
-    MathLib::value ret(*this);
-    if (v.mIntValue >= MathLib::bigint_bits) {
+    value ret(*this);
+    if (v.mIntValue >= bigint_bits) {
         return ret;
     }
     ret.mIntValue <<= v.mIntValue;
     return ret;
 }
 
-MathLib::value MathLib::value::shiftRight(const MathLib::value &v) const
+MathLib::value MathLib::value::shiftRight(const value &v) const
 {
     if (!isInt() || !v.isInt())
         throw InternalError(nullptr, "Shift operand is not integer");
-    MathLib::value ret(*this);
-    if (v.mIntValue >= MathLib::bigint_bits) {
+    value ret(*this);
+    if (v.mIntValue >= bigint_bits) {
         return ret;
     }
     ret.mIntValue >>= v.mIntValue;
@@ -644,7 +644,7 @@ bool MathLib::isPositive(const std::string &str)
 {
     if (str.empty())
         return false;
-    return !MathLib::isNegative(str);
+    return !isNegative(str);
 }
 
 static bool isValidIntegerSuffixIt(std::string::const_iterator it, std::string::const_iterator end, bool supportMicrosoftExtensions=true)
@@ -1058,7 +1058,7 @@ std::string MathLib::add(const std::string & first, const std::string & second)
 #ifdef TEST_MATHLIB_VALUE
     return (value(first) + value(second)).str();
 #else
-    if (MathLib::isInt(first) && MathLib::isInt(second)) {
+    if (isInt(first) && isInt(second)) {
         return std::to_string(toBigNumber(first) + toBigNumber(second)) + intsuffix(first, second);
     }
 
@@ -1080,7 +1080,7 @@ std::string MathLib::subtract(const std::string &first, const std::string &secon
 #ifdef TEST_MATHLIB_VALUE
     return (value(first) - value(second)).str();
 #else
-    if (MathLib::isInt(first) && MathLib::isInt(second)) {
+    if (isInt(first) && isInt(second)) {
         return std::to_string(toBigNumber(first) - toBigNumber(second)) + intsuffix(first, second);
     }
 
@@ -1105,7 +1105,7 @@ std::string MathLib::divide(const std::string &first, const std::string &second)
 #ifdef TEST_MATHLIB_VALUE
     return (value(first) / value(second)).str();
 #else
-    if (MathLib::isInt(first) && MathLib::isInt(second)) {
+    if (isInt(first) && isInt(second)) {
         const bigint a = toBigNumber(first);
         const bigint b = toBigNumber(second);
         if (b == 0)
@@ -1128,7 +1128,7 @@ std::string MathLib::multiply(const std::string &first, const std::string &secon
 #ifdef TEST_MATHLIB_VALUE
     return (value(first) * value(second)).str();
 #else
-    if (MathLib::isInt(first) && MathLib::isInt(second)) {
+    if (isInt(first) && isInt(second)) {
         return std::to_string(toBigNumber(first) * toBigNumber(second)) + intsuffix(first, second);
     }
     return toString(toDoubleNumber(first) * toDoubleNumber(second));
@@ -1140,7 +1140,7 @@ std::string MathLib::mod(const std::string &first, const std::string &second)
 #ifdef TEST_MATHLIB_VALUE
     return (value(first) % value(second)).str();
 #else
-    if (MathLib::isInt(first) && MathLib::isInt(second)) {
+    if (isInt(first) && isInt(second)) {
         const bigint b = toBigNumber(second);
         if (b == 0)
             throw InternalError(nullptr, "Internal Error: Division by zero");
@@ -1154,28 +1154,28 @@ std::string MathLib::calculate(const std::string &first, const std::string &seco
 {
     switch (action) {
     case '+':
-        return MathLib::add(first, second);
+        return add(first, second);
 
     case '-':
-        return MathLib::subtract(first, second);
+        return subtract(first, second);
 
     case '*':
-        return MathLib::multiply(first, second);
+        return multiply(first, second);
 
     case '/':
-        return MathLib::divide(first, second);
+        return divide(first, second);
 
     case '%':
-        return MathLib::mod(first, second);
+        return mod(first, second);
 
     case '&':
-        return std::to_string(MathLib::toBigNumber(first) & MathLib::toBigNumber(second)) + intsuffix(first, second);
+        return std::to_string(toBigNumber(first) & toBigNumber(second)) + intsuffix(first, second);
 
     case '|':
-        return std::to_string(MathLib::toBigNumber(first) | MathLib::toBigNumber(second)) + intsuffix(first, second);
+        return std::to_string(toBigNumber(first) | toBigNumber(second)) + intsuffix(first, second);
 
     case '^':
-        return std::to_string(MathLib::toBigNumber(first) ^ MathLib::toBigNumber(second)) + intsuffix(first, second);
+        return std::to_string(toBigNumber(first) ^ toBigNumber(second)) + intsuffix(first, second);
 
     default:
         throw InternalError(nullptr, std::string("Unexpected action '") + action + "' in MathLib::calculate(). Please report this to Cppcheck developers.");

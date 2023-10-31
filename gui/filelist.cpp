@@ -38,7 +38,7 @@ QStringList FileList::getDefaultFilters()
 bool FileList::filterMatches(const QFileInfo &inf)
 {
     if (inf.isFile()) {
-        const QStringList filters = FileList::getDefaultFilters();
+        const QStringList filters = getDefaultFilters();
         QString ext("*.");
         ext += inf.suffix();
         if (filters.contains(ext, Qt::CaseInsensitive))
@@ -58,7 +58,7 @@ void FileList::addDirectory(const QString &directory, bool recursive)
 {
     QDir dir(directory);
     dir.setSorting(QDir::Name);
-    const QStringList filters = FileList::getDefaultFilters();
+    const QStringList filters = getDefaultFilters();
     const QStringList origNameFilters = dir.nameFilters();
     dir.setNameFilters(filters);
     if (!recursive) {

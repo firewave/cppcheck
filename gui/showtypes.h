@@ -78,7 +78,7 @@ public:
      * @param category Showtype to check.
      * @return true if the showtype is visible.
      */
-    bool isShown(ShowTypes::ShowType category) const;
+    bool isShown(ShowType category) const;
 
     /**
      * @brief Is the severity visible in the GUI?
@@ -92,21 +92,21 @@ public:
      * @param category Showtype whose visibility to set.
      * @param showing true if the severity is set visible.
      */
-    void show(ShowTypes::ShowType category, bool showing);
+    void show(ShowType category, bool showing);
 
     /**
      * @brief Convert severity string to ShowTypes value
      * @param severity Error severity
      * @return Severity converted to ShowTypes value
      */
-    static ShowTypes::ShowType SeverityToShowType(Severity severity);
+    static ShowType SeverityToShowType(Severity severity);
 
     /**
      * @brief Convert ShowType to severity string
      * @param type ShowType to convert
      * @return ShowType converted to severity
      */
-    static Severity ShowTypeToSeverity(ShowTypes::ShowType type);
+    static Severity ShowTypeToSeverity(ShowType type);
 
     /**
      * @brief Convert QVariant (that contains an int) to Showtypes value
@@ -114,7 +114,7 @@ public:
      * @param data QVariant (that contains an int) to be converted
      * @return data converted to ShowTypes
      */
-    static ShowTypes::ShowType VariantToShowType(const QVariant &data);
+    static ShowType VariantToShowType(const QVariant &data);
 
     bool mVisible[ShowNone];
 };

@@ -73,12 +73,12 @@ std::string CTU::FileInfo::toString() const
     std::ostringstream out;
 
     // Function calls..
-    for (const CTU::FileInfo::FunctionCall &functionCall : functionCalls) {
+    for (const FunctionCall &functionCall : functionCalls) {
         out << functionCall.toXmlString();
     }
 
     // Nested calls..
-    for (const CTU::FileInfo::NestedCall &nestedCall : nestedCalls) {
+    for (const NestedCall &nestedCall : nestedCalls) {
         out << nestedCall.toXmlString() << "\n";
     }
 
@@ -148,10 +148,10 @@ std::string CTU::FileInfo::UnsafeUsage::toString() const
     return out.str();
 }
 
-std::string CTU::toString(const std::list<CTU::FileInfo::UnsafeUsage> &unsafeUsage)
+std::string CTU::toString(const std::list<FileInfo::UnsafeUsage> &unsafeUsage)
 {
     std::ostringstream ret;
-    for (const CTU::FileInfo::UnsafeUsage &u : unsafeUsage)
+    for (const FileInfo::UnsafeUsage &u : unsafeUsage)
         ret << u.toString();
     return ret.str();
 }
@@ -159,7 +159,7 @@ std::string CTU::toString(const std::list<CTU::FileInfo::UnsafeUsage> &unsafeUsa
 CTU::FileInfo::CallBase::CallBase(const Tokenizer *tokenizer, const Token *callToken)
     : callId(getFunctionId(tokenizer, callToken->function()))
     , callFunctionName(callToken->next()->astOperand1()->expressionString())
-    , location(CTU::FileInfo::Location(tokenizer, callToken))
+    , location(Location(tokenizer, callToken))
 {}
 
 CTU::FileInfo::NestedCall::NestedCall(const Tokenizer *tokenizer, const Function *myFunction, const Token *callToken)
@@ -245,17 +245,17 @@ void CTU::FileInfo::loadFromXml(const tinyxml2::XMLElement *xmlElement)
 
 std::map<std::string, std::list<const CTU::FileInfo::CallBase *>> CTU::FileInfo::getCallsMap() const
 {
-    std::map<std::string, std::list<const CTU::FileInfo::CallBase *>> ret;
-    for (const CTU::FileInfo::NestedCall &nc : nestedCalls)
+    std::map<std::string, std::list<const CallBase *>> ret;
+    for (const NestedCall &nc : nestedCalls)
         ret[nc.callId].push_back(&nc);
-    for (const CTU::FileInfo::FunctionCall &fc : functionCalls)
+    for (const FunctionCall &fc : functionCalls)
         ret[fc.callId].push_back(&fc);
     return ret;
 }
 
 std::list<CTU::FileInfo::UnsafeUsage> CTU::loadUnsafeUsageListFromXml(const tinyxml2::XMLElement *xmlElement)
 {
-    std::list<CTU::FileInfo::UnsafeUsage> ret;
+    std::list<FileInfo::UnsafeUsage> ret;
     for (const tinyxml2::XMLElement *e = xmlElement->FirstChildElement(); e; e = e->NextSiblingElement()) {
         if (std::strcmp(e->Name(), "unsafe-usage") != 0)
             continue;
@@ -470,7 +470,7 @@ static std::list<std::pair<const Token *, MathLib::bigint>> getUnsafeFunction(co
 
 std::list<CTU::FileInfo::UnsafeUsage> CTU::getUnsafeUsage(const Tokenizer *tokenizer, const Settings *settings, const Check *check, bool (*isUnsafeUsage)(const Check *check, const Token *argtok, MathLib::bigint *value))
 {
-    std::list<CTU::FileInfo::UnsafeUsage> unsafeUsage;
+    std::list<FileInfo::UnsafeUsage> unsafeUsage;
 
     // Parse all functions in TU
     const SymbolDatabase * const symbolDatabase = tokenizer->getSymbolDatabase();
@@ -485,7 +485,7 @@ std::list<CTU::FileInfo::UnsafeUsage> CTU::getUnsafeUsage(const Tokenizer *token
             for (const std::pair<const Token *, MathLib::bigint> &v : getUnsafeFunction(tokenizer, settings, &scope, argnr, check, isUnsafeUsage)) {
                 const Token *tok = v.first;
                 const MathLib::bigint val = v.second;
-                unsafeUsage.emplace_back(CTU::getFunctionId(tokenizer, function), argnr+1, tok->str(), CTU::FileInfo::Location(tokenizer,tok), val);
+                unsafeUsage.emplace_back(getFunctionId(tokenizer, function), argnr+1, tok->str(), FileInfo::Location(tokenizer,tok), val);
             }
         }
     }
@@ -551,15 +551,15 @@ static bool findPath(const std::string &callId,
 }
 
 std::list<ErrorMessage::FileLocation> CTU::FileInfo::getErrorPath(InvalidValueType invalidValue,
-                                                                  const CTU::FileInfo::UnsafeUsage &unsafeUsage,
-                                                                  const std::map<std::string, std::list<const CTU::FileInfo::CallBase *>> &callsMap,
+                                                                  const UnsafeUsage &unsafeUsage,
+                                                                  const std::map<std::string, std::list<const CallBase *>> &callsMap,
                                                                   const char info[],
                                                                   const FunctionCall ** const functionCallPtr,
                                                                   bool warning)
 {
     std::list<ErrorMessage::FileLocation> locationList;
 
-    const CTU::FileInfo::CallBase *path[10] = {nullptr};
+    const CallBase *path[10] = {nullptr};
 
     if (!findPath(unsafeUsage.myId, unsafeUsage.myArgNr, unsafeUsage.value, invalidValue, callsMap, path, 0, warning))
         return locationList;
@@ -570,7 +570,7 @@ std::list<ErrorMessage::FileLocation> CTU::FileInfo::getErrorPath(InvalidValueTy
         if (!path[index])
             continue;
 
-        const CTU::FileInfo::FunctionCall *functionCall = dynamic_cast<const CTU::FileInfo::FunctionCall *>(path[index]);
+        const FunctionCall *functionCall = dynamic_cast<const FunctionCall *>(path[index]);
 
         if (functionCall) {
             if (functionCallPtr)

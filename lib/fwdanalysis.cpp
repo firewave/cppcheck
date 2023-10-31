@@ -114,7 +114,7 @@ FwdAnalysis::Result FwdAnalysis::checkRecursive(const Token *expr, const Token *
 
         if (!inInnerClass && tok->str() == "{" && tok->scope()->isClassOrStruct()) {
             // skip returns from local class definition
-            FwdAnalysis::Result result = checkRecursive(expr, tok, tok->link(), exprVarIds, local, true, depth);
+            Result result = checkRecursive(expr, tok, tok->link(), exprVarIds, local, true, depth);
             if (result.type != Result::Type::NONE)
                 return result;
             tok=tok->link();
@@ -139,7 +139,7 @@ FwdAnalysis::Result FwdAnalysis::checkRecursive(const Token *expr, const Token *
             if (!opTok)
                 opTok = tok->next();
             std::pair<const Token*, const Token*> startEndTokens = opTok->findExpressionStartEndTokens();
-            FwdAnalysis::Result result =
+            Result result =
                 checkRecursive(expr, startEndTokens.first, startEndTokens.second->next(), exprVarIds, local, true, depth);
             if (result.type != Result::Type::NONE)
                 return result;
@@ -182,7 +182,7 @@ FwdAnalysis::Result FwdAnalysis::checkRecursive(const Token *expr, const Token *
                 }
 
                 // check loop body again..
-                const FwdAnalysis::Result &result = checkRecursive(expr, tok->link(), tok, exprVarIds, local, inInnerClass, depth);
+                const Result &result = checkRecursive(expr, tok->link(), tok, exprVarIds, local, inInnerClass, depth);
                 if (result.type == Result::Type::BAILOUT || result.type == Result::Type::READ)
                     return result;
             }
@@ -226,12 +226,12 @@ FwdAnalysis::Result FwdAnalysis::checkRecursive(const Token *expr, const Token *
             if (condTok->hasKnownIntValue()) {
                 const bool cond = condTok->values().front().intvalue;
                 if (cond) {
-                    FwdAnalysis::Result result = checkRecursive(expr, bodyStart, bodyStart->link(), exprVarIds, local, true, depth);
+                    Result result = checkRecursive(expr, bodyStart, bodyStart->link(), exprVarIds, local, true, depth);
                     if (result.type != Result::Type::NONE)
                         return result;
                 } else if (Token::simpleMatch(bodyStart->link(), "} else {")) {
                     bodyStart = bodyStart->link()->tokAt(2);
-                    FwdAnalysis::Result result = checkRecursive(expr, bodyStart, bodyStart->link(), exprVarIds, local, true, depth);
+                    Result result = checkRecursive(expr, bodyStart, bodyStart->link(), exprVarIds, local, true, depth);
                     if (result.type != Result::Type::NONE)
                         return result;
                 }
@@ -442,7 +442,7 @@ FwdAnalysis::Result FwdAnalysis::check(const Token* expr, const Token* startToke
     std::set<nonneg int> exprVarIds = getExprVarIds(expr, &local, &unknownVarId);
 
     if (unknownVarId)
-        return Result(FwdAnalysis::Result::Type::BAILOUT);
+        return Result(Result::Type::BAILOUT);
 
     if (mWhat == What::Reassign && isGlobalData(expr))
         local = false;
@@ -450,12 +450,12 @@ FwdAnalysis::Result FwdAnalysis::check(const Token* expr, const Token* startToke
     // In unused values checking we do not want to check assignments to
     // global data.
     if (mWhat == What::UnusedValue && isGlobalData(expr))
-        return Result(FwdAnalysis::Result::Type::BAILOUT);
+        return Result(Result::Type::BAILOUT);
 
     Result result = checkRecursive(expr, startToken, endToken, exprVarIds, local, false);
 
     // Break => continue checking in outer scope
-    while (mWhat!=What::ValueFlow && result.type == FwdAnalysis::Result::Type::BREAK) {
+    while (mWhat!=What::ValueFlow && result.type == Result::Type::BREAK) {
         const Token *scopeEndToken = findNextTokenFromBreak(result.token);
         if (!scopeEndToken)
             break;
@@ -480,7 +480,7 @@ const Token *FwdAnalysis::reassign(const Token *expr, const Token *startToken, c
         return nullptr;
     mWhat = What::Reassign;
     Result result = check(expr, startToken, endToken);
-    return result.type == FwdAnalysis::Result::Type::WRITE ? result.token : nullptr;
+    return result.type == Result::Type::WRITE ? result.token : nullptr;
 }
 
 bool FwdAnalysis::unusedValue(const Token *expr, const Token *startToken, const Token *endToken)
@@ -493,7 +493,7 @@ bool FwdAnalysis::unusedValue(const Token *expr, const Token *startToken, const 
         return false;
     mWhat = What::UnusedValue;
     Result result = check(expr, startToken, endToken);
-    return (result.type == FwdAnalysis::Result::Type::NONE || result.type == FwdAnalysis::Result::Type::RETURN) && !possiblyAliased(expr, startToken);
+    return (result.type == Result::Type::NONE || result.type == Result::Type::RETURN) && !possiblyAliased(expr, startToken);
 }
 
 bool FwdAnalysis::possiblyAliased(const Token *expr, const Token *startToken) const
