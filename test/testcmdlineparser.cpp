@@ -447,7 +447,7 @@ private:
         REDIRECT;
         const char * const argv[] = {"cppcheck", "file.cpp"};
         ASSERT_EQUALS(CmdLineParser::Result::Success, parser->parseFromArgs(2, argv));
-        ASSERT_EQUALS(1, (int)parser->getPathNames().size());
+        ASSERT_EQUALS(1, parser->getPathNames().size());
         ASSERT_EQUALS("file.cpp", parser->getPathNames().at(0));
     }
 
@@ -455,7 +455,7 @@ private:
         REDIRECT;
         const char * const argv[] = {"cppcheck", "src"};
         ASSERT_EQUALS(CmdLineParser::Result::Success, parser->parseFromArgs(2, argv));
-        ASSERT_EQUALS(1, (int)parser->getPathNames().size());
+        ASSERT_EQUALS(1, parser->getPathNames().size());
         ASSERT_EQUALS("src", parser->getPathNames().at(0));
     }
 
@@ -463,7 +463,7 @@ private:
         REDIRECT;
         const char * const argv[] = {"cppcheck", "-v"};
         ASSERT_EQUALS(CmdLineParser::Result::Fail, parser->parseFromArgs(2, argv));
-        ASSERT_EQUALS(0, (int)parser->getPathNames().size());
+        ASSERT_EQUALS(0, parser->getPathNames().size());
         ASSERT_EQUALS("cppcheck: error: no C or C++ source files found.\n", logger->str());
     }
 

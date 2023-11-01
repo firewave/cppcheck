@@ -1760,7 +1760,7 @@ private:
             preprocess(filedata, actual);
 
             // Compare results..
-            ASSERT_EQUALS(1, (int)actual.size());
+            ASSERT_EQUALS(1, actual.size());
             ASSERT_EQUALS("\n\n\n\nB", actual[""]);
         }
 
@@ -1775,7 +1775,7 @@ private:
             preprocess(filedata, actual);
 
             // Compare results..
-            ASSERT_EQUALS(1, (int)actual.size());
+            ASSERT_EQUALS(1, actual.size());
             ASSERT_EQUALS("\n\n$1", actual[""]);
         }
 
@@ -1790,7 +1790,7 @@ private:
             preprocess(filedata, actual);
 
             // Compare results..
-            ASSERT_EQUALS(1, (int)actual.size());
+            ASSERT_EQUALS(1, actual.size());
             ASSERT_EQUALS("\n\n$1", actual[""]);
         }
 
@@ -1805,7 +1805,7 @@ private:
             preprocess(filedata, actual);
 
             // Compare results..
-            ASSERT_EQUALS(1, (int)actual.size());
+            ASSERT_EQUALS(1, actual.size());
             ASSERT_EQUALS("\n\n$1", actual[""]);
         }
 
@@ -1821,7 +1821,7 @@ private:
             preprocess(filedata, actual);
 
             // Compare results..
-            ASSERT_EQUALS(1, (int)actual.size());
+            ASSERT_EQUALS(1, actual.size());
             ASSERT_EQUALS("\n\n\n\n$1", actual[""]);
         }
     }
@@ -1901,7 +1901,7 @@ private:
         preprocess(filedata, actual);
 
         // Compare results..
-        ASSERT_EQUALS(4, (int)actual.size());
+        ASSERT_EQUALS(4, actual.size());
         ASSERT(actual.find("") != actual.end());
         ASSERT(actual.find("BAR") != actual.end());
         ASSERT(actual.find("FOO") != actual.end());
@@ -1920,7 +1920,7 @@ private:
 
         // Compare results..
         ASSERT_EQUALS("char a [ ] = \"#endfile\" ;\nchar b [ ] = \"#endfile\" ;", actual[""]);
-        ASSERT_EQUALS(1, (int)actual.size());
+        ASSERT_EQUALS(1, actual.size());
     }
 
     void dup_defines() {

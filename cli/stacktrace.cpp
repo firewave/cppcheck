@@ -34,7 +34,7 @@ void print_stacktrace(FILE* output, bool demangling, int maxdepth, bool lowMem)
 #define ADDRESSDISPLAYLENGTH ((sizeof(long)==8)?12:8)
     const int fd = fileno(output);
     void *callstackArray[32]= {nullptr}; // the less resources the better...
-    const int currentdepth = backtrace(callstackArray, (int)getArrayLength(callstackArray));
+    const int currentdepth = backtrace(callstackArray, static_cast<int>(getArrayLength(callstackArray)));
     constexpr int offset=2; // some entries on top are within our own exception handling code or libc
     if (maxdepth<0)
         maxdepth=currentdepth-offset;
@@ -77,12 +77,12 @@ void print_stacktrace(FILE* output, bool demangling, int maxdepth, bool lowMem)
                             padLen, 0);
                 if (realnameString) {
                     fprintf(output, "%.*s in %s\n",
-                            (int)(secondBracketAddress-firstBracketAddress-3), firstBracketAddress+3,
+                            static_cast<int>(secondBracketAddress - firstBracketAddress - 3), firstBracketAddress+3,
                             realnameString);
                 } else {
                     fprintf(output, "%.*s in %.*s\n",
-                            (int)(secondBracketAddress-firstBracketAddress-3), firstBracketAddress+3,
-                            (int)(firstBracketAddress-symbolString), symbolString);
+                            static_cast<int>(secondBracketAddress - firstBracketAddress - 3), firstBracketAddress+3,
+                            static_cast<int>(firstBracketAddress - symbolString), symbolString);
                 }
             }
             free(symbolStringList);

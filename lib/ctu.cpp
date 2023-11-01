@@ -202,7 +202,7 @@ bool CTU::FileInfo::FunctionCall::loadFromXml(const tinyxml2::XMLElement *xmlEle
         return false;
     bool error=false;
     callArgumentExpression = readAttrString(xmlElement, ATTR_CALL_ARGEXPR, &error);
-    callValueType = (ValueFlow::Value::ValueType)readAttrInt(xmlElement, ATTR_CALL_ARGVALUETYPE, &error);
+    callValueType = static_cast<ValueFlow::Value::ValueType>(readAttrInt(xmlElement, ATTR_CALL_ARGVALUETYPE, &error));
     callArgValue = readAttrInt(xmlElement, ATTR_CALL_ARGVALUE, &error);
     const char *w = xmlElement->Attribute(ATTR_WARNING);
     warning = w && std::strcmp(w, "true") == 0;

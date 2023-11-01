@@ -325,11 +325,11 @@ private:
         ASSERT_EQUALS(-1, MathLib::toBigNumber("-10.0E-1"));
 
         // from char
-        ASSERT_EQUALS((int)('A'), MathLib::toBigNumber("'A'"));
-        ASSERT_EQUALS((int)('\x10'), MathLib::toBigNumber("'\\x10'"));
-        ASSERT_EQUALS((int)('\100'), MathLib::toBigNumber("'\\100'"));
-        ASSERT_EQUALS((int)('\200'), MathLib::toBigNumber("'\\200'"));
-        ASSERT_EQUALS((int)(L'A'), MathLib::toBigNumber("L'A'"));
+        ASSERT_EQUALS(static_cast<int>('A'), MathLib::toBigNumber("'A'"));
+        ASSERT_EQUALS(static_cast<int>('\x10'), MathLib::toBigNumber("'\\x10'"));
+        ASSERT_EQUALS(static_cast<int>('\100'), MathLib::toBigNumber("'\\100'"));
+        ASSERT_EQUALS(static_cast<int>('\200'), MathLib::toBigNumber("'\\200'"));
+        ASSERT_EQUALS(static_cast<int>(L'A'), MathLib::toBigNumber("L'A'"));
 
         ASSERT_EQUALS(-8552249625308161526, MathLib::toBigNumber("0x89504e470d0a1a0a"));
         ASSERT_EQUALS(-8481036456200365558, MathLib::toBigNumber("0x8a4d4e470d0a1a0a"));
@@ -490,11 +490,11 @@ private:
         ASSERT_EQUALS(-1, MathLib::toBigUNumber("-10.0E-1"));
 
         // from char
-        ASSERT_EQUALS((int)('A'), MathLib::toBigUNumber("'A'"));
-        ASSERT_EQUALS((int)('\x10'), MathLib::toBigUNumber("'\\x10'"));
-        ASSERT_EQUALS((int)('\100'), MathLib::toBigUNumber("'\\100'"));
-        ASSERT_EQUALS((int)('\200'), MathLib::toBigUNumber("'\\200'"));
-        ASSERT_EQUALS((int)(L'A'), MathLib::toBigUNumber("L'A'"));
+        ASSERT_EQUALS(static_cast<int>('A'), MathLib::toBigUNumber("'A'"));
+        ASSERT_EQUALS(static_cast<int>('\x10'), MathLib::toBigUNumber("'\\x10'"));
+        ASSERT_EQUALS(static_cast<int>('\100'), MathLib::toBigUNumber("'\\100'"));
+        ASSERT_EQUALS(static_cast<int>('\200'), MathLib::toBigUNumber("'\\200'"));
+        ASSERT_EQUALS(static_cast<int>(L'A'), MathLib::toBigUNumber("L'A'"));
 
         ASSERT_EQUALS(9894494448401390090ULL, MathLib::toBigUNumber("0x89504e470d0a1a0a"));
         ASSERT_EQUALS(9965707617509186058ULL, MathLib::toBigUNumber("0x8a4d4e470d0a1a0a"));

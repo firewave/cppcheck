@@ -91,7 +91,6 @@ elseif (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
     # TODO: fix and enable these warnings - or move to suppression list below
     add_compile_options_safe(-Wno-documentation-unknown-command) # TODO: Clang currently does not support all commands
     add_compile_options_safe(-Wno-unused-exception-parameter)
-    add_compile_options_safe(-Wno-old-style-cast)
     add_compile_options_safe(-Wno-sign-conversion)
     add_compile_options_safe(-Wno-shadow-field-in-constructor)
     add_compile_options_safe(-Wno-covered-switch-default)
@@ -107,6 +106,7 @@ elseif (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
     add_compile_options_safe(-Wno-date-time)
     add_compile_options(-Wno-disabled-macro-expansion)
     add_compile_options_safe(-Wno-bitwise-instead-of-logical)
+    add_compile_options_safe(-Wno-switch-default)
 
     # these cannot be fixed properly without adopting later C++ standards
     add_compile_options_safe(-Wno-unsafe-buffer-usage)

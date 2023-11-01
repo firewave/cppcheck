@@ -909,7 +909,7 @@ void ResultsTree::copy()
         QString inconclusive = data[INCONCLUSIVE].toBool() ? ",inconclusive" : "";
         text += '[' + data[FILENAME].toString() + ':' + QString::number(data[LINE].toInt())
                 + "] ("
-                + QString::fromStdString(severityToString(ShowTypes::ShowTypeToSeverity((ShowTypes::ShowType)data[SEVERITY].toInt()))) + inconclusive
+                + QString::fromStdString(severityToString(ShowTypes::ShowTypeToSeverity(static_cast<ShowTypes::ShowType>(data[SEVERITY].toInt())))) + inconclusive
                 + ") "
                 + data[MESSAGE].toString()
                 + " ["

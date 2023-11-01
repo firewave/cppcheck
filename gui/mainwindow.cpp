@@ -282,7 +282,7 @@ MainWindow::MainWindow(TranslationHandler* th, QSettings* settings) :
 #else
     constexpr Platform::Type defaultPlatform = Platform::Type::Unspecified;
 #endif
-    PlatformData &platform = mPlatforms.get((Platform::Type)mSettings->value(SETTINGS_CHECKED_PLATFORM, defaultPlatform).toInt());
+    PlatformData &platform = mPlatforms.get(static_cast<Platform::Type>(mSettings->value(SETTINGS_CHECKED_PLATFORM, defaultPlatform).toInt()));
     platform.mActMainWindow->setChecked(true);
 
     mNetworkAccessManager = new QNetworkAccessManager(this);
@@ -392,7 +392,7 @@ void MainWindow::loadSettings()
     mUI->mActionToolBarFilter->setChecked(showFilterToolbar);
     mUI->mToolBarFilter->setVisible(showFilterToolbar);
 
-    const Settings::Language enforcedLanguage = (Settings::Language)mSettings->value(SETTINGS_ENFORCED_LANGUAGE, 0).toInt();
+    const Settings::Language enforcedLanguage = static_cast<Settings::Language>(mSettings->value(SETTINGS_ENFORCED_LANGUAGE, 0).toInt());
     if (enforcedLanguage == Settings::CPP)
         mUI->mActionEnforceCpp->setChecked(true);
     else if (enforcedLanguage == Settings::C)
@@ -498,7 +498,7 @@ void MainWindow::doAnalyzeProject(ImportProject p, const bool checkLibrary, cons
         p.ignorePaths(v);
 
         if (!mProjectFile->getAnalyzeAllVsConfigs()) {
-            const Platform::Type platform = (Platform::Type) mSettings->value(SETTINGS_CHECKED_PLATFORM, 0).toInt();
+            const Platform::Type platform = static_cast<Platform::Type>(mSettings->value(SETTINGS_CHECKED_PLATFORM, 0).toInt());
             std::vector<std::string> configurations;
             const QStringList configs = mProjectFile->getVsConfigurations();
             std::transform(configs.cbegin(), configs.cend(), std::back_inserter(configurations), [](const QString& e) {
@@ -1021,7 +1021,7 @@ Settings MainWindow::getCppcheckSettings()
             result.platform.loadFromFile(applicationFilePath.toStdString().c_str(), platform.toStdString());
         } else {
             for (int i = Platform::Type::Native; i <= Platform::Type::Unix64; i++) {
-                const Platform::Type p = (Platform::Type)i;
+                const Platform::Type p = static_cast<Platform::Type>(i);
                 if (platform == Platform::toString(p)) {
                     result.platform.set(p);
                     break;
@@ -1088,10 +1088,10 @@ Settings MainWindow::getCppcheckSettings()
     result.inlineSuppressions = mSettings->value(SETTINGS_INLINE_SUPPRESSIONS, false).toBool();
     result.certainty.setEnabled(Certainty::inconclusive, mSettings->value(SETTINGS_INCONCLUSIVE_ERRORS, false).toBool());
     if (!mProjectFile || result.platform.type == Platform::Type::Unspecified)
-        result.platform.set((Platform::Type) mSettings->value(SETTINGS_CHECKED_PLATFORM, 0).toInt());
+        result.platform.set(static_cast<Platform::Type>(mSettings->value(SETTINGS_CHECKED_PLATFORM, 0).toInt()));
     result.standards.setCPP(mSettings->value(SETTINGS_STD_CPP, QString()).toString().toStdString());
     result.standards.setC(mSettings->value(SETTINGS_STD_C, QString()).toString().toStdString());
-    result.enforcedLang = (Settings::Language)mSettings->value(SETTINGS_ENFORCED_LANGUAGE, 0).toInt();
+    result.enforcedLang = static_cast<Settings::Language>(mSettings->value(SETTINGS_ENFORCED_LANGUAGE, 0).toInt());
 
     if (result.jobs <= 1) {
         result.jobs = 1;
@@ -1975,7 +1975,7 @@ void MainWindow::updateMRUMenuItems()
     if (removed)
         mSettings->setValue(SETTINGS_MRU_PROJECTS, projects);
 
-    const int numRecentProjects = qMin(projects.size(), (int)MaxRecentProjects);
+    const int numRecentProjects = qMin(projects.size(), static_cast<int>(MaxRecentProjects));
     for (int i = 0; i < numRecentProjects; i++) {
         const QString filename = QFileInfo(projects[i]).fileName();
         const QString text = QString("&%1 %2").arg(i + 1).arg(filename);
@@ -2014,7 +2014,7 @@ void MainWindow::selectPlatform()
 {
     QAction *action = qobject_cast<QAction *>(sender());
     if (action) {
-        const Platform::Type platform = (Platform::Type) action->data().toInt();
+        const Platform::Type platform = static_cast<Platform::Type>(action->data().toInt());
         mSettings->setValue(SETTINGS_CHECKED_PLATFORM, platform);
     }
 }

@@ -1331,8 +1331,8 @@ void CppCheck::executeRules(const std::string &tokenlist, const Tokenizer &token
 
         int pos = 0;
         int ovector[30]= {0};
-        while (pos < (int)str.size()) {
-            const int pcreExecRet = pcre_exec(re, pcreExtra, str.c_str(), (int)str.size(), pos, 0, ovector, 30);
+        while (pos < static_cast<int>(str.size())) {
+            const int pcreExecRet = pcre_exec(re, pcreExtra, str.c_str(), static_cast<int>(str.size()), pos, 0, ovector, 30);
             if (pcreExecRet < 0) {
                 const std::string errorMessage = pcreErrorCodeToString(pcreExecRet);
                 if (!errorMessage.empty()) {
@@ -1347,11 +1347,11 @@ void CppCheck::executeRules(const std::string &tokenlist, const Tokenizer &token
                 }
                 break;
             }
-            const unsigned int pos1 = (unsigned int)ovector[0];
-            const unsigned int pos2 = (unsigned int)ovector[1];
+            const unsigned int pos1 = static_cast<unsigned int>(ovector[0]);
+            const unsigned int pos2 = static_cast<unsigned int>(ovector[1]);
 
             // jump to the end of the match for the next pcre_exec
-            pos = (int)pos2;
+            pos = static_cast<int>(pos2);
 
             // determine location..
             ErrorMessage::FileLocation loc;
