@@ -4101,7 +4101,7 @@ void VariableMap::addVariable(const std::string& varname, bool globalNamespace)
             mVariableId_global[varname] = mVariableId[varname];
         return;
     }
-    std::unordered_map<std::string, nonneg int>::iterator it = mVariableId.find(varname);
+    const std::unordered_map<std::string, nonneg int>::iterator it = mVariableId.find(varname);
     if (it == mVariableId.end()) {
         mScopeInfo.top().emplace_back(varname, 0);
         mVariableId[varname] = ++mVarId;

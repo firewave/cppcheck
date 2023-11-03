@@ -1567,7 +1567,7 @@ void CppCheck::reportErr(const ErrorMessage &msg)
     std::set<std::string> macroNames;
     if (!msg.callStack.empty()) {
         const std::string &file = msg.callStack.back().getfile(false);
-        int lineNumber = msg.callStack.back().line;
+        const int lineNumber = msg.callStack.back().line;
         const auto it = mLocationMacros.find(Location(file, lineNumber));
         if (it != mLocationMacros.cend())
             macroNames = it->second;

@@ -253,7 +253,7 @@ private:
         ASSERT_LOC(tokenizer.tokenize(istr, "test.cpp"), file, line);
         const Token * const argtok = Token::findmatch(tokenizer.tokens(), pattern);
         ASSERT_LOC(argtok, file, line);
-        int indirect = (argtok->variable() && argtok->variable()->isArray());
+        const int indirect = (argtok->variable() && argtok->variable()->isArray());
         return (isVariableChangedByFunctionCall)(argtok, indirect, &settings, inconclusive);
     }
 

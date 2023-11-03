@@ -2085,7 +2085,7 @@ void MainWindow::replyFinished(QNetworkReply *reply) {
 }
 
 void MainWindow::hideInformation() {
-    int version = getVersion(mUI->mLabelInformation->text());
+    const int version = getVersion(mUI->mLabelInformation->text());
     mSettings->setValue(SETTINGS_CHECK_VERSION, version);
     mUI->mLabelInformation->setVisible(false);
     mUI->mButtonHideInformation->setVisible(false);

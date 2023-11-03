@@ -2728,7 +2728,7 @@ namespace {
         {
             if (tok->variable() && tok->variable()->isConst())
                 return false;
-            int n = 1 + (astIsPointer(tok) ? 1 : 0);
+            const int n = 1 + (astIsPointer(tok) ? 1 : 0);
             for (int i = 0; i < n; i++) {
                 bool inconclusive = false;
                 if (isVariableChangedByFunctionCall(tok, i, settings, &inconclusive))
@@ -2775,7 +2775,7 @@ namespace {
         {
             if (!valid())
                 return "";
-            bool loopVarChanged = isLoopVarChanged();
+            const bool loopVarChanged = isLoopVarChanged();
             if (!loopVarChanged && varsChanged.empty()) {
                 if (hasGotoOrBreak())
                     return "";

@@ -72,7 +72,7 @@ CheckMemoryLeak::AllocType CheckMemoryLeak::getAllocationType(const Token *tok2,
 
     if (!Token::Match(tok2, "%name% ::|. %type%")) {
         // Using realloc..
-        AllocType reallocType = getReallocationType(tok2, varid);
+        const AllocType reallocType = getReallocationType(tok2, varid);
         if (reallocType != No)
             return reallocType;
 

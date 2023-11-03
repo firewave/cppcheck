@@ -192,7 +192,7 @@ unsigned int ThreadExecutor::check()
         }
     }
 
-    unsigned int result = std::accumulate(threadFutures.begin(), threadFutures.end(), 0U, [](unsigned int v, std::future<unsigned int>& f) {
+    const unsigned int result = std::accumulate(threadFutures.begin(), threadFutures.end(), 0U, [](unsigned int v, std::future<unsigned int>& f) {
         return v + f.get();
     });
 
