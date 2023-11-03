@@ -1415,8 +1415,8 @@ private:
         Called after any mStr() modification. */
     void update_property_info();
 
-    /** Update internal property cache about isStandardType() */
-    void update_property_isStandardType();
+    /** Check if given type is a standard one */
+    static bool isStandardType(const std::string& s);
 
     /** Internal helper function to avoid excessive string allocations */
     void astStringVerboseRecursive(std::string& ret, const nonneg int indent1 = 0, const nonneg int indent2 = 0) const;

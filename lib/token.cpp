@@ -121,6 +121,10 @@ void Token::update_property_info()
                 tokType(eVariable);
             else if (mTokensFrontBack.list.isKeyword(mStr) || mStr == "asm") // TODO: not a keyword
                 tokType(eKeyword);
+            else if (isStandardType(mStr)) {
+                tokType(eType);
+                isStandardType(true);
+            }
             else
                 tokType(eName);
         } else if (simplecpp::Token::isNumberLike(mStr)) {
@@ -162,8 +166,6 @@ void Token::update_property_info()
             tokType(eEllipsis);
         else
             tokType(eOther);
-
-        update_property_isStandardType();
     } else {
         tokType(eNone);
     }
@@ -182,15 +184,15 @@ static const std::unordered_set<std::string> stdTypes = { "bool"
                                                           , "wchar_t"
 };
 
-void Token::update_property_isStandardType()
+bool Token::isStandardType(const std::string& s)
 {
-    if (mStr.size() < 3 || mStr.size() > 7)
-        return;
+    if (s.size() < 3 || s.size() > 7)
+        return false;
 
-    if (stdTypes.find(mStr)!=stdTypes.end()) {
-        isStandardType(true);
-        tokType(eType);
-    }
+    if (stdTypes.find(s)!=stdTypes.end())
+        return true;
+
+    return false;
 }
 
 bool Token::isUpperCaseName() const
