@@ -135,6 +135,7 @@ static const std::unordered_set<std::string> baseKeywords = {
 void Token::update_property_info()
 {
     setFlag(fIsControlFlowKeyword, controlFlowKeywords.find(mStr) != controlFlowKeywords.end());
+    isStandardType(false);
 
     if (!mStr.empty()) {
         if (mStr == "true" || mStr == "false")
@@ -191,12 +192,12 @@ void Token::update_property_info()
             tokType(eEllipsis);
         else
             tokType(eOther);
+
+        update_property_char_string_literal();
+        update_property_isStandardType();
     } else {
         tokType(eNone);
     }
-
-    update_property_char_string_literal();
-    update_property_isStandardType();
 }
 
 static const std::unordered_set<std::string> stdTypes = { "bool"
@@ -214,8 +215,6 @@ static const std::unordered_set<std::string> stdTypes = { "bool"
 
 void Token::update_property_isStandardType()
 {
-    isStandardType(false);
-
     if (mStr.size() < 3 || mStr.size() > 7)
         return;
 
