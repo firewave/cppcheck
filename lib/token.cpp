@@ -121,7 +121,7 @@ void Token::update_property_info()
                 tokType(eVariable);
             else if (mTokensFrontBack.list.isKeyword(mStr) || mStr == "asm") // TODO: not a keyword
                 tokType(eKeyword);
-            else if (mTokType != eVariable && mTokType != eFunction && mTokType != eType && mTokType != eKeyword)
+            else
                 tokType(eName);
         } else if (simplecpp::Token::isNumberLike(mStr)) {
             if (MathLib::isInt(mStr) || MathLib::isFloat(mStr))
