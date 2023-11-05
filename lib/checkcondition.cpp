@@ -1011,7 +1011,7 @@ double getvalue3(const double value1, const double value2)
 
 
 template<class T>
-static inline T getvalue(const int test, const T value1, const T value2)
+static T getvalue(const int test, const T value1, const T value2)
 {
     // test:
     // 1 => return value that is less than both value1 and value2

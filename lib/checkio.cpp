@@ -516,7 +516,7 @@ static bool findFormat(nonneg int arg, const Token *firstArg,
 }
 
 // Utility function returning whether iToTest equals iTypename or iOptionalPrefix+iTypename
-static inline bool typesMatch(const std::string& iToTest, const std::string& iTypename, const std::string& iOptionalPrefix = "std::")
+static bool typesMatch(const std::string& iToTest, const std::string& iTypename, const std::string& iOptionalPrefix = "std::")
 {
     return (iToTest == iTypename) || (iToTest == iOptionalPrefix + iTypename);
 }

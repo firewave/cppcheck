@@ -432,7 +432,7 @@ static
 #if defined(__GNUC__)
 // GCC does not inline this by itself
 // need to use the old syntax since the C++11 [[xxx:always_inline]] cannot be used here
-inline __attribute__((always_inline))
+__attribute__((always_inline))
 #endif
 int multiComparePercent(const Token *tok, const char*& haystack, nonneg int varid)
 {
@@ -569,7 +569,7 @@ int multiComparePercent(const Token *tok, const char*& haystack, nonneg int vari
 static
 #if defined(__GNUC__)
 // need to use the old syntax since the C++11 [[xxx:always_inline]] cannot be used here
-inline __attribute__((always_inline))
+__attribute__((always_inline))
 #endif
 int multiCompareImpl(const Token *tok, const char *haystack, nonneg int varid)
 {

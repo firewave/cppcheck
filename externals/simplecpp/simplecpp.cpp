@@ -322,7 +322,7 @@ protected:
     }
 
 private:
-    inline int makeUtf16Char(const unsigned char ch, const unsigned char ch2) const
+    int makeUtf16Char(const unsigned char ch, const unsigned char ch2) const
     {
         return (bom == 0xfeff) ? (ch<<8 | ch2) : (ch2<<8 | ch);
     }
@@ -1603,26 +1603,26 @@ namespace simplecpp {
 
         /** Struct that is thrown when there is invalid ## usage */
         struct invalidHashHash : public Error {
-            static inline std::string format(const std::string &macroName, const std::string &message) {
+            static std::string format(const std::string &macroName, const std::string &message) {
                 return "Invalid ## usage when expanding \'" + macroName + "\': " + message;
             }
 
             invalidHashHash(const Location &loc, const std::string &macroName, const std::string &message)
                 : Error(loc, format(macroName, message)) { }
 
-            static inline invalidHashHash unexpectedToken(const Location &loc, const std::string &macroName, const Token *tokenA) {
+            static invalidHashHash unexpectedToken(const Location &loc, const std::string &macroName, const Token *tokenA) {
                 return invalidHashHash(loc, macroName, "Unexpected token '"+ tokenA->str()+"'");
             }
 
-            static inline invalidHashHash cannotCombine(const Location &loc, const std::string &macroName, const Token *tokenA, const Token *tokenB) {
+            static invalidHashHash cannotCombine(const Location &loc, const std::string &macroName, const Token *tokenA, const Token *tokenB) {
                 return invalidHashHash(loc, macroName, "Combining '"+ tokenA->str()+ "' and '"+ tokenB->str() + "' yields an invalid token.");
             }
 
-            static inline invalidHashHash unexpectedNewline(const Location &loc, const std::string &macroName) {
+            static invalidHashHash unexpectedNewline(const Location &loc, const std::string &macroName) {
                 return invalidHashHash(loc, macroName, "Unexpected newline");
             }
 
-            static inline invalidHashHash universalCharacterUB(const Location &loc, const std::string &macroName, const Token* tokenA, const std::string& strAB) {
+            static invalidHashHash universalCharacterUB(const Location &loc, const std::string &macroName, const Token* tokenA, const std::string& strAB) {
                 return invalidHashHash(loc, macroName, "Combining '\\"+ tokenA->str()+ "' and '"+ strAB.substr(tokenA->str().size()) + "' yields universal character '\\" + strAB + "'. This is undefined behavior according to C standard chapter 5.1.1.2, paragraph 4.");
             }
         };

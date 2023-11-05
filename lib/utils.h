@@ -67,7 +67,7 @@ bool contains(const std::initializer_list<T>& r, const U& x)
 }
 
 template<class T, class ... Ts>
-inline std::array<T, sizeof...(Ts) + 1> makeArray(T x, Ts... xs)
+std::array<T, sizeof...(Ts) + 1> makeArray(T x, Ts... xs)
 {
     return {std::move(x), std::move(xs)...};
 }
@@ -113,7 +113,7 @@ bool endsWith(const std::string& str, const char (&end)[N])
     return endsWith(str, end, N - 1);
 }
 
-inline static bool isPrefixStringCharLiteral(const std::string &str, char q, const std::string& p)
+static bool isPrefixStringCharLiteral(const std::string &str, char q, const std::string& p)
 {
     // str must be at least the prefix plus the start and end quote
     if (str.length() < p.length() + 2)
@@ -134,7 +134,7 @@ inline static bool isPrefixStringCharLiteral(const std::string &str, char q, con
     return true;
 }
 
-inline static bool isStringCharLiteral(const std::string &str, char q)
+static bool isStringCharLiteral(const std::string &str, char q)
 {
     // early out to avoid the loop
     if (!endsWith(str, q))
@@ -146,37 +146,37 @@ inline static bool isStringCharLiteral(const std::string &str, char q)
     });
 }
 
-inline static bool isStringLiteral(const std::string &str)
+static bool isStringLiteral(const std::string &str)
 {
     return isStringCharLiteral(str, '"');
 }
 
-inline static bool isCharLiteral(const std::string &str)
+static bool isCharLiteral(const std::string &str)
 {
     return isStringCharLiteral(str, '\'');
 }
 
-inline static std::string getStringCharLiteral(const std::string &str, char q)
+static std::string getStringCharLiteral(const std::string &str, char q)
 {
     const std::size_t quotePos = str.find(q);
     return str.substr(quotePos + 1U, str.size() - quotePos - 2U);
 }
 
-inline static std::string getStringLiteral(const std::string &str)
+static std::string getStringLiteral(const std::string &str)
 {
     if (isStringLiteral(str))
         return getStringCharLiteral(str, '"');
     return "";
 }
 
-inline static std::string getCharLiteral(const std::string &str)
+static std::string getCharLiteral(const std::string &str)
 {
     if (isCharLiteral(str))
         return getStringCharLiteral(str, '\'');
     return "";
 }
 
-inline static const char *getOrdinalText(int i)
+static const char *getOrdinalText(int i)
 {
     if (i == 1)
         return "st";
@@ -292,7 +292,7 @@ std::size_t getArrayLength(const T (& /*unused*/)[size])
  * @brief get id string. i.e. for dump files
  * it will be a hexadecimal output.
  */
-static inline std::string id_string_i(std::uintptr_t l)
+static std::string id_string_i(std::uintptr_t l)
 {
     if (!l)
         return "0";
@@ -327,12 +327,12 @@ static inline std::string id_string_i(std::uintptr_t l)
     return &buf[idx];
 }
 
-static inline std::string id_string(const void* p)
+static std::string id_string(const void* p)
 {
     return id_string_i(reinterpret_cast<uintptr_t>(p));
 }
 
-static inline const char* bool_to_string(bool b)
+static const char* bool_to_string(bool b)
 {
     return b ? "true" : "false";
 }

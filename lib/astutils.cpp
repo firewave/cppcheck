@@ -1380,7 +1380,7 @@ bool isEqualKnownValue(const Token * const tok1, const Token * const tok2)
     });
 }
 
-static inline bool isDifferentKnownValues(const Token * const tok1, const Token * const tok2)
+static bool isDifferentKnownValues(const Token * const tok1, const Token * const tok2)
 {
     return compareKnownValue(tok1, tok2, [&](const ValueFlow::Value& v1, const ValueFlow::Value& v2, bool sameLifetime) {
         bool r = v1.equalValue(v2);
@@ -1391,7 +1391,7 @@ static inline bool isDifferentKnownValues(const Token * const tok1, const Token 
     });
 }
 
-static inline bool isSameConstantValue(bool macro, const Token* tok1, const Token* tok2)
+static bool isSameConstantValue(bool macro, const Token* tok1, const Token* tok2)
 {
     if (tok1 == nullptr || tok2 == nullptr)
         return false;

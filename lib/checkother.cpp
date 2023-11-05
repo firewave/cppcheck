@@ -563,7 +563,7 @@ void CheckOther::redundantAssignmentInSwitchError(const Token *tok1, const Token
 //            y = b;        // <- case 2 falls through and sets y twice
 //    }
 //---------------------------------------------------------------------------
-static inline bool isFunctionOrBreakPattern(const Token *tok)
+static bool isFunctionOrBreakPattern(const Token *tok)
 {
     return Token::Match(tok, "%name% (") || Token::Match(tok, "break|continue|return|exit|goto|throw");
 }

@@ -40,7 +40,7 @@ namespace MatchCompiler {
     };
 
     template<unsigned int n>
-    inline bool equalN(const char s1[], const char s2[])
+    bool equalN(const char s1[], const char s2[])
     {
         return (*s1 == *s2) && equalN<n-1>(s1+1, s2+1);
     }
@@ -52,19 +52,19 @@ namespace MatchCompiler {
     }
 
     template<unsigned int n>
-    inline bool operator==(const std::string & s1, ConstString<n> const & s2)
+    bool operator==(const std::string & s1, ConstString<n> const & s2)
     {
         return equalN<n>(s1.c_str(), s2);
     }
 
     template<unsigned int n>
-    inline bool operator!=(const std::string & s1, ConstString<n> const & s2)
+    bool operator!=(const std::string & s1, ConstString<n> const & s2)
     {
         return !operator==(s1,s2);
     }
 
     template<unsigned int n>
-    inline ConstString<n> makeConstString(const char (&s)[n])
+    ConstString<n> makeConstString(const char (&s)[n])
     {
         return ConstString<n>(s);
     }
