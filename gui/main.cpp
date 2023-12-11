@@ -22,6 +22,8 @@
 #include "erroritem.h" // IWYU pragma: keep
 #include "translationhandler.h"
 
+#include "../lib/application.h"
+
 #ifdef _WIN32
 #include "aboutdialog.h"
 
@@ -47,7 +49,6 @@ static bool CheckArgs(const QStringList &args);
 
 int main(int argc, char *argv[])
 {
-
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 6, 0)) && (QT_VERSION < QT_VERSION_CHECK(6, 0, 0))
     QApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
     QApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);
@@ -57,6 +58,8 @@ int main(int argc, char *argv[])
 
     QCoreApplication::setOrganizationName("Cppcheck");
     QCoreApplication::setApplicationName("Cppcheck-GUI");
+
+    Application::init(QCoreApplication::applicationFilePath().toStdString());
 
     auto* settings = new QSettings("Cppcheck", "Cppcheck-GUI", &app);
 

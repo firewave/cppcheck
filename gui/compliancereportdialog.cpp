@@ -215,7 +215,7 @@ void ComplianceReportDialog::save()
         args << "--files=" + tempFiles.fileName();
     args << mResultsFile;
 
-    const QString appPath = QFileInfo(QCoreApplication::applicationFilePath()).canonicalPath();
+    const QString appPath = QFileInfo(Application::exename()).canonicalPath();
 
     QProcess process;
 #ifdef Q_OS_WIN

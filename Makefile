@@ -195,6 +195,7 @@ LIBOBJ =      $(libcppdir)/valueflow.o \
               $(libcppdir)/symboldatabase.o \
               $(libcppdir)/addoninfo.o \
               $(libcppdir)/analyzerinfo.o \
+              $(libcppdir)/application.o \
               $(libcppdir)/astutils.o \
               $(libcppdir)/check.o \
               $(libcppdir)/check64bit.o \
@@ -474,6 +475,9 @@ $(libcppdir)/addoninfo.o: lib/addoninfo.cpp externals/picojson/picojson.h lib/ad
 $(libcppdir)/analyzerinfo.o: lib/analyzerinfo.cpp externals/tinyxml2/tinyxml2.h lib/analyzerinfo.h lib/color.h lib/config.h lib/errorlogger.h lib/errortypes.h lib/filesettings.h lib/path.h lib/platform.h lib/standards.h lib/utils.h lib/xml.h
 	$(CXX) ${INCLUDE_FOR_LIB} $(CPPFLAGS) $(CXXFLAGS) -c -o $@ $(libcppdir)/analyzerinfo.cpp
 
+$(libcppdir)/application.o: lib/application.cpp lib/application.h lib/config.h lib/path.h
+	$(CXX) ${INCLUDE_FOR_LIB} $(CPPFLAGS) $(CXXFLAGS) -c -o $@ $(libcppdir)/application.cpp
+
 $(libcppdir)/astutils.o: lib/astutils.cpp lib/addoninfo.h lib/astutils.h lib/check.h lib/checkclass.h lib/config.h lib/errortypes.h lib/findtoken.h lib/infer.h lib/library.h lib/mathlib.h lib/platform.h lib/settings.h lib/smallvector.h lib/sourcelocation.h lib/standards.h lib/suppressions.h lib/symboldatabase.h lib/templatesimplifier.h lib/token.h lib/tokenize.h lib/tokenlist.h lib/utils.h lib/valueflow.h lib/valueptr.h lib/vfvalue.h
 	$(CXX) ${INCLUDE_FOR_LIB} $(CPPFLAGS) $(CXXFLAGS) -c -o $@ $(libcppdir)/astutils.cpp
 
@@ -621,7 +625,7 @@ $(libcppdir)/programmemory.o: lib/programmemory.cpp lib/addoninfo.h lib/astutils
 $(libcppdir)/reverseanalyzer.o: lib/reverseanalyzer.cpp lib/addoninfo.h lib/analyzer.h lib/astutils.h lib/config.h lib/errortypes.h lib/forwardanalyzer.h lib/library.h lib/mathlib.h lib/platform.h lib/reverseanalyzer.h lib/settings.h lib/smallvector.h lib/sourcelocation.h lib/standards.h lib/suppressions.h lib/symboldatabase.h lib/templatesimplifier.h lib/token.h lib/utils.h lib/valueptr.h lib/vfvalue.h
 	$(CXX) ${INCLUDE_FOR_LIB} $(CPPFLAGS) $(CXXFLAGS) -c -o $@ $(libcppdir)/reverseanalyzer.cpp
 
-$(libcppdir)/settings.o: lib/settings.cpp externals/picojson/picojson.h lib/addoninfo.h lib/config.h lib/errortypes.h lib/json.h lib/library.h lib/mathlib.h lib/path.h lib/platform.h lib/settings.h lib/standards.h lib/summaries.h lib/suppressions.h lib/utils.h lib/vfvalue.h
+$(libcppdir)/settings.o: lib/settings.cpp externals/picojson/picojson.h lib/addoninfo.h lib/application.h lib/config.h lib/errortypes.h lib/json.h lib/library.h lib/mathlib.h lib/path.h lib/platform.h lib/settings.h lib/standards.h lib/summaries.h lib/suppressions.h lib/utils.h lib/vfvalue.h
 	$(CXX) ${INCLUDE_FOR_LIB} $(CPPFLAGS) $(CXXFLAGS) -c -o $@ $(libcppdir)/settings.cpp
 
 $(libcppdir)/summaries.o: lib/summaries.cpp lib/addoninfo.h lib/analyzerinfo.h lib/config.h lib/errortypes.h lib/library.h lib/mathlib.h lib/platform.h lib/settings.h lib/sourcelocation.h lib/standards.h lib/summaries.h lib/suppressions.h lib/symboldatabase.h lib/templatesimplifier.h lib/token.h lib/tokenize.h lib/tokenlist.h lib/utils.h lib/vfvalue.h
@@ -648,7 +652,7 @@ $(libcppdir)/utils.o: lib/utils.cpp lib/config.h lib/utils.h
 $(libcppdir)/vfvalue.o: lib/vfvalue.cpp lib/config.h lib/errortypes.h lib/mathlib.h lib/templatesimplifier.h lib/token.h lib/utils.h lib/vfvalue.h
 	$(CXX) ${INCLUDE_FOR_LIB} $(CPPFLAGS) $(CXXFLAGS) -c -o $@ $(libcppdir)/vfvalue.cpp
 
-cli/cmdlineparser.o: cli/cmdlineparser.cpp cli/cmdlinelogger.h cli/cmdlineparser.h cli/cppcheckexecutor.h cli/filelister.h externals/tinyxml2/tinyxml2.h lib/addoninfo.h lib/analyzerinfo.h lib/check.h lib/color.h lib/config.h lib/cppcheck.h lib/errorlogger.h lib/errortypes.h lib/filesettings.h lib/importproject.h lib/library.h lib/mathlib.h lib/path.h lib/pathmatch.h lib/platform.h lib/settings.h lib/standards.h lib/suppressions.h lib/timer.h lib/utils.h lib/xml.h
+cli/cmdlineparser.o: cli/cmdlineparser.cpp cli/cmdlinelogger.h cli/cmdlineparser.h cli/cppcheckexecutor.h cli/filelister.h externals/tinyxml2/tinyxml2.h lib/addoninfo.h lib/analyzerinfo.h lib/application.h lib/check.h lib/color.h lib/config.h lib/cppcheck.h lib/errorlogger.h lib/errortypes.h lib/filesettings.h lib/importproject.h lib/library.h lib/mathlib.h lib/path.h lib/pathmatch.h lib/platform.h lib/settings.h lib/standards.h lib/suppressions.h lib/timer.h lib/utils.h lib/xml.h
 	$(CXX) ${INCLUDE_FOR_CLI} $(CPPFLAGS) $(CXXFLAGS) -c -o $@ cli/cmdlineparser.cpp
 
 cli/cppcheckexecutor.o: cli/cppcheckexecutor.cpp cli/cmdlinelogger.h cli/cmdlineparser.h cli/cppcheckexecutor.h cli/cppcheckexecutorseh.h cli/executor.h cli/processexecutor.h cli/signalhandler.h cli/singleexecutor.h cli/threadexecutor.h lib/addoninfo.h lib/analyzerinfo.h lib/check.h lib/checkersreport.h lib/color.h lib/config.h lib/cppcheck.h lib/errorlogger.h lib/errortypes.h lib/filesettings.h lib/library.h lib/mathlib.h lib/platform.h lib/settings.h lib/standards.h lib/suppressions.h lib/utils.h
@@ -663,7 +667,7 @@ cli/executor.o: cli/executor.cpp cli/executor.h lib/addoninfo.h lib/color.h lib/
 cli/filelister.o: cli/filelister.cpp cli/filelister.h lib/config.h lib/path.h lib/pathmatch.h lib/standards.h lib/utils.h
 	$(CXX) ${INCLUDE_FOR_CLI} $(CPPFLAGS) $(CXXFLAGS) -c -o $@ cli/filelister.cpp
 
-cli/main.o: cli/main.cpp cli/cppcheckexecutor.h lib/config.h lib/errortypes.h lib/filesettings.h lib/platform.h lib/standards.h lib/utils.h
+cli/main.o: cli/main.cpp cli/cppcheckexecutor.h lib/application.h lib/config.h lib/errortypes.h lib/filesettings.h lib/platform.h lib/standards.h lib/utils.h
 	$(CXX) ${INCLUDE_FOR_CLI} $(CPPFLAGS) $(CXXFLAGS) -c -o $@ cli/main.cpp
 
 cli/processexecutor.o: cli/processexecutor.cpp cli/executor.h cli/processexecutor.h lib/addoninfo.h lib/analyzerinfo.h lib/check.h lib/color.h lib/config.h lib/cppcheck.h lib/errorlogger.h lib/errortypes.h lib/filesettings.h lib/library.h lib/mathlib.h lib/platform.h lib/settings.h lib/standards.h lib/suppressions.h lib/timer.h lib/utils.h
@@ -681,13 +685,13 @@ cli/stacktrace.o: cli/stacktrace.cpp cli/stacktrace.h lib/config.h lib/utils.h
 cli/threadexecutor.o: cli/threadexecutor.cpp cli/executor.h cli/threadexecutor.h lib/addoninfo.h lib/analyzerinfo.h lib/check.h lib/color.h lib/config.h lib/cppcheck.h lib/errorlogger.h lib/errortypes.h lib/filesettings.h lib/library.h lib/mathlib.h lib/platform.h lib/settings.h lib/standards.h lib/suppressions.h lib/timer.h lib/utils.h
 	$(CXX) ${INCLUDE_FOR_CLI} $(CPPFLAGS) $(CXXFLAGS) -c -o $@ cli/threadexecutor.cpp
 
-test/fixture.o: test/fixture.cpp externals/tinyxml2/tinyxml2.h lib/addoninfo.h lib/analyzerinfo.h lib/check.h lib/color.h lib/config.h lib/cppcheck.h lib/errorlogger.h lib/errortypes.h lib/library.h lib/mathlib.h lib/platform.h lib/settings.h lib/standards.h lib/suppressions.h lib/utils.h lib/xml.h test/fixture.h test/options.h test/redirect.h
+test/fixture.o: test/fixture.cpp externals/tinyxml2/tinyxml2.h lib/addoninfo.h lib/analyzerinfo.h lib/application.h lib/check.h lib/color.h lib/config.h lib/cppcheck.h lib/errorlogger.h lib/errortypes.h lib/library.h lib/mathlib.h lib/platform.h lib/settings.h lib/standards.h lib/suppressions.h lib/utils.h lib/xml.h test/fixture.h test/options.h test/redirect.h
 	$(CXX) ${INCLUDE_FOR_TEST} $(CPPFLAGS) $(CXXFLAGS) -c -o $@ test/fixture.cpp
 
 test/helpers.o: test/helpers.cpp cli/filelister.h externals/simplecpp/simplecpp.h lib/addoninfo.h lib/config.h lib/errortypes.h lib/library.h lib/mathlib.h lib/path.h lib/pathmatch.h lib/platform.h lib/preprocessor.h lib/settings.h lib/standards.h lib/suppressions.h lib/tokenize.h lib/tokenlist.h lib/utils.h test/helpers.h
 	$(CXX) ${INCLUDE_FOR_TEST} $(CPPFLAGS) $(CXXFLAGS) -c -o $@ test/helpers.cpp
 
-test/main.o: test/main.cpp externals/simplecpp/simplecpp.h lib/addoninfo.h lib/check.h lib/color.h lib/config.h lib/errorlogger.h lib/errortypes.h lib/library.h lib/mathlib.h lib/platform.h lib/preprocessor.h lib/settings.h lib/standards.h lib/suppressions.h lib/utils.h test/fixture.h test/options.h
+test/main.o: test/main.cpp externals/simplecpp/simplecpp.h lib/addoninfo.h lib/application.h lib/check.h lib/color.h lib/config.h lib/errorlogger.h lib/errortypes.h lib/library.h lib/mathlib.h lib/platform.h lib/preprocessor.h lib/settings.h lib/standards.h lib/suppressions.h lib/utils.h test/fixture.h test/options.h
 	$(CXX) ${INCLUDE_FOR_TEST} $(CPPFLAGS) $(CXXFLAGS) -c -o $@ test/main.cpp
 
 test/options.o: test/options.cpp test/options.h

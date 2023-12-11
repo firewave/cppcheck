@@ -118,7 +118,7 @@ ProjectFileDialog::ProjectFileDialog(ProjectFile *projectFile, bool premium, QWi
     loadSettings();
 
     // Checkboxes for the libraries..
-    const QString applicationFilePath = QCoreApplication::applicationFilePath();
+    const QString applicationFilePath = Application::exename();
     const QString appPath = QFileInfo(applicationFilePath).canonicalPath();
     const QString datadir = getDataDir();
     QStringList searchPaths;

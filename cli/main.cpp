@@ -57,6 +57,7 @@
  */
 
 
+#include "application.h"
 #include "cppcheckexecutor.h"
 
 #ifdef NDEBUG
@@ -81,6 +82,8 @@ int main(int argc, char* argv[])
 #if defined(_MSC_VER) && defined(_DEBUG)
     _CrtSetDbgFlag(_CrtSetDbgFlag(_CRTDBG_REPORT_FLAG) | _CRTDBG_LEAK_CHECK_DF);
 #endif
+
+    Application::init(argc, argv);
 
     CppCheckExecutor exec;
 

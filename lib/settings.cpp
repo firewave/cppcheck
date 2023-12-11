@@ -18,6 +18,8 @@
 
 #include "config.h"
 #include "settings.h"
+
+#include "application.h"
 #include "path.h"
 #include "summaries.h"
 #include "vfvalue.h"
@@ -73,8 +75,7 @@ std::string Settings::loadCppcheckCfg(Settings& settings, Suppressions& suppress
 #endif
     // cppcheck-suppress knownConditionTrueFalse
     if (fileName.empty()) {
-        // TODO: make sure that exename is set
-        fileName = Path::getPathFromFilename(settings.exename) + cfgFilename;
+        fileName = Path::getPathFromFilename(Application::exename()) + cfgFilename;
         if (!Path::isFile(fileName))
             return "";
     }

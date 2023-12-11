@@ -56,10 +56,11 @@ private:
     std::string mTestname;
 
 protected:
-    std::string exename;
     std::string testToRun;
     bool quiet_tests{};
     bool dry_run{};
+
+    const std::string& exename() const;
 
     virtual void run() = 0;
 
@@ -310,6 +311,6 @@ public:
 
 #define LOAD_LIB_2_EXE( LIB, NAME, EXE ) do { if (((LIB).load((EXE), NAME).errorcode != Library::ErrorCode::OK)) throw std::runtime_error("library '" + std::string(NAME) + "' not found"); } while (false)
 
-#define PLATFORM( P, T ) do { std::string errstr; assertEquals(__FILE__, __LINE__, true, P.set(Platform::toString(T), errstr, {exename}), errstr); } while (false)
+#define PLATFORM( P, T ) do { std::string errstr; assertEquals(__FILE__, __LINE__, true, P.set(Platform::toString(T), errstr, {exename()}), errstr); } while (false)
 
 #endif // fixtureH

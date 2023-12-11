@@ -6,6 +6,7 @@ INCLUDEPATH += $$PWD
 HEADERS += $${PWD}/addoninfo.h \
            $${PWD}/analyzer.h \
            $${PWD}/analyzerinfo.h \
+           $${PWD}/application.h \
            $${PWD}/astutils.h \
            $${PWD}/calculate.h \
            $${PWD}/check.h \
@@ -85,6 +86,7 @@ SOURCES += $${PWD}/valueflow.cpp \
            $${PWD}/symboldatabase.cpp \
            $${PWD}/addoninfo.cpp \
            $${PWD}/analyzerinfo.cpp \
+           $${PWD}/application.cpp \
            $${PWD}/astutils.cpp \
            $${PWD}/check.cpp \
            $${PWD}/check64bit.cpp \

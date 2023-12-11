@@ -19,6 +19,7 @@
 #include "cmdlineparser.h"
 
 #include "addoninfo.h"
+#include "application.h"
 #include "check.h"
 #include "color.h"
 #include "config.h"
@@ -309,8 +310,6 @@ bool CmdLineParser::fillSettingsFromArgs(int argc, const char* const argv[])
 // TODO: error out on all missing given files/paths
 CmdLineParser::Result CmdLineParser::parseFromArgs(int argc, const char* const argv[])
 {
-    mSettings.exename = Path::getCurrentExecutablePath(argv[0]);
-
     // default to --check-level=normal from CLI for now
     mSettings.setCheckLevel(Settings::CheckLevel::normal);
 
@@ -1850,7 +1849,7 @@ bool CmdLineParser::tryLoadLibrary(Library& destination, const std::string& base
 
 bool CmdLineParser::loadLibraries(Settings& settings)
 {
-    if (!tryLoadLibrary(settings.library, settings.exename, "std.cfg")) {
+    if (!tryLoadLibrary(settings.library, Application::exename(), "std.cfg")) {
         const std::string msg("Failed to load std.cfg. Your Cppcheck installation is broken, please re-install.");
 #ifdef FILESDIR
         const std::string details("The Cppcheck binary was compiled with FILESDIR set to \""
@@ -1868,7 +1867,7 @@ bool CmdLineParser::loadLibraries(Settings& settings)
 
     bool result = true;
     for (const auto& lib : settings.libraries) {
-        if (!tryLoadLibrary(settings.library, settings.exename, lib.c_str())) {
+        if (!tryLoadLibrary(settings.library, Application::exename(), lib.c_str())) {
             result = false;
         }
     }
@@ -1880,7 +1879,7 @@ bool CmdLineParser::loadAddons(Settings& settings)
     bool result = true;
     for (const std::string &addon: settings.addons) {
         AddonInfo addonInfo;
-        const std::string failedToGetAddonInfo = addonInfo.getAddonInfo(addon, settings.exename);
+        const std::string failedToGetAddonInfo = addonInfo.getAddonInfo(addon, Application::exename());
         if (!failedToGetAddonInfo.empty()) {
             mLogger.printRaw(failedToGetAddonInfo); // TODO: do not print as raw
             result = false;

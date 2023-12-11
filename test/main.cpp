@@ -16,6 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "application.h"
 #include "color.h"
 #include "options.h"
 #include "preprocessor.h"
@@ -29,6 +30,8 @@ int main(int argc, char *argv[])
 #if defined(_MSC_VER) && defined(_DEBUG)
     _CrtSetDbgFlag(_CrtSetDbgFlag(_CRTDBG_REPORT_FLAG) | _CRTDBG_LEAK_CHECK_DF);
 #endif
+
+    Application::init(argc, argv);
 
     Preprocessor::macroChar = '$';     // While macroChar is char(1) per default outside test suite, we require it to be a human-readable character here.
     gDisableColors = true;

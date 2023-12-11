@@ -18,6 +18,7 @@
 
 #include "fixture.h"
 
+#include "application.h"
 #include "cppcheck.h"
 #include "errortypes.h"
 #include "options.h"
@@ -372,7 +373,6 @@ void TestFixture::processOptions(const options& args)
 {
     quiet_tests = args.quiet();
     dry_run = args.dry_run();
-    exename = args.exe();
 }
 
 std::size_t TestFixture::runTests(const options& args)
@@ -450,11 +450,16 @@ TestFixture::SettingsBuilder& TestFixture::SettingsBuilder::checkLevel(Settings:
     return *this;
 }
 
+const std::string& TestFixture::exename() const
+{
+    return Application::exename();
+}
+
 TestFixture::SettingsBuilder& TestFixture::SettingsBuilder::library(const char lib[]) {
     if (REDUNDANT_CHECK && std::find(settings.libraries.cbegin(), settings.libraries.cend(), lib) != settings.libraries.cend())
         throw std::runtime_error("redundant setting: libraries (" + std::string(lib) + ")");
     // TODO: exename is not yet set
-    LOAD_LIB_2_EXE(settings.library, lib, fixture.exename.c_str());
+    LOAD_LIB_2_EXE(settings.library, lib, fixture.exename().c_str());
     // strip extension
     std::string lib_s(lib);
     const std::string ext(".cfg");
@@ -474,7 +479,7 @@ TestFixture::SettingsBuilder& TestFixture::SettingsBuilder::platform(Platform::T
 
     std::string errstr;
     // TODO: exename is not yet set
-    if (!settings.platform.set(platformStr, errstr, {fixture.exename}))
+    if (!settings.platform.set(platformStr, errstr, {fixture.exename()}))
         throw std::runtime_error("platform '" + platformStr + "' not found");
     return *this;
 }

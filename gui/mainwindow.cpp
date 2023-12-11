@@ -122,7 +122,7 @@ MainWindow::MainWindow(TranslationHandler* th, QSettings* settings) :
 {
     {
         Settings tempSettings;
-        tempSettings.exename = QCoreApplication::applicationFilePath().toStdString();
+        //tempSettings.exename = QCoreApplication::applicationFilePath().toStdString();
         Settings::loadCppcheckCfg(tempSettings, tempSettings.supprs); // TODO: how to handle error?
         mCppcheckCfgProductName = QString::fromStdString(tempSettings.cppcheckCfgProductName);
         mCppcheckCfgAbout = QString::fromStdString(tempSettings.cppcheckCfgAbout);
@@ -836,7 +836,7 @@ Library::Error MainWindow::loadLibrary(Library &library, const QString &filename
     }
 
     // Try to load the library from the application folder..
-    const QString appPath = QFileInfo(QCoreApplication::applicationFilePath()).canonicalPath();
+    const QString appPath = QFileInfo(Application::exename()).canonicalPath();
     ret = library.load(nullptr, (appPath+"/"+filename).toLatin1());
     if (ret.errorcode != Library::ErrorCode::FILE_NOT_FOUND)
         return ret;
@@ -967,8 +967,6 @@ QPair<bool,Settings> MainWindow::getCppcheckSettings()
     Settings::terminate(true);
     Settings result;
 
-    result.exename = QCoreApplication::applicationFilePath().toStdString();
-
     // default to --check-level=normal for GUI for now
     result.setCheckLevel(Settings::CheckLevel::normal);
 
@@ -1049,8 +1047,7 @@ QPair<bool,Settings> MainWindow::getCppcheckSettings()
 
         const QString platform = mProjectFile->getPlatform();
         if (platform.endsWith(".xml")) {
-            const QString applicationFilePath = QCoreApplication::applicationFilePath();
-            result.platform.loadFromFile(applicationFilePath.toStdString().c_str(), platform.toStdString());
+            result.platform.loadFromFile(Application::exename().c_str(), platform.toStdString());
         } else {
             for (int i = Platform::Type::Native; i <= Platform::Type::Unix64; i++) {
                 const auto p = (Platform::Type)i;

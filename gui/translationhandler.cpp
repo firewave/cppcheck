@@ -91,7 +91,7 @@ bool TranslationHandler::setLanguage(const QString &code)
             mTranslator = new QTranslator(this);
 
         //Load the new language
-        const QString appPath = QFileInfo(QCoreApplication::applicationFilePath()).canonicalPath();
+        const QString appPath = QFileInfo(Application::exename()).canonicalPath();
 
         QString datadir = getDataDir();
 
