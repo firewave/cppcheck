@@ -1268,9 +1268,9 @@ void TemplateSimplifier::useDefaultArgumentValues(TokenAndName &declaration)
         // don't strip args from uninstantiated templates
         const auto ti2 = std::find_if(mTemplateInstantiations.cbegin(),
                                       mTemplateInstantiations.cend(),
-                                      FindName(declaration.name()));
+                                                                         FindName(declaration.name()));
 
-        if (ti2 == mTemplateInstantiations.end())
+        if (ti2 == mTemplateInstantiations.cend())
             continue;
 
         eraseTokens(eqtok, tok2);
