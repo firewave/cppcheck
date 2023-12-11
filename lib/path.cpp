@@ -151,13 +151,13 @@ std::string Path::getCurrentExecutablePath(const char* fallback)
     success = (_NSGetExecutablePath(buf, &size) == 0);
 #else
     const char* procPath =
-#ifdef __SVR4 // Solaris
+#  ifdef __SVR4 // Solaris
         "/proc/self/path/a.out";
-#elif defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__) || defined(__DragonFly__)
+#  elif defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__) || defined(__DragonFly__)
         "/proc/curproc/file";
-#else // Linux
+#  else // Linux
         "/proc/self/exe";
-#endif
+#  endif
     success = (readlink(procPath, buf, sizeof(buf)) != -1);
 #endif
     return success ? std::string(buf) : std::string(fallback);
