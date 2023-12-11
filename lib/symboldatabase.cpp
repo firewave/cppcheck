@@ -1203,8 +1203,8 @@ void SymbolDatabase::fixVarId(VarIdMap & varIds, const Token * vartok, Token * m
         varIds.insert(std::make_pair(vartok->varId(), memberId));
         varId = varIds.find(vartok->varId());
     }
-    MemberIdMap::iterator memberId = varId->second.find(membervar->nameToken()->varId());
-    if (memberId == varId->second.end()) {
+    MemberIdMap::const_iterator memberId = varId->second.find(membervar->nameToken()->varId());
+    if (memberId == varId->second.cend()) {
         if (membertok->varId() == 0) {
             varId->second.insert(std::make_pair(membervar->nameToken()->varId(), const_cast<Tokenizer &>(mTokenizer).newVarId()));
             mVariableList.push_back(membervar);
@@ -3300,8 +3300,8 @@ void SymbolDatabase::addClassFunction(Scope **scope, const Token **tok, const To
     }
 
     // search for match
-    for (std::list<Scope>::iterator it1 = scopeList.begin(); it1 != scopeList.end(); ++it1) {
-        Scope *scope1 = &(*it1);
+    for (std::list<Scope>::const_iterator it1 = scopeList.cbegin(); it1 != scopeList.cend(); ++it1) {
+        const Scope *scope1 = &(*it1);
 
         bool match = false;
 
@@ -3360,7 +3360,7 @@ void SymbolDatabase::addClassFunction(Scope **scope, const Token **tok, const To
                         continue;
                 }
 
-                Scope *scope2 = scope1;
+                const Scope *scope2 = scope1;
 
                 while (scope2 && count > 1) {
                     count--;

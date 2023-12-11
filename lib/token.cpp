@@ -2274,7 +2274,7 @@ bool Token::addValue(const ValueFlow::Value &value)
             return false;
 
         // if value already exists, don't add it again
-        std::list<ValueFlow::Value>::iterator it;
+        ValueIterator it;
         for (it = mImpl->mValues->begin(); it != mImpl->mValues->end(); ++it) {
             // different types => continue
             if (it->valueType != value.valueType)

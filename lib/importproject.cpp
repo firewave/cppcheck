@@ -43,7 +43,7 @@
 // TODO: align the exclusion logic with PathMatch
 void ImportProject::ignorePaths(const std::vector<std::string> &ipaths)
 {
-    for (std::list<FileSettings>::iterator it = fileSettings.begin(); it != fileSettings.end();) {
+    for (std::list<FileSettings>::const_iterator it = fileSettings.cbegin(); it != fileSettings.cend();) {
         bool ignore = false;
         for (std::string i : ipaths) {
             if (it->filename.size() > i.size() && it->filename.compare(0,i.size(),i)==0) {
@@ -71,7 +71,7 @@ void ImportProject::ignorePaths(const std::vector<std::string> &ipaths)
 
 void ImportProject::ignoreOtherConfigs(const std::string &cfg)
 {
-    for (std::list<FileSettings>::iterator it = fileSettings.begin(); it != fileSettings.end();) {
+    for (std::list<FileSettings>::const_iterator it = fileSettings.cbegin(); it != fileSettings.cend();) {
         if (it->cfg != cfg)
             it = fileSettings.erase(it);
         else
@@ -1275,7 +1275,7 @@ bool ImportProject::importCppcheckGuiProject(std::istream &istr, Settings *setti
 void ImportProject::selectOneVsConfig(Platform::Type platform)
 {
     std::set<std::string> filenames;
-    for (std::list<FileSettings>::iterator it = fileSettings.begin(); it != fileSettings.end();) {
+    for (std::list<FileSettings>::const_iterator it = fileSettings.cbegin(); it != fileSettings.cend();) {
         if (it->cfg.empty()) {
             ++it;
             continue;
@@ -1301,7 +1301,7 @@ void ImportProject::selectOneVsConfig(Platform::Type platform)
 
 void ImportProject::selectVsConfigurations(Platform::Type platform, const std::vector<std::string> &configurations)
 {
-    for (std::list<FileSettings>::iterator it = fileSettings.begin(); it != fileSettings.end();) {
+    for (std::list<FileSettings>::const_iterator it = fileSettings.cbegin(); it != fileSettings.cend();) {
         if (it->cfg.empty()) {
             ++it;
             continue;

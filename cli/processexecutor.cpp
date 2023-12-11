@@ -319,14 +319,14 @@ unsigned int ProcessExecutor::check()
                 while (rp != rpipes.cend()) {
                     if (FD_ISSET(*rp, &rfds)) {
                         std::string name;
-                        const std::map<int, std::string>::iterator p = pipeFile.find(*rp);
-                        if (p != pipeFile.end()) {
+                        const std::map<int, std::string>::const_iterator p = pipeFile.find(*rp);
+                        if (p != pipeFile.cend()) {
                             name = p->second;
                         }
                         const bool readRes = handleRead(*rp, result, name);
                         if (!readRes) {
                             std::size_t size = 0;
-                            if (p != pipeFile.end()) {
+                            if (p != pipeFile.cend()) {
                                 pipeFile.erase(p);
                                 const auto fs = std::find_if(mFiles.cbegin(), mFiles.cend(), [&name](const std::pair<std::string, std::size_t>& entry) {
                                     return entry.first == name;
@@ -355,8 +355,8 @@ unsigned int ProcessExecutor::check()
             const pid_t child = waitpid(0, &stat, WNOHANG);
             if (child > 0) {
                 std::string childname;
-                const std::map<pid_t, std::string>::iterator c = childFile.find(child);
-                if (c != childFile.end()) {
+                const std::map<pid_t, std::string>::const_iterator c = childFile.find(child);
+                if (c != childFile.cend()) {
                     childname = c->second;
                     childFile.erase(c);
                 }

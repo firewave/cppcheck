@@ -5005,8 +5005,8 @@ void Tokenizer::setVarIdPass2()
             }
 
             if (tok->str() == "}") {
-                const std::map<const Token *, std::string>::iterator it = endOfScope.find(tok);
-                if (it != endOfScope.end())
+                const std::map<const Token *, std::string>::const_iterator it = endOfScope.find(tok);
+                if (it != endOfScope.cend())
                     scope.remove(it->second);
             }
 
