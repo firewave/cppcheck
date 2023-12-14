@@ -600,46 +600,63 @@ int multiCompareImpl(const Token *tok, const char *haystack, nonneg int varid)
     const char *needle = tok->str().c_str();
     const char *needlePointer = needle;
     for (;;) {
+        // if we are at the begin of the token compare with placeholders first
         if (needlePointer == needle && haystack[0] == '%' && haystack[1] != '|' && haystack[1] != '\0' && haystack[1] != ' ') {
             const int ret = multiComparePercent(tok, haystack, varid);
             if (ret < 2)
                 return ret;
-        } else if (*haystack == '|') {
-            if (*needlePointer == 0) {
+            continue;
+        }
+
+        // check if we reached end of first optional token we match for
+        if (*haystack == '|') {
+            if (*needlePointer == '\0') {
                 // If needle is at the end, we have a match.
                 return 1;
             }
 
             needlePointer = needle;
             ++haystack;
-        } else if (*needlePointer == *haystack) {
-            if (*needlePointer == '\0')
+            continue;
+        }
+
+        // check if characters match
+        if (*needlePointer == *haystack) {
+            if (*needlePointer == '\0') {
+                // If needle is at the end, we have a match.
                 return 1;
+            }
             ++needlePointer;
             ++haystack;
-        } else if (*haystack == ' ' || *haystack == '\0') {
-            if (needlePointer == needle)
+            continue;
+        }
+
+        // check if we reached end of the token we look for
+        if (*haystack == ' ' || *haystack == '\0') {
+            if (needlePointer == needle) {
+                // if needle is still at the start we have no match
                 return 0;
+            }
             break;
         }
+
+        // reset the token we compare with
+        needlePointer = needle;
+
         // If haystack and needle don't share the same character,
         // find next '|' character.
-        else {
-            needlePointer = needle;
-
-            do {
-                ++haystack;
-
-                if (*haystack == ' ' || *haystack == '\0') {
-                    return -1;
-                }
-                if (*haystack == '|') {
-                    break;
-                }
-            } while (true);
-
+        do {
             ++haystack;
-        }
+
+            if (*haystack == ' ' || *haystack == '\0') {
+                return -1;
+            }
+            if (*haystack == '|') {
+                break;
+            }
+        } while (true);
+
+        ++haystack;
     }
 
     if (*needlePointer == '\0')
