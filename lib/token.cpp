@@ -608,6 +608,20 @@ int multiCompareImpl(const Token *tok, const char *haystack, nonneg int varid)
             continue;
         }
 
+        // check if we reached end of the token we look for
+        if (*haystack == ' ' || *haystack == '\0') {
+            if (needlePointer == needle) {
+                // if needle is still at the start we have no match
+                return 0;
+            }
+            if (*needlePointer == '\0') {
+                // If needle is at the end, we have a match.
+                return 1;
+            }
+            // no match
+            return -1;
+        }
+
         // check if we reached end of first optional token we match for
         if (*haystack == '|') {
             if (*needlePointer == '\0') {
@@ -629,20 +643,6 @@ int multiCompareImpl(const Token *tok, const char *haystack, nonneg int varid)
             ++needlePointer;
             ++haystack;
             continue;
-        }
-
-        // check if we reached end of the token we look for
-        if (*haystack == ' ' || *haystack == '\0') {
-            if (needlePointer == needle) {
-                // if needle is still at the start we have no match
-                return 0;
-            }
-            if (*needlePointer == '\0') {
-                // If needle is at the end, we have a match.
-                return 1;
-            }
-            // no match
-            return -1;
         }
 
         // If haystack and needle don't share the same character,
