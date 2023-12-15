@@ -18,6 +18,7 @@
 
 #include "check.h"
 #include "checkclass.h"
+#include "ctu.h"
 #include "errortypes.h"
 #include "helpers.h"
 #include "preprocessor.h"
@@ -8795,22 +8796,17 @@ private:
         Check &check = getCheck<CheckClass>();
 
         // getFileInfo
-        std::list<Check::FileInfo*> fileInfo;
+        std::list<Check::FileInfoPtr> fileInfo;
         for (const std::string& c: code) {
             Tokenizer tokenizer(&settings, this);
             std::istringstream istr(c);
             ASSERT(tokenizer.tokenize(istr, (std::to_string(fileInfo.size()) + ".cpp").c_str()));
-            fileInfo.push_back(check.getFileInfo(&tokenizer, &settings));
+            fileInfo.emplace_back(check.getFileInfo(&tokenizer, &settings));
         }
 
         // Check code..
         errout.str("");
         check.analyseWholeProgram(nullptr, fileInfo, settings, *this);
-
-        while (!fileInfo.empty()) {
-            delete fileInfo.back();
-            fileInfo.pop_back();
-        }
     }
 
     void ctuOneDefinitionRule() {
@@ -8851,9 +8847,7 @@ private:
 
         // Check..
         const Check& c = getCheck<CheckClass>();
-        Check::FileInfo * fileInfo = (c.getFileInfo)(&tokenizer, &settings1);
-
-        delete fileInfo;
+        (void)(c.getFileInfo)(&tokenizer, &settings1);
     }
 
     void testGetFileInfo() {

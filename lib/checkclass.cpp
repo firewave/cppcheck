@@ -3445,7 +3445,7 @@ namespace
     };
 }
 
-Check::FileInfo *CheckClass::getFileInfo(const Tokenizer *tokenizer, const Settings *settings) const
+Check::FileInfoPtr CheckClass::getFileInfo(const Tokenizer *tokenizer, const Settings *settings) const
 {
     if (!tokenizer->isCPP())
         return nullptr;
@@ -3511,10 +3511,10 @@ Check::FileInfo *CheckClass::getFileInfo(const Tokenizer *tokenizer, const Setti
 
     MyFileInfo *fileInfo = new MyFileInfo;
     fileInfo->classDefinitions.swap(classDefinitions);
-    return fileInfo;
+    return Check::FileInfoPtr(fileInfo);
 }
 
-Check::FileInfo * CheckClass::loadFileInfoFromXml(const tinyxml2::XMLElement *xmlElement) const
+Check::FileInfoPtr CheckClass::loadFileInfoFromXml(const tinyxml2::XMLElement *xmlElement) const
 {
     MyFileInfo *fileInfo = new MyFileInfo;
     for (const tinyxml2::XMLElement *e = xmlElement->FirstChildElement(); e; e = e->NextSiblingElement()) {
@@ -3539,10 +3539,10 @@ Check::FileInfo * CheckClass::loadFileInfoFromXml(const tinyxml2::XMLElement *xm
         delete fileInfo;
         fileInfo = nullptr;
     }
-    return fileInfo;
+    return Check::FileInfoPtr(fileInfo);
 }
 
-bool CheckClass::analyseWholeProgram(const CTU::FileInfo *ctu, const std::list<Check::FileInfo*> &fileInfo, const Settings& settings, ErrorLogger &errorLogger)
+bool CheckClass::analyseWholeProgram(const std::unique_ptr<const CTU::FileInfo> &ctu, const std::list<Check::FileInfoPtr> &fileInfo, const Settings& settings, ErrorLogger &errorLogger)
 {
     bool foundErrors = false;
     (void)ctu; // This argument is unused
@@ -3554,8 +3554,8 @@ bool CheckClass::analyseWholeProgram(const CTU::FileInfo *ctu, const std::list<C
     dummy.
     logChecker("CheckClass::analyseWholeProgram");
 
-    for (const Check::FileInfo* fi1 : fileInfo) {
-        const MyFileInfo *fi = dynamic_cast<const MyFileInfo*>(fi1);
+    for (const auto& fi1 : fileInfo) {
+        const MyFileInfo *fi = dynamic_cast<const MyFileInfo*>(fi1.get());
         if (!fi)
             continue;
         for (const MyFileInfo::NameLoc &nameLoc : fi->classDefinitions) {

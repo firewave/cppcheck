@@ -580,7 +580,7 @@ namespace
     };
 }
 
-Check::FileInfo *CheckNullPointer::getFileInfo(const Tokenizer *tokenizer, const Settings *settings) const
+Check::FileInfoPtr CheckNullPointer::getFileInfo(const Tokenizer *tokenizer, const Settings *settings) const
 {
     const std::list<CTU::FileInfo::UnsafeUsage> &unsafeUsage = CTU::getUnsafeUsage(tokenizer, settings, isUnsafeUsage);
     if (unsafeUsage.empty())
@@ -588,10 +588,10 @@ Check::FileInfo *CheckNullPointer::getFileInfo(const Tokenizer *tokenizer, const
 
     MyFileInfo *fileInfo = new MyFileInfo;
     fileInfo->unsafeUsage = unsafeUsage;
-    return fileInfo;
+    return Check::FileInfoPtr(fileInfo);
 }
 
-Check::FileInfo * CheckNullPointer::loadFileInfoFromXml(const tinyxml2::XMLElement *xmlElement) const
+Check::FileInfoPtr CheckNullPointer::loadFileInfoFromXml(const tinyxml2::XMLElement *xmlElement) const
 {
     const std::list<CTU::FileInfo::UnsafeUsage> &unsafeUsage = CTU::loadUnsafeUsageListFromXml(xmlElement);
     if (unsafeUsage.empty())
@@ -599,10 +599,10 @@ Check::FileInfo * CheckNullPointer::loadFileInfoFromXml(const tinyxml2::XMLEleme
 
     MyFileInfo *fileInfo = new MyFileInfo;
     fileInfo->unsafeUsage = unsafeUsage;
-    return fileInfo;
+    return Check::FileInfoPtr(fileInfo);
 }
 
-bool CheckNullPointer::analyseWholeProgram(const CTU::FileInfo *ctu, const std::list<Check::FileInfo*> &fileInfo, const Settings& settings, ErrorLogger &errorLogger)
+bool CheckNullPointer::analyseWholeProgram(const std::unique_ptr<const CTU::FileInfo> &ctu, const std::list<Check::FileInfoPtr > &fileInfo, const Settings& settings, ErrorLogger &errorLogger)
 {
     if (!ctu)
         return false;
@@ -615,8 +615,8 @@ bool CheckNullPointer::analyseWholeProgram(const CTU::FileInfo *ctu, const std::
 
     const std::map<std::string, std::list<const CTU::FileInfo::CallBase *>> callsMap = ctu->getCallsMap();
 
-    for (const Check::FileInfo* fi1 : fileInfo) {
-        const MyFileInfo *fi = dynamic_cast<const MyFileInfo*>(fi1);
+    for (const auto& fi1 : fileInfo) {
+        const MyFileInfo *fi = dynamic_cast<const MyFileInfo*>(fi1.get());
         if (!fi)
             continue;
         for (const CTU::FileInfo::UnsafeUsage &unsafeUsage : fi->unsafeUsage) {

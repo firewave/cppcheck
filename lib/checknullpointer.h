@@ -106,12 +106,12 @@ private:
     void nullPointerError(const Token *tok, const std::string &varname, const ValueFlow::Value* value, bool inconclusive);
 
     /** @brief Parse current TU and extract file info */
-    Check::FileInfo *getFileInfo(const Tokenizer *tokenizer, const Settings *settings) const override;
+    Check::FileInfoPtr getFileInfo(const Tokenizer *tokenizer, const Settings *settings) const override;
 
-    Check::FileInfo * loadFileInfoFromXml(const tinyxml2::XMLElement *xmlElement) const override;
+    Check::FileInfoPtr loadFileInfoFromXml(const tinyxml2::XMLElement *xmlElement) const override;
 
     /** @brief Analyse all file infos for all TU */
-    bool analyseWholeProgram(const CTU::FileInfo *ctu, const std::list<Check::FileInfo*> &fileInfo, const Settings& settings, ErrorLogger &errorLogger) override;
+    bool analyseWholeProgram(const std::unique_ptr<const CTU::FileInfo> &ctu, const std::list<Check::FileInfoPtr > &fileInfo, const Settings& settings, ErrorLogger &errorLogger) override;
 
     /** Get error messages. Used by --errorlist */
     void getErrorMessages(ErrorLogger *errorLogger, const Settings *settings) const override {

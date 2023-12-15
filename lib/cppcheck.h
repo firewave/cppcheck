@@ -236,7 +236,7 @@ private:
     bool mTooManyConfigs{};
 
     /** File info used for whole program analysis */
-    std::list<Check::FileInfo*> mFileInfo;
+    std::list<Check::FileInfoPtr> mFileInfo;
 
     AnalyzerInformation mAnalyzerInformation;
 

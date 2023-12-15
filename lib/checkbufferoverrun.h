@@ -92,10 +92,10 @@ private:
     }
 
     /** @brief Parse current TU and extract file info */
-    Check::FileInfo *getFileInfo(const Tokenizer *tokenizer, const Settings *settings) const override;
+    Check::FileInfoPtr getFileInfo(const Tokenizer *tokenizer, const Settings *settings) const override;
 
     /** @brief Analyse all file infos for all TU */
-    bool analyseWholeProgram(const CTU::FileInfo *ctu, const std::list<Check::FileInfo*> &fileInfo, const Settings& settings, ErrorLogger &errorLogger) override;
+    bool analyseWholeProgram(const std::unique_ptr<const CTU::FileInfo> &ctu, const std::list<Check::FileInfoPtr> &fileInfo, const Settings& settings, ErrorLogger &errorLogger) override;
 
     void arrayIndex();
     void arrayIndexError(const Token* tok,
@@ -134,7 +134,7 @@ private:
     static bool isCtuUnsafeArrayIndex(const Settings *settings, const Token *argtok, MathLib::bigint *offset);
     static bool isCtuUnsafePointerArith(const Settings *settings, const Token *argtok, MathLib::bigint *offset);
 
-    Check::FileInfo * loadFileInfoFromXml(const tinyxml2::XMLElement *xmlElement) const override;
+    Check::FileInfoPtr loadFileInfoFromXml(const tinyxml2::XMLElement *xmlElement) const override;
     static bool analyseWholeProgram1(const std::map<std::string, std::list<const CTU::FileInfo::CallBase *>> &callsMap, const CTU::FileInfo::UnsafeUsage &unsafeUsage, int type, ErrorLogger &errorLogger);
 
 

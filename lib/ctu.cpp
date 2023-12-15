@@ -305,7 +305,7 @@ static int isCallFunction(const Scope *scope, int argnr, const Token **tok)
 }
 
 
-CTU::FileInfo *CTU::getFileInfo(const Tokenizer *tokenizer)
+std::unique_ptr<const CTU::FileInfo> CTU::getFileInfo(const Tokenizer *tokenizer)
 {
     const SymbolDatabase * const symbolDatabase = tokenizer->getSymbolDatabase();
 
@@ -433,7 +433,7 @@ CTU::FileInfo *CTU::getFileInfo(const Tokenizer *tokenizer)
         }
     }
 
-    return fileInfo;
+    return std::unique_ptr<const FileInfo>(fileInfo);
 }
 
 static std::list<std::pair<const Token *, MathLib::bigint>> getUnsafeFunction(const Tokenizer *tokenizer, const Settings *settings, const Scope *scope, int argnr, bool (*isUnsafeUsage)(const Settings *settings, const Token *argtok, MathLib::bigint *value))

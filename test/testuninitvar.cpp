@@ -7552,18 +7552,13 @@ private:
         std::istringstream istr(code);
         ASSERT_LOC(tokenizer.tokenize(istr, "test.cpp"), file, line);
 
-        CTU::FileInfo *ctu = CTU::getFileInfo(&tokenizer);
+        const auto ctu = CTU::getFileInfo(&tokenizer);
 
         // Check code..
-        std::list<Check::FileInfo*> fileInfo;
+        std::list<Check::FileInfoPtr> fileInfo;
         Check& c = getCheck<CheckUninitVar>();
         fileInfo.push_back(c.getFileInfo(&tokenizer, &settings));
         c.analyseWholeProgram(ctu, fileInfo, settings, *this);
-        while (!fileInfo.empty()) {
-            delete fileInfo.back();
-            fileInfo.pop_back();
-        }
-        delete ctu;
     }
 
     void ctuTest() {

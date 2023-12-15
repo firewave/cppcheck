@@ -946,7 +946,7 @@ bool CheckBufferOverrun::isCtuUnsafePointerArith(const Settings *settings, const
 }
 
 /** @brief Parse current TU and extract file info */
-Check::FileInfo *CheckBufferOverrun::getFileInfo(const Tokenizer *tokenizer, const Settings *settings) const
+Check::FileInfoPtr CheckBufferOverrun::getFileInfo(const Tokenizer *tokenizer, const Settings *settings) const
 {
     MyFileInfo *fileInfo = new MyFileInfo;
     fileInfo->unsafeArrayIndex = CTU::getUnsafeUsage(tokenizer, settings, isCtuUnsafeArrayIndex);
@@ -955,10 +955,10 @@ Check::FileInfo *CheckBufferOverrun::getFileInfo(const Tokenizer *tokenizer, con
         delete fileInfo;
         return nullptr;
     }
-    return fileInfo;
+    return Check::FileInfoPtr(fileInfo);
 }
 
-Check::FileInfo * CheckBufferOverrun::loadFileInfoFromXml(const tinyxml2::XMLElement *xmlElement) const
+Check::FileInfoPtr CheckBufferOverrun::loadFileInfoFromXml(const tinyxml2::XMLElement *xmlElement) const
 {
     // cppcheck-suppress shadowFunction - TODO: fix this
     const std::string arrayIndex("array-index");
@@ -977,11 +977,11 @@ Check::FileInfo * CheckBufferOverrun::loadFileInfoFromXml(const tinyxml2::XMLEle
         return nullptr;
     }
 
-    return fileInfo;
+    return Check::FileInfoPtr(fileInfo);
 }
 
 /** @brief Analyse all file infos for all TU */
-bool CheckBufferOverrun::analyseWholeProgram(const CTU::FileInfo *ctu, const std::list<Check::FileInfo*> &fileInfo, const Settings& settings, ErrorLogger &errorLogger)
+bool CheckBufferOverrun::analyseWholeProgram(const std::unique_ptr<const CTU::FileInfo> &ctu, const std::list<Check::FileInfoPtr > &fileInfo, const Settings& settings, ErrorLogger &errorLogger)
 {
     if (!ctu)
         return false;
@@ -994,8 +994,8 @@ bool CheckBufferOverrun::analyseWholeProgram(const CTU::FileInfo *ctu, const std
 
     const std::map<std::string, std::list<const CTU::FileInfo::CallBase *>> callsMap = ctu->getCallsMap();
 
-    for (const Check::FileInfo* fi1 : fileInfo) {
-        const MyFileInfo *fi = dynamic_cast<const MyFileInfo*>(fi1);
+    for (const auto& fi1 : fileInfo) {
+        const MyFileInfo *fi = dynamic_cast<const MyFileInfo*>(fi1.get());
         if (!fi)
             continue;
         for (const CTU::FileInfo::UnsafeUsage &unsafeUsage : fi->unsafeArrayIndex)

@@ -5148,18 +5148,13 @@ private:
         std::istringstream istr(code);
         ASSERT_LOC(tokenizer.tokenize(istr, "test.cpp"), file, line);
 
-        CTU::FileInfo *ctu = CTU::getFileInfo(&tokenizer);
+        const auto ctu = CTU::getFileInfo(&tokenizer);
 
         // Check code..
-        std::list<Check::FileInfo*> fileInfo;
+        std::list<Check::FileInfoPtr> fileInfo;
         Check& c = getCheck<CheckBufferOverrun>();
-        fileInfo.push_back(c.getFileInfo(&tokenizer, &settings0));
+        fileInfo.emplace_back(c.getFileInfo(&tokenizer, &settings0));
         c.analyseWholeProgram(ctu, fileInfo, settings0, *this);
-        while (!fileInfo.empty()) {
-            delete fileInfo.back();
-            fileInfo.pop_back();
-        }
-        delete ctu;
     }
 
     void ctu_malloc() {

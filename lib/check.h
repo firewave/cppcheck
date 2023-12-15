@@ -25,6 +25,7 @@
 #include "errortypes.h"
 
 #include <list>
+#include <memory>
 #include <string>
 #include <utility>
 
@@ -109,19 +110,21 @@ public:
         }
     };
 
-    virtual FileInfo * getFileInfo(const Tokenizer *tokenizer, const Settings *settings) const {
+    using FileInfoPtr = std::unique_ptr<const FileInfo>;
+
+    virtual FileInfoPtr getFileInfo(const Tokenizer *tokenizer, const Settings *settings) const {
         (void)tokenizer;
         (void)settings;
         return nullptr;
     }
 
-    virtual FileInfo * loadFileInfoFromXml(const tinyxml2::XMLElement *xmlElement) const {
+    virtual FileInfoPtr loadFileInfoFromXml(const tinyxml2::XMLElement *xmlElement) const {
         (void)xmlElement;
         return nullptr;
     }
 
     // Return true if an error is reported.
-    virtual bool analyseWholeProgram(const CTU::FileInfo *ctu, const std::list<FileInfo*> &fileInfo, const Settings& /*settings*/, ErrorLogger & /*errorLogger*/) {
+    virtual bool analyseWholeProgram(const std::unique_ptr<const CTU::FileInfo>& ctu, const std::list<FileInfoPtr> &fileInfo, const Settings& /*settings*/, ErrorLogger & /*errorLogger*/) {
         (void)ctu;
         (void)fileInfo;
         //(void)settings;

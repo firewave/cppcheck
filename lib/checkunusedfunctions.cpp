@@ -370,7 +370,7 @@ void CheckUnusedFunctions::unusedFunctionError(ErrorLogger * const errorLogger,
         Check::writeToErrorList(errmsg);
 }
 
-Check::FileInfo *CheckUnusedFunctions::getFileInfo(const Tokenizer *tokenizer, const Settings *settings) const
+Check::FileInfoPtr CheckUnusedFunctions::getFileInfo(const Tokenizer *tokenizer, const Settings *settings) const
 {
     if (!settings->checks.isEnabled(Checks::unusedFunction))
         return nullptr;
@@ -379,7 +379,7 @@ Check::FileInfo *CheckUnusedFunctions::getFileInfo(const Tokenizer *tokenizer, c
     return nullptr;
 }
 
-bool CheckUnusedFunctions::analyseWholeProgram(const CTU::FileInfo *ctu, const std::list<Check::FileInfo*> &fileInfo, const Settings& settings, ErrorLogger &errorLogger)
+bool CheckUnusedFunctions::analyseWholeProgram(const std::unique_ptr<const CTU::FileInfo> &ctu, const std::list<Check::FileInfoPtr> &fileInfo, const Settings& settings, ErrorLogger &errorLogger)
 {
     (void)ctu;
     (void)fileInfo;

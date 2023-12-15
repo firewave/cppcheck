@@ -351,11 +351,6 @@ CppCheck::CppCheck(ErrorLogger &errorLogger,
 
 CppCheck::~CppCheck()
 {
-    while (!mFileInfo.empty()) {
-        delete mFileInfo.back();
-        mFileInfo.pop_back();
-    }
-
     if (mPlistFile.is_open()) {
         mPlistFile << ErrorLogger::plistFooter();
         mPlistFile.close();
@@ -1097,10 +1092,10 @@ void CppCheck::checkNormalTokens(const Tokenizer &tokenizer)
     if (mSettings.useSingleJob() || !mSettings.buildDir.empty()) {
         // Analyse the tokens..
 
-        CTU::FileInfo *fi1 = CTU::getFileInfo(&tokenizer);
+        Check::FileInfoPtr fi1 = CTU::getFileInfo(&tokenizer);
         if (fi1) {
             if (mSettings.useSingleJob())
-                mFileInfo.push_back(fi1);
+                mFileInfo.emplace_back(std::move(fi1));
             if (!mSettings.buildDir.empty())
                 mAnalyzerInformation.setFileInfo("ctu", fi1->toString());
         }
@@ -1110,10 +1105,10 @@ void CppCheck::checkNormalTokens(const Tokenizer &tokenizer)
             if (doUnusedFunctionOnly && dynamic_cast<const CheckUnusedFunctions*>(check) == nullptr)
                 continue;
 
-            Check::FileInfo *fi = check->getFileInfo(&tokenizer, &mSettings);
+            Check::FileInfoPtr fi = check->getFileInfo(&tokenizer, &mSettings);
             if (fi != nullptr) {
                 if (mSettings.useSingleJob())
-                    mFileInfo.push_back(fi);
+                    mFileInfo.emplace_back(std::move(fi));
                 if (!mSettings.buildDir.empty())
                     mAnalyzerInformation.setFileInfo(check->name(), fi->toString());
             }
@@ -1730,8 +1725,8 @@ bool CppCheck::analyseWholeProgram()
     CTU::maxCtuDepth = mSettings.maxCtuDepth;
     // Analyse the tokens
     CTU::FileInfo ctu;
-    for (const Check::FileInfo *fi : mFileInfo) {
-        const CTU::FileInfo *fi2 = dynamic_cast<const CTU::FileInfo *>(fi);
+    for (const auto& fi : mFileInfo) {
+        const CTU::FileInfo *fi2 = dynamic_cast<const CTU::FileInfo *>(fi.get());
         if (fi2) {
             ctu.functionCalls.insert(ctu.functionCalls.end(), fi2->functionCalls.cbegin(), fi2->functionCalls.cend());
             ctu.nestedCalls.insert(ctu.nestedCalls.end(), fi2->nestedCalls.cbegin(), fi2->nestedCalls.cend());
@@ -1752,7 +1747,7 @@ void CppCheck::analyseWholeProgram(const std::string &buildDir, const std::list<
     }
     if (mSettings.checks.isEnabled(Checks::unusedFunction))
         CheckUnusedFunctions::analyseWholeProgram(mSettings, this, buildDir);
-    std::list<Check::FileInfo*> fileInfoList;
+    std::list<Check::FileInfoPtr> fileInfoList;
     CTU::FileInfo ctuFileInfo;
 
     // Load all analyzer info data..
@@ -1804,8 +1799,7 @@ void CppCheck::analyseWholeProgram(const std::string &buildDir, const std::list<
     for (Check *check : Check::instances())
         check->analyseWholeProgram(&ctuFileInfo, fileInfoList, mSettings, *this);
 
-    for (Check::FileInfo *fi : fileInfoList)
-        delete fi;
+    fileInfoList.clear();
 }
 
 bool CppCheck::isUnusedFunctionCheckEnabled() const
