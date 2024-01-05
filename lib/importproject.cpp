@@ -344,14 +344,40 @@ bool ImportProject::importCompileCommands(std::istream &istr)
 {
     picojson::value compileCommands;
     istr >> compileCommands;
+
+    const std::string& json_error = picojson::get_last_error();
+    if (!json_error.empty()) {
+        printError("compilation database is not a valid JSON - " + json_error);
+        return false;
+    }
+
     if (!compileCommands.is<picojson::array>()) {
         printError("compilation database is not a JSON array");
         return false;
     }
 
     for (const picojson::value &fileInfo : compileCommands.get<picojson::array>()) {
-        picojson::object obj = fileInfo.get<picojson::object>();
-        std::string dirpath = Path::fromNativeSeparators(obj["directory"].get<std::string>());
+        if (!fileInfo.is<picojson::object>()) {
+            printError("compilation database entry is not a JSON object");
+            return false;
+        }
+
+        const auto& obj = fileInfo.get<picojson::object>();
+
+        std::string dirpath;
+        {
+            const auto it = obj.find("directory");
+            if (it == obj.cend()) {
+                printError("compilation database entry is missing 'directory'");
+                return false;
+            }
+            const auto& val = it->second;
+            if (!val.is<std::string>()) {
+                printError("compilation database 'directory' entry is not a string");
+                return false;
+            }
+            dirpath = Path::fromNativeSeparators(val.get<std::string>());
+        }
 
         /* CMAKE produces the directory without trailing / so add it if not
          * there - it is needed by setIncludePaths() */
@@ -361,38 +387,60 @@ bool ImportProject::importCompileCommands(std::istream &istr)
         const std::string directory = std::move(dirpath);
 
         std::string command;
-        if (obj.count("arguments")) {
-            if (obj["arguments"].is<picojson::array>()) {
-                for (const picojson::value& arg : obj["arguments"].get<picojson::array>()) {
-                    if (arg.is<std::string>()) {
-                        std::string str = arg.get<std::string>();
-                        if (str.find(' ') != std::string::npos)
-                            str = "\"" + str + "\"";
-                        command += str + " ";
-                    }
+        {
+            const auto arg_it = obj.find("arguments");
+            if (arg_it != obj.cend()) {
+                const auto& val = arg_it->second;
+                if (!val.is<picojson::array>()) {
+                    printError("'arguments' field in compilation database entry is not a JSON array");
+                    return false;
                 }
-            } else {
-                printError("'arguments' field in compilation database entry is not a JSON array");
-                return false;
+                for (const picojson::value& arg : val.get<picojson::array>()) {
+                    if (!arg.is<std::string>()) {
+                        printError("'arguments' entry in compilation database entry is not a string");
+                        return false;
+                    }
+
+                    std::string str = arg.get<std::string>();
+                    if (str.find(' ') != std::string::npos)
+                        str = "\"" + str + "\"";
+                    command += str + " ";
+                }
             }
-        } else if (obj.count("command")) {
-            if (obj["command"].is<std::string>()) {
-                command = obj["command"].get<std::string>();
-            } else {
-                printError("'command' field in compilation database entry is not a string");
-                return false;
+            else {
+                const auto cmd_it = obj.find("command");
+                if (cmd_it != obj.cend()) {
+                    const auto& val = arg_it->second;
+                    if (!val.is<std::string>()) {
+                        printError("'command' field in compilation database entry is not a string");
+                        return false;
+                    }
+                    command = val.get<std::string>();
+                }
+                else {
+                    printError("no 'arguments' or 'command' field found in compilation database entry");
+                    return false;
+                }
             }
-        } else {
-            printError("no 'arguments' or 'command' field found in compilation database entry");
-            return false;
         }
 
-        if (!obj.count("file") || !obj["file"].is<std::string>()) {
-            printError("skip compilation database entry because it does not have a proper 'file' field");
-            continue;
-        }
+        std::string file;
+        {
+            const auto it = obj.find("file");
+            if (it == obj.cend()) {
+                // TODO: do not print as error?
+                printError("skipping compilation database entry because it does not have a 'file' field");
+                continue;
+            }
+            const auto& val = it->second;
+            if (!val.is<std::string>()) {
+                // TODO: do not print as error?
+                printError("skipping compilation database entry because its 'file' field is not a string");
+                continue;
+            }
 
-        const std::string file = Path::fromNativeSeparators(obj["file"].get<std::string>());
+            file = Path::fromNativeSeparators(val.get<std::string>());
+        }
 
         // Accept file?
         if (!Path::acceptFile(file))
