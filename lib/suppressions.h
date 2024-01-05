@@ -148,6 +148,7 @@ public:
         bool thisAndNextLine{}; // Special case for backwards compatibility: { // cppcheck-suppress something
         bool matched{};
         bool checked{}; // for inline suppressions, checked or not
+        bool isInline{};
 
         enum { NO_LINE = -1 };
     };
@@ -243,6 +244,12 @@ public:
      * @return list of unmatched suppressions
      */
     std::list<Suppression> getUnmatchedGlobalSuppressions(const bool unusedFunctionChecking) const;
+
+    /**
+     * @brief Returns list of unmatched inline suppressions.
+     * @return list of unmatched suppressions
+     */
+    std::list<Suppression> getUnmatchedInlineSuppressions(const bool unusedFunctionChecking) const;
 
     /**
      * @brief Returns list of all suppressions.
