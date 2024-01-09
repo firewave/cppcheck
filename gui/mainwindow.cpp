@@ -813,7 +813,9 @@ void MainWindow::analyzeFiles()
         || file0.endsWith(compile_commands_json)
         || file0.endsWith(".bpr")) {
         ImportProject p;
-        p.import(selected[0].toStdString());
+        Settings s; // TODO
+        Suppressions supprs;
+        p.import(selected[0].toStdString(), s, supprs); // TODO: check result
 
         if (file0.endsWith(".sln")) {
             QStringList configs;
@@ -1958,8 +1960,9 @@ void MainWindow::analyzeProject(const ProjectFile *projectFile, const QStringLis
             prjfile = inf.canonicalPath() + '/' + projectFile->getImportProject();
         }
         try {
-
-            const ImportProject::Type result = p.import(prjfile.toStdString());
+            Settings s; // TODO
+            Suppressions supprs;
+            const ImportProject::Type result = p.import(prjfile.toStdString(), s, supprs);
 
             QString errorMessage;
             switch (result) {

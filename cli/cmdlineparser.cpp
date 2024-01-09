@@ -1145,7 +1145,7 @@ CmdLineParser::Result CmdLineParser::parseFromArgs(int argc, const char* const a
 
             mSettings.checkAllConfigurations = false;     // Can be overridden with --max-configs or --force
             std::string projectFile = argv[i]+10;
-            projectType = project.import(projectFile, &mSettings, &mSuppressions, isCppcheckPremium());
+            projectType = project.import(projectFile, mSettings, mSuppressions, isCppcheckPremium());
             if (projectType == ImportProject::Type::CPPCHECK_GUI) {
                 for (const std::string &lib : project.guiProject.libraries)
                     mSettings.libraries.emplace_back(lib);
@@ -1163,7 +1163,7 @@ CmdLineParser::Result CmdLineParser::parseFromArgs(int argc, const char* const a
                 if (!projectFileGui.empty()) {
                     // read underlying project
                     projectFile = projectFileGui;
-                    projectType = project.import(projectFileGui, &mSettings, &mSuppressions);
+                    projectType = project.import(projectFileGui, mSettings, mSuppressions);
                     if (projectType == ImportProject::Type::CPPCHECK_GUI) {
                         mLogger.printError("nested Cppcheck GUI projects are not supported.");
                         return Result::Fail;

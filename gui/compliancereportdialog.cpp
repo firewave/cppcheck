@@ -170,7 +170,9 @@ void ComplianceReportDialog::save()
 
             ImportProject p;
             try {
-                p.import(prjfile.toStdString());
+                Settings s; // TODO
+                Suppressions supprs;
+                p.import(prjfile.toStdString(), s, supprs); // TODO: check result
             } catch (InternalError &e) {
                 QMessageBox msg(QMessageBox::Critical,
                                 tr("Save compliance report"),

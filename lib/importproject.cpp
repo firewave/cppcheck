@@ -165,49 +165,72 @@ void ImportProject::fsSetIncludePaths(FileSettings& fs, const std::string &basep
     }
 }
 
-ImportProject::Type ImportProject::import(const std::string &filename, Settings *settings, Suppressions *supprs, bool premium)
+ImportProject::Type ImportProject::identify(const std::string &filename)
 {
-    std::ifstream fin(filename);
-    if (!fin.is_open())
-        return ImportProject::Type::MISSING;
+    if (!Path::isFile(filename))
+        return Type::MISSING;
+
+    if (endsWith(filename, ".json")) {
+        return Type::COMPILE_DB;
+    }
+    if (endsWith(filename, ".sln")) {
+        return Type::VS_SLN;
+    }
+    if (endsWith(filename, ".vcxproj")) {
+        return Type::VS_VCXPROJ;
+    }
+    if (endsWith(filename, ".bpr")) {
+        return Type::BORLAND;
+    }
+    if (endsWith(filename, ".cppcheck")) {
+        return Type::CPPCHECK_GUI;
+    }
+
+    return Type::UNKNOWN;
+}
+
+ImportProject::Type ImportProject::import(const std::string &filename, Settings &settings, Suppressions &supprs, bool premium)
+{
+    const Type type = identify(filename);
+    if (type == Type::MISSING)
+        return type;
 
     mPath = Path::getPathFromFilename(Path::fromNativeSeparators(filename));
     if (!mPath.empty() && !endsWith(mPath,'/'))
         mPath += '/';
 
-    const std::vector<std::string> fileFilters =
-        settings ? settings->fileFilters : std::vector<std::string>();
+    const std::vector<std::string>& fileFilters = settings.fileFilters; // TODO: use consistently
 
-    if (endsWith(filename, ".json")) {
-        if (importCompileCommands(fin)) {
-            setRelativePaths(filename);
-            return ImportProject::Type::COMPILE_DB;
-        }
-    } else if (endsWith(filename, ".sln")) {
-        if (importSln(fin, mPath, fileFilters)) {
-            setRelativePaths(filename);
-            return ImportProject::Type::VS_SLN;
-        }
-    } else if (endsWith(filename, ".vcxproj")) {
+    std::ifstream fin(filename);
+
+    bool success = false;
+
+    if (type == Type::COMPILE_DB) {
+        success = importCompileCommands(fin);
+    }
+    else if (type == Type::VS_SLN) {
+        success = importSln(fin, mPath, fileFilters);
+    }
+    else if (type == Type::BORLAND) {
+        success = importBcb6Prj(filename);
+    }
+    else if (type == Type::VS_VCXPROJ) {
         std::map<std::string, std::string, cppcheck::stricmp> variables;
         std::vector<SharedItemsProject> sharedItemsProjects;
-        if (importVcxproj(filename, variables, "", fileFilters, sharedItemsProjects)) {
-            setRelativePaths(filename);
-            return ImportProject::Type::VS_VCXPROJ;
-        }
-    } else if (endsWith(filename, ".bpr")) {
-        if (importBcb6Prj(filename)) {
-            setRelativePaths(filename);
-            return ImportProject::Type::BORLAND;
-        }
-    } else if (settings && supprs && endsWith(filename, ".cppcheck")) {
-        if (importCppcheckGuiProject(fin, *settings, *supprs, premium)) {
-            setRelativePaths(filename);
-            return ImportProject::Type::CPPCHECK_GUI;
-        }
-    } else {
+        success = importVcxproj(filename, variables, "", fileFilters, sharedItemsProjects);
+    }
+    else if (type == Type::CPPCHECK_GUI) {
+        success = importCppcheckGuiProject(fin, settings, supprs, premium);
+    }
+    else {
         return ImportProject::Type::UNKNOWN;
     }
+
+    if (success) {
+        setRelativePaths(filename);
+        return type;
+    }
+
     return ImportProject::Type::FAILURE;
 }
 
