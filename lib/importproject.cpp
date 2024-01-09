@@ -177,49 +177,69 @@ void ImportProject::fsSetIncludePaths(FileSettings& fs, const std::string &basep
     }
 }
 
-ImportProject::Type ImportProject::import(const std::string &filename, Settings *settings)
+ImportProject::Type ImportProject::identify(const std::string &filename)
 {
-    std::ifstream fin(filename);
-    if (!fin.is_open())
-        return ImportProject::Type::MISSING;
+    if (!Path::isFile(filename))
+        return Type::MISSING;
+
+    if (endsWith(filename, ".json")) {
+        return Type::COMPILE_DB;
+    }
+    if (endsWith(filename, ".sln")) {
+        return Type::VS_SLN;
+    }
+    if (endsWith(filename, ".vcxproj")) {
+        return Type::VS_VCXPROJ;
+    }
+    if (endsWith(filename, ".bpr")) {
+        return Type::BORLAND;
+    }
+    if (endsWith(filename, ".cppcheck")) {
+        return Type::CPPCHECK_GUI;
+    }
+
+    return Type::UNKNOWN;
+}
+
+ImportProject::Type ImportProject::import(const std::string &filename, Settings &settings)
+{
+    const Type type = identify(filename);
+    if (type == Type::MISSING)
+        return type;
 
     mPath = Path::getPathFromFilename(Path::fromNativeSeparators(filename));
     if (!mPath.empty() && !endsWith(mPath,'/'))
         mPath += '/';
 
-    const std::vector<std::string> fileFilters =
-        settings ? settings->fileFilters : std::vector<std::string>();
+    const std::vector<std::string>& fileFilters = settings.fileFilters; // TODO: use consistently
 
-    if (endsWith(filename, ".json")) {
-        if (importCompileCommands(fin)) {
-            setRelativePaths(filename);
-            return ImportProject::Type::COMPILE_DB;
-        }
-    } else if (endsWith(filename, ".sln")) {
-        if (importSln(fin, mPath, fileFilters)) {
-            setRelativePaths(filename);
-            return ImportProject::Type::VS_SLN;
-        }
-    } else if (endsWith(filename, ".vcxproj")) {
-        std::map<std::string, std::string, cppcheck::stricmp> variables;
-        if (importVcxproj(filename, variables, emptyString, fileFilters)) {
-            setRelativePaths(filename);
-            return ImportProject::Type::VS_VCXPROJ;
-        }
-    } else if (endsWith(filename, ".bpr")) {
-        if (importBcb6Prj(filename)) {
-            setRelativePaths(filename);
-            return ImportProject::Type::BORLAND;
-        }
-    } else if (settings && endsWith(filename, ".cppcheck")) {
-        if (importCppcheckGuiProject(fin, settings)) {
-            setRelativePaths(filename);
-            return ImportProject::Type::CPPCHECK_GUI;
-        }
-    } else {
-        return ImportProject::Type::UNKNOWN;
+    std::ifstream fin(filename);
+
+    bool success = false;
+
+    if (type == Type::COMPILE_DB) {
+        success = importCompileCommands(fin);
     }
-    return ImportProject::Type::FAILURE;
+    else if (type == Type::VS_SLN) {
+        success = importSln(fin, mPath, fileFilters);
+    }
+    else if (type == Type::VS_VCXPROJ) {
+        std::map<std::string, std::string, cppcheck::stricmp> variables; // TODO: use this?
+        success = importVcxproj(filename, variables, emptyString, fileFilters);
+    }
+    else if (type == Type::BORLAND) {
+        success = importBcb6Prj(filename);
+    }
+    else if (type == Type::CPPCHECK_GUI) {
+        success = importCppcheckGuiProject(fin, settings);
+    }
+
+    if (success) {
+        setRelativePaths(filename);
+        return type;
+    }
+
+    return Type::FAILURE;
 }
 
 static std::string readUntil(const std::string &command, std::string::size_type *pos, const char until[])
@@ -1099,7 +1119,7 @@ static const char * readSafe(const char *s, const char *def) {
     return s ? s : def;
 }
 
-bool ImportProject::importCppcheckGuiProject(std::istream &istr, Settings *settings)
+bool ImportProject::importCppcheckGuiProject(std::istream &istr, Settings &settings)
 {
     tinyxml2::XMLDocument doc;
     const std::string xmldata = istream_to_string(istr);
@@ -1238,34 +1258,34 @@ bool ImportProject::importCppcheckGuiProject(std::istream &istr, Settings *setti
             return false;
         }
     }
-    settings->basePaths = temp.basePaths;
-    settings->relativePaths |= temp.relativePaths;
-    settings->buildDir = temp.buildDir;
-    settings->includePaths = temp.includePaths;
-    settings->userDefines = temp.userDefines;
-    settings->userUndefs = temp.userUndefs;
-    settings->addons = temp.addons;
-    settings->clang = temp.clang;
-    settings->clangTidy = temp.clangTidy;
+    settings.basePaths = temp.basePaths;
+    settings.relativePaths |= temp.relativePaths;
+    settings.buildDir = temp.buildDir;
+    settings.includePaths = temp.includePaths;
+    settings.userDefines = temp.userDefines;
+    settings.userUndefs = temp.userUndefs;
+    settings.addons = temp.addons;
+    settings.clang = temp.clang;
+    settings.clangTidy = temp.clangTidy;
 
-    if (!settings->premiumArgs.empty())
-        settings->premiumArgs += temp.premiumArgs;
+    if (!settings.premiumArgs.empty())
+        settings.premiumArgs += temp.premiumArgs;
     else if (!temp.premiumArgs.empty())
-        settings->premiumArgs = temp.premiumArgs.substr(1);
+        settings.premiumArgs = temp.premiumArgs.substr(1);
 
     for (const std::string &p : paths)
         guiProject.pathNames.push_back(p);
-    settings->nomsg.addSuppressions(std::move(suppressions));
-    settings->checkHeaders = temp.checkHeaders;
-    settings->checkUnusedTemplates = temp.checkUnusedTemplates;
-    settings->maxCtuDepth = temp.maxCtuDepth;
-    settings->maxTemplateRecursion = temp.maxTemplateRecursion;
-    settings->safeChecks = temp.safeChecks;
+    settings.nomsg.addSuppressions(std::move(suppressions));
+    settings.checkHeaders = temp.checkHeaders;
+    settings.checkUnusedTemplates = temp.checkUnusedTemplates;
+    settings.maxCtuDepth = temp.maxCtuDepth;
+    settings.maxTemplateRecursion = temp.maxTemplateRecursion;
+    settings.safeChecks = temp.safeChecks;
 
     if (checkLevelExhaustive)
-        settings->setCheckLevelExhaustive();
+        settings.setCheckLevelExhaustive();
     else
-        settings->setCheckLevelNormal();
+        settings.setCheckLevelNormal();
 
     return true;
 }

@@ -94,7 +94,7 @@ QStringList ProjectFileDialog::getProjectConfigs(const QString &fileName)
     QStringList ret;
     ImportProject importer;
     Settings projSettings;
-    importer.import(fileName.toStdString(), &projSettings);
+    importer.import(fileName.toStdString(), projSettings); // TODO: check result
     for (const std::string &cfg : importer.getVSConfigs())
         ret << QString::fromStdString(cfg);
     return ret;

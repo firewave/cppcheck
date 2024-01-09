@@ -908,7 +908,7 @@ CmdLineParser::Result CmdLineParser::parseFromArgs(int argc, const char* const a
 
                 mSettings.checkAllConfigurations = false; // Can be overridden with --max-configs or --force
                 std::string projectFile = argv[i]+10;
-                ImportProject::Type projType = project.import(projectFile, &mSettings);
+                ImportProject::Type projType = project.import(projectFile, mSettings);
                 project.projectType = projType;
                 if (projType == ImportProject::Type::CPPCHECK_GUI) {
                     for (const std::string &lib : project.guiProject.libraries)
@@ -938,7 +938,7 @@ CmdLineParser::Result CmdLineParser::parseFromArgs(int argc, const char* const a
                     if (!projectFileGui.empty()) {
                         // read underlying project
                         projectFile = projectFileGui;
-                        projType = project.import(projectFileGui, &mSettings);
+                        projType = project.import(projectFileGui, mSettings);
                     }
                 }
                 if (projType == ImportProject::Type::VS_SLN || projType == ImportProject::Type::VS_VCXPROJ) {

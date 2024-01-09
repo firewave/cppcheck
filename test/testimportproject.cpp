@@ -362,7 +362,7 @@ private:
         std::istringstream istr(xml);
         Settings s;
         TestImporter project;
-        ASSERT_EQUALS(true, project.importCppcheckGuiProject(istr, &s));
+        ASSERT_EQUALS(true, project.importCppcheckGuiProject(istr, s));
         ASSERT_EQUALS(1, project.guiProject.pathNames.size());
         ASSERT_EQUALS("cli/", project.guiProject.pathNames[0]);
         ASSERT_EQUALS(1, s.includePaths.size());
