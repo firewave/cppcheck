@@ -44,6 +44,8 @@ namespace CTU {
 /// @{
 
 class CPPCHECKLIB CheckUnusedFunctions : public Check {
+    friend class TestUnusedFunctions;
+
 public:
     /** @brief This constructor is used when registering the CheckUnusedFunctions */
     CheckUnusedFunctions() : Check(myName()) {}
@@ -61,9 +63,6 @@ public:
 
     static void parseTokens(const Tokenizer *tokenizer, const Settings *settings);
 
-    // Return true if an error is reported.
-    bool check(ErrorLogger * const errorLogger, const Settings& settings) const;
-
     /** @brief Parse current TU and extract file info */
     Check::FileInfo *getFileInfo(const Tokenizer *tokenizer, const Settings *settings) const override;
 
@@ -80,6 +79,9 @@ public:
     }
 
 private:
+    // Return true if an error is reported.
+    bool check(ErrorLogger * const errorLogger, const Settings& settings) const;
+
     void getErrorMessages(ErrorLogger */*errorLogger*/, const Settings * /*settings*/) const override {}
 
     void runChecks(const Tokenizer & /*tokenizer*/, ErrorLogger * /*errorLogger*/) override {}
