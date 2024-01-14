@@ -665,7 +665,7 @@ unsigned int CppCheck::checkFile(const std::string& filename, const std::string 
         if (mSettings.library.markupFile(filename)) {
             Tokenizer tokenizer(mSettings, this, &preprocessor);
             tokenizer.createTokens(std::move(tokens1));
-            checkUnusedFunctions.getFileInfo(&tokenizer, &mSettings);
+            CheckUnusedFunctions::parseTokens(&tokenizer, &mSettings);
             return EXIT_SUCCESS;
         }
 
