@@ -1130,6 +1130,8 @@ void CppCheck::checkNormalTokens(const Tokenizer &tokenizer)
                     delete fi;
             }
         }
+
+        CheckUnusedFunctions::parseTokens(&tokenizer, &mSettings);
     }
 
 #ifdef HAVE_RULES
