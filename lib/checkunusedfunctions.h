@@ -22,7 +22,6 @@
 #define checkunusedfunctionsH
 //---------------------------------------------------------------------------
 
-#include "check.h"
 #include "config.h"
 
 #include <list>
@@ -35,24 +34,14 @@ class Function;
 class Settings;
 class Tokenizer;
 
-namespace CTU {
-    class FileInfo;
-}
-
-/// @addtogroup Checks
 /** @brief Check for functions never called */
 /// @{
 
-class CPPCHECKLIB CheckUnusedFunctions : public Check {
+class CPPCHECKLIB CheckUnusedFunctions {
     friend class TestUnusedFunctions;
 
 public:
-    /** @brief This constructor is used when registering the CheckUnusedFunctions */
-    CheckUnusedFunctions() : Check(myName()) {}
-
-    /** @brief This constructor is used when running checks. */
-    CheckUnusedFunctions(const Tokenizer *tokenizer, const Settings *settings, ErrorLogger *errorLogger)
-        : Check(myName(), tokenizer, settings, errorLogger) {}
+    CheckUnusedFunctions() = default;
 
     static void clear();
 
@@ -65,8 +54,7 @@ public:
 
     std::string analyzerInfo() const;
 
-    /** @brief Combine and analyze all analyzerInfos for all TUs */
-    static void analyseWholeProgram2(const Settings &settings, ErrorLogger * const errorLogger, const std::string &buildDir);
+    static void analyseWholeProgram(const Settings &settings, ErrorLogger * const errorLogger, const std::string &buildDir);
 
     static void getErrorMessages(ErrorLogger *errorLogger) {
         unusedFunctionError(errorLogger, emptyString, 0, 0, "funcName");
@@ -78,24 +66,9 @@ private:
     // Return true if an error is reported.
     bool check(ErrorLogger * const errorLogger, const Settings& settings) const;
 
-    void getErrorMessages(ErrorLogger */*errorLogger*/, const Settings * /*settings*/) const override {}
-
-    void runChecks(const Tokenizer & /*tokenizer*/, ErrorLogger * /*errorLogger*/) override {}
-
-    /**
-     * Dummy implementation, just to provide error for --errorlist
-     */
     static void unusedFunctionError(ErrorLogger * const errorLogger,
                                     const std::string &filename, unsigned int fileIndex, unsigned int lineNumber,
                                     const std::string &funcname);
-
-    static std::string myName() {
-        return "Unused functions";
-    }
-
-    std::string classInfo() const override {
-        return "Check for functions that are never called\n";
-    }
 
     struct CPPCHECKLIB FunctionUsage {
         std::string filename;
