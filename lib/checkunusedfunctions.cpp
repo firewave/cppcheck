@@ -35,23 +35,55 @@
 #include <cctype>
 #include <cstring>
 #include <fstream> // IWYU pragma: keep
+#include <list>
 #include <map>
+#include <set>
 #include <sstream> // IWYU pragma: keep
 #include <tuple>
 #include <utility>
+#include <unordered_map>
 #include <vector>
 
 #include "xml.h"
 
-namespace CTU {
-    class FileInfo;
-}
 
 //---------------------------------------------------------------------------
 
-// Register this check class
+class UnusedFunctionsCheckerImpl
+{
+public:
+    void parseTokens(const Tokenizer &tokenizer, const char FileName[], const Settings &settings);
+    std::string analyzerInfo() const;
+
+    // Return true if an error is reported.
+    bool check(ErrorLogger& errorLogger, const Settings& settings) const;
+
+    static void unusedFunctionError(ErrorLogger& errorLogger,
+                                    const std::string &filename, unsigned int fileIndex, unsigned int lineNumber,
+                                    const std::string &funcname);
+
+    struct FunctionUsage {
+        std::string filename;
+        unsigned int lineNumber{};
+        unsigned int fileIndex{};
+        bool usedSameFile{};
+        bool usedOtherFile{};
+    };
+
+    std::unordered_map<std::string, FunctionUsage> mFunctions;
+
+    class FunctionDecl {
+    public:
+        explicit FunctionDecl(const Function *f);
+        std::string functionName;
+        unsigned int lineNumber;
+    };
+    std::list<FunctionDecl> mFunctionDecl;
+    std::set<std::string> mFunctionCalls;
+};
+
 namespace {
-    CheckUnusedFunctions instance;
+    UnusedFunctionsCheckerImpl instance;
 }
 
 static const CWE CWE561(561U);   // Dead Code
@@ -68,7 +100,7 @@ static std::string stripTemplateParameters(const std::string& funcName) {
 // FUNCTION USAGE - Check for unused functions etc
 //---------------------------------------------------------------------------
 
-void CheckUnusedFunctions::parseTokens(const Tokenizer &tokenizer, const char FileName[], const Settings &settings)
+void UnusedFunctionsCheckerImpl::parseTokens(const Tokenizer &tokenizer, const char FileName[], const Settings &settings)
 {
     const bool doMarkup = settings.library.markupFile(FileName);
 
@@ -313,7 +345,7 @@ static bool isOperatorFunction(const std::string & funcName)
     return std::find(additionalOperators.cbegin(), additionalOperators.cend(), funcName.substr(operatorPrefix.length())) != additionalOperators.cend();
 }
 
-bool CheckUnusedFunctions::check(ErrorLogger& errorLogger, const Settings& settings) const
+bool UnusedFunctionsCheckerImpl::check(ErrorLogger& errorLogger, const Settings& settings) const
 {
     using ErrorParams = std::tuple<std::string, unsigned int, unsigned int, std::string>;
     std::vector<ErrorParams> errors; // ensure well-defined order
@@ -347,7 +379,7 @@ bool CheckUnusedFunctions::check(ErrorLogger& errorLogger, const Settings& setti
     return !errors.empty();
 }
 
-void CheckUnusedFunctions::unusedFunctionError(ErrorLogger& errorLogger,
+void UnusedFunctionsCheckerImpl::unusedFunctionError(ErrorLogger& errorLogger,
                                                const std::string &filename, unsigned int fileIndex, unsigned int lineNumber,
                                                const std::string &funcname)
 {
@@ -378,11 +410,11 @@ bool CheckUnusedFunctions::check(const Settings& settings, ErrorLogger &errorLog
     return instance.check(errorLogger, settings);
 }
 
-CheckUnusedFunctions::FunctionDecl::FunctionDecl(const Function *f)
+UnusedFunctionsCheckerImpl::FunctionDecl::FunctionDecl(const Function *f)
     : functionName(f->name()), lineNumber(f->token->linenr())
 {}
 
-std::string CheckUnusedFunctions::analyzerInfo() const
+std::string UnusedFunctionsCheckerImpl::analyzerInfo() const
 {
     std::ostringstream ret;
     for (const FunctionDecl &functionDecl : mFunctionDecl) {
@@ -465,7 +497,30 @@ void CheckUnusedFunctions::analyseWholeProgram(const Settings &settings, ErrorLo
 
         if (calls.find(functionName) == calls.end() && !isOperatorFunction(functionName)) {
             const Location &loc = decl->second;
-            unusedFunctionError(errorLogger, loc.fileName, /*fileIndex*/ 0, loc.lineNumber, functionName);
+            UnusedFunctionsCheckerImpl::unusedFunctionError(errorLogger, loc.fileName, /*fileIndex*/ 0, loc.lineNumber, functionName);
         }
     }
+}
+
+CheckUnusedFunctions::CheckUnusedFunctions() : mImpl(new UnusedFunctionsCheckerImpl)
+{}
+
+void CheckUnusedFunctions::parseTokens(const Tokenizer &tokenizer, const char FileName[], const Settings &settings)
+{
+    static_cast<UnusedFunctionsCheckerImpl*>(mImpl)->parseTokens(tokenizer, FileName, settings);
+}
+
+std::string CheckUnusedFunctions::analyzerInfo() const
+{
+    return static_cast<UnusedFunctionsCheckerImpl*>(mImpl)->analyzerInfo();
+}
+
+void CheckUnusedFunctions::getErrorMessages(ErrorLogger &errorLogger)
+{
+    UnusedFunctionsCheckerImpl::unusedFunctionError(errorLogger, emptyString, 0, 0, "funcName");
+}
+
+bool CheckUnusedFunctions::check(ErrorLogger& errorLogger, const Settings& settings) const
+{
+    return static_cast<UnusedFunctionsCheckerImpl*>(mImpl)->check(errorLogger, settings);
 }

@@ -24,10 +24,7 @@
 
 #include "config.h"
 
-#include <list>
-#include <set>
 #include <string>
-#include <unordered_map>
 
 class ErrorLogger;
 class Function;
@@ -41,22 +38,19 @@ class CPPCHECKLIB CheckUnusedFunctions {
     friend class TestUnusedFunctions;
 
 public:
-    CheckUnusedFunctions() = default;
+    CheckUnusedFunctions();
 
     // Parse current tokens and determine..
     // * Check what functions are used
     // * What functions are declared
     void parseTokens(const Tokenizer &tokenizer, const char FileName[], const Settings &settings);
+    std::string analyzerInfo() const;
 
     static void parseTokens(const Tokenizer &tokenizer, const Settings &settings);
 
-    std::string analyzerInfo() const;
-
     static void analyseWholeProgram(const Settings &settings, ErrorLogger& errorLogger, const std::string &buildDir);
 
-    static void getErrorMessages(ErrorLogger &errorLogger) {
-        unusedFunctionError(errorLogger, emptyString, 0, 0, "funcName");
-    }
+    static void getErrorMessages(ErrorLogger &errorLogger);
 
     static bool check(const Settings& settings, ErrorLogger &errorLogger);
 
@@ -64,28 +58,7 @@ private:
     // Return true if an error is reported.
     bool check(ErrorLogger& errorLogger, const Settings& settings) const;
 
-    static void unusedFunctionError(ErrorLogger& errorLogger,
-                                    const std::string &filename, unsigned int fileIndex, unsigned int lineNumber,
-                                    const std::string &funcname);
-
-    struct CPPCHECKLIB FunctionUsage {
-        std::string filename;
-        unsigned int lineNumber{};
-        unsigned int fileIndex{};
-        bool usedSameFile{};
-        bool usedOtherFile{};
-    };
-
-    std::unordered_map<std::string, FunctionUsage> mFunctions;
-
-    class CPPCHECKLIB FunctionDecl {
-    public:
-        explicit FunctionDecl(const Function *f);
-        std::string functionName;
-        unsigned int lineNumber;
-    };
-    std::list<FunctionDecl> mFunctionDecl;
-    std::set<std::string> mFunctionCalls;
+    void* mImpl;
 };
 /// @}
 //---------------------------------------------------------------------------
