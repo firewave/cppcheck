@@ -43,8 +43,6 @@ class CPPCHECKLIB CheckUnusedFunctions {
 public:
     CheckUnusedFunctions() = default;
 
-    static void clear();
-
     // Parse current tokens and determine..
     // * Check what functions are used
     // * What functions are declared
