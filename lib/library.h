@@ -239,6 +239,7 @@ public:
         bool unstableErase{};
         bool unstableInsert{};
         bool view{};
+        bool isStd{};
 
         Action getAction(const std::string& function) const {
             const std::map<std::string, Function>::const_iterator i = functions.find(function);
