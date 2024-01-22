@@ -239,6 +239,7 @@ public:
         bool unstableErase{};
         bool unstableInsert{};
         bool view{};
+        bool isStd{};
 
         Action getAction(const std::string& function) const {
             const auto i = utils::as_const(functions).find(function);

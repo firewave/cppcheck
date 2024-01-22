@@ -620,6 +620,7 @@ Library::Error Library::load(const tinyxml2::XMLDocument &doc)
                 container.startPattern2 = startPattern;
                 if (!endsWith(container.startPattern, '<'))
                     container.startPattern2 += " !!::";
+                container.isStd = startsWith(container.startPattern, "std ::");
             }
             const char* const endPattern = node->Attribute("endPattern");
             if (endPattern)
@@ -1399,7 +1400,7 @@ const Library::Container* Library::detectContainerInternal(const Token* const ty
         if (container.startPattern.empty())
             continue;
 
-        const int offset = (withoutStd && startsWith(container.startPattern2, "std :: ")) ? 7 : 0;
+        const int offset = (withoutStd && container.isStd) ? 7 : 0;
 
         // If endPattern is undefined, it will always match, but itEndPattern has to be defined.
         if (detect != IteratorOnly && container.endPattern.empty()) {
