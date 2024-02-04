@@ -196,9 +196,9 @@ void ProgramMemory::insert(const ProgramMemory &pm)
         mValues.insert(p);
 }
 
-static ValueFlow::Value execute(const Token* expr, ProgramMemory& pm, const Settings* settings);
+static ValueFlow::Value execute(const Token* expr, ProgramMemory& pm, const Settings& settings);
 
-static bool evaluateCondition(MathLib::bigint r, const Token* condition, ProgramMemory& pm, const Settings* settings)
+static bool evaluateCondition(MathLib::bigint r, const Token* condition, ProgramMemory& pm, const Settings& settings)
 {
     if (!condition)
         return false;
@@ -208,12 +208,12 @@ static bool evaluateCondition(MathLib::bigint r, const Token* condition, Program
     return !error && result == r;
 }
 
-bool conditionIsFalse(const Token* condition, ProgramMemory pm, const Settings* settings)
+bool conditionIsFalse(const Token* condition, ProgramMemory pm, const Settings& settings)
 {
     return evaluateCondition(0, condition, pm, settings);
 }
 
-bool conditionIsTrue(const Token* condition, ProgramMemory pm, const Settings* settings)
+bool conditionIsTrue(const Token* condition, ProgramMemory pm, const Settings& settings)
 {
     return evaluateCondition(1, condition, pm, settings);
 }
@@ -271,7 +271,7 @@ static bool isBasicForLoop(const Token* tok)
     return true;
 }
 
-void programMemoryParseCondition(ProgramMemory& pm, const Token* tok, const Token* endTok, const Settings* settings, bool then)
+void programMemoryParseCondition(ProgramMemory& pm, const Token* tok, const Token* endTok, const Settings& settings, bool then)
 {
     auto eval = [&](const Token* t) -> std::vector<MathLib::bigint> {
         if (!t)
@@ -295,12 +295,12 @@ void programMemoryParseCondition(ProgramMemory& pm, const Token* tok, const Toke
             return;
         if (!truevalue.isIntValue())
             return;
-        if (endTok && findExpressionChanged(vartok, tok->next(), endTok, settings))
+        if (endTok && findExpressionChanged(vartok, tok->next(), endTok, &settings))
             return;
         const bool impossible = (tok->str() == "==" && !then) || (tok->str() == "!=" && then);
         const ValueFlow::Value& v = then ? truevalue : falsevalue;
         pm.setValue(vartok, impossible ? asImpossible(v) : v);
-        const Token* containerTok = settings->library.getContainerFromYield(vartok, Library::Container::Yield::SIZE);
+        const Token* containerTok = settings.library.getContainerFromYield(vartok, Library::Container::Yield::SIZE);
         if (containerTok)
             pm.setContainerSizeValue(containerTok, v.intvalue, !impossible);
     } else if (Token::simpleMatch(tok, "!")) {
@@ -323,17 +323,16 @@ void programMemoryParseCondition(ProgramMemory& pm, const Token* tok, const Toke
                 pm.setIntValue(tok, 0, then);
         }
     } else if (tok && tok->exprId() > 0) {
-        if (endTok && findExpressionChanged(tok, tok->next(), endTok, settings))
+        if (endTok && findExpressionChanged(tok, tok->next(), endTok, &settings))
             return;
         pm.setIntValue(tok, 0, then);
-        assert(settings);
-        const Token* containerTok = settings->library.getContainerFromYield(tok, Library::Container::Yield::EMPTY);
+        const Token* containerTok = settings.library.getContainerFromYield(tok, Library::Container::Yield::EMPTY);
         if (containerTok)
             pm.setContainerSizeValue(containerTok, 0, then);
     }
 }
 
-static void fillProgramMemoryFromConditions(ProgramMemory& pm, const Scope* scope, const Token* endTok, const Settings* settings)
+static void fillProgramMemoryFromConditions(ProgramMemory& pm, const Scope* scope, const Token* endTok, const Settings& settings)
 {
     if (!scope)
         return;
@@ -353,12 +352,12 @@ static void fillProgramMemoryFromConditions(ProgramMemory& pm, const Scope* scop
     }
 }
 
-static void fillProgramMemoryFromConditions(ProgramMemory& pm, const Token* tok, const Settings* settings)
+static void fillProgramMemoryFromConditions(ProgramMemory& pm, const Token* tok, const Settings& settings)
 {
     fillProgramMemoryFromConditions(pm, tok->scope(), tok, settings);
 }
 
-static void fillProgramMemoryFromAssignments(ProgramMemory& pm, const Token* tok, const Settings* settings, const ProgramMemory& state, const ProgramMemory::Map& vars)
+static void fillProgramMemoryFromAssignments(ProgramMemory& pm, const Token* tok, const Settings& settings, const ProgramMemory& state, const ProgramMemory::Map& vars)
 {
     int indentlevel = 0;
     for (const Token *tok2 = tok; tok2; tok2 = tok2->previous()) {
@@ -381,7 +380,7 @@ static void fillProgramMemoryFromAssignments(ProgramMemory& pm, const Token* tok
                 }
             }
         } else if (tok2->exprId() > 0 && Token::Match(tok2, ".|(|[|*|%var%") && !pm.hasValue(tok2->exprId()) &&
-                   isVariableChanged(tok2, 0, settings)) {
+                   isVariableChanged(tok2, 0, &settings)) {
             pm.setUnknown(tok2);
         }
 
@@ -427,12 +426,12 @@ static void removeModifiedVars(ProgramMemory& pm, const Token* tok, const Token*
 
 static ProgramMemory getInitialProgramState(const Token* tok,
                                             const Token* origin,
-                                            const Settings* settings,
+                                            const Settings& settings,
                                             const ProgramMemory::Map& vars = ProgramMemory::Map {})
 {
     ProgramMemory pm;
     if (origin) {
-        fillProgramMemoryFromConditions(pm, origin, nullptr);
+        fillProgramMemoryFromConditions(pm, origin, settings);
         const ProgramMemory state = pm;
         fillProgramMemoryFromAssignments(pm, tok, settings, state, vars);
         removeModifiedVars(pm, tok, origin);
@@ -440,7 +439,7 @@ static ProgramMemory getInitialProgramState(const Token* tok,
     return pm;
 }
 
-ProgramMemoryState::ProgramMemoryState(const Settings* s) : settings(s) {}
+ProgramMemoryState::ProgramMemoryState(const Settings& s) : settings(s) {}
 
 void ProgramMemoryState::insert(const ProgramMemory &pm, const Token* origin)
 {
@@ -508,7 +507,7 @@ void ProgramMemoryState::removeModifiedVars(const Token* tok)
     state.erase_if([&](const ExprIdToken& e) {
         const Token* start = origins[e.getExpressionId()];
         const Token* expr = e.tok;
-        if (!expr || findExpressionChangedSkipDeadCode(expr, start, tok, settings, eval)) {
+        if (!expr || findExpressionChangedSkipDeadCode(expr, start, tok, &settings, eval)) {
             origins.erase(e.getExpressionId());
             return true;
         }
@@ -534,7 +533,7 @@ ProgramMemory ProgramMemoryState::get(const Token* tok, const Token* ctx, const 
     return local.state;
 }
 
-ProgramMemory getProgramMemory(const Token* tok, const Token* expr, const ValueFlow::Value& value, const Settings* settings)
+ProgramMemory getProgramMemory(const Token* tok, const Token* expr, const ValueFlow::Value& value, const Settings& settings)
 {
     ProgramMemory programMemory;
     programMemory.replace(getInitialProgramState(tok, value.tokvalue, settings));
@@ -1222,7 +1221,7 @@ static std::vector<const Token*> setDifference(const std::vector<const Token*>& 
 static bool evalSameCondition(const ProgramMemory& state,
                               const Token* storedValue,
                               const Token* cond,
-                              const Settings* settings)
+                              const Settings& settings)
 {
     assert(!conditionIsTrue(cond, state, settings));
     ProgramMemory pm = state;
@@ -1253,11 +1252,11 @@ static void pruneConditions(std::vector<const Token*>& conds,
 namespace {
     struct Executor {
         ProgramMemory* pm = nullptr;
-        const Settings* settings = nullptr;
+        const Settings& settings;
         int fdepth = 4;
         int depth = 10;
 
-        explicit Executor(ProgramMemory* pm = nullptr, const Settings* settings = nullptr) : pm(pm), settings(settings) {}
+        explicit Executor(ProgramMemory* pm, const Settings& settings) : pm(pm), settings(settings) {}
 
         static ValueFlow::Value unknown() {
             return ValueFlow::Value::unknown();
@@ -1561,7 +1560,7 @@ namespace {
                 const Token* ftok = expr->previous();
                 const Function* f = ftok->function();
                 ValueFlow::Value result = unknown();
-                if (settings && expr->str() == "(") {
+                if (expr->str() == "(") {
                     std::vector<const Token*> tokArgs = getArguments(expr);
                     std::vector<ValueFlow::Value> args(tokArgs.size());
                     std::transform(
@@ -1589,7 +1588,7 @@ namespace {
                         BuiltinLibraryFunction lf = getBuiltinLibraryFunction(ftok->str());
                         if (lf)
                             return lf(args);
-                        const std::string& returnValue = settings->library.returnValue(ftok);
+                        const std::string& returnValue = settings.library.returnValue(ftok);
                         if (!returnValue.empty()) {
                             std::unordered_map<nonneg int, ValueFlow::Value> arg_map;
                             int argn = 0;
@@ -1607,10 +1606,10 @@ namespace {
                     if (child->exprId() > 0 && pm->hasValue(child->exprId())) {
                         ValueFlow::Value& v = pm->at(child->exprId());
                         if (v.valueType == ValueFlow::Value::ValueType::CONTAINER_SIZE) {
-                            if (ValueFlow::isContainerSizeChanged(child, v.indirect, *settings))
+                            if (ValueFlow::isContainerSizeChanged(child, v.indirect, settings))
                                 v = unknown();
                         } else if (v.valueType != ValueFlow::Value::ValueType::UNINIT) {
-                            if (isVariableChanged(child, v.indirect, settings))
+                            if (isVariableChanged(child, v.indirect, &settings))
                                 v = unknown();
                         }
                     }
@@ -1740,13 +1739,13 @@ namespace {
     };
 }     // namespace
 
-static ValueFlow::Value execute(const Token* expr, ProgramMemory& pm, const Settings* settings)
+static ValueFlow::Value execute(const Token* expr, ProgramMemory& pm, const Settings& settings)
 {
     Executor ex{&pm, settings};
     return ex.execute(expr);
 }
 
-std::vector<ValueFlow::Value> execute(const Scope* scope, ProgramMemory& pm, const Settings* settings)
+std::vector<ValueFlow::Value> execute(const Scope* scope, ProgramMemory& pm, const Settings& settings)
 {
     Executor ex{&pm, settings};
     return ex.execute(scope);
@@ -1754,7 +1753,7 @@ std::vector<ValueFlow::Value> execute(const Scope* scope, ProgramMemory& pm, con
 
 ValueFlow::Value evaluateLibraryFunction(const std::unordered_map<nonneg int, ValueFlow::Value>& args,
                                          const std::string& returnValue,
-                                         const Settings* settings,
+                                         const Settings& settings,
                                          bool cpp)
 {
     thread_local static std::unordered_map<std::string,
@@ -1785,7 +1784,7 @@ void execute(const Token* expr,
              ProgramMemory& programMemory,
              MathLib::bigint* result,
              bool* error,
-             const Settings* settings)
+             const Settings& settings)
 {
     ValueFlow::Value v = execute(expr, programMemory, settings);
     if (!v.isIntValue() || v.isImpossible()) {

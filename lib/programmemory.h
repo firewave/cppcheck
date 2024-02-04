@@ -161,14 +161,14 @@ private:
     Map mValues;
 };
 
-void programMemoryParseCondition(ProgramMemory& pm, const Token* tok, const Token* endTok, const Settings* settings, bool then);
+void programMemoryParseCondition(ProgramMemory& pm, const Token* tok, const Token* endTok, const Settings& settings, bool then);
 
 struct ProgramMemoryState {
     ProgramMemory state;
     std::map<nonneg int, const Token*> origins;
-    const Settings* settings;
+    const Settings& settings;
 
-    explicit ProgramMemoryState(const Settings* s);
+    explicit ProgramMemoryState(const Settings& s);
 
     void insert(const ProgramMemory &pm, const Token* origin = nullptr);
     void replace(ProgramMemory pm, const Token* origin = nullptr);
@@ -182,36 +182,36 @@ struct ProgramMemoryState {
     ProgramMemory get(const Token* tok, const Token* ctx, const ProgramMemory::Map& vars) const;
 };
 
-std::vector<ValueFlow::Value> execute(const Scope* scope, ProgramMemory& pm, const Settings* settings);
+std::vector<ValueFlow::Value> execute(const Scope* scope, ProgramMemory& pm, const Settings& settings);
 
 void execute(const Token* expr,
              ProgramMemory& programMemory,
              MathLib::bigint* result,
              bool* error,
-             const Settings* settings = nullptr);
+             const Settings& settings);
 
 /**
  * Is condition always false when variable has given value?
  * \param condition   top ast token in condition
  * \param pm   program memory
  */
-bool conditionIsFalse(const Token* condition, ProgramMemory pm, const Settings* settings);
+bool conditionIsFalse(const Token* condition, ProgramMemory pm, const Settings& settings);
 
 /**
  * Is condition always true when variable has given value?
  * \param condition   top ast token in condition
  * \param pm   program memory
  */
-bool conditionIsTrue(const Token* condition, ProgramMemory pm, const Settings* settings);
+bool conditionIsTrue(const Token* condition, ProgramMemory pm, const Settings& settings);
 
 /**
  * Get program memory by looking backwards from given token.
  */
-ProgramMemory getProgramMemory(const Token* tok, const Token* expr, const ValueFlow::Value& value, const Settings* settings);
+ProgramMemory getProgramMemory(const Token* tok, const Token* expr, const ValueFlow::Value& value, const Settings& settings);
 
 ValueFlow::Value evaluateLibraryFunction(const std::unordered_map<nonneg int, ValueFlow::Value>& args,
                                          const std::string& returnValue,
-                                         const Settings* settings,
+                                         const Settings& settings,
                                          bool cpp);
 
 #endif

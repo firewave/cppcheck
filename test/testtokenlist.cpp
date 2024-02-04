@@ -44,7 +44,7 @@ private:
     // inspired by #5895
     void testaddtoken1() const {
         const std::string code = "0x89504e470d0a1a0a";
-        TokenList tokenlist(&settings);
+        TokenList tokenlist(settings);
         tokenlist.addtoken(code, 1, 1, false);
         ASSERT_EQUALS("0x89504e470d0a1a0a", tokenlist.front()->str());
     }
@@ -53,7 +53,7 @@ private:
         const std::string code = "0xF0000000";
         /*const*/ Settings settings1;
         settings1.platform.int_bit = 32;
-        TokenList tokenlist(&settings1);
+        TokenList tokenlist(settings1);
         tokenlist.addtoken(code, 1, 1, false);
         ASSERT_EQUALS("0xF0000000", tokenlist.front()->str());
     }
@@ -119,7 +119,7 @@ private:
         {
             const char code2[] = "_Generic"; // C11 keyword
             const Settings s = settingsBuilder().c(Standards::C89).build();
-            TokenList tokenlist(&s);
+            TokenList tokenlist(s);
             std::istringstream istr(code2);
             ASSERT(tokenlist.createTokens(istr, "a.c"));
             ASSERT_EQUALS(false, tokenlist.front()->isKeyword());
@@ -140,7 +140,7 @@ private:
         {
             const char code2[] = "noexcept"; // C++11 keyword
             const Settings s = settingsBuilder().cpp(Standards::CPP03).build();
-            TokenList tokenlist(&s);
+            TokenList tokenlist(s);
             std::istringstream istr(code2);
             ASSERT(tokenlist.createTokens(istr, "a.cpp"));
             ASSERT_EQUALS(false, tokenlist.front()->isKeyword());

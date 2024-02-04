@@ -2463,7 +2463,7 @@ struct ValueFlowAnalyzer : Analyzer {
     const Settings& settings;
     ProgramMemoryState pms;
 
-    explicit ValueFlowAnalyzer(const TokenList& t, const Settings& s) : tokenlist(t), settings(s), pms(&settings) {}
+    explicit ValueFlowAnalyzer(const TokenList& t, const Settings& s) : tokenlist(t), settings(s), pms(settings) {}
 
     virtual const ValueFlow::Value* getValue(const Token* tok) const = 0;
     virtual ValueFlow::Value* getValue(const Token* tok) = 0;
@@ -2963,14 +2963,14 @@ struct ValueFlowAnalyzer : Analyzer {
         std::vector<MathLib::bigint> result;
         ProgramMemory pm = getProgramMemory();
         if (Token::Match(tok, "&&|%oror%")) {
-            if (conditionIsTrue(tok, pm, &getSettings()))
+            if (conditionIsTrue(tok, pm, getSettings()))
                 result.push_back(1);
-            if (conditionIsFalse(tok, std::move(pm), &getSettings()))
+            if (conditionIsFalse(tok, std::move(pm), getSettings()))
                 result.push_back(0);
         } else {
             MathLib::bigint out = 0;
             bool error = false;
-            execute(tok, pm, &out, &error, &getSettings());
+            execute(tok, pm, &out, &error, getSettings());
             if (!error)
                 result.push_back(out);
         }
@@ -3817,7 +3817,8 @@ static bool isNotEqual(std::pair<const Token*, const Token*> x, std::pair<const 
 }
 static bool isNotEqual(std::pair<const Token*, const Token*> x, const std::string& y, bool cpp)
 {
-    TokenList tokenList(nullptr);
+    const Settings settings; // TODO
+    TokenList tokenList(settings);
     std::istringstream istr(y);
     tokenList.createTokens(istr, cpp ? Standards::Language::CPP : Standards::Language::C);
     return isNotEqual(x, std::make_pair(tokenList.front(), tokenList.back()));
@@ -6670,9 +6671,9 @@ struct ConditionHandler {
                 ProgramMemory pm;
                 fillFromPath(pm, initTok, path);
                 fillFromPath(pm, condTok, path);
-                execute(initTok, pm, nullptr, nullptr);
+                execute(initTok, pm, nullptr, nullptr, settings);
                 MathLib::bigint result = 1;
-                execute(condTok, pm, &result, nullptr);
+                execute(condTok, pm, &result, nullptr, settings);
                 if (result == 0)
                     return;
                 // Remove condition since for condition is not redundant
@@ -7089,10 +7090,11 @@ static bool valueFlowForLoop2(const Token *tok,
     ProgramMemory programMemory;
     MathLib::bigint result(0);
     bool error = false;
-    execute(firstExpression, programMemory, &result, &error);
+    const Settings settings; // TODO
+    execute(firstExpression, programMemory, &result, &error, settings);
     if (error)
         return false;
-    execute(secondExpression, programMemory, &result, &error);
+    execute(secondExpression, programMemory, &result, &error, settings);
     if (result == 0) // 2nd expression is false => no looping
         return false;
     if (error) {
@@ -7115,9 +7117,9 @@ static bool valueFlowForLoop2(const Token *tok,
     int maxcount = 10000;
     while (result != 0 && !error && --maxcount > 0) {
         endMemory = programMemory;
-        execute(thirdExpression, programMemory, &result, &error);
+        execute(thirdExpression, programMemory, &result, &error, settings);
         if (!error)
-            execute(secondExpression, programMemory, &result, &error);
+            execute(secondExpression, programMemory, &result, &error, settings);
     }
 
     if (memory1)
@@ -7174,9 +7176,9 @@ static void valueFlowForLoopSimplify(Token* const bodyStart,
         }
 
         if (Token::Match(tok2, "%oror%|&&")) {
-            const ProgramMemory programMemory(getProgramMemory(tok2->astTop(), expr, ValueFlow::Value(value), &settings));
-            if ((tok2->str() == "&&" && !conditionIsTrue(tok2->astOperand1(), programMemory, &settings)) ||
-                (tok2->str() == "||" && !conditionIsFalse(tok2->astOperand1(), programMemory, &settings))) {
+            const ProgramMemory programMemory(getProgramMemory(tok2->astTop(), expr, ValueFlow::Value(value), settings));
+            if ((tok2->str() == "&&" && !conditionIsTrue(tok2->astOperand1(), programMemory, settings)) ||
+                (tok2->str() == "||" && !conditionIsFalse(tok2->astOperand1(), programMemory, settings))) {
                 // Skip second expression..
                 Token *parent = tok2;
                 while (parent && parent->str() == tok2->str())
@@ -7199,12 +7201,12 @@ static void valueFlowForLoopSimplify(Token* const bodyStart,
 
         if ((tok2->str() == "&&" &&
              conditionIsFalse(tok2->astOperand1(),
-                              getProgramMemory(tok2->astTop(), expr, ValueFlow::Value(value), &settings),
-                              &settings)) ||
+                              getProgramMemory(tok2->astTop(), expr, ValueFlow::Value(value), settings),
+                              settings)) ||
             (tok2->str() == "||" &&
              conditionIsTrue(tok2->astOperand1(),
-                             getProgramMemory(tok2->astTop(), expr, ValueFlow::Value(value), &settings),
-                             &settings)))
+                             getProgramMemory(tok2->astTop(), expr, ValueFlow::Value(value), settings),
+                             settings)))
             break;
 
         if (Token::simpleMatch(tok2, ") {")) {
@@ -7683,7 +7685,7 @@ static void valueFlowLibraryFunction(Token *tok, const std::string &returnValue,
     if (returnValue.find("arg") != std::string::npos && argValues.empty())
         return;
     productParams(settings, argValues, [&](const std::unordered_map<nonneg int, ValueFlow::Value>& arg) {
-        ValueFlow::Value value = evaluateLibraryFunction(arg, returnValue, &settings, tok->isCpp());
+        ValueFlow::Value value = evaluateLibraryFunction(arg, returnValue, settings, tok->isCpp());
         if (value.isUninitValue())
             return;
         ValueFlow::Value::ValueKind kind = ValueFlow::Value::ValueKind::Known;
@@ -7923,7 +7925,7 @@ static void valueFlowFunctionReturn(TokenList &tokenlist, ErrorLogger *errorLogg
         }
         if (programMemory.empty() && !arguments.empty())
             continue;
-        std::vector<ValueFlow::Value> values = execute(function->functionScope, programMemory, &settings);
+        std::vector<ValueFlow::Value> values = execute(function->functionScope, programMemory, settings);
         for (const ValueFlow::Value& v : values) {
             if (v.isUninitValue())
                 continue;
@@ -9180,7 +9182,7 @@ static bool getMinMaxValues(const ValueType *vt, const Platform &platform, MathL
 
 static bool getMinMaxValues(const std::string &typestr, const Settings &settings, bool cpp, MathLib::bigint &minvalue, MathLib::bigint &maxvalue)
 {
-    TokenList typeTokens(&settings);
+    TokenList typeTokens(settings);
     std::istringstream istr(typestr+";");
     if (!typeTokens.createTokens(istr, cpp ? Standards::Language::CPP : Standards::Language::C))
         return false;

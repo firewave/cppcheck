@@ -37,6 +37,8 @@ public:
     TestTokenRange() : TestFixture("TestTokenRange") {}
 
 private:
+    const Settings settings;
+
     void run() override {
         TEST_CASE(enumerationToEnd);
         TEST_CASE(untilHelperToEnd);

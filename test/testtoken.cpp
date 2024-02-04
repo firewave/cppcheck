@@ -39,7 +39,7 @@ public:
     }
 
 private:
-    /*const*/ TokenList list{&settingsDefault};
+    /*const*/ TokenList list{settingsDefault};
 
     std::vector<std::string> arithmeticalOps;
     std::vector<std::string> logicalOps;
