@@ -80,6 +80,18 @@ private:
      */
     static int executeCommand(std::string exe, std::vector<std::string> args, std::string redirect, std::string &output_);
 
+    /** analyse whole program use .analyzeinfo files */
+    void analyseWholeProgram(CppCheck& cppCheck, const std::list<std::pair<std::string, std::size_t>> &files, const std::list<FileSettings>& fileSettings) const;
+
+    /**
+     * Execute addons
+     */
+    void executeAddonsWholeProgram(CppCheck& cppcheck, const std::list<std::pair<std::string, std::size_t>> &files) const;
+
+    // TODO: should not be const - has filesystem side-effects
+    /** Remove *.ctu-info files */
+    void removeCtuInfoFiles(const Settings& settings, const std::list<std::pair<std::string, std::size_t>>& files, const std::list<FileSettings>& fileSettings) const;
+
 protected:
 
     static bool reportSuppressions(const Settings &settings, const Suppressions& suppressions, bool unusedFunctionCheckEnabled, const std::list<std::pair<std::string, std::size_t>> &files, const std::list<FileSettings>& fileSettings, ErrorLogger& errorLogger);

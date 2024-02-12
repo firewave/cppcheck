@@ -52,7 +52,9 @@ struct FileSettings;
  * errors or places that could be improved.
  * Usage: See check() for more info.
  */
-class CPPCHECKLIB CppCheck : ErrorLogger {
+class CPPCHECKLIB CppCheck : public ErrorLogger {
+    friend class CppCheckExecutor;
+
 public:
     using ExecuteCmdFn = std::function<int (std::string,std::vector<std::string>,std::string,std::string&)>;
 
@@ -137,15 +139,9 @@ public:
     /** Analyze all files using clang-tidy */
     void analyseClangTidy(const FileSettings &fileSettings);
 
-    /** analyse whole program use .analyzeinfo files */
-    void analyseWholeProgram(const std::string &buildDir, const std::list<std::pair<std::string, std::size_t>> &files, const std::list<FileSettings>& fileSettings);
-
     /** Check if the user wants to check for unused functions
      * and if it's possible at all */
     bool isUnusedFunctionCheckEnabled() const;
-
-    /** Remove *.ctu-info files */
-    void removeCtuInfoFiles(const std::list<std::pair<std::string, std::size_t>>& files, const std::list<FileSettings>& fileSettings); // cppcheck-suppress functionConst // has side effects
 
     static void resetTimerResults();
     static void printTimerResults(SHOWTIME_MODES mode);
@@ -153,6 +149,9 @@ public:
     bool isPremiumCodingStandardId(const std::string& id) const;
 
     std::string getAddonMessage(const std::string& id, const std::string& text) const;
+
+    static std::string getDumpFileName(const Settings& settings, const std::string& filename);
+    static std::string getCtuInfoFileName(const std::string &dumpFile);
 
 private:
 #ifdef HAVE_RULES
@@ -189,11 +188,6 @@ private:
      */
     void executeAddons(const std::vector<std::string>& files, const std::string& file0);
     void executeAddons(const std::string &dumpFile, const std::string& file0);
-
-    /**
-     * Execute addons
-     */
-    void executeAddonsWholeProgram(const std::list<std::pair<std::string, std::size_t>> &files);
 
 #ifdef HAVE_RULES
     /**

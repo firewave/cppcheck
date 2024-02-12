@@ -148,7 +148,7 @@ static int getPid()
 #endif
 }
 
-static std::string getDumpFileName(const Settings& settings, const std::string& filename)
+std::string CppCheck::getDumpFileName(const Settings& settings, const std::string& filename)
 {
     if (!settings.dumpFile.empty())
         return settings.dumpFile;
@@ -164,7 +164,7 @@ static std::string getDumpFileName(const Settings& settings, const std::string& 
     return filename + extension;
 }
 
-static std::string getCtuInfoFileName(const std::string &dumpFile)
+std::string CppCheck::getCtuInfoFileName(const std::string &dumpFile)
 {
     return dumpFile.substr(0, dumpFile.size()-4) + "ctu-info";
 }
@@ -176,14 +176,14 @@ static void createDumpFile(const Settings& settings,
 {
     if (!settings.dump && settings.addons.empty())
         return;
-    dumpFile = getDumpFileName(settings, filename);
+    dumpFile = CppCheck::getDumpFileName(settings, filename);
 
     fdump.open(dumpFile);
     if (!fdump.is_open())
         return;
 
     {
-        std::ofstream fout(getCtuInfoFileName(dumpFile));
+        std::ofstream fout(CppCheck::getCtuInfoFileName(dumpFile));
     }
 
     std::string language;
@@ -1495,30 +1495,6 @@ void CppCheck::executeAddons(const std::vector<std::string>& files, const std::s
     }
 }
 
-void CppCheck::executeAddonsWholeProgram(const std::list<std::pair<std::string, std::size_t>> &files)
-{
-    if (mSettings.addons.empty())
-        return;
-
-    std::vector<std::string> ctuInfoFiles;
-    for (const auto &f: files) {
-        const std::string &dumpFileName = getDumpFileName(mSettings, f.first);
-        ctuInfoFiles.push_back(getCtuInfoFileName(dumpFileName));
-    }
-
-    try {
-        executeAddons(ctuInfoFiles, "");
-    } catch (const InternalError& e) {
-        const ErrorMessage errmsg = ErrorMessage::fromInternalError(e, nullptr, "", "Bailing out from analysis: Whole program analysis failed");
-        reportErr(errmsg);
-    }
-
-    if (mSettings.buildDir.empty()) {
-        for (const std::string &f: ctuInfoFiles)
-            std::remove(f.c_str());
-    }
-}
-
 Settings &CppCheck::settings()
 {
     return mSettings;
@@ -1789,92 +1765,9 @@ bool CppCheck::analyseWholeProgram()
     return errors && (mExitCode > 0);
 }
 
-void CppCheck::analyseWholeProgram(const std::string &buildDir, const std::list<std::pair<std::string, std::size_t>> &files, const std::list<FileSettings>& fileSettings)
-{
-    executeAddonsWholeProgram(files); // TODO: pass FileSettings
-    if (buildDir.empty()) {
-        removeCtuInfoFiles(files, fileSettings);
-        return;
-    }
-    if (mSettings.checks.isEnabled(Checks::unusedFunction))
-        CheckUnusedFunctions::analyseWholeProgram(mSettings, *this, buildDir);
-    std::list<Check::FileInfo*> fileInfoList;
-    CTU::FileInfo ctuFileInfo;
-
-    // Load all analyzer info data..
-    const std::string filesTxt(buildDir + "/files.txt");
-    std::ifstream fin(filesTxt);
-    std::string filesTxtLine;
-    while (std::getline(fin, filesTxtLine)) {
-        const std::string::size_type firstColon = filesTxtLine.find(':');
-        if (firstColon == std::string::npos)
-            continue;
-        const std::string::size_type lastColon = filesTxtLine.rfind(':');
-        if (firstColon == lastColon)
-            continue;
-        const std::string xmlfile = buildDir + '/' + filesTxtLine.substr(0,firstColon);
-        //const std::string sourcefile = filesTxtLine.substr(lastColon+1);
-
-        tinyxml2::XMLDocument doc;
-        const tinyxml2::XMLError error = doc.LoadFile(xmlfile.c_str());
-        if (error != tinyxml2::XML_SUCCESS)
-            continue;
-
-        const tinyxml2::XMLElement * const rootNode = doc.FirstChildElement();
-        if (rootNode == nullptr)
-            continue;
-
-        for (const tinyxml2::XMLElement *e = rootNode->FirstChildElement(); e; e = e->NextSiblingElement()) {
-            if (std::strcmp(e->Name(), "FileInfo") != 0)
-                continue;
-            const char *checkClassAttr = e->Attribute("check");
-            if (!checkClassAttr)
-                continue;
-            if (std::strcmp(checkClassAttr, "ctu") == 0) {
-                ctuFileInfo.loadFromXml(e);
-                continue;
-            }
-            // cppcheck-suppress shadowFunction - TODO: fix this
-            for (const Check *check : Check::instances()) {
-                if (checkClassAttr == check->name())
-                    fileInfoList.push_back(check->loadFileInfoFromXml(e));
-            }
-        }
-    }
-
-    // Set CTU max depth
-    CTU::maxCtuDepth = mSettings.maxCtuDepth;
-
-    // Analyse the tokens
-    // cppcheck-suppress shadowFunction - TODO: fix this
-    for (Check *check : Check::instances())
-        check->analyseWholeProgram(&ctuFileInfo, fileInfoList, mSettings, *this);
-
-    CheckUnusedFunctions::check(mSettings, *this);
-
-    for (Check::FileInfo *fi : fileInfoList)
-        delete fi;
-}
-
 bool CppCheck::isUnusedFunctionCheckEnabled() const
 {
     return (mSettings.useSingleJob() && mSettings.checks.isEnabled(Checks::unusedFunction));
-}
-
-void CppCheck::removeCtuInfoFiles(const std::list<std::pair<std::string, std::size_t>> &files, const std::list<FileSettings>& fileSettings)
-{
-    if (mSettings.buildDir.empty()) {
-        for (const auto& f: files) {
-            const std::string &dumpFileName = getDumpFileName(mSettings, f.first);
-            const std::string &ctuInfoFileName = getCtuInfoFileName(dumpFileName);
-            std::remove(ctuInfoFileName.c_str());
-        }
-        for (const auto& fs: fileSettings) {
-            const std::string &dumpFileName = getDumpFileName(mSettings, fs.filename);
-            const std::string &ctuInfoFileName = getCtuInfoFileName(dumpFileName);
-            std::remove(ctuInfoFileName.c_str());
-        }
-    }
 }
 
 // cppcheck-suppress unusedFunction - only used in tests
