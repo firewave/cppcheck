@@ -1021,7 +1021,7 @@ unsigned int CppCheck::checkFile(const std::string& filename, const std::string 
     // In jointSuppressionReport mode, unmatched suppressions are
     // collected after all files are processed
     if (!mSettings.useSingleJob() && (mSettings.severity.isEnabled(Severity::information) || mSettings.checkConfiguration)) {
-        Suppressions::reportUnmatchedSuppressions(mSettings.nomsg.getUnmatchedLocalSuppressions(filename, isUnusedFunctionCheckEnabled()), *this);
+        SuppressionList::reportUnmatchedSuppressions(mSettings.nomsg.getUnmatchedLocalSuppressions(filename, isUnusedFunctionCheckEnabled()), *this);
     }
 
     mErrorList.clear();
@@ -1617,7 +1617,7 @@ void CppCheck::reportErr(const ErrorMessage &msg)
     }
 
     // TODO: only convert if necessary
-    const auto errorMessage = Suppressions::ErrorMessage::fromErrorMessage(msg, macroNames);
+    const auto errorMessage = SuppressionList::ErrorMessage::fromErrorMessage(msg, macroNames);
 
     if (mSettings.nomsg.isSuppressed(errorMessage, mUseGlobalSuppressions)) {
         // Safety: Report critical errors to ErrorLogger
