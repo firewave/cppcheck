@@ -298,6 +298,7 @@ int CppCheckExecutor::check_internal(CppCheck& cppcheck) const
             returnValue = settings.exitCode;
     }
 
+    // TODO: move this somewhere else?
     if (!settings.checkConfiguration) {
         cppcheck.tooManyConfigsError(emptyString,0U);
     }
