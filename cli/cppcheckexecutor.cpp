@@ -178,7 +178,7 @@ int CppCheckExecutor::check(int argc, const char* const argv[])
 {
     Settings settings;
     CmdLineLoggerStd logger;
-    CmdLineParser parser(logger, settings, settings.nomsg, settings.nofail);
+    CmdLineParser parser(logger, settings, settings.supprs);
     if (!parser.fillSettingsFromArgs(argc, argv)) {
         return EXIT_FAILURE;
     }
@@ -249,7 +249,7 @@ bool CppCheckExecutor::reportSuppressions(const Settings &settings, const Suppre
 int CppCheckExecutor::check_internal(CppCheck& cppcheck) const
 {
     const auto& settings = cppcheck.settings();
-    auto& suppressions = cppcheck.settings().nomsg;
+    auto& suppressions = cppcheck.settings().supprs.nomsg;
 
     if (settings.reportProgress >= 0)
         mStdLogger->resetLatestProgressOutputTime();
@@ -285,7 +285,7 @@ int CppCheckExecutor::check_internal(CppCheck& cppcheck) const
     cppcheck.analyseWholeProgram(settings.buildDir, mFiles, mFileSettings);
 
     if (settings.severity.isEnabled(Severity::information) || settings.checkConfiguration) {
-        const bool err = reportSuppressions(settings, settings.nomsg, cppcheck.isUnusedFunctionCheckEnabled(), mFiles, mFileSettings, *mStdLogger);
+        const bool err = reportSuppressions(settings, settings.supprs.nomsg, cppcheck.isUnusedFunctionCheckEnabled(), mFiles, mFileSettings, *mStdLogger);
         if (err && returnValue == 0)
             returnValue = settings.exitCode;
     }
@@ -314,7 +314,7 @@ void CppCheckExecutor::StdLogger::writeCheckersReport()
     CheckersReport checkersReport(mSettings, mActiveCheckers);
 
     bool suppressed = false;
-    for (const SuppressionList::Suppression& s : mSettings.nomsg.getSuppressions()) {
+    for (const SuppressionList::Suppression& s : mSettings.supprs.nomsg.getSuppressions()) {
         if (s.errorId == "checkersReport")
             suppressed = true;
     }
