@@ -22,6 +22,7 @@
 #include "filesettings.h"
 #include "fixture.h"
 #include "helpers.h"
+#include "suppressions.h"
 #include "threadexecutor.h"
 #include "timer.h"
 
@@ -104,6 +105,7 @@ private:
         if (opt.plistOutput)
             s.plistOutput = opt.plistOutput;
         s.clangTidy = opt.clangTidy;
+        Suppressions supprs;
 
         bool executeCommandCalled = false;
         std::string exe;
@@ -125,7 +127,7 @@ private:
         if (useFS)
             filelist.clear();
 
-        ThreadExecutor executor(filelist, fileSettings, s, s.supprs.nomsg, *this, executeFn);
+        ThreadExecutor executor(filelist, fileSettings, s, supprs, *this, executeFn);
         ASSERT_EQUALS(result, executor.check());
         ASSERT_EQUALS(opt.executeCommandCalled, executeCommandCalled);
         ASSERT_EQUALS(opt.exe, exe);

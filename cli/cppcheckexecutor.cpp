@@ -116,7 +116,7 @@ public:
     /**
      * @brief Write the checkers report
      */
-    void writeCheckersReport();
+    void writeCheckersReport(const SuppressionList& supprs);
 
     bool hasCriticalErrors() const {
         return !mCriticalErrors.empty();
@@ -177,8 +177,9 @@ private:
 int CppCheckExecutor::check(int argc, const char* const argv[])
 {
     Settings settings;
+    Suppressions supprs;
     CmdLineLoggerStd logger;
-    CmdLineParser parser(logger, settings, settings.supprs);
+    CmdLineParser parser(logger, settings, supprs);
     if (!parser.fillSettingsFromArgs(argc, argv)) {
         return EXIT_FAILURE;
     }
@@ -195,7 +196,7 @@ int CppCheckExecutor::check(int argc, const char* const argv[])
 
     mStdLogger = new StdLogger(settings);
 
-    CppCheck cppCheck(*mStdLogger, true, executeCommand);
+    CppCheck cppCheck(supprs, *mStdLogger, true, executeCommand);
     cppCheck.settings() = settings; // this is a copy
 
     const int ret = check_wrapper(cppCheck);
@@ -249,7 +250,8 @@ bool CppCheckExecutor::reportSuppressions(const Settings &settings, const Suppre
 int CppCheckExecutor::check_internal(CppCheck& cppcheck) const
 {
     const auto& settings = cppcheck.settings();
-    auto& suppressions = cppcheck.settings().supprs.nomsg;
+    Suppressions supprs;
+    SuppressionList suppressions; // TODO
 
     if (settings.reportProgress >= 0)
         mStdLogger->resetLatestProgressOutputTime();
@@ -271,13 +273,13 @@ int CppCheckExecutor::check_internal(CppCheck& cppcheck) const
     unsigned int returnValue;
     if (settings.useSingleJob()) {
         // Single process
-        SingleExecutor executor(cppcheck, mFiles, mFileSettings, settings, suppressions, *mStdLogger);
+        SingleExecutor executor(cppcheck, mFiles, mFileSettings, settings, supprs, *mStdLogger);
         returnValue = executor.check();
     } else {
 #if defined(THREADING_MODEL_THREAD)
-        ThreadExecutor executor(mFiles, mFileSettings, settings, suppressions, *mStdLogger, CppCheckExecutor::executeCommand);
+        ThreadExecutor executor(mFiles, mFileSettings, settings, suppres, *mStdLogger, CppCheckExecutor::executeCommand);
 #elif defined(THREADING_MODEL_FORK)
-        ProcessExecutor executor(mFiles, mFileSettings, settings, suppressions, *mStdLogger, CppCheckExecutor::executeCommand);
+        ProcessExecutor executor(mFiles, mFileSettings, settings, supprs, *mStdLogger, CppCheckExecutor::executeCommand);
 #endif
         returnValue = executor.check();
     }
@@ -285,7 +287,7 @@ int CppCheckExecutor::check_internal(CppCheck& cppcheck) const
     cppcheck.analyseWholeProgram(settings.buildDir, mFiles, mFileSettings);
 
     if (settings.severity.isEnabled(Severity::information) || settings.checkConfiguration) {
-        const bool err = reportSuppressions(settings, settings.supprs.nomsg, cppcheck.isUnusedFunctionCheckEnabled(), mFiles, mFileSettings, *mStdLogger);
+        const bool err = reportSuppressions(settings, suppressions, cppcheck.isUnusedFunctionCheckEnabled(), mFiles, mFileSettings, *mStdLogger);
         if (err && returnValue == 0)
             returnValue = settings.exitCode;
     }
@@ -295,7 +297,7 @@ int CppCheckExecutor::check_internal(CppCheck& cppcheck) const
     }
 
     if (settings.safety || settings.severity.isEnabled(Severity::information) || !settings.checkersReportFilename.empty())
-        mStdLogger->writeCheckersReport();
+        mStdLogger->writeCheckersReport(suppressions);
 
     if (settings.xml) {
         mStdLogger->reportErr(ErrorMessage::getXMLFooter());
@@ -309,12 +311,12 @@ int CppCheckExecutor::check_internal(CppCheck& cppcheck) const
     return EXIT_SUCCESS;
 }
 
-void CppCheckExecutor::StdLogger::writeCheckersReport()
+void CppCheckExecutor::StdLogger::writeCheckersReport(const SuppressionList& suppressions)
 {
     CheckersReport checkersReport(mSettings, mActiveCheckers);
 
     bool suppressed = false;
-    for (const SuppressionList::Suppression& s : mSettings.supprs.nomsg.getSuppressions()) {
+    for (const SuppressionList::Suppression& s : suppressions.getSuppressions()) {
         if (s.errorId == "checkersReport")
             suppressed = true;
     }

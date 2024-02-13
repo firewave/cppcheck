@@ -29,7 +29,7 @@
 class Settings;
 class ErrorLogger;
 class ErrorMessage;
-class SuppressionList;
+struct Suppressions;
 struct FileSettings;
 
 /// @addtogroup CLI
@@ -41,7 +41,7 @@ struct FileSettings;
  */
 class Executor {
 public:
-    Executor(const std::list<std::pair<std::string, std::size_t>> &files, const std::list<FileSettings>& fileSettings, const Settings &settings, SuppressionList &suppressions, ErrorLogger &errorLogger);
+    Executor(const std::list<std::pair<std::string, std::size_t>> &files, const std::list<FileSettings>& fileSettings, const Settings &settings, Suppressions &suppressions, ErrorLogger &errorLogger);
     virtual ~Executor() = default;
 
     Executor(const Executor &) = delete;
@@ -70,7 +70,7 @@ protected:
     const std::list<std::pair<std::string, std::size_t>> &mFiles;
     const std::list<FileSettings>& mFileSettings;
     const Settings &mSettings;
-    SuppressionList &mSuppressions;
+    Suppressions &mSuppressions;
     ErrorLogger &mErrorLogger;
 
 private:

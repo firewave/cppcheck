@@ -32,6 +32,7 @@
 class Settings;
 class SuppressionList;
 class Library;
+struct Suppressions;
 
 /// @addtogroup CLI
 /// @{

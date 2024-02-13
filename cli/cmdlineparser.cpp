@@ -1687,8 +1687,8 @@ void CmdLineParser::printHelp() const
 }
 
 bool CmdLineParser::isCppcheckPremium() const {
-    if (mSettings.cppcheckCfgProductName.empty())
-        mSettings.loadCppcheckCfg();
+    //if (mSettings.cppcheckCfgProductName.empty())
+    //    mSettings.loadCppcheckCfg();
     return startsWith(mSettings.cppcheckCfgProductName, "Cppcheck Premium");
 }
 
@@ -1784,7 +1784,7 @@ bool CmdLineParser::loadAddons(Settings& settings)
 
 bool CmdLineParser::loadCppcheckCfg()
 {
-    const std::string cfgErr = mSettings.loadCppcheckCfg();
+    const std::string cfgErr = Settings::loadCppcheckCfg(mSettings, mSuppressions);
     if (!cfgErr.empty()) {
         mLogger.printError("could not load cppcheck.cfg - " + cfgErr);
         return false;

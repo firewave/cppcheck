@@ -23,6 +23,7 @@
 #include "fixture.h"
 #include "helpers.h"
 #include "settings.h"
+#include "suppressions.h"
 
 #include <algorithm>
 #include <list>
@@ -97,8 +98,9 @@ private:
                         "  return 0;\n"
                         "}");
 
+        Suppressions supprs;
         ErrorLogger2 errorLogger;
-        CppCheck cppcheck(errorLogger, false, {});
+        CppCheck cppcheck(supprs, errorLogger, false, {});
         ASSERT_EQUALS(1, cppcheck.check(file.path()));
         // TODO: how to properly disable these warnings?
         errorLogger.ids.erase(std::remove_if(errorLogger.ids.begin(), errorLogger.ids.end(), [](const std::string& id) {
@@ -117,8 +119,9 @@ private:
                         "  return 0;\n"
                         "}");
 
+        Suppressions supprs;
         ErrorLogger2 errorLogger;
-        CppCheck cppcheck(errorLogger, false, {});
+        CppCheck cppcheck(supprs, errorLogger, false, {});
         FileSettings fs;
         fs.filename = file.path();
         ASSERT_EQUALS(1, cppcheck.check(fs));
@@ -139,8 +142,9 @@ private:
                         "  return 0;\n"
                         "}");
 
+        Suppressions supprs;
         ErrorLogger2 errorLogger;
-        CppCheck cppcheck(errorLogger, false, {});
+        CppCheck cppcheck(supprs, errorLogger, false, {});
         const char xmldata[] = R"(<def format="2"><markup ext=".cpp" reporterrors="false"/></def>)";
         const Settings s = settingsBuilder().libraryxml(xmldata, sizeof(xmldata)).build();
         cppcheck.settings() = s;
@@ -165,8 +169,9 @@ private:
         ScopedFile test_file_b("b.cpp",
                                "#include \"inc.h\"");
 
+        Suppressions supprs;
         ErrorLogger2 errorLogger;
-        CppCheck cppcheck(errorLogger, false, {});
+        CppCheck cppcheck(supprs, errorLogger, false, {});
         ASSERT_EQUALS(1, cppcheck.check(test_file_a.path()));
         ASSERT_EQUALS(1, cppcheck.check(test_file_b.path()));
         // TODO: how to properly disable these warnings?
@@ -182,8 +187,9 @@ private:
     }
 
     void isPremiumCodingStandardId() const {
+        Suppressions supprs;
         ErrorLogger2 errorLogger;
-        CppCheck cppcheck(errorLogger, false, {});
+        CppCheck cppcheck(supprs, errorLogger, false, {});
 
         cppcheck.settings().premiumArgs = "";
         ASSERT_EQUALS(false, cppcheck.isPremiumCodingStandardId("misra-c2012-0.0"));
