@@ -28,6 +28,7 @@
 #include "errorlogger.h"
 #include "errortypes.h"
 #include "filesettings.h"
+#include "path.h"
 #include "settings.h"
 #include "singleexecutor.h"
 #include "suppressions.h"
@@ -266,7 +267,7 @@ int CppCheckExecutor::check_internal(CppCheck& cppcheck) const
     }
 
     if (!settings.checkersReportFilename.empty())
-        std::remove(settings.checkersReportFilename.c_str());
+        Path::deleteFile(settings.checkersReportFilename);
 
     unsigned int returnValue;
     if (settings.useSingleJob()) {

@@ -217,6 +217,13 @@ public:
      * join 2 paths with '/' separators
      */
     static std::string join(const std::string& path1, const std::string& path2);
+
+    /**
+    * @brief Deletes given files
+    * @param path Path to be delete
+    * @return true if given path does not exist or the file has been successfully deleted
+    */
+    static bool deleteFile(const std::string& path);
 };
 
 /// @}

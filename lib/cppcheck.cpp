@@ -98,7 +98,7 @@ namespace {
         FilesDeleter() = default;
         ~FilesDeleter() {
             for (const std::string& fileName: mFilenames)
-                std::remove(fileName.c_str());
+                Path::deleteFile(fileName.c_str());
         }
         void addFile(const std::string& fileName) {
             mFilenames.push_back(fileName);
@@ -1524,7 +1524,7 @@ void CppCheck::executeAddonsWholeProgram(const std::list<std::pair<std::string, 
 
     if (mSettings.buildDir.empty()) {
         for (const std::string &f: ctuInfoFiles)
-            std::remove(f.c_str());
+            Path::deleteFile(f.c_str());
     }
 }
 
@@ -1878,12 +1878,12 @@ void CppCheck::removeCtuInfoFiles(const std::list<std::pair<std::string, std::si
         for (const auto& f: files) {
             const std::string &dumpFileName = getDumpFileName(mSettings, f.first);
             const std::string &ctuInfoFileName = getCtuInfoFileName(dumpFileName);
-            std::remove(ctuInfoFileName.c_str());
+            Path::deleteFile(ctuInfoFileName);
         }
         for (const auto& fs: fileSettings) {
             const std::string &dumpFileName = getDumpFileName(mSettings, fs.filename);
             const std::string &ctuInfoFileName = getCtuInfoFileName(dumpFileName);
-            std::remove(ctuInfoFileName.c_str());
+            Path::deleteFile(ctuInfoFileName);
         }
     }
 }

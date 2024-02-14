@@ -24,6 +24,7 @@
 #include "utils.h"
 
 #include <algorithm>
+#include <cstdio>
 #include <cstdlib>
 #include <sys/stat.h>
 #include <unordered_set>
@@ -341,4 +342,19 @@ std::string Path::join(const std::string& path1, const std::string& path2) {
     if (path2.front() == '/')
         return path2;
     return ((path1.back() == '/') ? path1 : (path1 + "/")) + path2;
+}
+
+bool Path::deleteFile(const std::string& path)
+{
+    if (file_type(path) == 0) {
+        // path does not exist - just return
+        return true;
+    }
+    const int res = std::remove(path.c_str());
+    if (res != 0) {
+        const int err = errno;
+        (void)err; // TODO: how to provide details?
+        return false;
+    }
+    return true;
 }
