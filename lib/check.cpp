@@ -63,20 +63,24 @@ void Check::writeToErrorList(const ErrorMessage &errmsg)
 
 void Check::reportError(const std::list<const Token *> &callstack, Severity severity, const std::string &id, const std::string &msg, const CWE &cwe, Certainty certainty)
 {
+#ifndef FUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION
     const ErrorMessage errmsg(callstack, mTokenizer ? &mTokenizer->list : nullptr, severity, id, msg, cwe, certainty);
     if (mErrorLogger)
         mErrorLogger->reportErr(errmsg);
     else
         writeToErrorList(errmsg);
+#endif
 }
 
 void Check::reportError(const ErrorPath &errorPath, Severity severity, const char id[], const std::string &msg, const CWE &cwe, Certainty certainty)
 {
+#ifndef FUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION
     const ErrorMessage errmsg(errorPath, mTokenizer ? &mTokenizer->list : nullptr, severity, id, msg, cwe, certainty);
     if (mErrorLogger)
         mErrorLogger->reportErr(errmsg);
     else
         writeToErrorList(errmsg);
+#endif
 }
 
 bool Check::wrongData(const Token *tok, const char *str)

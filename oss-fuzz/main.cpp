@@ -41,8 +41,11 @@ static DummyErrorLogger s_errorLogger;
 static void doCheck(const std::string& code)
 {
     CppCheck cppcheck(s_errorLogger, false, nullptr);
+    // TODO: load std.cfg
+    cppcheck.settings().quiet = true;
     cppcheck.settings().addEnabled("all");
     cppcheck.settings().certainty.setEnabled(Certainty::inconclusive, true);
+    cppcheck.settings().checkLevel = Settings::CheckLevel::exhaustive;
     cppcheck.check("test.cpp", code);
 }
 
@@ -51,8 +54,9 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t dataSize);
 
 int LLVMFuzzerTestOneInput(const uint8_t *data, size_t dataSize)
 {
-    if (dataSize < 10000) {
-        const std::string code = generateCode2(data, dataSize);
+    //if (dataSize < 10000)
+    {
+        const std::string code = std::string(reinterpret_cast<const char*>(data), dataSize); // generateCode2(data, dataSize);
         doCheck(code);
     }
     return 0;
