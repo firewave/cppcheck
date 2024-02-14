@@ -943,8 +943,10 @@ unsigned int CppCheck::checkFile(const std::string& filename, const std::string 
                     fdump << "</dump>" << std::endl;
                 }
 
-                // Need to call this even if the hash will skip this configuration
-                mSettings.supprs.nomsg.markUnmatchedInlineSuppressionsAsChecked(tokenizer);
+                if (mSettings.inlineSuppressions) {
+                    // Need to call this even if the hash will skip this configuration
+                    mSettings.supprs.nomsg.markUnmatchedInlineSuppressionsAsChecked(tokenizer);
+                }
 
                 // Skip if we already met the same simplified token list
                 if (mSettings.force || mSettings.maxConfigs > 1) {
@@ -1440,10 +1442,11 @@ void CppCheck::executeRules(const std::string &tokenlist, const Tokenizer &token
 
 void CppCheck::executeAddons(const std::string& dumpFile, const std::string& file0)
 {
-    if (!dumpFile.empty()) {
-        std::vector<std::string> f{dumpFile};
-        executeAddons(f, file0);
-    }
+    if (mSettings.addons.empty() || dumpFile.empty())
+        return;
+
+    std::vector<std::string> f{dumpFile};
+    executeAddons(f, file0);
 }
 
 void CppCheck::executeAddons(const std::vector<std::string>& files, const std::string& file0)
