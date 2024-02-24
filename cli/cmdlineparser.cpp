@@ -1530,6 +1530,8 @@ void CmdLineParser::printHelp() const
         "                         provided. Note that your operating system can modify\n"
         "                         this value, e.g. '256' can become '0'.\n"
         "    --errorlist          Print a list of all the error messages in XML format.\n"
+        "    --executor=<type>\n"
+        "                         Specifies the executor to use. Possible values: auto, thread, processor.\n"
         "    --exitcode-suppressions=<file>\n"
         "                         Used when certain messages should be displayed but\n"
         "                         should not cause a non-zero exitcode.\n"

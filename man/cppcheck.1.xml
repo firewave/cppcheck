@@ -118,6 +118,9 @@ man(1), man(7), http://www.tldp.org/HOWTO/Man-Page/
         <option>--errorlist</option>
       </arg>
       <arg choice="opt">
+        <option>--executor=&lt;type&gt;</option>
+      </arg>
+      <arg choice="opt">
         <option>--exitcode-suppressions=&lt;file&gt;</option>
       </arg>
       <arg choice="opt">
@@ -326,6 +329,15 @@ Example: '-UDEBUG'</para>
         </term>
         <listitem>
           <para>Print a list of all possible error messages in XML format.</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <option>--executor=&lt;type&gt;</option>
+        </term>
+        <listitem>
+          <para>Specifies the executor to use. Possible values:</para>
+          <glosslist><glossentry><glossterm>auto</glossterm><glossdef><para>Automatically select (default)</para></glossdef></glossentry><glossentry><glossterm>thread</glossterm><glossdef><para>Perform analysis within a thread in the main process</para></glossdef></glossentry><glossentry><glossterm>proicess</glossterm><glossdef><para>Perform analysis of each file in a separate child process</para></glossdef></glossentry></glosslist>
         </listitem>
       </varlistentry>
       <varlistentry>
