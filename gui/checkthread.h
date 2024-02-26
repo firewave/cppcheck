@@ -20,7 +20,7 @@
 #ifndef CHECKTHREAD_H
 #define CHECKTHREAD_H
 
-#include "cppcheck.h"
+#include "settings.h"
 #include "suppressions.h"
 
 #include <atomic>
@@ -126,10 +126,8 @@ protected:
     std::atomic<State> mState{Ready};
 
     ThreadResult &mResult;
-    /**
-     * @brief Cppcheck itself
-     */
-    CppCheck mCppcheck;
+
+    Settings mSettings;
 
 private:
     void runAddonsAndTools(const FileSettings *fileSettings, const QString &fileName);

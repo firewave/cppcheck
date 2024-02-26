@@ -23,6 +23,7 @@
 #include "fixture.h"
 #include "helpers.h"
 #include "settings.h"
+#include "suppressions.h"
 
 #include <algorithm>
 #include <list>
@@ -97,8 +98,10 @@ private:
                         "  return 0;\n"
                         "}");
 
+        Settings s;
+        Suppressions supprs;
         ErrorLogger2 errorLogger;
-        CppCheck cppcheck(errorLogger, false, {});
+        CppCheck cppcheck(s, supprs, errorLogger, false, {});
         ASSERT_EQUALS(1, cppcheck.check(file.path()));
         // TODO: how to properly disable these warnings?
         errorLogger.ids.erase(std::remove_if(errorLogger.ids.begin(), errorLogger.ids.end(), [](const std::string& id) {
@@ -117,8 +120,10 @@ private:
                         "  return 0;\n"
                         "}");
 
+        Settings s;
+        Suppressions supprs;
         ErrorLogger2 errorLogger;
-        CppCheck cppcheck(errorLogger, false, {});
+        CppCheck cppcheck(s, supprs, errorLogger, false, {});
         FileSettings fs;
         fs.filename = file.path();
         ASSERT_EQUALS(1, cppcheck.check(fs));
@@ -139,11 +144,11 @@ private:
                         "  return 0;\n"
                         "}");
 
-        ErrorLogger2 errorLogger;
-        CppCheck cppcheck(errorLogger, false, {});
         const char xmldata[] = R"(<def format="2"><markup ext=".cpp" reporterrors="false"/></def>)";
-        const Settings s = settingsBuilder().libraryxml(xmldata, sizeof(xmldata)).build();
-        cppcheck.settings() = s;
+        Settings s = settingsBuilder().libraryxml(xmldata, sizeof(xmldata)).build();
+        Suppressions supprs;
+        ErrorLogger2 errorLogger;
+        CppCheck cppcheck(s, supprs, errorLogger, false, {});
         ASSERT_EQUALS(0, cppcheck.check(file.path()));
         // TODO: how to properly disable these warnings?
         errorLogger.ids.erase(std::remove_if(errorLogger.ids.begin(), errorLogger.ids.end(), [](const std::string& id) {
@@ -165,8 +170,10 @@ private:
         ScopedFile test_file_b("b.cpp",
                                "#include \"inc.h\"");
 
+        Settings s;
+        Suppressions supprs;
         ErrorLogger2 errorLogger;
-        CppCheck cppcheck(errorLogger, false, {});
+        CppCheck cppcheck(s, supprs, errorLogger, false, {});
         ASSERT_EQUALS(1, cppcheck.check(test_file_a.path()));
         ASSERT_EQUALS(1, cppcheck.check(test_file_b.path()));
         // TODO: how to properly disable these warnings?
@@ -182,10 +189,12 @@ private:
     }
 
     void isPremiumCodingStandardId() const {
+        Settings s;
+        s.premiumArgs = "";
+        Suppressions supprs;
         ErrorLogger2 errorLogger;
-        CppCheck cppcheck(errorLogger, false, {});
+        CppCheck cppcheck(s, supprs, errorLogger, false, {});
 
-        cppcheck.settings().premiumArgs = "";
         ASSERT_EQUALS(false, cppcheck.isPremiumCodingStandardId("misra-c2012-0.0"));
         ASSERT_EQUALS(false, cppcheck.isPremiumCodingStandardId("misra-c2023-0.0"));
         ASSERT_EQUALS(false, cppcheck.isPremiumCodingStandardId("premium-misra-c2012-0.0"));
@@ -195,7 +204,7 @@ private:
         ASSERT_EQUALS(false, cppcheck.isPremiumCodingStandardId("premium-cert-int50-cpp"));
         ASSERT_EQUALS(false, cppcheck.isPremiumCodingStandardId("premium-autosar-0-0-0"));
 
-        cppcheck.settings().premiumArgs = "--misra-c-2012 --cert-c++-2016 --autosar";
+        s.premiumArgs = "--misra-c-2012 --cert-c++-2016 --autosar";
         ASSERT_EQUALS(true, cppcheck.isPremiumCodingStandardId("misra-c2012-0.0"));
         ASSERT_EQUALS(true, cppcheck.isPremiumCodingStandardId("misra-c2023-0.0"));
         ASSERT_EQUALS(true, cppcheck.isPremiumCodingStandardId("premium-misra-c2012-0.0"));

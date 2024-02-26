@@ -117,7 +117,7 @@ namespace {
         /**
          * @brief Write the checkers report
          */
-        void writeCheckersReport();
+        void writeCheckersReport(const Suppressions& supprs);
 
         bool hasCriticalErrors() const {
             return !mCriticalErrors.empty();
@@ -179,8 +179,9 @@ namespace {
 int CppCheckExecutor::check(int argc, const char* const argv[])
 {
     Settings settings;
+    Suppressions supprs;
     CmdLineLoggerStd logger;
-    CmdLineParser parser(logger, settings, settings.supprs);
+    CmdLineParser parser(logger, settings, supprs);
     if (!parser.fillSettingsFromArgs(argc, argv)) {
         return EXIT_FAILURE;
     }
@@ -195,21 +196,21 @@ int CppCheckExecutor::check(int argc, const char* const argv[])
 
     settings.setMisraRuleTexts(executeCommand);
 
-    const int ret = check_wrapper(settings);
+    const int ret = check_wrapper(settings, supprs);
 
     return ret;
 }
 
-int CppCheckExecutor::check_wrapper(const Settings& settings)
+int CppCheckExecutor::check_wrapper(const Settings& settings, Suppressions& supprs)
 {
 #ifdef USE_WINDOWS_SEH
     if (settings.exceptionHandling)
-        return check_wrapper_seh(*this, &CppCheckExecutor::check_internal, settings);
+        return check_wrapper_seh(*this, &CppCheckExecutor::check_internal, settings, supprs);
 #elif defined(USE_UNIX_SIGNAL_HANDLING)
     if (settings.exceptionHandling)
-        return check_wrapper_sig(*this, &CppCheckExecutor::check_internal, settings);
+        return check_wrapper_sig(*this, &CppCheckExecutor::check_internal, settings, supprs);
 #endif
-    return check_internal(settings);
+    return check_internal(settings, supprs);
 }
 
 bool CppCheckExecutor::reportSuppressions(const Settings &settings, const SuppressionList& suppressions, bool unusedFunctionCheckEnabled, const std::list<std::pair<std::string, std::size_t>> &files, const std::list<FileSettings>& fileSettings, ErrorLogger& errorLogger) {
@@ -241,7 +242,7 @@ bool CppCheckExecutor::reportSuppressions(const Settings &settings, const Suppre
 /*
  * That is a method which gets called from check_wrapper
  * */
-int CppCheckExecutor::check_internal(const Settings& settings) const
+int CppCheckExecutor::check_internal(const Settings& settings, Suppressions& supprs) const
 {
     StdLogger stdLogger(settings);
 
@@ -262,20 +263,18 @@ int CppCheckExecutor::check_internal(const Settings& settings) const
     if (!settings.checkersReportFilename.empty())
         std::remove(settings.checkersReportFilename.c_str());
 
-    CppCheck cppcheck(stdLogger, true, executeCommand);
-    cppcheck.settings() = settings; // this is a copy
-    auto& suppressions = cppcheck.settings().supprs.nomsg;
+    CppCheck cppcheck(settings, supprs, stdLogger, true, executeCommand);
 
     unsigned int returnValue;
     if (settings.useSingleJob()) {
         // Single process
-        SingleExecutor executor(cppcheck, mFiles, mFileSettings, settings, suppressions, stdLogger);
+        SingleExecutor executor(cppcheck, mFiles, mFileSettings, settings, supprs, stdLogger);
         returnValue = executor.check();
     } else {
 #if defined(THREADING_MODEL_THREAD)
-        ThreadExecutor executor(mFiles, mFileSettings, settings, suppressions, stdLogger, CppCheckExecutor::executeCommand);
+        ThreadExecutor executor(mFiles, mFileSettings, settings, supprs, stdLogger, CppCheckExecutor::executeCommand);
 #elif defined(THREADING_MODEL_FORK)
-        ProcessExecutor executor(mFiles, mFileSettings, settings, suppressions, stdLogger, CppCheckExecutor::executeCommand);
+        ProcessExecutor executor(mFiles, mFileSettings, settings, supprs, stdLogger, CppCheckExecutor::executeCommand);
 #endif
         returnValue = executor.check();
     }
@@ -283,7 +282,7 @@ int CppCheckExecutor::check_internal(const Settings& settings) const
     cppcheck.analyseWholeProgram(settings.buildDir, mFiles, mFileSettings);
 
     if (settings.severity.isEnabled(Severity::information) || settings.checkConfiguration) {
-        const bool err = reportSuppressions(settings, suppressions, settings.isUnusedFunctionCheckEnabled(), mFiles, mFileSettings, stdLogger);
+        const bool err = reportSuppressions(settings, supprs.nomsg, settings.isUnusedFunctionCheckEnabled(), mFiles, mFileSettings, stdLogger);
         if (err && returnValue == 0)
             returnValue = settings.exitCode;
     }
@@ -293,7 +292,7 @@ int CppCheckExecutor::check_internal(const Settings& settings) const
     }
 
     if (settings.safety || settings.severity.isEnabled(Severity::information) || !settings.checkersReportFilename.empty())
-        stdLogger.writeCheckersReport();
+        stdLogger.writeCheckersReport(supprs);
 
     if (settings.xml) {
         stdLogger.reportErr(ErrorMessage::getXMLFooter());
@@ -307,12 +306,12 @@ int CppCheckExecutor::check_internal(const Settings& settings) const
     return EXIT_SUCCESS;
 }
 
-void StdLogger::writeCheckersReport()
+void StdLogger::writeCheckersReport(const Suppressions& supprs)
 {
     CheckersReport checkersReport(mSettings, mActiveCheckers);
 
     bool suppressed = false;
-    for (const SuppressionList::Suppression& s : mSettings.supprs.nomsg.getSuppressions()) {
+    for (const SuppressionList::Suppression& s : supprs.nomsg.getSuppressions()) {
         if (s.errorId == "checkersReport")
             suppressed = true;
     }

@@ -298,7 +298,7 @@ static void CppcheckSignalHandler(int signo, siginfo_t * info, void * context)
     }
 }
 
-int check_wrapper_sig(CppCheckExecutor& executor, int (CppCheckExecutor::*f)(const Settings&) const, const Settings& settings)
+int check_wrapper_sig(CppCheckExecutor& executor, int (CppCheckExecutor::*f)(const Settings&, Suppressions&) const, const Settings& settings, Suppressions& supprs)
 {
     // determine stack vs. heap
     char stackVariable;
@@ -321,7 +321,7 @@ int check_wrapper_sig(CppCheckExecutor& executor, int (CppCheckExecutor::*f)(con
     for (std::map<int, std::string>::const_iterator sig=listofsignals.cbegin(); sig!=listofsignals.cend(); ++sig) {
         sigaction(sig->first, &act, nullptr);
     }
-    return (executor.*f)(settings);
+    return (executor.*f)(settings, supprs);
 }
 
 #endif

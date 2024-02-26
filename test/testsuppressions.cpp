@@ -244,16 +244,16 @@ private:
             }
         }
 
-        CppCheck cppCheck(*this, true, nullptr);
-        Settings& settings = cppCheck.settings();
+        Settings settings;
         settings.jobs = 1;
         settings.quiet = true;
         settings.inlineSuppressions = true;
         settings.severity.enable(Severity::information);
         if (suppression == "unusedFunction")
             settings.checks.setEnabled(Checks::unusedFunction, true);
+        Suppressions supprs;
         if (!suppression.empty()) {
-            EXPECT_EQ("", settings.supprs.nomsg.addSuppressionLine(suppression));
+            EXPECT_EQ("", supprs.nomsg.addSuppressionLine(suppression));
         }
 
         std::vector<std::unique_ptr<ScopedFile>> scopedfiles;
@@ -265,10 +265,11 @@ private:
         if (useFS)
             filelist.clear();
 
-        SingleExecutor executor(cppCheck, filelist, fileSettings, settings, settings.supprs.nomsg, *this);
+        CppCheck cppCheck(settings, supprs, *this, true, nullptr);
+        SingleExecutor executor(cppCheck, filelist, fileSettings, settings, supprs, *this);
         const unsigned int exitCode = executor.check();
 
-        CppCheckExecutor::reportSuppressions(settings, settings.supprs.nomsg, false, filelist, fileSettings, *this); // TODO: check result
+        CppCheckExecutor::reportSuppressions(settings, supprs.nomsg, false, filelist, fileSettings, *this); // TODO: check result
 
         return exitCode;
     }
@@ -301,8 +302,9 @@ private:
                                             $.quiet = true,
                                             $.inlineSuppressions = true);
         settings.severity.enable(Severity::information);
+        Suppressions supprs;
         if (!suppression.empty()) {
-            EXPECT_EQ("", settings.supprs.nomsg.addSuppressionLine(suppression));
+            EXPECT_EQ("", supprs.nomsg.addSuppressionLine(suppression));
         }
 
         std::vector<std::unique_ptr<ScopedFile>> scopedfiles;
@@ -314,10 +316,10 @@ private:
         if (useFS)
             filelist.clear();
 
-        ThreadExecutor executor(filelist, fileSettings, settings, settings.supprs.nomsg, *this, CppCheckExecutor::executeCommand);
+        ThreadExecutor executor(filelist, fileSettings, settings, supprs, *this, CppCheckExecutor::executeCommand);
         const unsigned int exitCode = executor.check();
 
-        CppCheckExecutor::reportSuppressions(settings, settings.supprs.nomsg, false, filelist, fileSettings, *this); // TODO: check result
+        CppCheckExecutor::reportSuppressions(settings, supprs.nomsg, false, filelist, fileSettings, *this); // TODO: check result
 
         return exitCode;
     }
@@ -351,8 +353,9 @@ private:
                                             $.quiet = true,
                                             $.inlineSuppressions = true);
         settings.severity.enable(Severity::information);
+        Suppressions supprs;
         if (!suppression.empty()) {
-            EXPECT_EQ("", settings.supprs.nomsg.addSuppressionLine(suppression));
+            EXPECT_EQ("", supprs.nomsg.addSuppressionLine(suppression));
         }
 
         std::vector<std::unique_ptr<ScopedFile>> scopedfiles;
@@ -364,10 +367,10 @@ private:
         if (useFS)
             filelist.clear();
 
-        ProcessExecutor executor(filelist, fileSettings, settings, settings.supprs.nomsg, *this, CppCheckExecutor::executeCommand);
+        ProcessExecutor executor(filelist, fileSettings, settings, supprs, *this, CppCheckExecutor::executeCommand);
         const unsigned int exitCode = executor.check();
 
-        CppCheckExecutor::reportSuppressions(settings, settings.supprs.nomsg, false, filelist, fileSettings, *this); // TODO: check result
+        CppCheckExecutor::reportSuppressions(settings, supprs.nomsg, false, filelist, fileSettings, *this); // TODO: check result
 
         return exitCode;
     }
@@ -1197,13 +1200,14 @@ private:
     void globalSuppressions() { // Testing that Cppcheck::useGlobalSuppressions works (#8515)
         errout.str("");
 
-        CppCheck cppCheck(*this, false, nullptr); // <- do not "use global suppressions". pretend this is a thread that just checks a file.
-        Settings& settings = cppCheck.settings();
+        Settings settings;
         settings.quiet = true;
-        ASSERT_EQUALS("", settings.supprs.nomsg.addSuppressionLine("uninitvar"));
+        Suppressions supprs;
+        ASSERT_EQUALS("", supprs.nomsg.addSuppressionLine("uninitvar"));
         settings.exitCode = 1;
 
         const char code[] = "int f() { int a; return a; }";
+        CppCheck cppCheck(settings, supprs, *this, false, nullptr); // <- do not "use global suppressions". pretend this is a thread that just checks a file.
         ASSERT_EQUALS(0, cppCheck.check("test.c", code)); // <- no unsuppressed error is seen
         ASSERT_EQUALS("[test.c:1]: (error) Uninitialized variable: a\n", errout.str()); // <- report error so ThreadExecutor can suppress it and make sure the global suppression is matched.
     }
@@ -1232,13 +1236,14 @@ private:
         // Clear the error log
         errout.str("");
 
-        CppCheck cppCheck(*this, true, nullptr);
-        Settings& settings = cppCheck.settings();
+        Settings settings;
         settings.quiet = true;
         settings.severity.enable(Severity::style);
         settings.inlineSuppressions = true;
         settings.relativePaths = true;
         settings.basePaths.emplace_back("/somewhere");
+        Suppressions supprs;
+
         const char code[] =
             "struct Point\n"
             "{\n"
@@ -1247,6 +1252,7 @@ private:
             "    // cppcheck-suppress unusedStructMember\n"
             "    int y;\n"
             "};";
+        CppCheck cppCheck(settings, supprs, *this, true, nullptr);
         ASSERT_EQUALS(0, cppCheck.check("/somewhere/test.cpp", code));
         ASSERT_EQUALS("",errout.str());
     }

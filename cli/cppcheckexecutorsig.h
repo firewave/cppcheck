@@ -25,8 +25,9 @@
 
 class CppCheckExecutor;
 class Settings;
+struct Suppressions;
 
-int check_wrapper_sig(CppCheckExecutor& executor, int (CppCheckExecutor::*f)(const Settings&) const, const Settings& settings);
+int check_wrapper_sig(CppCheckExecutor& executor, int (CppCheckExecutor::*f)(const Settings&, Suppressions&) const, const Settings& settings, Suppressions& supprs);
 
 #endif // CPPCHECKEXECUTORSIG_H
 

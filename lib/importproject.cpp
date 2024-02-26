@@ -177,7 +177,7 @@ void ImportProject::fsSetIncludePaths(FileSettings& fs, const std::string &basep
     }
 }
 
-ImportProject::Type ImportProject::import(const std::string &filename, Settings *settings)
+ImportProject::Type ImportProject::import(const std::string &filename, Settings *settings, Suppressions *supprs)
 {
     std::ifstream fin(filename);
     if (!fin.is_open())
@@ -212,7 +212,7 @@ ImportProject::Type ImportProject::import(const std::string &filename, Settings 
             return ImportProject::Type::BORLAND;
         }
     } else if (settings && endsWith(filename, ".cppcheck")) {
-        if (importCppcheckGuiProject(fin, settings)) {
+        if (importCppcheckGuiProject(fin, settings, supprs)) {
             setRelativePaths(filename);
             return ImportProject::Type::CPPCHECK_GUI;
         }
@@ -1101,7 +1101,7 @@ static const char * readSafe(const char *s, const char *def) {
     return s ? s : def;
 }
 
-bool ImportProject::importCppcheckGuiProject(std::istream &istr, Settings *settings)
+bool ImportProject::importCppcheckGuiProject(std::istream &istr, Settings *settings, Suppressions *supprs)
 {
     tinyxml2::XMLDocument doc;
     const std::string xmldata = istream_to_string(istr);
@@ -1257,7 +1257,7 @@ bool ImportProject::importCppcheckGuiProject(std::istream &istr, Settings *setti
 
     for (const std::string &p : paths)
         guiProject.pathNames.push_back(p);
-    settings->supprs.nomsg.addSuppressions(std::move(suppressions));
+    supprs->nomsg.addSuppressions(std::move(suppressions));
     settings->checkHeaders = temp.checkHeaders;
     settings->checkUnusedTemplates = temp.checkUnusedTemplates;
     settings->maxCtuDepth = temp.maxCtuDepth;

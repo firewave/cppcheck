@@ -84,15 +84,14 @@ int CheckThread::executeCommand(std::string exe, std::vector<std::string> args, 
 }
 
 
-CheckThread::CheckThread(ThreadResult &result) :
-    mResult(result),
-    mCppcheck(result, true, executeCommand)
+CheckThread::CheckThread(ThreadResult &result)
+    : mResult(result)
 {}
 
 void CheckThread::check(const Settings &settings)
 {
     mFiles.clear();
-    mCppcheck.settings() = settings;
+    mSettings = settings; // this is a copy
     start();
 }
 
@@ -106,6 +105,9 @@ void CheckThread::analyseWholeProgram(const QStringList &files)
 // cppcheck-suppress unusedFunction - TODO: false positive
 void CheckThread::run()
 {
+    Suppressions supprs; // TODO
+    CppCheck cppcheck(mSettings, supprs, mResult, true, executeCommand);
+
     mState = Running;
 
     if (!mFiles.isEmpty() || mAnalyseWholeProgram) {
@@ -115,7 +117,7 @@ void CheckThread::run()
         std::transform(mFiles.cbegin(), mFiles.cend(), std::back_inserter(files2), [&](const QString& file) {
             return std::pair<std::string, std::size_t>{file.toStdString(), 0};
         });
-        mCppcheck.analyseWholeProgram(mCppcheck.settings().buildDir, files2, {});
+        cppcheck.analyseWholeProgram(cppcheck.settings().buildDir, files2, {});
         mFiles.clear();
         emit done();
         return;
@@ -124,7 +126,7 @@ void CheckThread::run()
     QString file = mResult.getNextFile();
     while (!file.isEmpty() && mState == Running) {
         qDebug() << "Checking file" << file;
-        mCppcheck.check(file.toStdString());
+        cppcheck.check(file.toStdString());
         runAddonsAndTools(nullptr, file);
         emit fileChecked(file);
 
@@ -136,7 +138,7 @@ void CheckThread::run()
     while (!fileSettings.filename.empty() && mState == Running) {
         file = QString::fromStdString(fileSettings.filename);
         qDebug() << "Checking file" << file;
-        mCppcheck.check(fileSettings);
+        cppcheck.check(fileSettings);
         runAddonsAndTools(&fileSettings, QString::fromStdString(fileSettings.filename));
         emit fileChecked(file);
 
@@ -204,7 +206,7 @@ void CheckThread::runAddonsAndTools(const FileSettings *fileSettings, const QStr
                 args << ("-std=" + QString::fromStdString(fileSettings->standard));
             else {
                 // TODO: pass C or C++ standard based on file type
-                const std::string std = mCppcheck.settings().standards.getCPP();
+                const std::string std = mSettings.standards.getCPP();
                 if (!std.empty()) {
                     args << ("-std=" + QString::fromStdString(std));
                 }
@@ -212,7 +214,7 @@ void CheckThread::runAddonsAndTools(const FileSettings *fileSettings, const QStr
 
             QString analyzerInfoFile;
 
-            const std::string &buildDir = mCppcheck.settings().buildDir;
+            const std::string &buildDir = mSettings.buildDir;
             if (!buildDir.empty()) {
                 analyzerInfoFile = QString::fromStdString(AnalyzerInformation::getAnalyzerInfoFile(buildDir, fileSettings->filename, fileSettings->cfg));
 

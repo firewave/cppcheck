@@ -42,6 +42,7 @@
 class Tokenizer;
 enum class SHOWTIME_MODES;
 struct FileSettings;
+struct Suppressions;
 
 /// @addtogroup Core
 /// @{
@@ -59,7 +60,9 @@ public:
     /**
      * @brief Constructor.
      */
-    CppCheck(ErrorLogger &errorLogger,
+    CppCheck(const Settings& settings,
+             Suppressions& suppressions,
+             ErrorLogger &errorLogger,
              bool useGlobalSuppressions,
              ExecuteCmdFn executeCommand);
 
@@ -102,7 +105,7 @@ public:
      * @brief Get reference to current settings.
      * @return a reference to current settings
      */
-    Settings &settings();
+    const Settings &settings();
 
     /**
      * @brief Returns current version number as a string.
@@ -220,7 +223,8 @@ private:
 
     // TODO: store hashes instead of the full messages
     std::unordered_set<std::string> mErrorList;
-    Settings mSettings;
+    const Settings& mSettings;
+    Suppressions& mSuppressions;
 
     void reportProgress(const std::string &filename, const char stage[], const std::size_t value) override;
 

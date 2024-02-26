@@ -23,6 +23,7 @@
 #include "filesettings.h"
 #include "fixture.h"
 #include "helpers.h"
+#include "suppressions.h"
 #include "timer.h"
 
 #include <algorithm>
@@ -103,6 +104,7 @@ private:
         s.quiet = opt.quiet;
         if (opt.plistOutput)
             s.plistOutput = opt.plistOutput;
+        Suppressions supprs;
 
         bool executeCommandCalled = false;
         std::string exe;
@@ -124,7 +126,7 @@ private:
         if (useFS)
             filelist.clear();
 
-        ProcessExecutor executor(filelist, fileSettings, s, s.supprs.nomsg, *this, executeFn);
+        ProcessExecutor executor(filelist, fileSettings, s, supprs, *this, executeFn);
         ASSERT_EQUALS(result, executor.check());
         ASSERT_EQUALS(opt.executeCommandCalled, executeCommandCalled);
         ASSERT_EQUALS(opt.exe, exe);

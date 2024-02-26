@@ -33,6 +33,9 @@
 #include <string>
 #include <vector>
 
+class Settings;
+struct Suppressions;
+
 /// @addtogroup Core
 /// @{
 
@@ -43,8 +46,6 @@ namespace cppcheck {
         }
     };
 }
-
-class Settings;
 
 /**
  * @brief Importing project settings.
@@ -94,10 +95,10 @@ public:
     void ignorePaths(const std::vector<std::string> &ipaths);
     void ignoreOtherConfigs(const std::string &cfg);
 
-    Type import(const std::string &filename, Settings *settings=nullptr);
+    Type import(const std::string &filename, Settings *settings=nullptr, Suppressions *supprs=nullptr);
 protected:
     bool importCompileCommands(std::istream &istr);
-    bool importCppcheckGuiProject(std::istream &istr, Settings *settings);
+    bool importCppcheckGuiProject(std::istream &istr, Settings *settings, Suppressions *supprs);
     virtual bool sourceFileExists(const std::string &file);
 private:
     bool importSln(std::istream &istr, const std::string &path, const std::vector<std::string> &fileFilters);

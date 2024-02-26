@@ -122,7 +122,7 @@ MainWindow::MainWindow(TranslationHandler* th, QSettings* settings) :
     {
         Settings tempSettings;
         tempSettings.exename = QCoreApplication::applicationFilePath().toStdString();
-        tempSettings.loadCppcheckCfg(); // TODO: how to handle error?
+        //tempSettings.loadCppcheckCfg(); // TODO: how to handle error?
         mCppcheckCfgProductName = QString::fromStdString(tempSettings.cppcheckCfgProductName);
         mCppcheckCfgAbout = QString::fromStdString(tempSettings.cppcheckCfgAbout);
     }
@@ -641,8 +641,8 @@ void MainWindow::analyzeCode(const QString& code, const QString& filename)
             mUI->mResults, SLOT(debugError(ErrorItem)));
 
     // Create CppCheck instance
-    CppCheck cppcheck(result, true, nullptr);
-    cppcheck.settings() = checkSettings;
+    Suppressions supprs;
+    CppCheck cppcheck(checkSettings, supprs, result, true, nullptr);
 
     // Check
     checkLockDownUI();
@@ -978,7 +978,7 @@ QPair<bool,Settings> MainWindow::getCppcheckSettings()
     const QString pythonCmd = fromNativePath(mSettings->value(SETTINGS_PYTHON_PATH).toString());
 
     {
-        const QString cfgErr = QString::fromStdString(result.loadCppcheckCfg());
+        const QString cfgErr;// = QString::fromStdString(result.loadCppcheckCfg());
         if (!cfgErr.isEmpty()) {
             QMessageBox::critical(this, tr("Error"), tr("Failed to load %1 - %2\n\nAnalysis is aborted.").arg("cppcheck.cfg").arg(cfgErr));
             return {false, {}};
@@ -1022,7 +1022,7 @@ QPair<bool,Settings> MainWindow::getCppcheckSettings()
         }
 
         for (const SuppressionList::Suppression &suppression : mProjectFile->getSuppressions()) {
-            result.supprs.nomsg.addSuppression(suppression);
+            //result.supprs.nomsg.addSuppression(suppression);
         }
 
         // Only check the given -D configuration

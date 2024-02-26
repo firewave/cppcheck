@@ -31,6 +31,7 @@
 class Settings;
 class ErrorLogger;
 class SuppressionList;
+struct Suppressions;
 
 /**
  * This class works as an example of how CppCheck can be used in external
@@ -89,7 +90,7 @@ protected:
      *
      * @param settings the settings
      **/
-    int check_wrapper(const Settings& settings);
+    int check_wrapper(const Settings& settings, Suppressions& supprs);
 
     /**
      * Starts the checking.
@@ -101,7 +102,7 @@ protected:
      *         given value is returned instead of default 0.
      *         If no errors are found, 0 is returned.
      */
-    int check_internal(const Settings& settings) const;
+    int check_internal(const Settings& settings, Suppressions& suppr) const;
 
     /**
      * Filename associated with size of file
