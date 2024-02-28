@@ -10604,12 +10604,13 @@ bool Tokenizer::hasIfdef(const Token *start, const Token *end) const
 {
     assert(mPreprocessor);
 
-    return std::any_of(mPreprocessor->getDirectives().cbegin(), mPreprocessor->getDirectives().cend(), [&](const Directive& d) {
-        return startsWith(d.str, "#if") &&
-        d.linenr >= start->linenr() &&
+    const auto& directives = mPreprocessor->getDirectives();
+    return std::any_of(directives.cbegin(), directives.cend(), [&](const Directive& d) {
+        return d.linenr >= start->linenr() &&
         d.linenr <= end->linenr() &&
         start->fileIndex() < list.getFiles().size() &&
-        d.file == list.getFiles()[start->fileIndex()];
+        d.file == list.getFiles()[start->fileIndex()] &&
+        startsWith(d.str, "#if");
     });
 }
 
