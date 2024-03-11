@@ -65,7 +65,7 @@ def test_local_path(tmpdir):
     assert ret == 0, stdout
 
 
-# TODO: we actually need to trigger the --force limit
+# TODO: actually trigger the --force limit
 def test_local_path_force(tmpdir):
     create_compile_commands(tmpdir)
     ret, stdout, stderr = cppcheck(['--project={}'.format(COMPILE_COMMANDS_JSON), '--force'], cwd=tmpdir)
@@ -82,7 +82,7 @@ def test_local_path_force(tmpdir):
     assert ret == 0, stdout
 
 
-# TODO: we actually need to hit the threshold
+# TODO: actually hit the threshold
 def test_local_path_maxconfigs(tmpdir):
     create_compile_commands(tmpdir)
     ret, stdout, stderr = cppcheck(['--project={}'.format(COMPILE_COMMANDS_JSON), '--max-configs=2'], cwd=tmpdir)
