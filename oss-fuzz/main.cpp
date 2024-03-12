@@ -47,8 +47,10 @@ static Settings create_settings()
 {
     // TODO: load std.cfg
     Settings s;
+    s.quiet = true;
     s.addEnabled("all");
     s.certainty.setEnabled(Certainty::inconclusive, true);
+    s.checkLevel = Settings::CheckLevel::exhaustive;
     return s;
 }
 static const Settings s_settings = create_settings();
