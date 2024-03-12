@@ -50,8 +50,11 @@ static void doCheck(const std::string& code)
 {
     Suppressions supprs;
     CppCheck cppcheck(supprs, s_errorLogger, false, nullptr);
+    // TODO: load std.cfg when settings are no longer owned by CppCheck
+    cppcheck.settings().quiet = true;
     cppcheck.settings().addEnabled("all");
     cppcheck.settings().certainty.setEnabled(Certainty::inconclusive, true);
+    cppcheck.settings().checkLevel = Settings::CheckLevel::exhaustive;
     cppcheck.check(s_file, code);
 }
 
