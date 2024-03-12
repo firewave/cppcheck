@@ -48,10 +48,13 @@ static const FileWithDetails s_file("test.cpp");
 
 static void doCheck(const std::string& code)
 {
+    // TODO: load std.cfg when settings are no longer owned by CppCheck
     // TODO: create the settings only once
     Settings s;
+    s.quiet = true;
     s.addEnabled("all");
     s.certainty.setEnabled(Certainty::inconclusive, true);
+    s.checkLevel = Settings::CheckLevel::exhaustive;
     Suppressions supprs;
     CppCheck cppcheck(s, supprs, s_errorLogger, false, nullptr);
     cppcheck.check(s_file, code);
