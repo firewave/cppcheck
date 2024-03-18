@@ -1076,56 +1076,56 @@ CmdLineParser::Result CmdLineParser::parseFromArgs(int argc, const char* const a
                 const std::string ruleFile = argv[i] + 12;
                 tinyxml2::XMLDocument doc;
                 const tinyxml2::XMLError err = doc.LoadFile(ruleFile.c_str());
-                if (err == tinyxml2::XML_SUCCESS) {
-                    const tinyxml2::XMLElement *node = doc.FirstChildElement();
-                    // check if it is a single or multi rule configuration
-                    if (node && strcmp(node->Value(), "rules") == 0)
-                        node = node->FirstChildElement("rule");
-                    for (; node && strcmp(node->Value(), "rule") == 0; node = node->NextSiblingElement()) {
-                        Settings::Rule rule;
-
-                        for (const tinyxml2::XMLElement *subnode = node->FirstChildElement(); subnode; subnode = subnode->NextSiblingElement()) {
-                            const char * const subtext = subnode->GetText();
-                            if (std::strcmp(subnode->Name(), "tokenlist") == 0) {
-                                rule.tokenlist = empty_if_null(subtext);
-                            }
-                            else if (std::strcmp(subnode->Name(), "pattern") == 0) {
-                                rule.pattern = empty_if_null(subtext);
-                            }
-                            else if (std::strcmp(subnode->Name(), "message") == 0) {
-                                for (const tinyxml2::XMLElement *msgnode = subnode->FirstChildElement(); msgnode; msgnode = msgnode->NextSiblingElement()) {
-                                    const char * const msgtext = msgnode->GetText();
-                                    if (std::strcmp(msgnode->Name(), "severity") == 0) {
-                                        rule.severity = severityFromString(empty_if_null(msgtext));
-                                    }
-                                    else if (std::strcmp(msgnode->Name(), "id") == 0) {
-                                        rule.id = empty_if_null(msgtext);
-                                    }
-                                    else if (std::strcmp(msgnode->Name(), "summary") == 0) {
-                                        rule.summary = empty_if_null(msgtext);
-                                    }
-                                    else {
-                                        mLogger.printError("unable to load rule-file '" + ruleFile + "' - unknown element '" + msgnode->Name() + "' encountered in 'message'.");
-                                        return Result::Fail;
-                                    }
-                                }
-                            }
-                            else {
-                                mLogger.printError("unable to load rule-file '" + ruleFile + "' - unknown element '" + subnode->Name() + "' encountered in 'rule'.");
-                                return Result::Fail;
-                            }
-                        }
-
-                        if (rule.pattern.empty()) {
-                            mLogger.printError("unable to load rule-file '" + ruleFile + "' - a rule is lacking a pattern.");
-                            return Result::Fail;
-                        }
-
-                        mSettings.rules.emplace_back(std::move(rule));
-                    }
-                } else {
+                if (err != tinyxml2::XML_SUCCESS) {
                     mLogger.printError("unable to load rule-file '" + ruleFile + "' (" + tinyxml2::XMLDocument::ErrorIDToName(err) + ").");
                     return Result::Fail;
+                }
+
+                const tinyxml2::XMLElement *node = doc.FirstChildElement();
+                // check if it is a single or multi rule configuration
+                if (node && strcmp(node->Value(), "rules") == 0)
+                    node = node->FirstChildElement("rule");
+                for (; node && strcmp(node->Value(), "rule") == 0; node = node->NextSiblingElement()) {
+                    Settings::Rule rule;
+
+                    for (const tinyxml2::XMLElement *subnode = node->FirstChildElement(); subnode; subnode = subnode->NextSiblingElement()) {
+                        const char * const subtext = subnode->GetText();
+                        if (std::strcmp(subnode->Name(), "tokenlist") == 0) {
+                            rule.tokenlist = empty_if_null(subtext);
+                        }
+                        else if (std::strcmp(subnode->Name(), "pattern") == 0) {
+                            rule.pattern = empty_if_null(subtext);
+                        }
+                        else if (std::strcmp(subnode->Name(), "message") == 0) {
+                            for (const tinyxml2::XMLElement *msgnode = subnode->FirstChildElement(); msgnode; msgnode = msgnode->NextSiblingElement()) {
+                                const char * const msgtext = msgnode->GetText();
+                                if (std::strcmp(msgnode->Name(), "severity") == 0) {
+                                    rule.severity = severityFromString(empty_if_null(msgtext));
+                                }
+                                else if (std::strcmp(msgnode->Name(), "id") == 0) {
+                                    rule.id = empty_if_null(msgtext);
+                                }
+                                else if (std::strcmp(msgnode->Name(), "summary") == 0) {
+                                    rule.summary = empty_if_null(msgtext);
+                                }
+                                else {
+                                    mLogger.printError("unable to load rule-file '" + ruleFile + "' - unknown element '" + msgnode->Name() + "' encountered in 'message'.");
+                                    return Result::Fail;
+                                }
+                            }
+                        }
+                        else {
+                            mLogger.printError("unable to load rule-file '" + ruleFile + "' - unknown element '" + subnode->Name() + "' encountered in 'rule'.");
+                            return Result::Fail;
+                        }
+                    }
+
+                    if (rule.pattern.empty()) {
+                        mLogger.printError("unable to load rule-file '" + ruleFile + "' - a rule is lacking a pattern.");
+                        return Result::Fail;
+                    }
+
+                    mSettings.rules.emplace_back(std::move(rule));
                 }
 #else
                 mLogger.printError("Option --rule-file cannot be used as Cppcheck has not been built with rules support.");
