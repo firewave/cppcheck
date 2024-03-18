@@ -1092,6 +1092,11 @@ CmdLineParser::Result CmdLineParser::parseFromArgs(int argc, const char* const a
                         const char * const subtext = subnode->GetText();
                         if (std::strcmp(subnode->Name(), "tokenlist") == 0) {
                             rule.tokenlist = empty_if_null(subtext);
+                            if (rule.tokenlist != "define" && rule.tokenlist != "normal")
+                            {
+                                mLogger.printError("unable to load rule-file '" + ruleFile + "' - unsupported 'tokenlist' value '" + rule.tokenlist + "'.");
+                                return Result::Fail;
+                            }
                         }
                         else if (std::strcmp(subnode->Name(), "pattern") == 0) {
                             rule.pattern = empty_if_null(subtext);
@@ -1100,10 +1105,21 @@ CmdLineParser::Result CmdLineParser::parseFromArgs(int argc, const char* const a
                             for (const tinyxml2::XMLElement *msgnode = subnode->FirstChildElement(); msgnode; msgnode = msgnode->NextSiblingElement()) {
                                 const char * const msgtext = msgnode->GetText();
                                 if (std::strcmp(msgnode->Name(), "severity") == 0) {
-                                    rule.severity = severityFromString(empty_if_null(msgtext));
+                                    const char * const t = empty_if_null(msgtext);
+                                    rule.severity = severityFromString(t);
+                                    if (rule.severity == Severity::none)
+                                    {
+                                        mLogger.printError("unable to load rule-file '" + ruleFile + "' - unsupported 'severity' value '" + t + "' in 'message'.");
+                                        return Result::Fail;
+                                    }
                                 }
                                 else if (std::strcmp(msgnode->Name(), "id") == 0) {
                                     rule.id = empty_if_null(msgtext);
+                                    if (rule.id.empty())
+                                    {
+                                        mLogger.printError("unable to load rule-file '" + ruleFile + "' - empty 'id' in 'message'.");
+                                        return Result::Fail;
+                                    }
                                 }
                                 else if (std::strcmp(msgnode->Name(), "summary") == 0) {
                                     rule.summary = empty_if_null(msgtext);

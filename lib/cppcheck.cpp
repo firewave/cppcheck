@@ -1318,6 +1318,38 @@ static const char * pcreErrorCodeToString(const int pcreExecRet)
     return "";
 }
 
+static std::string compileRule(const char * pattern, pcre*& re, pcre_extra*& pcreExtra)
+{
+    const char *pcreCompileErrorStr = nullptr;
+    int erroffset = 0;
+    re = pcre_compile(pattern, 0, &pcreCompileErrorStr, &erroffset, nullptr);
+    if (!re) {
+        if (pcreCompileErrorStr)
+            return std::string("pcre_compile failed for '") + pattern + "' (" + pcreCompileErrorStr + ")";
+        return std::string("pcre_compile failed for '") + pattern + "' (unknown error)";
+    }
+
+    // Optimize the regex, but only if PCRE_CONFIG_JIT is available
+#ifdef PCRE_CONFIG_JIT
+    const char *pcreStudyErrorStr = nullptr;
+    pcreExtra = pcre_study(re, PCRE_STUDY_JIT_COMPILE, &pcreStudyErrorStr);
+    // pcre_study() returns NULL for both errors and when it can not optimize the regex.
+    // The last argument is how one checks for errors.
+    // It is NULL if everything works, and points to an error string otherwise.
+    if (pcreStudyErrorStr) {
+        // pcre_compile() worked, but pcre_study() returned an error. Free the resources allocated by pcre_compile().
+        pcre_free(re);
+        re = nullptr;
+
+        if (pcreStudyErrorStr)
+            return std::string("pcre_study failed for '") + pattern + "' (" + pcreStudyErrorStr + ")";
+        return std::string("pcre_study failed for '") + pattern + "' (unknown error)";
+    }
+#endif
+
+    return "";
+}
+
 void CppCheck::executeRules(const std::string &tokenlist, const Tokenizer &tokenizer)
 {
     // There is no rule to execute
@@ -1338,48 +1370,9 @@ void CppCheck::executeRules(const std::string &tokenlist, const Tokenizer &token
             reportOut("Processing rule: " + rule.pattern, Color::FgGreen);
         }
 
-        const char *pcreCompileErrorStr = nullptr;
-        int erroffset = 0;
-        pcre * const re = pcre_compile(rule.pattern.c_str(),0,&pcreCompileErrorStr,&erroffset,nullptr);
-        if (!re) {
-            if (pcreCompileErrorStr) {
-                const std::string msg = "pcre_compile failed: " + std::string(pcreCompileErrorStr);
-                const ErrorMessage errmsg(std::list<ErrorMessage::FileLocation>(),
-                                          emptyString,
-                                          Severity::error,
-                                          msg,
-                                          "pcre_compile",
-                                          Certainty::normal);
-
-                reportErr(errmsg);
-            }
-            continue;
-        }
-
-        // Optimize the regex, but only if PCRE_CONFIG_JIT is available
-#ifdef PCRE_CONFIG_JIT
-        const char *pcreStudyErrorStr = nullptr;
-        pcre_extra * const pcreExtra = pcre_study(re, PCRE_STUDY_JIT_COMPILE, &pcreStudyErrorStr);
-        // pcre_study() returns NULL for both errors and when it can not optimize the regex.
-        // The last argument is how one checks for errors.
-        // It is NULL if everything works, and points to an error string otherwise.
-        if (pcreStudyErrorStr) {
-            const std::string msg = "pcre_study failed: " + std::string(pcreStudyErrorStr);
-            const ErrorMessage errmsg(std::list<ErrorMessage::FileLocation>(),
-                                      emptyString,
-                                      Severity::error,
-                                      msg,
-                                      "pcre_study",
-                                      Certainty::normal);
-
-            reportErr(errmsg);
-            // pcre_compile() worked, but pcre_study() returned an error. Free the resources allocated by pcre_compile().
-            pcre_free(re);
-            continue;
-        }
-#else
-        const pcre_extra * const pcreExtra = nullptr;
-#endif
+        pcre* re = nullptr;
+        pcre_extra* pcreExtra = nullptr;
+        const std::string err = compileRule(rule.pattern.c_str(), re, pcreExtra);
 
         int pos = 0;
         int ovector[30]= {0};
