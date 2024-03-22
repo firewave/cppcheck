@@ -1937,7 +1937,7 @@ static void valueFlowImpossibleValues(TokenList& tokenList, const Settings& sett
                     ValueFlow::Value symValue{};
                     symValue.valueType = ValueFlow::Value::ValueType::SYMBOLIC;
                     symValue.tokvalue = tok2;
-                    values.push_back(symValue);
+                    values.push_back(std::move(symValue));
                     std::copy_if(tok2->values().cbegin(),
                                  tok2->values().cend(),
                                  std::back_inserter(values),
@@ -8897,7 +8897,7 @@ static void valueFlowContainerSize(TokenList& tokenlist,
                     value.valueType = ValueFlow::Value::ValueType::TOK;
                     value.tokvalue = tok;
                     value.setKnown();
-                    values.push_back(value);
+                    values.push_back(std::move(value));
                 } else if (Token::simpleMatch(tok, "(")) {
                     const Token* constructorArgs = tok;
                     values = getContainerSizeFromConstructor(constructorArgs, tok->valueType(), settings, true);
