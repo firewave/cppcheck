@@ -104,14 +104,13 @@ private:
 
     void FileLocationConstruct() const {
         const ErrorMessage::FileLocation loc("foo.cpp", 1, 2);
-        ASSERT_EQUALS("foo.cpp", loc.getOrigFile());
         ASSERT_EQUALS("foo.cpp", loc.getfile());
         ASSERT_EQUALS(1, loc.line);
         ASSERT_EQUALS(2, loc.column);
     }
 
     void FileLocationConstructNormalize() const {
-        ErrorMessage::FileLocation loc(".\\test\\test1\\..\\foo.cpp");
+        const ErrorMessage::FileLocation loc(".\\test\\test1\\..\\foo.cpp", 0, 0);
         ASSERT_EQUALS("test/foo.cpp", loc.getfile());
         ASSERT_EQUALS(0, loc.line);
         ASSERT_EQUALS(0, loc.column);
@@ -430,7 +429,6 @@ private:
 
     void SerializeFileLocation() const {
         ErrorMessage::FileLocation loc1("[]:;,()", "abcd:/,", 654, 33);
-        loc1.setfile("[]:;,()");
 
         ErrorMessage msg({std::move(loc1)}, emptyString, Severity::error, "Programming error", "errorId", Certainty::inconclusive);
 

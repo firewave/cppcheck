@@ -213,7 +213,7 @@ bool CTU::FileInfo::FunctionCall::loadFromXml(const tinyxml2::XMLElement *xmlEle
         std::string info = readAttrString(e2, ATTR_INFO, &error);
         const int line = readAttrInt(e2, ATTR_LOC_LINENR, &error);
         const int column = readAttrInt(e2, ATTR_LOC_COLUMN, &error);
-        ErrorMessage::FileLocation loc(file, std::move(info), line, column);
+        ErrorMessage::FileLocation loc(std::move(file), std::move(info), line, column);
         (void)loc; // TODO: loc is unused
     }
     return !error;
@@ -350,8 +350,7 @@ CTU::FileInfo *CTU::getFileInfo(const Tokenizer *tokenizer)
                         const std::string& info = i.second;
                         const int line = i.first->linenr();
                         const int column = i.first->column();
-                        ErrorMessage::FileLocation loc(file, info, line, column);
-                        functionCall.callValuePath.push_back(std::move(loc));
+                        functionCall.callValuePath.emplace_back(file, info, line, column);
                     }
                     fileInfo->functionCalls.push_back(std::move(functionCall));
                 }

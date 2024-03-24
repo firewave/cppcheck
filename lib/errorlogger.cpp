@@ -413,8 +413,8 @@ void ErrorMessage::deserialize(const std::string &data)
         // (*loc).line << '\t' << (*loc).column << '\t' << (*loc).getfile(false) << '\t' << loc->getinfo();
 
         std::string info;
-        if (substrings.size() == 5)
-            info = std::move(substrings[4]);
+        if (substrings.size() == 4)
+            info = std::move(substrings[3]);
         ErrorMessage::FileLocation loc(substrings[2], std::move(info), strToInt<int>(substrings[0]), strToInt<unsigned int>(substrings[1]));
 
         callStack.push_back(std::move(loc));

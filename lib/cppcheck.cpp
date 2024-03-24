@@ -403,10 +403,10 @@ static bool reportClangErrors(std::istream &is, const std::function<void(const E
         const std::string colnr = line.substr(pos2+1, pos3-pos2-1);
         const std::string msg = line.substr(line.find(':', pos3+1) + 2);
 
-        const std::string locFile = Path::toNativeSeparators(filename);
+        std::string locFile = Path::toNativeSeparators(filename);
         const int line_i = strToInt<int>(linenr);
         const int column = strToInt<unsigned int>(colnr);
-        ErrorMessage::FileLocation loc(locFile, line_i, column);
+        ErrorMessage::FileLocation loc(std::move(locFile), line_i, column);
         ErrorMessage errmsg({std::move(loc)},
                             locFile,
                             Severity::error,
@@ -686,7 +686,7 @@ unsigned int CppCheck::checkFile(const std::string& filename, const std::string 
             if (mSettings.relativePaths)
                 file = Path::getRelativePath(file, mSettings.basePaths);
 
-            ErrorMessage::FileLocation loc1(file, output.location.line, output.location.col);
+            ErrorMessage::FileLocation loc1(std::move(file), output.location.line, output.location.col);
 
             ErrorMessage errmsg({std::move(loc1)},
                                 "",
@@ -969,7 +969,7 @@ unsigned int CppCheck::checkFile(const std::string& filename, const std::string 
                     if (mSettings.relativePaths)
                         file = Path::getRelativePath(file, mSettings.basePaths);
 
-                    ErrorMessage::FileLocation loc1(file, o.location.line, o.location.col);
+                    ErrorMessage::FileLocation loc1(std::move(file), o.location.line, o.location.col);
 
                     ErrorMessage errmsg({std::move(loc1)},
                                         filename,
@@ -998,8 +998,8 @@ unsigned int CppCheck::checkFile(const std::string& filename, const std::string 
             for (const std::string &s : configurationError)
                 msg += '\n' + s;
 
-            const std::string locFile = Path::toNativeSeparators(filename);
-            ErrorMessage::FileLocation loc(locFile, 0, 0);
+            std::string locFile = Path::toNativeSeparators(filename);
+            ErrorMessage::FileLocation loc(std::move(locFile), 0, 0);
             ErrorMessage errmsg({std::move(loc)},
                                 locFile,
                                 Severity::information,
@@ -1392,7 +1392,7 @@ void CppCheck::executeRules(const std::string &tokenlist, const TokenList &list)
                 }
             }
 
-            ErrorMessage::FileLocation loc(file, line, 0);
+            ErrorMessage::FileLocation loc(std::move(file), line, 0);
 
             // Create error message
             std::string summary;
@@ -1472,7 +1472,7 @@ void CppCheck::executeAddons(const std::vector<std::string>& files, const std::s
                     std::string fileName = loc["file"].get<std::string>();
                     const int64_t lineNumber = loc["linenr"].get<int64_t>();
                     const int64_t column = loc["column"].get<int64_t>();
-                    std::string info = loc["info"].get<std::string>();
+                     std::string info = loc["info"].get<std::string>();
                     errmsg.callStack.emplace_back(std::move(fileName), std::move(info), lineNumber, column);
                 }
             }
