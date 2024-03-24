@@ -40,7 +40,7 @@ private:
     void run() override {
         TEST_CASE(PatternSearchReplace);
         TEST_CASE(FileLocationConstruct);
-        TEST_CASE(FileLocationSetFile);
+        TEST_CASE(FileLocationConstructNormalize);
         TEST_CASE(ErrorMessageConstruct);
         TEST_CASE(ErrorMessageConstructLocations);
         TEST_CASE(ErrorMessageVerbose);
@@ -110,11 +110,9 @@ private:
         ASSERT_EQUALS(2, loc.column);
     }
 
-    void FileLocationSetFile() const {
-        ErrorMessage::FileLocation loc("foo1.cpp", 0, 0);
-        loc.setfile("foo.cpp");
-        ASSERT_EQUALS("foo1.cpp", loc.getOrigFile());
-        ASSERT_EQUALS("foo.cpp", loc.getfile());
+    void FileLocationConstructNormalize() const {
+        ErrorMessage::FileLocation loc(".\\test\\test1\\..\\foo.cpp");
+        ASSERT_EQUALS("test/foo.cpp", loc.getfile());
         ASSERT_EQUALS(0, loc.line);
         ASSERT_EQUALS(0, loc.column);
     }
@@ -431,7 +429,7 @@ private:
     }
 
     void SerializeFileLocation() const {
-        ErrorMessage::FileLocation loc1(":/,;", "abcd:/,", 654, 33);
+        ErrorMessage::FileLocation loc1("[]:;,()", "abcd:/,", 654, 33);
         loc1.setfile("[]:;,()");
 
         ErrorMessage msg({std::move(loc1)}, emptyString, Severity::error, "Programming error", "errorId", Certainty::inconclusive);
@@ -446,12 +444,11 @@ private:
                       "17 Programming error"
                       "17 Programming error"
                       "1 "
-                      "27 654\t33\t[]:;,()\t:/,;\tabcd:/,", msg_str);
+                      "22 654\t33\t[]:;,()\tabcd:/,", msg_str);
 
         ErrorMessage msg2;
         ASSERT_NO_THROW(msg2.deserialize(msg_str));
         ASSERT_EQUALS("[]:;,()", msg2.callStack.front().getfile(false));
-        ASSERT_EQUALS(":/,;", msg2.callStack.front().getOrigFile(false));
         ASSERT_EQUALS(654, msg2.callStack.front().line);
         ASSERT_EQUALS(33, msg2.callStack.front().column);
         ASSERT_EQUALS("abcd:/,", msg2.callStack.front().getinfo());
