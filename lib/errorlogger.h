@@ -87,7 +87,6 @@ public:
          */
         std::string stringify(bool addcolumn = false) const;
 
-        unsigned int fileIndex;
         int line; // negative value means "no line"
         unsigned int column;
 

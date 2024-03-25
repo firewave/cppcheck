@@ -731,15 +731,15 @@ ErrorMessage::FileLocation::FileLocation(const std::string &file, int line, unsi
 {}
 
 ErrorMessage::FileLocation::FileLocation(const std::string &file, std::string info, int line, unsigned int column)
-    : fileIndex(0), line(line), column(column), mOrigFileName(file), mFileName(Path::simplifyPath(file)), mInfo(std::move(info))
+    : line(line), column(column), mOrigFileName(file), mFileName(Path::simplifyPath(file)), mInfo(std::move(info))
 {}
 
 ErrorMessage::FileLocation::FileLocation(const Token* tok, const TokenList* tokenList)
-    : fileIndex(tok->fileIndex()), line(tok->linenr()), column(tok->column()), mOrigFileName(tokenList->getOrigFile(tok)), mFileName(Path::simplifyPath(tokenList->file(tok)))
+    : line(tok->linenr()), column(tok->column()), mOrigFileName(tokenList->getOrigFile(tok)), mFileName(Path::simplifyPath(tokenList->file(tok)))
 {}
 
 ErrorMessage::FileLocation::FileLocation(const Token* tok, std::string info, const TokenList* tokenList)
-    : fileIndex(tok->fileIndex()), line(tok->linenr()), column(tok->column()), mOrigFileName(tokenList->getOrigFile(tok)), mFileName(Path::simplifyPath(tokenList->file(tok))), mInfo(std::move(info))
+    : line(tok->linenr()), column(tok->column()), mOrigFileName(tokenList->getOrigFile(tok)), mFileName(Path::simplifyPath(tokenList->file(tok))), mInfo(std::move(info))
 {}
 
 std::string ErrorMessage::FileLocation::getfile(bool convert) const
@@ -846,7 +846,7 @@ static std::string plistLoc(const char indent[], const ErrorMessage::FileLocatio
     ostr << indent << "<dict>\r\n"
          << indent << ' ' << "<key>line</key><integer>" << loc.line << "</integer>\r\n"
          << indent << ' ' << "<key>col</key><integer>" << loc.column << "</integer>\r\n"
-         << indent << ' ' << "<key>file</key><integer>" << loc.fileIndex << "</integer>\r\n"
+         << indent << ' ' << "<key>file</key><string>" << loc.getfile() << "</string>\r\n"
          << indent << "</dict>\r\n";
     return ostr.str();
 }
