@@ -174,7 +174,6 @@ private:
             const auto msg = ErrorMessage::fromInternalError(internalError, nullptr, "file.c");
             ASSERT_EQUALS(1, msg.callStack.size());
             const auto &loc = *msg.callStack.cbegin();
-            ASSERT_EQUALS(0, loc.fileIndex);
             ASSERT_EQUALS(0, loc.line);
             ASSERT_EQUALS(0, loc.column);
             ASSERT_EQUALS("message", msg.shortMessage());
@@ -187,7 +186,6 @@ private:
             const auto msg = ErrorMessage::fromInternalError(internalError, nullptr, "file.cpp", "msg");
             ASSERT_EQUALS(1, msg.callStack.size());
             const auto &loc = *msg.callStack.cbegin();
-            ASSERT_EQUALS(0, loc.fileIndex);
             ASSERT_EQUALS(0, loc.line);
             ASSERT_EQUALS(0, loc.column);
             ASSERT_EQUALS("msg: message", msg.shortMessage());

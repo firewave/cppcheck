@@ -58,10 +58,10 @@ public:
     class CPPCHECKLIB WARN_UNUSED FileLocation {
     public:
         FileLocation(const std::string &file, int line, unsigned int column)
-            : fileIndex(0), line(line), column(column), mOrigFileName(file), mFileName(file) {}
+            : line(line), column(column), mOrigFileName(file), mFileName(file) {}
 
         FileLocation(const std::string &file, std::string info, int line, unsigned int column)
-            : fileIndex(0), line(line), column(column), mOrigFileName(file), mFileName(file), mInfo(std::move(info)) {}
+            : line(line), column(column), mOrigFileName(file), mFileName(file), mInfo(std::move(info)) {}
 
         FileLocation(const Token* tok, const TokenList* tokenList);
         FileLocation(const Token* tok, std::string info, const TokenList* tokenList);
@@ -91,7 +91,6 @@ public:
          */
         std::string stringify() const;
 
-        unsigned int fileIndex;
         int line; // negative value means "no line"
         unsigned int column;
 
