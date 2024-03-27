@@ -377,6 +377,40 @@ private:
     std::istream &istr;
 };
 
+class StdStringStream : public simplecpp::TokenList::Stream {
+public:
+    // cppcheck-suppress uninitDerivedMemberVar - we call Stream::init() to initialize the private members
+    EXPLICIT StdStringStream(const std::string &str)
+        : str(str)
+        , size(str.size())
+        , pos(-1)
+    {
+        init();
+    }
+
+    virtual int get() OVERRIDE {
+        if (pos >= size)
+            return EOF;
+        return str[++pos];
+    }
+    virtual int peek() OVERRIDE {
+        if ((pos+1) >= size)
+            return EOF;
+        return str[pos+1];
+    }
+    virtual void unget() OVERRIDE {
+        --pos;
+    }
+    virtual bool good() OVERRIDE {
+        return pos < size;
+    }
+
+private:
+    const std::string &str;
+    const int size;
+    int pos;
+};
+
 class FileStream : public simplecpp::TokenList::Stream {
 public:
     // cppcheck-suppress uninitDerivedMemberVar - we call Stream::init() to initialize the private members
@@ -1447,8 +1481,7 @@ namespace simplecpp {
 
         Macro(const std::string &name, const std::string &value, std::vector<std::string> &f) : nameTokDef(nullptr), files(f), tokenListDefine(f), valueDefinedInCode_(false) {
             const std::string def(name + ' ' + value);
-            std::istringstream istr(def);
-            StdIStream stream(istr);
+            StdStringStream stream(def);
             tokenListDefine.readfile(stream);
             if (!parseDefine(tokenListDefine.cfront()))
                 throw std::runtime_error("bad macro syntax. macroname=" + name + " value=" + value);
