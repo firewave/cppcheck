@@ -3814,8 +3814,7 @@ static bool isNotEqual(std::pair<const Token*, const Token*> x, std::pair<const 
 static bool isNotEqual(std::pair<const Token*, const Token*> x, const std::string& y, bool cpp)
 {
     TokenList tokenList(nullptr);
-    std::istringstream istr(y);
-    tokenList.createTokens(istr, cpp ? Standards::Language::CPP : Standards::Language::C);
+    tokenList.createTokens(y, cpp ? Standards::Language::CPP : Standards::Language::C);
     return isNotEqual(x, std::make_pair(tokenList.front(), tokenList.back()));
 }
 static bool isNotEqual(std::pair<const Token*, const Token*> x, const ValueType* y, bool cpp)
@@ -9188,8 +9187,8 @@ static bool getMinMaxValues(const ValueType *vt, const Platform &platform, MathL
 static bool getMinMaxValues(const std::string &typestr, const Settings &settings, bool cpp, MathLib::bigint &minvalue, MathLib::bigint &maxvalue)
 {
     TokenList typeTokens(&settings);
-    std::istringstream istr(typestr+";");
-    if (!typeTokens.createTokens(istr, cpp ? Standards::Language::CPP : Standards::Language::C))
+    const std::string code(typestr+";");
+    if (!typeTokens.createTokens(code, cpp ? Standards::Language::CPP : Standards::Language::C))
         return false;
     typeTokens.simplifyPlatformTypes();
     typeTokens.simplifyStdType();

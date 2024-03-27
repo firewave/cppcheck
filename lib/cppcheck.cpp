@@ -849,8 +849,7 @@ unsigned int CppCheck::checkInternal(const std::string& filename, const std::str
                     code += "#line " + std::to_string(dir.linenr) + " \"" + dir.file + "\"\n" + dir.str + '\n';
             }
             Tokenizer tokenizer2(mSettings, this);
-            std::istringstream istr2(code);
-            tokenizer2.list.createTokens(istr2, Path::identify(*files.begin()));
+            tokenizer2.list.createTokens(code, Path::identify(*files.begin()));
             executeRules("define", tokenizer2);
         }
 #endif

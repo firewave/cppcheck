@@ -55,8 +55,8 @@ static std::vector<std::string> getnames(const char *names)
 
 static void gettokenlistfromvalid(const std::string& valid, bool cpp, TokenList& tokenList)
 {
-    std::istringstream istr(valid + ',');
-    tokenList.createTokens(istr, cpp ? Standards::Language::CPP : Standards::Language::C);
+    const std::string code(valid + ',');
+    tokenList.createTokens(code, cpp ? Standards::Language::CPP : Standards::Language::C);
     for (Token *tok = tokenList.front(); tok; tok = tok->next()) {
         if (Token::Match(tok,"- %num%")) {
             tok->str("-" + tok->strAt(1));
@@ -1752,8 +1752,7 @@ std::shared_ptr<Token> createTokenFromExpression(const std::string& returnValue,
     std::shared_ptr<TokenList> tokenList = std::make_shared<TokenList>(settings);
     {
         const std::string code = "return " + returnValue + ";";
-        std::istringstream istr(code);
-        if (!tokenList->createTokens(istr, cpp ? Standards::Language::CPP : Standards::Language::C))
+        if (!tokenList->createTokens(code, cpp ? Standards::Language::CPP : Standards::Language::C))
             return nullptr;
     }
 

@@ -5912,8 +5912,7 @@ private:
     std::string testAst(const char code[], AstStyle style = AstStyle::Simple) const {
         // tokenize given code..
         Tokenizer tokenizer(settings0, nullptr);
-        std::istringstream istr(code);
-        if (!tokenizer.list.createTokens(istr,"test.cpp"))
+        if (!tokenizer.list.createTokens(code,"test.cpp"))
             return "ERROR";
 
         tokenizer.combineStringAndCharLiterals();

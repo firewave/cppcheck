@@ -118,8 +118,7 @@ private:
             const char code2[] = "_Generic"; // C11 keyword
             const Settings s = settingsBuilder().c(Standards::C89).build();
             TokenList tokenlist(&s);
-            std::istringstream istr(code2);
-            ASSERT(tokenlist.createTokens(istr, "a.c"));
+            ASSERT(tokenlist.createTokens(code2, "a.c"));
             ASSERT_EQUALS(false, tokenlist.front()->isKeyword());
         }
 
@@ -139,8 +138,7 @@ private:
             const char code2[] = "noexcept"; // C++11 keyword
             const Settings s = settingsBuilder().cpp(Standards::CPP03).build();
             TokenList tokenlist(&s);
-            std::istringstream istr(code2);
-            ASSERT(tokenlist.createTokens(istr, "a.cpp"));
+            ASSERT(tokenlist.createTokens(code2, "a.cpp"));
             ASSERT_EQUALS(false, tokenlist.front()->isKeyword());
         }
     }

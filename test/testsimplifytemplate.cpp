@@ -5287,8 +5287,7 @@ private:
     unsigned int templateParameters(const char code[]) {
         Tokenizer tokenizer(settings, this);
 
-        std::istringstream istr(code);
-        if (!tokenizer.list.createTokens(istr, "test.cpp"))
+        if (!tokenizer.list.createTokens(code, "test.cpp"))
             return false;
         tokenizer.createLinks();
         tokenizer.splitTemplateRightAngleBrackets(false);
@@ -5355,8 +5354,7 @@ private:
     int templateNamePositionHelper(const char code[], unsigned offset = 0) {
         Tokenizer tokenizer(settings, this);
 
-        std::istringstream istr(code);
-        if (!tokenizer.list.createTokens(istr, "test.cpp"))
+        if (!tokenizer.list.createTokens(code, "test.cpp"))
             return false;
         tokenizer.createLinks();
         tokenizer.splitTemplateRightAngleBrackets(false);
@@ -5426,8 +5424,7 @@ private:
     bool findTemplateDeclarationEndHelper(const char code[], const char pattern[], unsigned offset = 0) {
         Tokenizer tokenizer(settings, this);
 
-        std::istringstream istr(code);
-        if (!tokenizer.list.createTokens(istr, "test.cpp"))
+        if (!tokenizer.list.createTokens(code, "test.cpp"))
             return false;
         tokenizer.createLinks();
         tokenizer.splitTemplateRightAngleBrackets(false);
@@ -5456,8 +5453,7 @@ private:
     bool getTemplateParametersInDeclarationHelper(const char code[], const std::vector<std::string> & params) {
         Tokenizer tokenizer(settings, this);
 
-        std::istringstream istr(code);
-        if (!tokenizer.list.createTokens(istr, "test.cpp"))
+        if (!tokenizer.list.createTokens(code, "test.cpp"))
             return false;
         tokenizer.createLinks();
         tokenizer.splitTemplateRightAngleBrackets(false);
