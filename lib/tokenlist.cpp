@@ -343,6 +343,17 @@ bool TokenList::createTokens(std::istream &code, const std::string& file0)
 
 //---------------------------------------------------------------------------
 
+bool TokenList::createTokens(const std::string &code, const std::string& file0)
+{
+    ASSERT_LANG(!file0.empty());
+
+    appendFileIfNew(file0);
+
+    return createTokensInternal(code, file0);
+}
+
+//---------------------------------------------------------------------------
+
 bool TokenList::createTokens(std::istream &code, Standards::Language lang)
 {
     ASSERT_LANG(lang != Standards::Language::None);
@@ -357,7 +368,33 @@ bool TokenList::createTokens(std::istream &code, Standards::Language lang)
 
 //---------------------------------------------------------------------------
 
+bool TokenList::createTokens(const std::string& code, Standards::Language lang)
+{
+    ASSERT_LANG(lang != Standards::Language::None);
+    if (mLang == Standards::Language::None) {
+        mLang = lang;
+    } else {
+        ASSERT_LANG(lang == mLang);
+    }
+
+    return createTokensInternal(code, "");
+}
+
+//---------------------------------------------------------------------------
+
 bool TokenList::createTokensInternal(std::istream &code, const std::string& file0)
+{
+    simplecpp::OutputList outputList;
+    simplecpp::TokenList tokens(code, mFiles, file0, &outputList);
+
+    createTokens(std::move(tokens));
+
+    return outputList.empty();
+}
+
+//---------------------------------------------------------------------------
+
+bool TokenList::createTokensInternal(const std::string& code, const std::string& file0)
 {
     simplecpp::OutputList outputList;
     simplecpp::TokenList tokens(code, mFiles, file0, &outputList);

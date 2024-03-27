@@ -43,6 +43,10 @@ class Tokenizer;
 enum class SHOWTIME_MODES;
 struct FileSettings;
 class CheckUnusedFunctions;
+namespace simplecpp {
+    class TokenList;
+    struct Output;
+}
 
 /// @addtogroup Core
 /// @{
@@ -167,7 +171,39 @@ private:
      * @param fileStream stream the file content can be read from
      * @return number of errors found
      */
-    unsigned int checkFile(const std::string& filename, const std::string &cfgname, std::istream* fileStream = nullptr);
+    unsigned int checkStream(const std::string& filename, const std::string &cfgname, std::istream& fileStream);
+
+
+    /**
+     * @brief Check a file
+     * @param filename the file name to be read from
+     * @param cfgname  cfg name
+     * @return number of errors found
+     */
+    unsigned int checkFile(const std::string& filename, const std::string &cfgname);
+
+    /**
+      * @brief Check a file using string
+      * @param filename file name
+      * @param cfgname  cfg name
+      * @param str the string to be read from
+      * @return number of errors found
+      */
+    unsigned int checkString(const std::string& filename, const std::string &cfgname, const std::string& str);
+
+    using CreateTokensFn = std::function<void(TokenList&)>;
+    // TODO: should use simplecpp::OutputList
+    using CreateTokenListFn = std::function<simplecpp::TokenList(std::vector<std::string>&, std::list<simplecpp::Output>*)>;
+
+    /**
+     * @brief Check a file using stream
+     * @param filename file name
+     * @param cfgname  cfg name
+     * @param createTokens a function to create the tokens with
+     * @param createTokenList a function to create the TokenList with
+     * @return number of errors found
+     */
+    unsigned int checkInternal(const std::string& filename, const std::string &cfgname, const CreateTokensFn& createTokens, const CreateTokenListFn& createTokenList);
 
     /**
      * @brief Check raw tokens

@@ -105,7 +105,9 @@ public:
      * @param file0 source file name
      */
     bool createTokens(std::istream &code, const std::string& file0);
+    bool createTokens(const std::string &code, const std::string& file0);
     bool createTokens(std::istream &code, Standards::Language lang);
+    bool createTokens(const std::string &code, Standards::Language lang);
 
     void createTokens(simplecpp::TokenList&& tokenList);
 
@@ -204,6 +206,7 @@ private:
     void determineCppC();
 
     bool createTokensInternal(std::istream &code, const std::string& file0);
+    bool createTokensInternal(const std::string &code, const std::string& file0);
 
     /** Token list */
     TokensFrontBack mTokensFrontBack;
