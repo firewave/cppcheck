@@ -38,7 +38,7 @@ public:
 
 static DummyErrorLogger s_errorLogger;
 
-static void doCheck(const std::string& code)
+static void doCheck(const uint8_t *data, size_t dataSize)
 {
     CppCheck cppcheck(s_errorLogger, false, nullptr);
     // TODO: load std.cfg
@@ -46,7 +46,7 @@ static void doCheck(const std::string& code)
     cppcheck.settings().addEnabled("all");
     cppcheck.settings().certainty.setEnabled(Certainty::inconclusive, true);
     cppcheck.settings().checkLevel = Settings::CheckLevel::exhaustive;
-    cppcheck.check("test.cpp", code);
+    cppcheck.check("test.cpp", data, dataSize);
 }
 
 #ifndef NO_FUZZ
@@ -56,8 +56,8 @@ int LLVMFuzzerTestOneInput(const uint8_t *data, size_t dataSize)
 {
     //if (dataSize < 10000)
     {
-        const std::string code = std::string(reinterpret_cast<const char*>(data), dataSize); // generateCode2(data, dataSize);
-        doCheck(code);
+        //const std::string code = std::string(reinterpret_cast<const char*>(data), dataSize); // generateCode2(data, dataSize);
+        doCheck(data, dataSize);
     }
     return 0;
 }
@@ -78,7 +78,7 @@ int main(int argc, char * argv[])
         return EXIT_FAILURE;
 
     const std::string code = oss.str();
-    doCheck(code);
+    doCheck(reinterpret_cast<const unsigned char*>(code.data()), code.size());
 
     return EXIT_SUCCESS;
 }

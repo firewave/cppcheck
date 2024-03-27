@@ -563,10 +563,9 @@ unsigned int CppCheck::check(const std::string &path)
     return checkFile(Path::simplifyPath(path), emptyString);
 }
 
-unsigned int CppCheck::check(const std::string &path, const std::string &content)
+unsigned int CppCheck::check(const std::string &path, const uint8_t* data, std::size_t size)
 {
-    std::istringstream iss(content);
-    return checkFile(Path::simplifyPath(path), emptyString, &iss);
+    return checkBuffer(Path::simplifyPath(path), emptyString, data, size);
 }
 
 unsigned int CppCheck::check(const FileSettings &fs)
@@ -606,15 +605,41 @@ unsigned int CppCheck::check(const FileSettings &fs)
     return returnValue;
 }
 
-static simplecpp::TokenList createTokenList(const std::string& filename, std::vector<std::string>& files, simplecpp::OutputList* outputList, std::istream* fileStream)
+unsigned int CppCheck::checkBuffer(const std::string& filename, const std::string &cfgname, const uint8_t* data, std::size_t size)
 {
-    if (fileStream)
-        return {*fileStream, files, filename, outputList};
-
-    return {filename, files, outputList};
+    return checkInternal(filename, cfgname,
+        [&filename, data, size](TokenList& list) {
+            list.createTokens(data, size, filename);
+        },
+        [&filename, data, size](std::vector<std::string>& files, simplecpp::OutputList* outputList) {
+            return simplecpp::TokenList{data, size, files, filename, outputList};
+        });
 }
 
-unsigned int CppCheck::checkFile(const std::string& filename, const std::string &cfgname, std::istream* fileStream)
+unsigned int CppCheck::checkStream(const std::string& filename, const std::string &cfgname, std::istream& fileStream)
+{
+    return checkInternal(filename, cfgname,
+        [&filename, &fileStream](TokenList& list) {
+            list.createTokens(fileStream, filename);
+        },
+        [&filename, &fileStream](std::vector<std::string>& files, simplecpp::OutputList* outputList) {
+            return simplecpp::TokenList{fileStream, files, filename, outputList};
+        });
+}
+
+unsigned int CppCheck::checkFile(const std::string& filename, const std::string &cfgname)
+{
+    return checkInternal(filename, cfgname,
+        [&filename](TokenList& list) {
+            std::ifstream in(filename);
+            list.createTokens(in, filename);
+        },
+        [&filename](std::vector<std::string>& files, simplecpp::OutputList* outputList) {
+            return simplecpp::TokenList{filename, files, outputList};
+        });
+}
+
+unsigned int CppCheck::checkInternal(const std::string& filename, const std::string &cfgname, const CreateTokensFn& createTokens, const CreateTokenListFn& createTokenList)
 {
     // TODO: move to constructor when CppCheck no longer owns the settings
     if (mSettings.checks.isEnabled(Checks::unusedFunction) && !mUnusedFunctionsCheck)
@@ -660,13 +685,7 @@ unsigned int CppCheck::checkFile(const std::string& filename, const std::string 
                 // this is not a real source file - we just want to tokenize it. treat it as C anyways as the language needs to be determined.
                 Tokenizer tokenizer(mSettings, this);
                 tokenizer.list.setLang(Standards::Language::C);
-                if (fileStream) {
-                    tokenizer.list.createTokens(*fileStream, filename);
-                }
-                else {
-                    std::ifstream in(filename);
-                    tokenizer.list.createTokens(in, filename);
-                }
+                createTokens(tokenizer.list);
                 mUnusedFunctionsCheck->parseTokens(tokenizer, mSettings);
             }
             return EXIT_SUCCESS;
@@ -674,7 +693,7 @@ unsigned int CppCheck::checkFile(const std::string& filename, const std::string 
 
         simplecpp::OutputList outputList;
         std::vector<std::string> files;
-        simplecpp::TokenList tokens1 = createTokenList(filename, files, &outputList, fileStream);
+        simplecpp::TokenList tokens1 = createTokenList(files, &outputList);
 
         // If there is a syntax error, report it and stop
         const auto output_it = std::find_if(outputList.cbegin(), outputList.cend(), [](const simplecpp::Output &output){
