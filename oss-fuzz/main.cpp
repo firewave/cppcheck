@@ -78,7 +78,8 @@ int main(int argc, char * argv[])
         return EXIT_FAILURE;
 
     const std::string code = oss.str();
-    doCheck(code);
+    for(int i = 0; i < 1000; ++i)
+        doCheck(code);
 
     return EXIT_SUCCESS;
 }
