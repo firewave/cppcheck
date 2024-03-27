@@ -39,7 +39,7 @@ public:
 static DummyErrorLogger s_errorLogger;
 static const FileWithDetails s_file("test.cpp");
 
-static void doCheck(const std::string& code)
+static void doCheck(const uint8_t *data, size_t dataSize)
 {
     CppCheck cppcheck(s_errorLogger, false, nullptr);
     // TODO: load std.cfg
@@ -47,7 +47,7 @@ static void doCheck(const std::string& code)
     cppcheck.settings().addEnabled("all");
     cppcheck.settings().certainty.setEnabled(Certainty::inconclusive, true);
     cppcheck.settings().checkLevel = Settings::CheckLevel::exhaustive;
-    cppcheck.check(s_file, code);
+    cppcheck.check(s_file, data, dataSize);
 }
 
 #ifndef NO_FUZZ
@@ -55,8 +55,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t dataSize);
 
 int LLVMFuzzerTestOneInput(const uint8_t *data, size_t dataSize)
 {
-    const std::string code = std::string(reinterpret_cast<const char*>(data), dataSize);
-    doCheck(code);
+    doCheck(data, dataSize);
     return 0;
 }
 #else
@@ -79,7 +78,7 @@ int main(int argc, char * argv[])
 
     const std::string code = oss.str();
     for (int i = 0; i < cnt; ++i)
-        doCheck(code);
+        doCheck(reinterpret_cast<const unsigned char*>(code.data()), code.size());
 
     return EXIT_SUCCESS;
 }
