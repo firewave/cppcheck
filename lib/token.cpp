@@ -100,6 +100,14 @@ static const std::unordered_set<std::string> controlFlowKeywords = {
     "return"
 };
 
+static inline bool isControlFlowKeyword(const std::string& s)
+{
+    if (s.size() < 2 || s.size() > 8)
+        return false;
+
+    return controlFlowKeywords.find(s) != controlFlowKeywords.end();
+}
+
 // TODO: replace with Keywords::getX()?
 // Another list of keywords
 static const std::unordered_set<std::string> baseKeywords = {
@@ -134,7 +142,7 @@ static const std::unordered_set<std::string> baseKeywords = {
 
 void Token::update_property_info()
 {
-    setFlag(fIsControlFlowKeyword, controlFlowKeywords.find(mStr) != controlFlowKeywords.end());
+    setFlag(fIsControlFlowKeyword, ::isControlFlowKeyword(mStr));
     isStandardType(false);
 
     if (!mStr.empty()) {
