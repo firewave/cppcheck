@@ -731,9 +731,9 @@ std::vector<ValueType> getParentValueTypes(const Token* tok, const Settings* set
                 const Scope* scope = t->classScope;
                 // Check for aggregate constructors
                 if (scope && scope->numConstructors == 0 && t->derivedFrom.empty() &&
-                    (t->isClassType() || t->isStructType()) && numberOfArguments(ftok) <= scope->varlist.size() &&
+                    (t->isClassType() || t->isStructType()) && numberOfArguments(ftok) <= static_cast<int>(scope->varlist.size()) &&
                     !scope->varlist.empty()) {
-                    assert(argn < scope->varlist.size());
+                    assert(argn < static_cast<int>(scope->varlist.size()));
                     auto it = std::next(scope->varlist.cbegin(), argn);
                     if (it->valueType())
                         return {*it->valueType()};
@@ -1309,7 +1309,7 @@ SmallVector<ReferenceToken> followAllReferences(const Token* tok,
                         return refs_result;
                     }
                     std::vector<const Token*> args = getArguments(tok->previous());
-                    if (n >= args.size()) {
+                    if (n >= static_cast<int>(args.size())) {
                         SmallVector<ReferenceToken> refs_result;
                         refs_result.push_back({tok, std::move(errors)});
                         return refs_result;
@@ -2361,7 +2361,7 @@ std::vector<const Variable*> getArgumentVars(const Token* tok, int argnr)
             return result;
         const bool tokIsBrace = Token::simpleMatch(tok, "{");
         // Aggregate constructor
-        if (tokIsBrace && typeScope->numConstructors == 0 && argnr < typeScope->varlist.size()) {
+        if (tokIsBrace && typeScope->numConstructors == 0 && argnr < static_cast<int>(typeScope->varlist.size())) {
             auto it = std::next(typeScope->varlist.cbegin(), argnr);
             return {&*it};
         }

@@ -2198,14 +2198,14 @@ void TemplateSimplifier::expandTemplate(
                 if (Token::simpleMatch(closingBracket->next(), "&")) {
                     int num = 0;
                     const Token *par = tok3->next();
-                    while (num < typeParametersInDeclaration.size() && par != closingBracket) {
+                    while (num < static_cast<int>(typeParametersInDeclaration.size()) && par != closingBracket) {
                         const std::string pattern("[<,] " + typeParametersInDeclaration[num]->str() + " [,>]");
                         if (!Token::Match(par, pattern.c_str()))
                             break;
                         ++num;
                         par = par->tokAt(2);
                     }
-                    if (num < typeParametersInDeclaration.size() || par != closingBracket)
+                    if (num < static_cast<int>(typeParametersInDeclaration.size()) || par != closingBracket)
                         continue;
                 }
 
@@ -2969,10 +2969,10 @@ bool TemplateSimplifier::matchSpecialization(
                 declToken->isUnsigned() != instToken->isUnsigned() ||
                 declToken->isLong() != instToken->isLong()) {
                 int nr = 0;
-                while (nr < templateParameters.size() && templateParameters[nr]->str() != declToken->str())
+                while (nr < static_cast<int>(templateParameters.size()) && templateParameters[nr]->str() != declToken->str())
                     ++nr;
 
-                if (nr == templateParameters.size())
+                if (nr == static_cast<int>(templateParameters.size()))
                     break;
             }
             declToken = declToken->next();

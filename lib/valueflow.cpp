@@ -1622,16 +1622,16 @@ static void valueFlowArrayElement(TokenList& tokenlist, const Settings& settings
 
                 if (arrayValue.tokvalue->tokType() == Token::eString) {
                     const std::string s = arrayValue.tokvalue->strValue();
-                    if (index == s.size()) {
+                    if (index == static_cast<int>(s.size())) {
                         result.intvalue = 0;
                         setTokenValue(tok, std::move(result), settings);
-                    } else if (index >= 0 && index < s.size()) {
+                    } else if (index >= 0 && index < static_cast<int>(s.size())) {
                         result.intvalue = s[index];
                         setTokenValue(tok, std::move(result), settings);
                     }
                 } else if (Token::simpleMatch(arrayValue.tokvalue, "{")) {
                     std::vector<const Token*> args = getArguments(arrayValue.tokvalue);
-                    if (index < 0 || index >= args.size())
+                    if (index < 0 || index >= static_cast<int>(args.size()))
                         continue;
                     const Token* arg = args[index];
                     if (!arg->hasKnownIntValue())
@@ -3601,7 +3601,7 @@ static std::vector<ValueFlow::LifetimeToken> getLifetimeTokens(const Token* tok,
                             return std::vector<ValueFlow::LifetimeToken> {};
                         std::vector<const Token*> args = getArguments(tok->previous());
                         // TODO: Track lifetimes of default parameters
-                        if (n >= args.size())
+                        if (n >= static_cast<int>(args.size()))
                             return std::vector<ValueFlow::LifetimeToken> {};
                         argTok = args[n];
                         lt.errorPath.emplace_back(returnTok, "Return reference.");
@@ -4100,7 +4100,7 @@ struct LifetimeStore {
         if (n < 0)
             return LifetimeStore{};
         std::vector<const Token *> args = getArguments(tok);
-        if (n >= args.size()) {
+        if (n >= static_cast<int>(args.size())) {
             if (settings.debugwarnings)
                 bailout(tokenlist,
                         errorLogger,
@@ -4462,7 +4462,7 @@ static void valueFlowLifetimeFunction(Token *tok, TokenList &tokenlist, ErrorLog
     const int returnContainer = settings.library.returnValueContainer(tok);
     if (returnContainer >= 0) {
         std::vector<const Token *> args = getArguments(tok);
-        for (int argnr = 1; argnr <= args.size(); ++argnr) {
+        for (int argnr = 1; argnr <= static_cast<int>(args.size()); ++argnr) {
             const Library::ArgumentChecks::IteratorInfo *i = settings.library.getArgIteratorInfo(tok, argnr);
             if (!i)
                 continue;
@@ -4626,7 +4626,7 @@ static const Function* findConstructor(const Scope* scope, const Token* tok, con
         f = nullptr;
         std::vector<const Function*> candidates;
         for (const Function& function : scope->functionList) {
-            if (function.minArgCount() > args.size())
+            if (function.minArgCount() > static_cast<int>(args.size()))
                 continue;
             if (!function.isConstructor())
                 continue;
@@ -7500,7 +7500,7 @@ static bool productParams(const Settings& settings, const std::unordered_map<Key
     bool bail = false;
     int max = settings.performanceValueFlowMaxSubFunctionArgs;
     for (const auto& p:vars) {
-        if (args.size() > max) {
+        if (static_cast<int>(args.size()) > max) {
             bail = true;
             break;
         }
@@ -7526,7 +7526,7 @@ static bool productParams(const Settings& settings, const std::unordered_map<Key
         });
     }
 
-    if (args.size() > max) {
+    if (static_cast<int>(args.size()) > max) {
         bail = true;
         args.resize(max);
     }
@@ -7752,7 +7752,7 @@ static void valueFlowSubFunction(TokenList& tokenlist, SymbolDatabase& symboldat
             std::unordered_map<const Variable*, std::list<ValueFlow::Value>> argvars;
             // TODO: Rewrite this. It does not work well to inject 1 argument at a time.
             const std::vector<const Token *> &callArguments = getArguments(tok);
-            for (int argnr = 0U; argnr < callArguments.size(); ++argnr) {
+            for (int argnr = 0U; argnr < static_cast<int>(callArguments.size()); ++argnr) {
                 const Token *argtok = callArguments[argnr];
                 // Get function argument
                 const Variable * const argvar = calledFunction->getArgumentVar(argnr);
@@ -9033,8 +9033,8 @@ static void valueFlowDynamicBufferSize(const TokenList& tokenlist, const SymbolD
 
         const std::vector<const Token*> args = getArguments(funcTok);
 
-        const Token* const arg1 = (args.size() >= allocFunc->bufferSizeArg1) ? args[allocFunc->bufferSizeArg1 - 1] : nullptr;
-        const Token* const arg2 = (args.size() >= allocFunc->bufferSizeArg2) ? args[allocFunc->bufferSizeArg2 - 1] : nullptr;
+        const Token* const arg1 = (static_cast<int>(args.size()) >= allocFunc->bufferSizeArg1) ? args[allocFunc->bufferSizeArg1 - 1] : nullptr;
+        const Token* const arg2 = (static_cast<int>(args.size()) >= allocFunc->bufferSizeArg2) ? args[allocFunc->bufferSizeArg2 - 1] : nullptr;
 
         switch (allocFunc->bufferSize) {
         case Library::AllocFunc::BufferSize::none:

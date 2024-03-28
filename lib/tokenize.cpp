@@ -1684,7 +1684,7 @@ void Tokenizer::simplifyTypedefCpp()
                             --classLevel;
                             pattern.clear();
 
-                            for (int i = classLevel; i < spaceInfo.size(); ++i)
+                            for (int i = classLevel; i < static_cast<int>(spaceInfo.size()); ++i)
                                 pattern += (spaceInfo[i].className + " :: ");
 
                             pattern += typeName->str();
@@ -1712,7 +1712,7 @@ void Tokenizer::simplifyTypedefCpp()
                             while (Token::Match(func->tokAt(offset - 2), "%name% ::"))
                                 offset -= 2;
                             // check for available and matching class name
-                            if (spaceInfo.size() > 1 && classLevel < spaceInfo.size() &&
+                            if (spaceInfo.size() > 1 && classLevel < static_cast<int>(spaceInfo.size()) &&
                                 func->strAt(offset) == spaceInfo[classLevel].className) {
                                 memberScope = 0;
                                 inMemberFunc = true;
@@ -1725,13 +1725,13 @@ void Tokenizer::simplifyTypedefCpp()
                         // check for entering a new namespace
                         if (tok2->isCpp()) {
                             if (tok2->strAt(-2) == "namespace") {
-                                if (classLevel < spaceInfo.size() &&
+                                if (classLevel < static_cast<int>(spaceInfo.size()) &&
                                     spaceInfo[classLevel].isNamespace &&
                                     spaceInfo[classLevel].className == tok2->previous()->str()) {
                                     spaceInfo[classLevel].bodyEnd2 = tok2->link();
                                     ++classLevel;
                                     pattern.clear();
-                                    for (int i = classLevel; i < spaceInfo.size(); ++i)
+                                    for (int i = classLevel; i < static_cast<int>(spaceInfo.size()); ++i)
                                         pattern += spaceInfo[i].className + " :: ";
 
                                     pattern += typeName->str();
@@ -1762,7 +1762,7 @@ void Tokenizer::simplifyTypedefCpp()
                     // check for qualifier
                     if (tok2->previous()->str() == "::") {
                         // check for available and matching class name
-                        if (spaceInfo.size() > 1 && classLevel < spaceInfo.size() &&
+                        if (spaceInfo.size() > 1 && classLevel < static_cast<int>(spaceInfo.size()) &&
                             tok2->strAt(-2) == spaceInfo[classLevel].className) {
                             tok2 = tok2->next();
                             simplifyType = true;
@@ -1820,7 +1820,7 @@ void Tokenizer::simplifyTypedefCpp()
                             }
 
                             // remove qualification if present
-                            for (int i = classLevel; i < spaceInfo.size(); ++i) {
+                            for (int i = classLevel; i < static_cast<int>(spaceInfo.size()); ++i) {
                                 if (!removed.empty())
                                     removed += " ";
                                 removed += (tok2->str() + " " + tok2->strAt(1));
@@ -1961,7 +1961,7 @@ void Tokenizer::simplifyTypedefCpp()
                             tok2 = tok2->next();
                         }
 
-                        for (int i = classLevel; i < spaceInfo.size(); ++i) {
+                        for (int i = classLevel; i < static_cast<int>(spaceInfo.size()); ++i) {
                             tok2->insertToken(spaceInfo[i].className);
                             tok2 = tok2->next();
                             tok2->insertToken("::");
@@ -8055,7 +8055,7 @@ void Tokenizer::cppcheckError(const Token *tok) const
 void Tokenizer::unhandledCharLiteral(const Token *tok, const std::string& msg) const
 {
     std::string s = tok ? (" " + tok->str()) : "";
-    for (int i = 0; i < s.size(); ++i) {
+    for (int i = 0; i < static_cast<int>(s.size()); ++i) {
         if ((unsigned char)s[i] >= 0x80)
             s.clear();
     }
@@ -10625,7 +10625,7 @@ bool Tokenizer::hasIfdef(const Token *start, const Token *end) const
         return startsWith(d.str, "#if") &&
         d.linenr >= start->linenr() &&
         d.linenr <= end->linenr() &&
-        start->fileIndex() < list.getFiles().size() &&
+        start->fileIndex() < static_cast<int>(list.getFiles().size()) &&
         d.file == list.getFiles()[start->fileIndex()];
     });
 }

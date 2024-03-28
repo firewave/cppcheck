@@ -121,7 +121,7 @@ std::string CheckersReport::getReport(const std::string& criticalErrors) const
     int maxCheckerSize = 0;
     for (const auto& checkReq: checkers::allCheckers) {
         const std::string& checker = checkReq.first;
-        if (checker.size() > maxCheckerSize)
+        if (static_cast<int>(checker.size()) > maxCheckerSize)
             maxCheckerSize = checker.size();
     }
     for (const auto& checkReq: checkers::allCheckers) {
@@ -152,7 +152,7 @@ std::string CheckersReport::getReport(const std::string& criticalErrors) const
         int maxCheckerSize = 0;
         for (const auto& checkReq: premiumCheckers) {
             const std::string& checker = checkReq.first;
-            if (checker.find(substring) != std::string::npos && checker.size() > maxCheckerSize)
+            if (checker.find(substring) != std::string::npos && static_cast<int>(checker.size()) > maxCheckerSize)
                 maxCheckerSize = checker.size();
         }
         for (const auto& checkReq: premiumCheckers) {

@@ -1365,7 +1365,7 @@ public:
 
     // cppcheck-suppress unusedFunction
     bool isVarId(nonneg int varid) const {
-        return varid < mVariableList.size();
+        return varid < static_cast<int>(mVariableList.size());
     }
 
     const Variable *getVariableFromVarId(nonneg int varId) const {

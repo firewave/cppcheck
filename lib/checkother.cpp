@@ -3560,14 +3560,14 @@ void CheckOther::funcArgOrderDifferent(const std::string & functionName,
         !definitions.empty() ? definitions[0] ? definitions[0] : definition : nullptr
     };
     std::string msg = "$symbol:" + functionName + "\nFunction '$symbol' argument order different: declaration '";
-    for (int i = 0; i < declarations.size(); ++i) {
+    for (int i = 0; i < static_cast<int>(declarations.size()); ++i) {
         if (i != 0)
             msg += ", ";
         if (declarations[i])
             msg += declarations[i]->str();
     }
     msg += "' definition '";
-    for (int i = 0; i < definitions.size(); ++i) {
+    for (int i = 0; i < static_cast<int>(definitions.size()); ++i) {
         if (i != 0)
             msg += ", ";
         if (definitions[i])
@@ -3992,9 +3992,9 @@ void CheckOther::checkOverlappingWrite()
                 if (!nonOverlappingData)
                     continue;
                 const std::vector<const Token *> args = getArguments(tok);
-                if (nonOverlappingData->ptr1Arg <= 0 || nonOverlappingData->ptr1Arg > args.size())
+                if (nonOverlappingData->ptr1Arg <= 0 || nonOverlappingData->ptr1Arg > static_cast<int>(args.size()))
                     continue;
-                if (nonOverlappingData->ptr2Arg <= 0 || nonOverlappingData->ptr2Arg > args.size())
+                if (nonOverlappingData->ptr2Arg <= 0 || nonOverlappingData->ptr2Arg > static_cast<int>(args.size()))
                     continue;
 
                 const Token *ptr1 = args[nonOverlappingData->ptr1Arg - 1];
@@ -4006,7 +4006,7 @@ void CheckOther::checkOverlappingWrite()
                     continue;
 
                 // TODO: nonOverlappingData->strlenArg
-                if (nonOverlappingData->sizeArg <= 0 || nonOverlappingData->sizeArg > args.size()) {
+                if (nonOverlappingData->sizeArg <= 0 || nonOverlappingData->sizeArg > static_cast<int>(args.size())) {
                     if (nonOverlappingData->sizeArg == -1) {
                         ErrorPath errorPath;
                         constexpr bool macro = true;

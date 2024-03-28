@@ -837,7 +837,7 @@ unsigned int CppCheck::checkFile(const std::string& filename, const std::string 
         }
 #endif
 
-        if (!mSettings.force && configurations.size() > mSettings.maxConfigs) {
+        if (!mSettings.force && static_cast<int>(configurations.size()) > mSettings.maxConfigs) {
             if (mSettings.severity.isEnabled(Severity::information)) {
                 tooManyConfigsError(Path::toNativeSeparators(filename),configurations.size());
             } else {

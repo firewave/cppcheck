@@ -1314,7 +1314,7 @@ void CheckClass::privateFunctions()
             bool used = checkFunctionUsage(pf, scope); // Usage in this class
             // Check in friend classes
             const std::vector<Type::FriendInfo>& friendList = scope->definedType->friendList;
-            for (int i = 0; i < friendList.size() && !used; i++) {
+            for (int i = 0; i < static_cast<int>(friendList.size()) && !used; i++) {
                 if (friendList[i].type)
                     used = checkFunctionUsage(pf, friendList[i].type->classScope);
                 else
@@ -2699,7 +2699,7 @@ void CheckClass::initializerListOrder()
                         }
                     }
 
-                    for (int j = 0; j < vars.size(); j++) {
+                    for (int j = 0; j < static_cast<int>(vars.size()); j++) {
                         // check for use of uninitialized arguments
                         for (const auto& arg : vars[j].initArgs)
                             if (vars[j].var->index() < arg->index())

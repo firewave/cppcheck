@@ -326,7 +326,7 @@ CTU::FileInfo *CTU::getFileInfo(const Tokenizer *tokenizer)
             if (!tokFunction)
                 continue;
             const std::vector<const Token *> args(getArguments(tok->previous()));
-            for (int argnr = 0; argnr < args.size(); ++argnr) {
+            for (int argnr = 0; argnr < static_cast<int>(args.size()); ++argnr) {
                 const Token *argtok = args[argnr];
                 if (!argtok)
                     continue;

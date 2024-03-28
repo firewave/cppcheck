@@ -74,7 +74,7 @@ static const ValueFlow::Value *getBufferSizeValue(const Token *tok)
 
 static int getMinFormatStringOutputLength(const std::vector<const Token*> &parameters, nonneg int formatStringArgNr)
 {
-    if (formatStringArgNr <= 0 || formatStringArgNr > parameters.size())
+    if (formatStringArgNr <= 0 || formatStringArgNr > static_cast<int>(parameters.size()))
         return 0;
     if (parameters[formatStringArgNr - 1]->tokType() != Token::eString)
         return 0;
@@ -86,9 +86,9 @@ static int getMinFormatStringOutputLength(const std::vector<const Token*> &param
     bool i_d_x_f_found = false;
     int parameterLength = 0;
     int inputArgNr = formatStringArgNr;
-    for (int i = 1; i + 1 < formatString.length(); ++i) {
+    for (int i = 1; i + 1 < static_cast<int>(formatString.size()); ++i) {
         if (formatString[i] == '\\') {
-            if (i < formatString.length() - 1 && formatString[i + 1] == '0')
+            if (i < static_cast<int>(formatString.size()) - 1 && formatString[i + 1] == '0')
                 break;
 
             ++outputStringSize;
@@ -120,14 +120,14 @@ static int getMinFormatStringOutputLength(const std::vector<const Token*> &param
             case 'd':
                 i_d_x_f_found = true;
                 parameterLength = 1;
-                if (inputArgNr < parameters.size() && parameters[inputArgNr]->hasKnownIntValue())
+                if (inputArgNr < static_cast<int>(parameters.size()) && parameters[inputArgNr]->hasKnownIntValue())
                     parameterLength = std::to_string(parameters[inputArgNr]->getKnownIntValue()).length();
 
                 handleNextParameter = true;
                 break;
             case 's':
                 parameterLength = 0;
-                if (inputArgNr < parameters.size() && parameters[inputArgNr]->tokType() == Token::eString)
+                if (inputArgNr < static_cast<int>(parameters.size()) && parameters[inputArgNr]->tokType() == Token::eString)
                     parameterLength = Token::getStrLength(parameters[inputArgNr]);
 
                 handleNextParameter = true;
@@ -257,7 +257,7 @@ static std::vector<ValueFlow::Value> getOverrunIndexValues(const Token* tok,
 
     bool overflow = false;
     std::vector<ValueFlow::Value> indexValues;
-    for (int i = 0; i < dimensions.size() && i < indexTokens.size(); ++i) {
+    for (int i = 0; i < static_cast<int>(dimensions.size()) && i < static_cast<int>(indexTokens.size()); ++i) {
         MathLib::bigint size = dimensions[i].num;
         if (!isArrayIndex)
             size++;
@@ -586,8 +586,8 @@ ValueFlow::Value CheckBufferOverrun::getBufferSize(const Token *bufTok) const
 
 static bool checkBufferSize(const Token *ftok, const Library::ArgumentChecks::MinSize &minsize, const std::vector<const Token *> &args, const MathLib::bigint bufferSize, const Settings *settings, const Tokenizer* tokenizer)
 {
-    const Token * const arg = (minsize.arg > 0 && minsize.arg - 1 < args.size()) ? args[minsize.arg - 1] : nullptr;
-    const Token * const arg2 = (minsize.arg2 > 0 && minsize.arg2 - 1 < args.size()) ? args[minsize.arg2 - 1] : nullptr;
+    const Token * const arg = (minsize.arg > 0 && minsize.arg - 1 < static_cast<int>(args.size())) ? args[minsize.arg - 1] : nullptr;
+    const Token * const arg2 = (minsize.arg2 > 0 && minsize.arg2 - 1 < static_cast<int>(args.size())) ? args[minsize.arg2 - 1] : nullptr;
 
     switch (minsize.type) {
     case Library::ArgumentChecks::MinSize::Type::STRLEN:
@@ -642,7 +642,7 @@ void CheckBufferOverrun::bufferOverflow()
             if (!mSettings->library.hasminsize(tok))
                 continue;
             const std::vector<const Token *> args = getArguments(tok);
-            for (int argnr = 0; argnr < args.size(); ++argnr) {
+            for (int argnr = 0; argnr < static_cast<int>(args.size()); ++argnr) {
                 if (!args[argnr]->valueType() || args[argnr]->valueType()->pointer == 0)
                     continue;
                 const std::vector<Library::ArgumentChecks::MinSize> *minsizes = mSettings->library.argminsizes(tok, argnr + 1);
@@ -834,7 +834,7 @@ void CheckBufferOverrun::argumentSize()
             // If argument is '%type% a[num]' then check bounds against num
             const Function *callfunc = tok->function();
             const std::vector<const Token *> callargs = getArguments(tok);
-            for (nonneg int paramIndex = 0; paramIndex < callargs.size() && paramIndex < callfunc->argCount(); ++paramIndex) {
+            for (nonneg int paramIndex = 0; paramIndex < static_cast<int>(callargs.size()) && paramIndex < callfunc->argCount(); ++paramIndex) {
                 const Variable* const argument = callfunc->getArgumentVar(paramIndex);
                 if (!argument || !argument->nameToken() || !argument->isArray())
                     continue;
@@ -850,7 +850,7 @@ void CheckBufferOverrun::argumentSize()
                 if (calldata->variable()->dimensions().size() != argument->dimensions().size())
                     continue;
                 bool err = false;
-                for (int d = 0; d < argument->dimensions().size(); ++d) {
+                for (int d = 0; d < static_cast<int>(argument->dimensions().size()); ++d) {
                     const auto& dim1 = calldata->variable()->dimensions()[d];
                     const auto& dim2 = argument->dimensions()[d];
                     if (!dim1.known || !dim2.known)

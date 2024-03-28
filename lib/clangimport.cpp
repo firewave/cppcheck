@@ -139,7 +139,7 @@ static std::vector<std::string> splitString(const std::string &line)
             pos2 = line.find('\"', pos1+1);
         else if (line[pos1] == '\'') {
             pos2 = line.find('\'', pos1+1);
-            if (pos2 < (int)line.size() - 3 && line.compare(pos2, 3, "\':\'", 0, 3) == 0)
+            if (pos2 < line.size() - 3 && line.compare(pos2, 3, "\':\'", 0, 3) == 0)
                 pos2 = line.find('\'', pos2 + 3);
         } else {
             pos2 = pos1;
@@ -346,7 +346,7 @@ namespace clangimport {
         }
 
         AstNodePtr getChild(int c) {
-            if (c >= children.size()) {
+            if (c >= static_cast<int>(children.size())) {
                 std::ostringstream err;
                 err << "ClangImport: AstNodePtr::getChild(" << c << ") out of bounds. children.size=" << children.size() << " " << nodeType;
                 for (const std::string &s: mExtTokens)
@@ -386,21 +386,21 @@ std::string clangimport::AstNode::getSpelling() const
 {
     if (nodeType == CompoundAssignOperator) {
         int typeIndex = 1;
-        while (typeIndex < mExtTokens.size() && mExtTokens[typeIndex][0] != '\'')
+        while (typeIndex < static_cast<int>(mExtTokens.size()) && mExtTokens[typeIndex][0] != '\'')
             typeIndex++;
         // name is next quoted token
         int nameIndex = typeIndex + 1;
-        while (nameIndex < mExtTokens.size() && mExtTokens[nameIndex][0] != '\'')
+        while (nameIndex < static_cast<int>(mExtTokens.size()) && mExtTokens[nameIndex][0] != '\'')
             nameIndex++;
-        return (nameIndex < mExtTokens.size()) ? unquote(mExtTokens[nameIndex]) : "";
+        return (nameIndex < static_cast<int>(mExtTokens.size())) ? unquote(mExtTokens[nameIndex]) : "";
     }
 
     if (nodeType == UnaryExprOrTypeTraitExpr) {
         int typeIndex = 1;
-        while (typeIndex < mExtTokens.size() && mExtTokens[typeIndex][0] != '\'')
+        while (typeIndex < static_cast<int>(mExtTokens.size()) && mExtTokens[typeIndex][0] != '\'')
             typeIndex++;
         const int nameIndex = typeIndex + 1;
-        return (nameIndex < mExtTokens.size()) ? unquote(mExtTokens[nameIndex]) : "";
+        return (nameIndex < static_cast<int>(mExtTokens.size())) ? unquote(mExtTokens[nameIndex]) : "";
     }
 
     int typeIndex = mExtTokens.size() - 1;
@@ -450,9 +450,9 @@ std::string clangimport::AstNode::getType(int index) const
 std::string clangimport::AstNode::getFullType(int index) const
 {
     int typeIndex = 1;
-    while (typeIndex < mExtTokens.size() && mExtTokens[typeIndex][0] != '\'')
+    while (typeIndex < static_cast<int>(mExtTokens.size()) && mExtTokens[typeIndex][0] != '\'')
         typeIndex++;
-    if (typeIndex >= mExtTokens.size())
+    if (typeIndex >= static_cast<int>(mExtTokens.size()))
         return "";
     std::string type = mExtTokens[typeIndex];
     if (type.find("\':\'") != std::string::npos) {
@@ -493,7 +493,7 @@ void clangimport::AstNode::dumpAst(int num, int indent) const
     for (const auto& tok: mExtTokens)
         std::cout << " " << tok;
     std::cout << std::endl;
-    for (int c = 0; c < children.size(); ++c) {
+    for (int c = 0; c < static_cast<int>(children.size()); ++c) {
         if (children[c])
             children[c]->dumpAst(c, indent + 2);
         else
@@ -888,7 +888,7 @@ Token *clangimport::AstNode::createTokens(TokenList &tokenList)
         return nullptr;
     }
     if (nodeType == CXXMethodDecl) {
-        for (int i = 0; i+1 < mExtTokens.size(); ++i) {
+        for (int i = 0; i+1 < static_cast<int>(mExtTokens.size()); ++i) {
             if (mExtTokens[i] == "prev" && !mData->hasDecl(mExtTokens[i+1]))
                 return nullptr;
         }
@@ -1287,7 +1287,7 @@ Token * clangimport::AstNode::createTokensCall(TokenList &tokenList)
     Token *par1 = addtoken(tokenList, "(");
     par1->astOperand1(f);
     int args = 0;
-    while (args < children.size() && children[args]->nodeType != CXXDefaultArgExpr)
+    while (args < static_cast<int>(children.size()) && children[args]->nodeType != CXXDefaultArgExpr)
         args++;
     Token *child = nullptr;
     for (int c = firstParam; c < args; ++c) {
@@ -1379,7 +1379,7 @@ void clangimport::AstNode::createTokensFunctionDecl(TokenList &tokenList)
         function->nestedIn = nestedIn;
     function->argDef = par1;
     // Function arguments
-    for (int i = 0; i < children.size(); ++i) {
+    for (int i = 0; i < static_cast<int>(children.size()); ++i) {
         AstNodePtr child = children[i];
         if (child->nodeType != ParmVarDecl)
             continue;
@@ -1608,12 +1608,12 @@ void clangimport::parseClangAstDump(Tokenizer &tokenizer, std::istream &f)
         }
 
         const int level = (pos1 - 1) / 2;
-        if (level == 0 || level > tree.size())
+        if (level == 0 || level > static_cast<int>(tree.size()))
             continue;
 
         AstNodePtr newNode = std::make_shared<AstNode>(nodeType, ext, &data);
         tree[level - 1]->children.push_back(newNode);
-        if (level >= tree.size())
+        if (level >= static_cast<int>(tree.size()))
             tree.push_back(std::move(newNode));
         else
             tree[level] = std::move(newNode);

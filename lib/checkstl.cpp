@@ -808,7 +808,7 @@ void CheckStl::mismatchingContainers()
 
             // Group args together by container
             std::map<int, std::vector<ArgIteratorInfo>> containers;
-            for (int argnr = 1; argnr <= args.size(); ++argnr) {
+            for (int argnr = 1; argnr <= static_cast<int>(args.size()); ++argnr) {
                 const Library::ArgumentChecks::IteratorInfo *i = mSettings->library.getArgIteratorInfo(ftok, argnr);
                 if (!i)
                     continue;
@@ -1000,7 +1000,7 @@ namespace {
                         if (var->isArgument()) {
                             const int n = getArgumentPos(var, f);
                             const Token* tok2 = nullptr;
-                            if (n >= 0 && n < args.size())
+                            if (n >= 0 && n < static_cast<int>(args.size()))
                                 tok2 = args[n];
                             r.tok = tok2;
                         }
@@ -1415,7 +1415,7 @@ void CheckStl::eraseCheckLoopVar(const Scope &scope, const Variable *var)
                 continue;
             }
             if (tok2->str() == "}") {
-                if (indentlevel > 0U)
+                if (indentlevel > 0)
                     --indentlevel;
                 else if (Token::simpleMatch(tok2, "} else {"))
                     tok2 = tok2->linkAt(2);
@@ -3124,7 +3124,7 @@ void CheckStl::knownEmptyContainer()
                 if (args.empty())
                     continue;
 
-                for (int argnr = 1; argnr <= args.size(); ++argnr) {
+                for (int argnr = 1; argnr <= static_cast<int>(args.size()); ++argnr) {
                     const Library::ArgumentChecks::IteratorInfo *i = mSettings->library.getArgIteratorInfo(tok, argnr);
                     if (!i)
                         continue;

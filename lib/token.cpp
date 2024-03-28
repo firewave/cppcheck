@@ -1392,7 +1392,7 @@ std::string Token::stringifyList(const stringifyOptions& options, const std::vec
             fileIndex = tok->mImpl->mFileIndex;
             if (options.files) {
                 ret += "\n\n##file ";
-                if (fileNames && fileNames->size() > tok->mImpl->mFileIndex)
+                if (fileNames && static_cast<int>(fileNames->size()) > tok->mImpl->mFileIndex)
                     ret += fileNames->at(tok->mImpl->mFileIndex);
                 else
                     ret += std::to_string(fileIndex);

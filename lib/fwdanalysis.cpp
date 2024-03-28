@@ -340,9 +340,9 @@ FwdAnalysis::Result FwdAnalysis::checkRecursive(const Token *expr, const Token *
                 if (ftok && Token::Match(ftok->previous(), "%name% (")) {
                     const std::vector<const Token *> args = getArguments(ftok);
                     int argnr = 0;
-                    while (argnr < args.size() && args[argnr] != parent)
+                    while (argnr < static_cast<int>(args.size()) && args[argnr] != parent)
                         argnr++;
-                    if (argnr < args.size()) {
+                    if (argnr < static_cast<int>(args.size())) {
                         const Library::Function* functionInfo = mLibrary.getFunction(ftok->astOperand1());
                         if (functionInfo) {
                             const auto it = functionInfo->argumentChecks.find(argnr + 1);
@@ -506,7 +506,7 @@ bool FwdAnalysis::possiblyAliased(const Token *expr, const Token *startToken) co
         if (Token::Match(tok, "%name% (") && !Token::Match(tok, "if|while|for")) {
             // Is argument passed by reference?
             const std::vector<const Token*> args = getArguments(tok);
-            for (int argnr = 0; argnr < args.size(); ++argnr) {
+            for (int argnr = 0; argnr < static_cast<int>(args.size()); ++argnr) {
                 if (!Token::Match(args[argnr], "%name%|.|::"))
                     continue;
                 if (tok->function() && tok->function()->getArgumentVar(argnr) && !tok->function()->getArgumentVar(argnr)->isReference() && !tok->function()->isConst())

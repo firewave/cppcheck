@@ -163,7 +163,7 @@ CheckMemoryLeak::AllocType CheckMemoryLeak::getReallocationType(const Token *tok
     if (!(f && f->reallocArg > 0 && f->reallocArg <= numberOfArguments(tok2)))
         return No;
     const auto args = getArguments(tok2);
-    if (args.size() < (f->reallocArg))
+    if (static_cast<int>(args.size()) < f->reallocArg)
         return No;
     const Token* arg = args.at(f->reallocArg - 1);
     while (arg && arg->isCast())

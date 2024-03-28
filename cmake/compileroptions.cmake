@@ -49,7 +49,7 @@ if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR CMAKE_CXX_COMPILER_ID MATCHES "Clang
     add_compile_options(-Wundef)
     add_compile_options(-Wno-missing-field-initializers)
     add_compile_options(-Wno-missing-braces)
-    add_compile_options(-Wno-sign-compare)
+    #add_compile_options(-Wno-sign-compare)
     add_compile_options(-Wno-multichar)
     add_compile_options(-Woverloaded-virtual)       # when a function declaration hides virtual functions from a base class
 

@@ -70,7 +70,7 @@ void CheckNullPointer::parseFunctionCall(const Token &tok, std::list<const Token
     const std::vector<const Token *> args = getArguments(&tok);
 
     if (library || tok.function() != nullptr) {
-        for (int argnr = 1; argnr <= args.size(); ++argnr) {
+        for (int argnr = 1; argnr <= static_cast<int>(args.size()); ++argnr) {
             const Token *param = args[argnr - 1];
             if (library && library->isnullargbad(&tok, argnr) && checkNullpointerFunctionCallPlausibility(tok.function(), argnr))
                 var.push_back(param);
@@ -84,7 +84,7 @@ void CheckNullPointer::parseFunctionCall(const Token &tok, std::list<const Token
 
     if (library && library->formatstr_function(&tok)) {
         const int formatStringArgNr = library->formatstr_argno(&tok);
-        if (formatStringArgNr < 0 || formatStringArgNr >= args.size())
+        if (formatStringArgNr < 0 || formatStringArgNr >= static_cast<int>(args.size()))
             return;
 
         // 1st parameter..
@@ -119,7 +119,7 @@ void CheckNullPointer::parseFunctionCall(const Token &tok, std::list<const Token
                 if (_continue)
                     continue;
 
-                if (argnr < args.size() && (*i == 'n' || *i == 's' || scan))
+                if (argnr < static_cast<int>(args.size()) && (*i == 'n' || *i == 's' || scan))
                     var.push_back(args[argnr]);
 
                 if (*i != 'm') // %m is a non-standard glibc extension that requires no parameter
@@ -380,7 +380,7 @@ void CheckNullPointer::nullConstantDereference()
 
             else if (Token::Match(tok->previous(), "::|. %name% (")) {
                 const std::vector<const Token *> &args = getArguments(tok);
-                for (int argnr = 0; argnr < args.size(); ++argnr) {
+                for (int argnr = 0; argnr < static_cast<int>(args.size()); ++argnr) {
                     const Token *argtok = args[argnr];
                     if (!argtok->hasKnownIntValue())
                         continue;

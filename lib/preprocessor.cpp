@@ -527,7 +527,7 @@ static void getConfigs(const simplecpp::TokenList &tokens, std::set<std::string>
                 const std::array<std::string, 6> match{"if", "!", "defined", "(", config, ")"};
                 int i = 0;
                 ifndef = true;
-                for (const simplecpp::Token *t = cmdtok; i < match.size(); t = t->next) {
+                for (const simplecpp::Token *t = cmdtok; i < static_cast<int>(match.size()); t = t->next) {
                     if (!t || t->str() != match[i++]) {
                         ifndef = false;
                         break;
