@@ -587,8 +587,12 @@ unsigned int CppCheck::check(const FileSettings &fs)
     for (const auto& suppr : temp.mSettings.supprs.nomsg.getSuppressions())
     {
         // skip inline suppressions - are handled in checkFile()
-        if (suppr.isInline)
+        if (suppr.isInline) {
+            // need to transfer unusedFunction suppressions because these are handled later on
+            if (suppr.errorId == "unusedFunction")
+                mSettings.supprs.nomsg.addSuppression(suppr); // TODO: check result
             continue;
+        }
 
         const bool res = mSettings.supprs.nomsg.updateSuppressionState(suppr);
         if (!res)
@@ -1002,7 +1006,8 @@ unsigned int CppCheck::checkFile(const std::string& filename, const std::string 
 
     if (mSettings.severity.isEnabled(Severity::information) || mSettings.checkConfiguration) {
         // TODO: check result?
-        SuppressionList::reportUnmatchedSuppressions(mSettings.supprs.nomsg.getUnmatchedInlineSuppressions(false), *this);
+        // defer reporting of unusedFunction to later
+        SuppressionList::reportUnmatchedSuppressions(mSettings.supprs.nomsg.getUnmatchedInlineSuppressions(SuppressionList::UnusedFunction::Exclude), *this);
 
         // In jointSuppressionReport mode, unmatched suppressions are
         // collected after all files are processed
