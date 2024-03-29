@@ -973,7 +973,7 @@ static bool isFloatSuffix(const simplecpp::Token *tok)
 
 void simplecpp::TokenList::combineOperators()
 {
-    std::stack<bool> executableScope;
+    std::stack<bool, std::vector<bool>> executableScope;
     executableScope.push(false);
     for (Token *tok = front(); tok; tok = tok->next) {
         if (tok->op == '{') {
