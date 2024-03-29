@@ -1507,6 +1507,13 @@ namespace simplecpp {
             *this = other;
         }
 
+#if __cplusplus >= 201103L
+        Macro(Macro &&other) : nameTokDef(nullptr), files(other.files), tokenListDefine(other.files), valueDefinedInCode_(other.valueDefinedInCode_)
+        {
+            *this = std::move(other);
+        }
+#endif
+
         Macro &operator=(const Macro &other) {
             if (this != &other) {
                 files = other.files;
@@ -1521,6 +1528,23 @@ namespace simplecpp {
             }
             return *this;
         }
+
+#if __cplusplus >= 201103L
+        Macro &operator=(Macro &&other) {
+            if (this != &other) {
+                files = other.files;
+                valueDefinedInCode_ = other.valueDefinedInCode_;
+                if (other.tokenListDefine.empty())
+                    parseDefine(other.nameTokDef);
+                else {
+                    tokenListDefine = std::move(other.tokenListDefine);
+                    parseDefine(tokenListDefine.cfront());
+                }
+                usageList = std::move(other.usageList);
+            }
+            return *this;
+        }
+#endif
 
         bool valueDefinedInCode() const {
             return valueDefinedInCode_;
