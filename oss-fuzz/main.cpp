@@ -78,7 +78,8 @@ int main(int argc, char * argv[])
         return EXIT_FAILURE;
 
     const std::string code = oss.str();
-    doCheck(reinterpret_cast<const unsigned char*>(code.data()), code.size());
+    for(int i = 0; i < 1000; ++i)
+        doCheck(reinterpret_cast<const unsigned char*>(code.data()), code.size());
 
     return EXIT_SUCCESS;
 }
