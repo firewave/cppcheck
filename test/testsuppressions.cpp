@@ -1192,7 +1192,7 @@ private:
         settings.exitCode = 1;
 
         const char code[] = "int f() { int a; return a; }";
-        ASSERT_EQUALS(0, cppCheck.check("test.c", code)); // <- no unsuppressed error is seen
+        ASSERT_EQUALS(0, cppCheck.check("test.c", reinterpret_cast<const uint8_t*>(code), sizeof(code))); // <- no unsuppressed error is seen
         ASSERT_EQUALS("[test.c:1]: (error) Uninitialized variable: a\n", errout_str()); // <- report error so ThreadExecutor can suppress it and make sure the global suppression is matched.
     }
 
@@ -1232,7 +1232,7 @@ private:
             "    // cppcheck-suppress unusedStructMember\n"
             "    int y;\n"
             "};";
-        ASSERT_EQUALS(0, cppCheck.check("/somewhere/test.cpp", code));
+        ASSERT_EQUALS(0, cppCheck.check("/somewhere/test.cpp", reinterpret_cast<const uint8_t*>(code), sizeof(code)));
         ASSERT_EQUALS("",errout_str());
     }
 

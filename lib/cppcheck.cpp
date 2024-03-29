@@ -849,8 +849,7 @@ unsigned int CppCheck::checkInternal(const std::string& filename, const std::str
                     code += "#line " + std::to_string(dir.linenr) + " \"" + dir.file + "\"\n" + dir.str + '\n';
             }
             Tokenizer tokenizer2(mSettings, this);
-            std::istringstream istr2(code);
-            tokenizer2.list.createTokens(istr2, Path::identify(*files.begin()));
+            tokenizer2.list.createTokens(code.data(), code.size(), Path::identify(*files.begin())); // TODO: check result?
             executeRules("define", tokenizer2);
         }
 #endif
@@ -1333,6 +1332,7 @@ static const char * pcreErrorCodeToString(const int pcreExecRet)
     return "";
 }
 
+// TODO: pass TokenList instead
 void CppCheck::executeRules(const std::string &tokenlist, const Tokenizer &tokenizer)
 {
     // There is no rule to execute

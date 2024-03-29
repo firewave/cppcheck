@@ -64,11 +64,10 @@ private:
 class SimpleTokenList
 {
 public:
-
-    explicit SimpleTokenList(const char code[], Standards::Language lang = Standards::Language::CPP)
+    template<size_t size>
+    SimpleTokenList(const char (&data)[size], Standards::Language lang = Standards::Language::CPP)
     {
-        std::istringstream iss(code);
-        if (!list.createTokens(iss, lang))
+        if (!list.createTokens(data, size-1, lang))
             throw std::runtime_error("creating tokens failed");
     }
 
