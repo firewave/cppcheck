@@ -299,7 +299,7 @@ namespace simplecpp {
 
         Token *frontToken;
         Token *backToken;
-        std::vector<std::string> &files;
+        std::vector<std::string> *files;
     };
 
     /** Tracking how macros are used */
