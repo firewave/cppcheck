@@ -45,6 +45,7 @@ jobs:
         with:
           version: ${{ env.QT_VERSION }}
           modules: 'qtcharts'
+          install-deps: false
           cache: true
 
       - name: Verify clang-tidy configuration
