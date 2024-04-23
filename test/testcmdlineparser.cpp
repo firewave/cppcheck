@@ -2577,6 +2577,7 @@ private:
         ASSERT_EQUALS(100, settings->vfOptions.maxIfCount);
         ASSERT_EQUALS(8, settings->vfOptions.maxSubFunctionArgs);
         ASSERT_EQUALS(true, settings->vfOptions.doConditionExpressionAnalysis);
+        ASSERT_EQUALS(-1, settings->vfOptions.maxForwardBranches);
     }
 
     void checkLevelNormal() {
@@ -2587,6 +2588,7 @@ private:
         ASSERT_EQUALS(100, settings->vfOptions.maxIfCount);
         ASSERT_EQUALS(8, settings->vfOptions.maxSubFunctionArgs);
         ASSERT_EQUALS(false, settings->vfOptions.doConditionExpressionAnalysis);
+        ASSERT_EQUALS(4, settings->vfOptions.maxForwardBranches);
     }
 
     void checkLevelExhaustive() {
@@ -2597,6 +2599,7 @@ private:
         ASSERT_EQUALS(-1, settings->vfOptions.maxIfCount);
         ASSERT_EQUALS(256, settings->vfOptions.maxSubFunctionArgs);
         ASSERT_EQUALS(true, settings->vfOptions.doConditionExpressionAnalysis);
+        ASSERT_EQUALS(-1, settings->vfOptions.maxForwardBranches);
     }
 
     void checkLevelUnknown() {
