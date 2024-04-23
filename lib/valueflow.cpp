@@ -7568,7 +7568,7 @@ static bool productParams(const Settings& settings, const std::unordered_map<Key
         args.back()[p.first] = p.second.front();
     }
     bool bail = false;
-    int max = settings.performanceValueFlowMaxSubFunctionArgs;
+    int max = settings.vfOptions.maxSubFunctionArgs;
     for (const auto& p:vars) {
         if (args.size() > max) {
             bail = true;
@@ -9462,7 +9462,7 @@ struct ValueFlowPassRunner {
     bool run(std::initializer_list<ValuePtr<ValueFlowPass>> passes) const
     {
         std::size_t values = 0;
-        std::size_t n = state.settings.valueFlowMaxIterations;
+        std::size_t n = state.settings.vfOptions.maxIterations;
         while (n > 0 && values != getTotalValues()) {
             values = getTotalValues();
             if (std::any_of(passes.begin(), passes.end(), [&](const ValuePtr<ValueFlowPass>& pass) {
@@ -9512,7 +9512,7 @@ struct ValueFlowPassRunner {
 
     void setSkippedFunctions()
     {
-        if (state.settings.performanceValueFlowMaxIfCount > 0) {
+        if (state.settings.vfOptions.maxIfCount > 0) {
             for (const Scope* functionScope : state.symboldatabase.functionScopes) {
                 int countIfScopes = 0;
                 std::vector<const Scope*> scopes{functionScope};
@@ -9525,7 +9525,7 @@ struct ValueFlowPassRunner {
                             ++countIfScopes;
                     }
                 }
-                if (countIfScopes > state.settings.performanceValueFlowMaxIfCount) {
+                if (countIfScopes > state.settings.vfOptions.maxIfCount) {
                     state.skippedFunctions.emplace(functionScope);
 
                     if (state.settings.severity.isEnabled(Severity::information)) {
@@ -9549,8 +9549,8 @@ struct ValueFlowPassRunner {
 
     void setStopTime()
     {
-        if (state.settings.performanceValueFlowMaxTime >= 0)
-            stop = Clock::now() + std::chrono::seconds{state.settings.performanceValueFlowMaxTime};
+        if (state.settings.vfOptions.maxTime >= 0)
+            stop = Clock::now() + std::chrono::seconds{state.settings.vfOptions.maxTime};
     }
 
     ValueFlowState state;
