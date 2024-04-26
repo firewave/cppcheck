@@ -21,6 +21,7 @@ import logging
 import logging.handlers
 import operator
 import html as html_lib
+import io
 from urllib.parse import urlparse
 
 # Version scheme (MAJOR.MINOR.PATCH) should orientate on "Semantic Versioning" https://semver.org/
@@ -1353,14 +1354,17 @@ def server(server_address_port: int, packages: list, packageIndex: int, resultPa
             # Verify that head was compared to correct OLD_VERSION
             versions_found = False
             old_version_wrong = False
-            for line in data.split('\n', 20):
-                if line.startswith('cppcheck: '):
-                    versions_found = True
-                    if OLD_VERSION not in line.split():
-                        print_ts('Compared to wrong old version. Should be ' + OLD_VERSION + '. Versions compared: ' +
-                              line + '. Ignoring result data.')
-                        old_version_wrong = True
-                    break
+            with io.StringIO(data) as data_buf:
+                line = data_buf.readline()
+                while line:
+                    if line.startswith('cppcheck: '):
+                        versions_found = True
+                        if OLD_VERSION not in line.split():
+                            print_ts('Compared to wrong old version. Should be ' + OLD_VERSION + '. Versions compared: ' +
+                                  line + '. Ignoring result data.')
+                            old_version_wrong = True
+                        break
+                    line = data_buf.readline()
             if not versions_found:
                 print_ts('Cppcheck versions missing in result data. Ignoring result data.')
                 continue
