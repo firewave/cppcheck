@@ -1373,7 +1373,9 @@ def server(server_address_port: int, packages: list, packageIndex: int, resultPa
                 continue
             filename = os.path.join(resultPath, res.group(1))
             with open(filename, 'wt') as f:
-                f.write(strDateTime() + '\n' + data)
+                f.write(strDateTime())
+                f.write('\n')
+                f.write(data)
             # track latest added results..
             if len(latestResults) >= 20:
                 latestResults = latestResults[1:]
@@ -1415,7 +1417,9 @@ def server(server_address_port: int, packages: list, packageIndex: int, resultPa
                 os.mkdir(info_path)
             filename = info_path + '/' + res.group(1)
             with open(filename, 'wt') as f:
-                f.write(strDateTime() + '\n' + data)
+                f.write(strDateTime())
+                f.write('\n')
+                f.write(data)
             print_ts('write_info finished for {} ({} bytes / {}s)'.format(res.group(1), len(data), (time.perf_counter() - t_start)))
             continue
         elif cmd == 'getPackagesCount\n':
