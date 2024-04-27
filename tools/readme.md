@@ -61,13 +61,18 @@ $ ./dmake
 
 Script that reduces code for a hang/false positive.
 
-### * tools/times.sh
-
-Script to generate a `times.log` file that contains timing information of the last 20 revisions.
-
 ### * tools/donate-cpu.py
 
 Script to donate CPU time to Cppcheck project by checking current Debian packages.
+
+### * tools/donate-cpu-server.py
+
+The server for the Cppcheck CPU donating project for checking current Debian packages.
+
+Setting up a server for testing:
+
+`python3 daca2-getpackages.py > ~/daca@home/packages.txt`
+`python3 donate-cpu-server.py --test`
 
 ### * tools/test-my-pr.py
 
