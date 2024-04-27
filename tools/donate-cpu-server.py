@@ -1379,7 +1379,7 @@ def server(server_address_port: int, packages: list, packageIndex: int, resultPa
             connection.send(pkg.encode('utf-8', 'ignore'))
             closeConn(connection)
             continue
-        elif cmd.startswith('write\nftp://') or cmd.startswith('write\nhttp://'):
+        elif cmd.startswith('write\nftp://'):
             t_start = time.perf_counter()
             data = read_data(connection, cmd, pos_nl, max_data_size=2.5 * 1024 * 1024, check_done=True, cmd_name='write')
             if data is None:
@@ -1396,10 +1396,7 @@ def server(server_address_port: int, packages: list, packageIndex: int, resultPa
             print_ts('write:' + url)
 
             # save data
-            res = re.match(r'ftp://.*pool/main/[^/]+/([^/]+)/[^/]*tar.(gz|bz2|xz)', url)
-            if res is None:
-                res = re.match(r'https?://cppcheck\.sf\.net/([a-z]+).tgz', url)
-            if res is None:
+            if re.match(r'ftp://.*pool/main/[^/]+/([^/]+)/[^/]*tar.(gz|bz2|xz)', url) is None:
                 print_ts('res is None. Ignoring result data.')
                 continue
             if url not in packages:
