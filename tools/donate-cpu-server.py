@@ -1494,51 +1494,54 @@ if __name__ == "__main__":
         print_ts("fatal: result path '{}' is missing".format(resultPath))
         sys.exit(1)
 
-    with open('packages.txt', 'rt') as f:
-        packages = [val.strip() for val in f.readlines()]
+    is_test_server = '--test' in sys.argv[1:]
 
-    print_ts('packages: {}'.format(len(packages)))
-
-    if os.path.isfile('packages_nodata.txt'):
-        with open('packages_nodata.txt', 'rt') as f:
-            packages_nodata = [val.strip() for val in f.readlines()]
-            packages_nodata.sort()
-
-        print_ts('packages_nodata: {}'.format(len(packages_nodata)))
-
-        print_ts('removing packages with no files to process'.format(len(packages_nodata)))
-        packages_nodata_clean = []
-        for pkg_n in packages_nodata:
-            if pkg_n in packages:
-                packages.remove(pkg_n)
-                packages_nodata_clean.append(pkg_n)
-
-        packages_nodata_diff = len(packages_nodata) - len(packages_nodata_clean)
-        if packages_nodata_diff:
-            with open('packages_nodata.txt', 'wt') as f:
-                for pkg in packages_nodata_clean:
-                    f.write(pkg + '\n')
-
-            print_ts('removed {} packages from packages_nodata.txt'.format(packages_nodata_diff))
+    while is_test_server:
+        with open('packages.txt', 'rt') as f:
+            packages = [val.strip() for val in f.readlines()]
 
         print_ts('packages: {}'.format(len(packages)))
 
-    if len(packages) == 0:
-        print_ts('fatal: there are no packages')
-        sys.exit(1)
+        if os.path.isfile('packages_nodata.txt'):
+            with open('packages_nodata.txt', 'rt') as f:
+                packages_nodata = [val.strip() for val in f.readlines()]
+                packages_nodata.sort()
 
-    packageIndex = 0
-    if os.path.isfile('package-index.txt'):
-        with open('package-index.txt', 'rt') as f:
-            packageIndex = int(f.read())
-        if packageIndex < 0 or packageIndex >= len(packages):
-            packageIndex = 0
+            print_ts('packages_nodata: {}'.format(len(packages_nodata)))
 
-    server_address_port = 8000
-    if '--test' in sys.argv[1:]:
-        server_address_port = 8001
+            print_ts('removing packages with no files to process'.format(len(packages_nodata)))
+            packages_nodata_clean = []
+            for pkg_n in packages_nodata:
+                if pkg_n in packages:
+                    packages.remove(pkg_n)
+                    packages_nodata_clean.append(pkg_n)
 
-    try:
-        server(server_address_port, packages, packageIndex, resultPath)
-    except socket.timeout:
-        print_ts('Timeout!')
+            packages_nodata_diff = len(packages_nodata) - len(packages_nodata_clean)
+            if packages_nodata_diff:
+                with open('packages_nodata.txt', 'wt') as f:
+                    for pkg in packages_nodata_clean:
+                        f.write(pkg + '\n')
+
+                print_ts('removed {} packages from packages_nodata.txt'.format(packages_nodata_diff))
+
+            print_ts('packages: {}'.format(len(packages)))
+
+        if len(packages) == 0:
+            print_ts('fatal: there are no packages')
+            sys.exit(1)
+
+        packageIndex = 0
+        if os.path.isfile('package-index.txt'):
+            with open('package-index.txt', 'rt') as f:
+                packageIndex = int(f.read())
+            if packageIndex < 0 or packageIndex >= len(packages):
+                packageIndex = 0
+
+        server_address_port = 8000
+        if is_test_server:
+            server_address_port = 8001
+
+        try:
+            server(server_address_port, packages, packageIndex, resultPath)
+        except socket.timeout:
+            print_ts('Timeout!')
