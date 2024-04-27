@@ -1551,4 +1551,4 @@ if __name__ == "__main__":
         try:
             server(server_address_port, packages, packageIndex, resultPath)
         except socket.timeout:
-            print_ts('Timeout!')
+            print_ts('no connection received within timeout - restarting')
