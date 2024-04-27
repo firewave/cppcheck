@@ -1082,6 +1082,13 @@ def httpGetResponse(connection: socket.socket, data: str, contentType: str) -> N
     sendAll(connection, resp)
 
 
+def closeConn(connection: socket.socket) -> None:
+    #  according to https://docs.python.org/3/library/socket.html#socket.socket.close
+    #  you need to call socket.shutdown() before socket.close() to close the connection "in a timely fashion"
+    connection.shutdown(socket.SHUT_RDWR)
+    connection.close()
+
+
 class HttpClientThread(Thread):
     def __init__(self, connection: socket.socket, cmd: str, resultPath: str, latestResults: list) -> None:
         Thread.__init__(self)
@@ -1106,7 +1113,7 @@ class HttpClientThread(Thread):
             url, queryParams = self.parse_req(cmd)
             if url is None:
                 print_ts('invalid request: {}'.format(cmd))
-                self.connection.close()
+                closeConn(self.connection)
                 return
             t_start = time.perf_counter()
             if url == '/':
@@ -1212,7 +1219,7 @@ class HttpClientThread(Thread):
             httpGetResponse(self.connection, tb, 'text/plain')
         finally:
             time.sleep(1)
-            self.connection.close()
+            closeConn(self.connection)
 
 
 def read_data(connection, cmd, pos_nl, max_data_size, check_done, cmd_name, timeout=10):
@@ -1239,7 +1246,7 @@ def read_data(connection, cmd, pos_nl, max_data_size, check_done, cmd_name, time
         print_ts('Socket error occurred ({}): {}'.format(cmd_name, e))
         data = None
 
-    connection.close()
+    closeConn(connection)
 
     if (timeout > 0) and (t >= timeout):
         print_ts('Timeout occurred ({}).'.format(cmd_name))
@@ -1281,21 +1288,21 @@ def server(server_address_port: int, packages: list, packageIndex: int, resultPa
             cmd = bytes_received.decode('utf-8', 'ignore')
         except socket.error as e:
             print_ts('Error: Recv error: ' + str(e))
-            connection.close()
+            closeConn(connection)
             continue
         except UnicodeDecodeError as e:
             print_ts('Error: Decoding failed: ' + str(e))
-            connection.close()
+            closeConn(connection)
             continue
         pos_nl = cmd.find('\n')
         if pos_nl < 1:
             print_ts("No newline found in data: '{}'".format(cmd))
-            connection.close()
+            closeConn(connection)
             continue
         firstLine = cmd[:pos_nl]
         if re.match('[a-zA-Z0-9./ ]+', firstLine) is None:
             print_ts('Unsupported characters found in command: {}'.format(firstLine))
-            connection.close()
+            closeConn(connection)
             continue
         if cmd.startswith('GET /'):
             cmd = cmd[:cmd.find('\r\n')]
@@ -1307,7 +1314,7 @@ def server(server_address_port: int, packages: list, packageIndex: int, resultPa
             reply = 'head ' + OLD_VERSION
             print_ts('GetCppcheckVersions: ' + reply)
             connection.send(reply.encode('utf-8', 'ignore'))
-            connection.close()
+            closeConn(connection)
             continue
         elif cmd == 'get\n':
             while True:
@@ -1323,7 +1330,7 @@ def server(server_address_port: int, packages: list, packageIndex: int, resultPa
 
             print_ts('get:' + pkg)
             connection.send(pkg.encode('utf-8', 'ignore'))
-            connection.close()
+            closeConn(connection)
             continue
         elif cmd.startswith('write\nftp://') or cmd.startswith('write\nhttp://'):
             t_start = time.perf_counter()
@@ -1426,7 +1433,7 @@ def server(server_address_port: int, packages: list, packageIndex: int, resultPa
             packages_count = str(len(packages))
             connection.send(packages_count.encode('utf-8', 'ignore'))
             print_ts('getPackagesCount: ' + packages_count)
-            connection.close()
+            closeConn(connection)
             continue
         elif cmd.startswith('getPackageIdx'):
             request_idx = abs(int(cmd[len('getPackageIdx:'):]))
@@ -1436,7 +1443,7 @@ def server(server_address_port: int, packages: list, packageIndex: int, resultPa
                 print_ts('getPackageIdx: ' + pkg)
             else:
                 print_ts('getPackageIdx: index {} is out of range'.format(request_idx))
-            connection.close()
+            closeConn(connection)
             continue
         elif cmd.startswith('write_nodata\nftp://'):
             data = read_data(connection, cmd, pos_nl, max_data_size=8 * 1024, check_done=False, cmd_name='write_nodata')
@@ -1479,7 +1486,7 @@ def server(server_address_port: int, packages: list, packageIndex: int, resultPa
                 if len(lines) > 2:
                     s += '...'
                 print_ts('invalid command: "' + s + '"')
-            connection.close()
+            closeConn(connection)
             continue
 
 
