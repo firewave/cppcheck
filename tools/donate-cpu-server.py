@@ -83,7 +83,6 @@ def overviewReport() -> str:
     html += '<h1>daca@home</h1>\n'
     html += '<a href="crash.html">Crash report</a> - <a href="crash.html?pkgs=1">packages.txt</a><br>\n'
     html += '<a href="timeout.html">Timeout report</a><br>\n'
-    html += '<a href="stale.html">Stale report</a><br>\n'
     html += '<a href="diff.html">Diff report</a><br>\n'
     html += '<a href="head.html">HEAD report</a><br>\n'
     html += '<a href="headinfo.html">HEAD (information) report</a><br>\n'
@@ -91,6 +90,11 @@ def overviewReport() -> str:
     html += '<a href="time_lt.html">Time report (improved)</a><br>\n'
     html += '<a href="time_gt.html">Time report (regressed)</a> - <a href="time_gt.html?pkgs=1">packages.txt</a><br>\n'
     html += '<a href="time_slow.html">Time report (slowest)</a><br>\n'
+    html += '<br>\n'
+    html += 'Data consistency:<br>\n'
+    html += '<a href="stale.html">Stale report</a><br>\n'
+    html += '<a href="incomplete.html">Incomplete data report</a><br>\n'
+    html += '<a href="incompleteinfo.html">Incomplete data (information) report</a><br>\n'
     html += '<br>\n'
     html += '--check-library:<br>\n'
     html += '<a href="check_library_function_report.html">checkLibraryFunction report</a><br>\n'
@@ -365,6 +369,42 @@ def staleReport(results_path: str) -> str:
             package = filename[filename.rfind('/')+1:]
             html += fmt(package, datestr) + '\n'
             break
+    html += '</pre>\n'
+
+    html += '</body></html>\n'
+    return html
+
+
+def incompleteReport(results_path: str) -> str:
+    html = '<!DOCTYPE html>\n'
+    html += '<html><head><title>Incomplete data report</title></head><body>\n'
+    html += '<h1>Incomplete data report</h1>\n'
+    html += '<pre>\n'
+    html += '<b>' + fmt('Package', 'Date       Time', link=False) + '</b>\n'
+    current_year = datetime.date.today().year
+    for filename in sorted(glob.glob(os.path.expanduser(results_path + '/*'))):
+        if not os.path.isfile(filename) or filename.endswith('.diff'):
+            continue
+        done_marker = '\nDONE'
+        done_marker_len = len(done_marker)
+        with open(filename, 'rt') as f:
+            data = f.readline().strip()
+            print(data)
+            print(f.readline())
+            if data.startswith(str(current_year) + '-') or data.startswith(str(current_year - 1) + '-'):
+                datestr = data
+            else:
+                continue  # proceed with next file
+
+        # need to open as binary for reverse seek
+        with open(filename, 'rb') as f:
+            # look for DONE marker at the end
+            f.seek(-done_marker_len, os.SEEK_END)
+            data = f.read(done_marker_len)
+            if data.decode('utf-8', 'ignore') == done_marker:
+                continue  # proceed with next file
+            package = filename[filename.rfind('/')+1:]
+            html += fmt(package, datestr) + '\n'
     html += '</pre>\n'
 
     html += '</body></html>\n'
@@ -1131,6 +1171,12 @@ class HttpClientThread(Thread):
             elif url == '/stale.html':
                 html = staleReport(self.resultPath)
                 httpGetResponse(self.connection, html, 'text/html')
+            elif url == '/incomplete.html':
+                html = incompleteReport(self.resultPath)
+                httpGetResponse(self.connection, html, 'text/html')
+            elif url == '/incompleteinfo.html':
+                html = incompleteReport(self.infoPath)
+                httpGetResponse(self.connection, html, 'text/html')
             elif url == '/diff.html':
                 html = diffReport(self.resultPath)
                 httpGetResponse(self.connection, html, 'text/html')
@@ -1203,6 +1249,7 @@ class HttpClientThread(Thread):
                 var_name = url[len('/unknown_macro-'):]
                 text = check_library_function_name(self.resultPath, var_name, queryParams, nonfunc_id='unknownMacro')
                 httpGetResponse(self.connection, text, 'text/plain')
+            #elif url.startswith('/info-'):
             else:
                 filename = resultPath + url
                 if not os.path.isfile(filename):
