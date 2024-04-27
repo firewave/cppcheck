@@ -1223,7 +1223,7 @@ class HttpClientThread(Thread):
 
 
 def read_data(connection, cmd, pos_nl, max_data_size, check_done, cmd_name, timeout=10):
-    data = cmd[pos_nl+1:]
+    data = cmd[pos_nl+1:]  # TODO: use io.StringIO
     t = 0.0
     try:
         while (len(data) < max_data_size) and (not check_done or not data.endswith('\nDONE')) and (timeout > 0 and t < timeout):
