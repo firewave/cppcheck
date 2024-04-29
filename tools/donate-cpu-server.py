@@ -346,7 +346,11 @@ def timeoutReport(results_path: str) -> str:
     return html
 
 
-def staleReport(results_path: str) -> str:
+def staleReport(results_path: str, query_params: dict) -> str:
+    thresh_d = query_params.get('days')
+    if not thresh_d:
+        thresh_d = 30
+
     html = '<!DOCTYPE html>\n'
     html += '<html><head><title>Stale report</title></head><body>\n'
     html += '<h1>Stale report</h1>\n'
@@ -364,7 +368,7 @@ def staleReport(results_path: str) -> str:
                 continue
             dt = dateTimeFromStr(datestr)
             diff = datetime.datetime.now() - dt
-            if diff.days < 30:
+            if diff.days < thresh_d:
                 continue
             package = filename[filename.rfind('/')+1:]
             html += fmt(package, datestr) + '\n'
@@ -1169,7 +1173,7 @@ class HttpClientThread(Thread):
                 html = timeoutReport(self.resultPath)
                 httpGetResponse(self.connection, html, 'text/html')
             elif url == '/stale.html':
-                html = staleReport(self.resultPath)
+                html = staleReport(self.resultPath, queryParams)
                 httpGetResponse(self.connection, html, 'text/html')
             elif url == '/incomplete.html':
                 html = incompleteReport(self.resultPath)
