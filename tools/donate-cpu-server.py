@@ -1393,9 +1393,6 @@ def server(server_address_port: int, packages: list, packageIndex: int, resultPa
             if pos == -1:
                 print_ts('No newline found in data. Ignoring result data.')
                 continue
-            if pos < 10:
-                print_ts('Data is less than 10 characters. Ignoring result data.')
-                continue
             url = data[:pos]
             print_ts('write:' + url)
 
@@ -1451,9 +1448,6 @@ def server(server_address_port: int, packages: list, packageIndex: int, resultPa
             if pos == -1:
                 print_ts('No newline found in data. Ignoring information data.')
                 continue
-            if pos < 10:
-                print_ts('Data is less than 10 characters. Ignoring information data.')
-                continue
             url = data[:pos]
             print_ts('write_info:' + url)
 
@@ -1501,9 +1495,6 @@ def server(server_address_port: int, packages: list, packageIndex: int, resultPa
             pos = data.find('\n')
             if pos == -1:
                 print_ts('No newline found in data. Ignoring no-data data.')
-                continue
-            if pos < 10:
-                print_ts('Data is less than 10 characters ({}). Ignoring no-data data.'.format(pos))
                 continue
             url = data[:pos]
 
