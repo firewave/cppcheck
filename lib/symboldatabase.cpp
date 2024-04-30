@@ -3731,9 +3731,11 @@ bool Variable::arrayDimensions(const Settings& settings, bool& isContainer)
         // check for empty array dimension []
         if (dim->strAt(1) != "]") {
             dimension_.tok = dim->astOperand2();
+#ifndef FUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION
             // TODO: only perform when ValueFlow is enabled
             // TODO: collect timing information for this call?
             ValueFlow::valueFlowConstantFoldAST(const_cast<Token *>(dimension_.tok), settings);
+#endif
             if (dimension_.tok && dimension_.tok->hasKnownIntValue()) {
                 dimension_.num = dimension_.tok->getKnownIntValue();
                 dimension_.known = true;
