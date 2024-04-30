@@ -3421,10 +3421,7 @@ bool Tokenizer::simplifyTokens1(const std::string &configuration)
         Summaries::create(*this, configuration);
 
     // TODO: do not run valueflow if no checks are being performed at all - e.g. unusedFunctions only
-    const char* disableValueflowEnv = std::getenv("DISABLE_VALUEFLOW");
-    const bool doValueFlow = !disableValueflowEnv || (std::strcmp(disableValueflowEnv, "1") != 0);
-
-    if (doValueFlow) {
+    if (mSettings.vfOptions.enabled) {
         if (mTimerResults) {
             Timer t("Tokenizer::simplifyTokens1::ValueFlow", mSettings.showtime, mTimerResults);
             ValueFlow::setValues(list, *mSymbolDatabase, mErrorLogger, mSettings, mTimerResults);
@@ -3448,7 +3445,7 @@ bool Tokenizer::simplifyTokens1(const std::string &configuration)
         }
     }
 
-    if (doValueFlow) {
+    if (mSettings.vfOptions.enabled) {
         mSymbolDatabase->setArrayDimensionsUsingValueFlow();
     }
 

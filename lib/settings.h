@@ -384,6 +384,9 @@ public:
 
     struct ValueFlowOptions
     {
+        /** @brief Control if ValueFlow is performed in Tokenizer::simplifyTokens1() */
+        bool enabled = true;
+
         /** @brief the maximum iterations to execute */
         std::size_t maxIterations = 4;
 
