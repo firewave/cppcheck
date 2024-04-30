@@ -287,6 +287,10 @@ void Settings::loadSummaries()
 
 void Settings::setCheckLevel(CheckLevel level)
 {
+    // TODO: requires regular settings creation to be applied
+    const char * const disableValueflowEnv = std::getenv("DISABLE_VALUEFLOW");
+    vfOptions.enabled = !disableValueflowEnv || (std::strcmp(disableValueflowEnv, "1") != 0);
+
     if (level == CheckLevel::normal) {
         // Checking should finish in reasonable time.
         checkLevel = level;
