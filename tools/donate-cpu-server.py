@@ -750,7 +750,7 @@ def timeReport(resultPath: str, show_gt: bool, query_params: dict):
 
     total_time_base = 0.0
     total_time_head = 0.0
-    for filename in glob.glob(resultPath + '/*'):
+    for filename in glob.iglob(resultPath + '/*'):
         if filename.endswith('.diff') or not os.path.isfile(filename):
             continue
         datestr = None
@@ -853,7 +853,7 @@ def timeReportSlow(resultPath: str) -> str:
 
     data = {}
 
-    for filename in glob.glob(resultPath + '/*'):
+    for filename in glob.iglob(resultPath + '/*'):
         if filename.endswith('.diff') or not os.path.isfile(filename):
             continue
         datestr = None
@@ -942,7 +942,7 @@ def check_library_report(result_path: str, message_id: str) -> str:
     html += '</b>\n'
 
     function_counts = {}
-    for filename in glob.glob(result_path + '/*'):
+    for filename in glob.iglob(result_path + '/*'):
         if filename.endswith('.diff') or not os.path.isfile(filename):
             continue
         in_results = False
@@ -1006,7 +1006,7 @@ def check_library_function_name(result_path: str, function_name: str, query_para
             id = '[checkLibraryCheckType]'
         marker = INFO_MARKER
     output_lines_list = []
-    for filename in glob.glob(result_path + '/*'):
+    for filename in glob.iglob(result_path + '/*'):
         if filename.endswith('.diff') or not os.path.isfile(filename):
             continue
         in_results = False
