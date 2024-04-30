@@ -176,11 +176,10 @@ def latestReport(latestResults: list) -> str:
         lost = 0
         added = 0
         for line in open(filename, 'rt'):
-            line = line.strip()
             if datestr is None and line.startswith(str(current_year) + '-') or line.startswith(str(current_year - 1) + '-'):
-                datestr = line
+                datestr = line.strip()
             elif line.startswith('count: '):
-                count = line.split(' ')[1:]
+                count = line.strip().split(' ')[1:]
             elif line.startswith('head ') and not line.startswith('head results:'):
                 added += 1
             elif line.startswith(OLD_VERSION + ' '):
@@ -213,19 +212,18 @@ def crashReport(results_path: str, query_params: dict):
             datestr = None
             package_url = None
             for line in file_:
-                line = line.strip()
                 if datestr is None and line.startswith(str(current_year) + '-') or line.startswith(str(current_year - 1) + '-'):
-                    datestr = line
+                    datestr = line.strip()
                 elif line.startswith('cppcheck: '):
                     if OLD_VERSION not in line:
                         break  # Package results seem to be too old, skip
                 elif pkgs is not None and package_url is None and line.startswith('ftp://'):
-                    package_url = line
+                    package_url = line.strip()
                 elif line.startswith('count:'):
                     if line.find('Crash') < 0:
                         break
                     package = pkg_from_file(filename)
-                    counts = line.split(' ')
+                    counts = line.strip().split(' ')
                     c_version = ''
                     if counts[2] == 'Crash!':
                         c_version = 'Crash'
@@ -310,9 +308,8 @@ def timeoutReport(results_path: str) -> str:
         with open(filename, 'rt') as file_:
             datestr = None
             for line in file_:
-                line = line.strip()
                 if datestr is None and line.startswith(str(current_year) + '-') or line.startswith(str(current_year - 1) + '-'):
-                    datestr = line
+                    datestr = line.strip()
                 elif line.startswith('cppcheck: '):
                     if OLD_VERSION not in line:
                         break  # Package results seem to be too old, skip
@@ -320,7 +317,7 @@ def timeoutReport(results_path: str) -> str:
                     if line.find('TO!') < 0:
                         break
                     package = pkg_from_file(filename)
-                    counts = line.split(' ')
+                    counts = line.strip().split(' ')
                     c2 = ''
                     if counts[2] == 'TO!':
                         c2 = 'Timeout'
@@ -586,7 +583,6 @@ def summaryReport(resultsPath: str, name: str, prefix: str, marker: str) -> str:
             if uploadedToday is None:
                 uploadedToday = line.startswith(today)
                 continue
-            line = line.strip()
             if line.startswith('cppcheck: '):
                 if OLD_VERSION not in line:
                     # Package results seem to be too old, skip
@@ -600,6 +596,7 @@ def summaryReport(resultsPath: str, name: str, prefix: str, marker: str) -> str:
                 continue
             if line.startswith('diff:'):
                 break
+            line = line.strip()
             if not line.endswith(']'):
                 continue
             if ': note: ' in line:
@@ -756,9 +753,9 @@ def timeReport(resultPath: str, show_gt: bool, query_params: dict):
         datestr = None
         package_url = None
         for line in open(filename, 'rt'):
-            line = line.strip()
+
             if datestr is None and line.startswith(str(current_year) + '-') or line.startswith(str(current_year - 1) + '-'):
-                datestr = line
+                datestr = line.strip()
                 continue
             if line.startswith('cppcheck: '):
                 if OLD_VERSION not in line:
@@ -768,11 +765,11 @@ def timeReport(resultPath: str, show_gt: bool, query_params: dict):
                     # Current package, parse on
                     continue
             if pkgs is not None and package_url is None and line.startswith('ftp://'):
-                package_url = line
+                package_url = line.strip()
                 continue
             if not line.startswith('elapsed-time:'):
                 continue
-            split_line = line.split()
+            split_line = line.strip().split()
             time_base = float(split_line[2])
             time_head = float(split_line[1])
             if time_base < 0.0 or time_head < 0.0:
@@ -858,9 +855,8 @@ def timeReportSlow(resultPath: str) -> str:
             continue
         datestr = None
         for line in open(filename, 'rt'):
-            line = line.strip()
             if datestr is None and line.startswith(str(current_year) + '-') or line.startswith(str(current_year - 1) + '-'):
-                datestr = line
+                datestr = line.strip()
                 continue
             if line.startswith('cppcheck: '):
                 if OLD_VERSION not in line:
@@ -870,14 +866,14 @@ def timeReportSlow(resultPath: str) -> str:
                     # Current package, parse on
                     continue
             if line.startswith('count:'):
-                count_head = line.split()[1]
+                count_head = line.strip().split()[1]
                 if count_head == 'TO!':
                     # ignore results with timeouts
                     break
                 continue
             if not line.startswith('elapsed-time:'):
                 continue
-            split_line = line.split()
+            split_line = line.strip().split()
             time_base = float(split_line[2])
             time_head = float(split_line[1])
             if time_base < 0.0 or time_head < 0.0:
