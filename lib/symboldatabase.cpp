@@ -3713,7 +3713,8 @@ bool Variable::arrayDimensions(const Settings& settings, bool& isContainer)
         // check for empty array dimension []
         if (dim->next()->str() != "]") {
             dimension_.tok = dim->astOperand2();
-            ValueFlow::valueFlowConstantFoldAST(const_cast<Token *>(dimension_.tok), settings);
+            if (settings.vfOptions.enabled)
+                ValueFlow::valueFlowConstantFoldAST(const_cast<Token *>(dimension_.tok), settings);
             if (dimension_.tok && dimension_.tok->hasKnownIntValue()) {
                 dimension_.num = dimension_.tok->getKnownIntValue();
                 dimension_.known = true;
