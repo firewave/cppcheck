@@ -179,8 +179,6 @@ def latestReport(latestResults: list) -> str:
             line = line.strip()
             if datestr is None and line.startswith(str(current_year) + '-') or line.startswith(str(current_year - 1) + '-'):
                 datestr = line
-            #elif line.startswith('cppcheck:'):
-            #    cppcheck = line[9:]
             elif line.startswith('count: '):
                 count = line.split(' ')[1:]
             elif line.startswith('head ') and not line.startswith('head results:'):
@@ -209,22 +207,18 @@ def crashReport(results_path: str, query_params: dict):
     current_year = datetime.date.today().year
     stack_traces = {}
     for filename in sorted(glob.glob(os.path.expanduser(results_path + '/*'))):
-        if not os.path.isfile(filename) or filename.endswith('.diff'):
+        if filename.endswith('.diff') or not os.path.isfile(filename):
             continue
         with open(filename, 'rt') as file_:
             datestr = None
             package_url = None
             for line in file_:
                 line = line.strip()
-                if line.startswith('cppcheck: '):
-                    if OLD_VERSION not in line:
-                        # Package results seem to be too old, skip
-                        break
-                    else:
-                        # Current package, parse on
-                        continue
                 if datestr is None and line.startswith(str(current_year) + '-') or line.startswith(str(current_year - 1) + '-'):
                     datestr = line
+                elif line.startswith('cppcheck: '):
+                    if OLD_VERSION not in line:
+                        break  # Package results seem to be too old, skip
                 elif pkgs is not None and package_url is None and line.startswith('ftp://'):
                     package_url = line
                 elif line.startswith('count:'):
@@ -311,21 +305,17 @@ def timeoutReport(results_path: str) -> str:
     html += '<b>' + fmt('Package', 'Date       Time', OLD_VERSION, 'Head', link=False) + '</b>\n'
     current_year = datetime.date.today().year
     for filename in sorted(glob.glob(os.path.expanduser(results_path + '/*'))):
-        if not os.path.isfile(filename) or filename.endswith('.diff'):
+        if filename.endswith('.diff') and not os.path.isfile(filename):
             continue
         with open(filename, 'rt') as file_:
             datestr = None
             for line in file_:
                 line = line.strip()
-                if line.startswith('cppcheck: '):
-                    if OLD_VERSION not in line:
-                        # Package results seem to be too old, skip
-                        break
-                    else:
-                        # Current package, parse on
-                        continue
                 if datestr is None and line.startswith(str(current_year) + '-') or line.startswith(str(current_year - 1) + '-'):
                     datestr = line
+                elif line.startswith('cppcheck: '):
+                    if OLD_VERSION not in line:
+                        break  # Package results seem to be too old, skip
                 elif line.startswith('count:'):
                     if line.find('TO!') < 0:
                         break
@@ -443,16 +433,15 @@ def diffReport(resultsPath: str) -> str:
 
 
 def generate_package_diff_statistics(filename: str) -> None:
-    is_diff = False
+    in_diff = False
 
     sums = {}
 
     for line in open(filename, 'rt'):
         line = line.strip()
-        if line == 'diff:':
-            is_diff = True
-            continue
-        elif not is_diff:
+        if not in_diff:
+            if line == 'diff:':
+                in_diff = True
             continue
         if not line.endswith(']'):
             continue
@@ -583,16 +572,13 @@ def summaryReport(resultsPath: str, name: str, prefix: str, marker: str) -> str:
     today = strDateTime()[:10]
 
     for filename in sorted(glob.glob(resultsPath + '/*')):
-        if not os.path.isfile(filename) or filename.endswith('.diff'):
+        if filename.endswith('.diff') or not os.path.isfile(filename):
             continue
-        uploadedToday = False
-        firstLine = True
+        uploadedToday = None
         inResults = False
         for line in open(filename, 'rt'):
-            if firstLine:
-                if line.startswith(today):
-                    uploadedToday = True
-                firstLine = False
+            if uploadedToday is None:
+                uploadedToday = line.startswith(today)
                 continue
             line = line.strip()
             if line.startswith('cppcheck: '):
@@ -602,10 +588,9 @@ def summaryReport(resultsPath: str, name: str, prefix: str, marker: str) -> str:
                 else:
                     # Current package, parse on
                     continue
-            if line.startswith(marker):
-                inResults = True
-                continue
             if not inResults:
+                if line.startswith(marker):
+                    inResults = True
                 continue
             if line.startswith('diff:'):
                 break
@@ -654,7 +639,7 @@ def messageIdReport(resultPath: str, marker: str, messageId: str, query_params: 
     text = messageId + '\n'
     e = '[' + messageId + ']\n'
     for filename in sorted(glob.glob(resultPath + '/*')):
-        if not os.path.isfile(filename) or filename.endswith('.diff'):
+        if filename.endswith('.diff') or not os.path.isfile(filename):
             continue
         url = None
         inResults = False
@@ -666,7 +651,7 @@ def messageIdReport(resultPath: str, marker: str, messageId: str, query_params: 
                 else:
                     # Current package, parse on
                     continue
-            if line.startswith('ftp://'):
+            if url is None and line.startswith('ftp://'):
                 url = line
                 continue
             if not inResults:
@@ -700,7 +685,7 @@ def messageIdTodayReport(resultPath: str, messageId: str, marker: str) -> str:
     e = '[' + messageId + ']\n'
     today = strDateTime()[:10]
     for filename in sorted(glob.glob(resultPath + '/*')):
-        if not os.path.isfile(filename) or filename.endswith('.diff'):
+        if filename.endswith('.diff') or not os.path.isfile(filename):
             continue
         url = None
         inResults = False
@@ -760,12 +745,15 @@ def timeReport(resultPath: str, show_gt: bool, query_params: dict):
     total_time_base = 0.0
     total_time_head = 0.0
     for filename in glob.glob(resultPath + '/*'):
-        if not os.path.isfile(filename) or filename.endswith('.diff'):
+        if filename.endswith('.diff') or not os.path.isfile(filename):
             continue
         datestr = None
         package_url = None
         for line in open(filename, 'rt'):
             line = line.strip()
+            if datestr is None and line.startswith(str(current_year) + '-') or line.startswith(str(current_year - 1) + '-'):
+                datestr = line
+                continue
             if line.startswith('cppcheck: '):
                 if OLD_VERSION not in line:
                     # Package results seem to be too old, skip
@@ -773,11 +761,9 @@ def timeReport(resultPath: str, show_gt: bool, query_params: dict):
                 else:
                     # Current package, parse on
                     continue
-            if datestr is None and line.startswith(str(current_year) + '-') or line.startswith(str(current_year - 1) + '-'):
-                datestr = line
-                continue
-            elif pkgs is not None and package_url is None and line.startswith('ftp://'):
+            if pkgs is not None and package_url is None and line.startswith('ftp://'):
                 package_url = line
+                continue
             if not line.startswith('elapsed-time:'):
                 continue
             split_line = line.split()
@@ -862,11 +848,14 @@ def timeReportSlow(resultPath: str) -> str:
     data = {}
 
     for filename in glob.glob(resultPath + '/*'):
-        if not os.path.isfile(filename) or filename.endswith('.diff'):
+        if filename.endswith('.diff') or not os.path.isfile(filename):
             continue
         datestr = None
         for line in open(filename, 'rt'):
             line = line.strip()
+            if datestr is None and line.startswith(str(current_year) + '-') or line.startswith(str(current_year - 1) + '-'):
+                datestr = line
+                continue
             if line.startswith('cppcheck: '):
                 if OLD_VERSION not in line:
                     # Package results seem to be too old, skip
@@ -874,10 +863,7 @@ def timeReportSlow(resultPath: str) -> str:
                 else:
                     # Current package, parse on
                     continue
-            if datestr is None and line.startswith(str(current_year) + '-') or line.startswith(str(current_year - 1) + '-'):
-                datestr = line
-                continue
-            elif line.startswith('count:'):
+            if line.startswith('count:'):
                 count_head = line.split()[1]
                 if count_head == 'TO!':
                     # ignore results with timeouts
@@ -951,7 +937,7 @@ def check_library_report(result_path: str, message_id: str) -> str:
 
     function_counts = {}
     for filename in glob.glob(result_path + '/*'):
-        if not os.path.isfile(filename) or filename.endswith('.diff'):
+        if filename.endswith('.diff') or not os.path.isfile(filename):
             continue
         in_results = False
         for line in open(filename, 'rt'):
@@ -1015,7 +1001,7 @@ def check_library_function_name(result_path: str, function_name: str, query_para
         marker = INFO_MARKER
     output_lines_list = []
     for filename in glob.glob(result_path + '/*'):
-        if not os.path.isfile(filename) or filename.endswith('.diff'):
+        if filename.endswith('.diff') or not os.path.isfile(filename):
             continue
         in_results = False
         package_url = None
@@ -1028,10 +1014,10 @@ def check_library_function_name(result_path: str, function_name: str, query_para
                 else:
                     # Current package, parse on
                     continue
-            if line.startswith('ftp://'):
+            if package_url is None and line.startswith('ftp://'):
                 package_url = line
                 continue
-            if line.startswith('cppcheck-options:'):
+            if cppcheck_options is None and line.startswith('cppcheck-options:'):
                 cppcheck_options = line
                 continue
             if not in_results:
