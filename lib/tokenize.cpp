@@ -3470,6 +3470,7 @@ bool Tokenizer::simplifyTokens1(const std::string &configuration)
     if (!mSettings.buildDir.empty())
         Summaries::create(*this, configuration);
 
+#ifndef FUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION
     // TODO: apply this through Settings::ValueFlowOptions
     // TODO: do not run valueflow if no checks are being performed at all - e.g. unusedFunctions only
     const char* disableValueflowEnv = std::getenv("DISABLE_VALUEFLOW");
@@ -3482,6 +3483,7 @@ bool Tokenizer::simplifyTokens1(const std::string &configuration)
 
         arraySizeAfterValueFlow();
     }
+#endif
 
     // Warn about unhandled character literals
     if (mSettings.severity.isEnabled(Severity::portability)) {
@@ -3496,9 +3498,11 @@ bool Tokenizer::simplifyTokens1(const std::string &configuration)
         }
     }
 
+#ifndef FUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION
     if (doValueFlow) {
         mSymbolDatabase->setArrayDimensionsUsingValueFlow();
     }
+#endif
 
     printDebugOutput(1, std::cout);
 
