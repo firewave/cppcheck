@@ -1796,7 +1796,8 @@ std::shared_ptr<Token> createTokenFromExpression(const std::string& returnValue,
     for (Token* tok2 = tokenList->front(); tok2; tok2 = tok2->next()) {
         if (!startsWith(tok2->str(), "arg"))
             continue;
-        nonneg int const id = strToInt<nonneg int>(tok2->str().c_str() + 3);
+        nonneg
+        int const id = strToInt<nonneg int>(tok2->str().c_str() + 3);
         tok2->varId(id);
         if (lookupVarId)
             (*lookupVarId)[id] = tok2;
@@ -1807,4 +1808,22 @@ std::shared_ptr<Token> createTokenFromExpression(const std::string& returnValue,
     Token* expr = tokenList->front()->astOperand1();
     ValueFlow::valueFlowConstantFoldAST(expr, settings);
     return {tokenList, expr};
+}
+
+const std::string& Library::getCfgForHeader(const std::string& header) const
+{
+    // TODO: put into cfg files
+    static const std::map<std::string, std::set<std::string>> mappings =
+    {
+        {
+            "sdl",
+            { "SDL.h', 'SDL/SDL.h', 'SDL2/SDL.h" }
+        }
+    };
+    // TODO: optimize lookup
+    for (const auto& m : mappings) {
+        if (m.second.find(header) != m.second.end())
+            return m.first;
+    }
+    return emptyString;
 }

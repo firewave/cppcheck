@@ -416,6 +416,8 @@ public:
     static bool isContainerYield(const Token* const cond, Library::Container::Yield y, const std::string& fallback = emptyString);
     static Library::Container::Yield getContainerYield(const Token* const cond);
 
+    const std::string& getCfgForHeader(const std::string& header) const;
+
     bool isreflection(const std::string &token) const {
         return mReflection.find(token) != mReflection.end();
     }
