@@ -2013,3 +2013,21 @@ const Library::PlatformType *Library::platform_type(const std::string &name, con
     const auto it2 = utils::as_const(mData->mPlatformTypes).find(name);
     return (it2 != mData->mPlatformTypes.end()) ? &(it2->second) : nullptr;
 }
+
+const std::string& Library::getCfgForHeader(const std::string& header) const
+{
+    // TODO: put into cfg files
+    static const std::map<std::string, std::set<std::string>> mappings =
+    {
+        {
+            "sdl",
+            { "SDL.h', 'SDL/SDL.h', 'SDL2/SDL.h" }
+        }
+    };
+    // TODO: optimize lookup
+    for (const auto& m : mappings) {
+        if (m.second.find(header) != m.second.end())
+            return m.first;
+    }
+    return emptyString;
+}

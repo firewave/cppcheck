@@ -908,6 +908,25 @@ void Preprocessor::missingInclude(const std::string &filename, unsigned int line
     if (!mSettings.checks.isEnabled(Checks::missingInclude))
         return;
 
+    if (mSettings.daca) {
+        if (headerType == UserHeader)
+            return;
+
+        if (!mSettings.library.getCfgForHeader(header).empty())
+            return;
+
+        std::list<ErrorMessage::FileLocation> locationList;
+        if (!filename.empty()) {
+            locationList.emplace_back(filename, linenr, 0);
+        }
+        ErrorMessage errmsg(std::move(locationList), mFile0, Severity::debug,
+                            "No mapping found for missing include file: <" + header + "> not found.",
+                            "missingIncludeMapping",
+                            Certainty::normal);
+        mErrorLogger.reportErr(errmsg);
+        return;
+    }
+
     std::list<ErrorMessage::FileLocation> locationList;
     if (!filename.empty()) {
         locationList.emplace_back(filename, linenr, 0);

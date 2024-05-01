@@ -398,6 +398,8 @@ public:
     static bool isContainerYield(const Token* cond, Library::Container::Yield y, const std::string& fallback = emptyString);
     static Library::Container::Yield getContainerYield(const Token* cond);
 
+    const std::string& getCfgForHeader(const std::string& header) const;
+
     bool isreflection(const std::string &token) const;
 
     int reflectionArgument(const std::string &token) const;
