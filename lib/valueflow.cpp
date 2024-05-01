@@ -592,8 +592,8 @@ static ValueFlow::Value truncateImplicitConversion(Token* parent, const ValueFlo
     // If the sign is the same there is no truncation
     if (vt1->sign == vt2->sign)
         return value;
-    const size_t n1 = ValueFlow::getSizeOf(*vt1, settings);
-    const size_t n2 = ValueFlow::getSizeOf(*vt2, settings);
+    const size_t n1 = ValueFlow::getSizeOf(*vt1, settings, tokenlist, errorLogger);
+    const size_t n2 = ValueFlow::getSizeOf(*vt2, settings, tokenlist, errorLogger);
     ValueType::Sign sign = ValueType::Sign::UNSIGNED;
     if (n1 < n2)
         sign = vt2->sign;
@@ -619,11 +619,13 @@ static long long truncateIntValue(long long value, size_t value_size, const Valu
 static void setTokenValue(Token* tok,
                           ValueFlow::Value value,
                           const Settings& settings,
+                          const TokenList& tokenlist,
+                          ErrorLogger& errorLogger,
                           SourceLocation loc = SourceLocation::current())
 {
     // Skip setting values that are too big since its ambiguous
     if (!value.isImpossible() && value.isIntValue() && value.intvalue < 0 && astIsUnsigned(tok) &&
-        ValueFlow::getSizeOf(*tok->valueType(), settings) >= sizeof(MathLib::bigint))
+        ValueFlow::getSizeOf(*tok->valueType(), settings, tokenlist, errorLogger) >= sizeof(MathLib::bigint))
         return;
 
     if (!value.isImpossible() && value.isIntValue())
@@ -650,13 +652,13 @@ static void setTokenValue(Token* tok,
         if (!callParent || (!Token::Match(callParent->previous(), "%name%|> (") && !Token::simpleMatch(callParent, "{") &&
                             (!Token::Match(callParent, "( %name%") || settings.library.isNotLibraryFunction(callParent->next())) &&
                             !(callParent->str() == "(" && (Token::simpleMatch(callParent->astOperand1(), "*") || Token::Match(callParent->astOperand1(), "%name%|("))))) {
-            setTokenValue(parent, std::move(value), settings);
+            setTokenValue(parent, std::move(value), settings, tokenlist, errorLogger);
             return;
         }
     }
 
     if (Token::simpleMatch(parent, "=") && astIsRHS(tok)) {
-        setTokenValue(parent, value, settings);
+        setTokenValue(parent, value, settings, tokenlist, errorLogger);
         if (!value.isUninitValue())
             return;
     }
@@ -694,7 +696,7 @@ static void setTokenValue(Token* tok,
                     if (Token::simpleMatch(parent, "!=") && !result.intvalue)
                         continue;
 
-                    setTokenValue(parent, std::move(result), settings);
+                    setTokenValue(parent, std::move(result), settings, tokenlist, errorLogger);
                 }
             }
         }
@@ -703,7 +705,7 @@ static void setTokenValue(Token* tok,
         if (yields == Library::Container::Yield::SIZE) {
             ValueFlow::Value v(value);
             v.valueType = ValueFlow::Value::ValueType::INT;
-            setTokenValue(next, std::move(v), settings);
+            setTokenValue(next, std::move(v), settings, tokenlist, errorLogger);
         } else if (yields == Library::Container::Yield::EMPTY) {
             ValueFlow::Value v(value);
             v.valueType = ValueFlow::Value::ValueType::INT;
@@ -720,7 +722,7 @@ static void setTokenValue(Token* tok,
             } else {
                 v.intvalue = !v.intvalue;
             }
-            setTokenValue(next, std::move(v), settings);
+            setTokenValue(next, std::move(v), settings, tokenlist, errorLogger);
         }
         return;
     }
@@ -729,19 +731,19 @@ static void setTokenValue(Token* tok,
         if (!ValueFlow::isLifetimeBorrowed(parent, settings))
             return;
         if (value.lifetimeKind == ValueFlow::Value::LifetimeKind::Iterator && astIsIterator(parent)) {
-            setTokenValue(parent,std::move(value),settings);
+            setTokenValue(parent,std::move(value),settings, tokenlist, errorLogger);
         } else if (astIsPointer(tok) && astIsPointer(parent) && !parent->isUnaryOp("*") &&
                    (parent->isArithmeticalOp() || parent->isCast())) {
-            setTokenValue(parent,std::move(value),settings);
+            setTokenValue(parent,std::move(value),settings, tokenlist, errorLogger);
         }
         return;
     }
 
     if (value.isUninitValue()) {
         if (Token::Match(tok, ". %var%"))
-            setTokenValue(tok->next(), value, settings);
+            setTokenValue(tok->next(), value, settings, tokenlist, errorLogger);
         if (parent->isCast()) {
-            setTokenValue(parent, std::move(value), settings);
+            setTokenValue(parent, std::move(value), settings, tokenlist, errorLogger);
             return;
         }
         ValueFlow::Value pvalue = value;
@@ -753,18 +755,18 @@ static void setTokenValue(Token* tok,
         }
         if (parent->isUnaryOp("&")) {
             pvalue.indirect++;
-            setTokenValue(parent, std::move(pvalue), settings);
+            setTokenValue(parent, std::move(pvalue), settings, tokenlist, errorLogger);
         } else if (Token::Match(parent, ". %var%") && parent->astOperand1() == tok && parent->astOperand2()) {
             if (parent->originalName() == "->" && pvalue.indirect > 0)
                 pvalue.indirect--;
-            setTokenValue(parent->astOperand2(), std::move(pvalue), settings);
+            setTokenValue(parent->astOperand2(), std::move(pvalue), settings, tokenlist, errorLogger);
         } else if (Token::Match(parent->astParent(), ". %var%") && parent->astParent()->astOperand1() == parent) {
             if (parent->astParent()->originalName() == "->" && pvalue.indirect > 0)
                 pvalue.indirect--;
-            setTokenValue(parent->astParent()->astOperand2(), std::move(pvalue), settings);
+            setTokenValue(parent->astParent()->astOperand2(), std::move(pvalue), settings, tokenlist, errorLogger);
         } else if (parent->isUnaryOp("*") && pvalue.indirect > 0) {
             pvalue.indirect--;
-            setTokenValue(parent, std::move(pvalue), settings);
+            setTokenValue(parent, std::move(pvalue), settings, tokenlist, errorLogger);
         }
         return;
     }
@@ -777,13 +779,13 @@ static void setTokenValue(Token* tok,
         const ValueType &valueType = ValueType::parseDecl(castType, settings);
         if (value.isImpossible() && value.isIntValue() && value.intvalue < 0 && astIsUnsigned(tok) &&
             valueType.sign == ValueType::SIGNED && tok->valueType() &&
-            ValueFlow::getSizeOf(*tok->valueType(), settings) >= ValueFlow::getSizeOf(valueType, settings))
+            ValueFlow::getSizeOf(*tok->valueType(), settings, tokenlist, errorLogger) >= ValueFlow::getSizeOf(valueType, settings, tokenlist, errorLogger))
             return;
         setTokenValueCast(parent, valueType, value, settings);
     }
 
     else if (parent->str() == ":") {
-        setTokenValue(parent,std::move(value),settings);
+        setTokenValue(parent,std::move(value),settings, tokenlist, errorLogger);
     }
 
     else if (parent->str() == "?" && tok->str() == ":" && tok == parent->astOperand2() && parent->astOperand1()) {
@@ -792,14 +794,14 @@ static void setTokenValue(Token* tok,
             const ValueFlow::Value &condvalue = parent->astOperand1()->values().front();
             const bool cond(condvalue.isTokValue() || (condvalue.isIntValue() && condvalue.intvalue != 0));
             if (cond && !tok->astOperand1()) { // true condition, no second operator
-                setTokenValue(parent, condvalue, settings);
+                setTokenValue(parent, condvalue, settings, tokenlist, errorLogger);
             } else {
                 const Token *op = cond ? tok->astOperand1() : tok->astOperand2();
                 if (!op) // #7769 segmentation fault at setTokenValue()
                     return;
                 const std::list<ValueFlow::Value> &values = op->values();
                 if (std::find(values.cbegin(), values.cend(), value) != values.cend())
-                    setTokenValue(parent, std::move(value), settings);
+                    setTokenValue(parent, std::move(value), settings, tokenlist, errorLogger);
             }
         } else if (!value.isImpossible()) {
             // is condition only depending on 1 variable?
@@ -823,7 +825,7 @@ static void setTokenValue(Token* tok,
             v.conditional = true;
             v.changeKnownToPossible();
 
-            setTokenValue(parent, std::move(v), settings);
+            setTokenValue(parent, std::move(v), settings, tokenlist, errorLogger);
         }
     }
 
@@ -834,7 +836,7 @@ static void setTokenValue(Token* tok,
                 : parent->astOperand2()->astOperand1()->values());
 
         for (const ValueFlow::Value &v : values)
-            setTokenValue(parent, v, settings);
+            setTokenValue(parent, v, settings, tokenlist, errorLogger);
     }
 
     // Calculations..
@@ -1159,19 +1161,24 @@ static size_t bitCeil(size_t x)
     return x + 1;
 }
 
-static size_t getAlignOf(const ValueType& vt, const Settings& settings, int maxRecursion = 0)
+static size_t getAlignOf(const ValueType& vt, const Settings& settings, const TokenList& tokenlist, ErrorLogger& errorLogger, int maxRecursion = 0)
 {
     if (maxRecursion == settings.vfOptions.maxAlignOfRecursion) {
-        // TODO: add bailout message
+        if (settings.debugwarnings) {
+            // TODO: log at function-level?
+            ErrorMessage::FileLocation loc(tokenlist.getSourceFilePath(), 0, 0);
+            const ErrorMessage errmsg({std::move(loc)}, tokenlist.getSourceFilePath(), Severity::debug, "Limiting analysis because maximum alignof recursion exceeded.", "valueFlowBailoutMaxAlignOfRecursion", Certainty::normal);
+            errorLogger.reportErr(errmsg);
+        }
         return 0;
     }
     if (vt.pointer || vt.reference != Reference::None || vt.isPrimitive()) {
-        auto align = ValueFlow::getSizeOf(vt, settings);
+        auto align = ValueFlow::getSizeOf(vt, settings, tokenlist, errorLogger);
         return align == 0 ? 0 : bitCeil(align);
     }
     if (vt.type == ValueType::Type::RECORD && vt.typeScope) {
         auto accHelper = [&](size_t max, const ValueType& vt2, size_t /*dim*/) {
-            size_t a = getAlignOf(vt2, settings, ++maxRecursion);
+            size_t a = getAlignOf(vt2, settings, tokenlist, errorLogger, ++maxRecursion);
             return std::max(max, a);
         };
         size_t total = 0;
@@ -1193,13 +1200,18 @@ static nonneg int getSizeOfType(const Token *typeTok, const Settings &settings)
 {
     const ValueType &valueType = ValueType::parseDecl(typeTok, settings);
 
-    return ValueFlow::getSizeOf(valueType, settings);
+    return ValueFlow::getSizeOf(valueType, settings, tokenlist, errorLogger);
 }
 
-size_t ValueFlow::getSizeOf(const ValueType &vt, const Settings &settings, int maxRecursion)
+size_t ValueFlow::getSizeOf(const ValueType &vt, const Settings &settings, const TokenList& tokenlist, ErrorLogger& errorLogger, int maxRecursion)
 {
     if (maxRecursion == settings.vfOptions.maxSizeOfRecursion) {
-        // TODO: add bailout message
+        if (settings.debugwarnings) {
+            // TODO: log at function-level?
+            ErrorMessage::FileLocation loc(tokenlist.getSourceFilePath(), 0, 0);
+            const ErrorMessage errmsg({std::move(loc)}, tokenlist.getSourceFilePath(), Severity::debug, "Limiting analysis because maximum sizeof recursion exceeded.", "valueFlowBailoutMaxSizeOfRecursion", Certainty::normal);
+            errorLogger.reportErr(errmsg);
+        }
         return 0;
     }
     if (vt.pointer || vt.reference != Reference::None)
@@ -1226,8 +1238,8 @@ size_t ValueFlow::getSizeOf(const ValueType &vt, const Settings &settings, int m
         return 3 * settings.platform.sizeof_pointer; // Just guess
     if (vt.type == ValueType::Type::RECORD && vt.typeScope) {
         auto accHelper = [&](size_t total, const ValueType& vt2, size_t dim) -> size_t {
-            size_t n = ValueFlow::getSizeOf(vt2, settings, ++maxRecursion);
-            size_t a = getAlignOf(vt2, settings);
+            size_t n = ValueFlow::getSizeOf(vt2, settings, tokenlist, errorLogger, ++maxRecursion);
+            size_t a = getAlignOf(vt2, settings, tokenlist, errorLogger);
             if (n == 0 || a == 0)
                 return 0;
             n *= dim;
@@ -1244,7 +1256,7 @@ size_t ValueFlow::getSizeOf(const ValueType &vt, const Settings &settings, int m
         }
         if (total == 0)
             return 0;
-        size_t align = getAlignOf(vt, settings);
+        size_t align = getAlignOf(vt, settings, tokenlist, errorLogger);
         if (align == 0)
             return 0;
         total += (align - (total % align)) % align;
@@ -1263,7 +1275,7 @@ static Token * valueFlowSetConstantValue(Token *tok, const Settings &settings)
         try {
             MathLib::bigint signedValue = MathLib::toBigNumber(tok->str());
             const ValueType* vt = tok->valueType();
-            if (vt && vt->sign == ValueType::UNSIGNED && signedValue < 0 && ValueFlow::getSizeOf(*vt, settings) < sizeof(MathLib::bigint)) {
+            if (vt && vt->sign == ValueType::UNSIGNED && signedValue < 0 && ValueFlow::getSizeOf(*vt, settings, tokenlist, errorLogger) < sizeof(MathLib::bigint)) {
                 MathLib::bigint minValue{}, maxValue{};
                 if (getMinMaxValues(tok->valueType(), settings.platform, minValue, maxValue))
                     signedValue += maxValue + 1;
@@ -1297,7 +1309,7 @@ static Token * valueFlowSetConstantValue(Token *tok, const Settings &settings)
             (tok->next()->astOperand2()->valueType()->pointer == 0 || // <- TODO this is a bailout, abort when there are array->pointer conversions
              (tok->next()->astOperand2()->variable() && !tok->next()->astOperand2()->variable()->isArray())) &&
             !tok->next()->astOperand2()->valueType()->isEnum()) { // <- TODO this is a bailout, handle enum with non-int types
-            const size_t sz = ValueFlow::getSizeOf(*tok->next()->astOperand2()->valueType(), settings);
+            const size_t sz = ValueFlow::getSizeOf(*tok->next()->astOperand2()->valueType(), settings, tokenlist, errorLogger);
             if (sz) {
                 ValueFlow::Value value(sz);
                 value.setKnown();
@@ -1316,7 +1328,7 @@ static Token * valueFlowSetConstantValue(Token *tok, const Settings &settings)
         }
         if (Token::simpleMatch(tok, "sizeof ( *")) {
             const ValueType *vt = tok->tokAt(2)->valueType();
-            const size_t sz = vt ? ValueFlow::getSizeOf(*vt, settings) : 0;
+            const size_t sz = vt ? ValueFlow::getSizeOf(*vt, settings, tokenlist, errorLogger) : 0;
             if (sz > 0) {
                 ValueFlow::Value value(sz);
                 if (!tok2->isTemplateArg() && settings.platform.type != Platform::Type::Unspecified)
@@ -1377,7 +1389,7 @@ static Token * valueFlowSetConstantValue(Token *tok, const Settings &settings)
                     if (var->type()->classScope && var->type()->classScope->enumType)
                         size = getSizeOfType(var->type()->classScope->enumType, settings);
                 } else if (var->valueType()) {
-                    size = ValueFlow::getSizeOf(*var->valueType(), settings);
+                    size = ValueFlow::getSizeOf(*var->valueType(), settings, tokenlist, errorLogger);
                 } else if (!var->type()) {
                     size = getSizeOfType(var->typeStartToken(), settings);
                 }
@@ -1426,7 +1438,7 @@ static Token * valueFlowSetConstantValue(Token *tok, const Settings &settings)
             }
         } else if (!tok2->type()) {
             const ValueType& vt = ValueType::parseDecl(tok2, settings);
-            size_t sz = ValueFlow::getSizeOf(vt, settings);
+            size_t sz = ValueFlow::getSizeOf(vt, settings, tokenlist, errorLogger);
             const Token* brac = tok2->astParent();
             while (Token::simpleMatch(brac, "[")) {
                 const Token* num = brac->astOperand2();
@@ -2836,7 +2848,7 @@ struct ValueFlowAnalyzer : Analyzer {
             /* Truncate value */
             const ValueType *dst = tok->valueType();
             if (dst) {
-                const size_t sz = ValueFlow::getSizeOf(*dst, settings);
+                const size_t sz = ValueFlow::getSizeOf(*dst, settings, tokenlist, errorLogger);
                 if (sz > 0 && sz < 8)
                     value->intvalue = truncateIntValue(value->intvalue, sz, dst->sign);
 
@@ -5501,8 +5513,8 @@ static bool isTruncated(const ValueType* src, const ValueType* dst, const Settin
     if (src->smartPointer && dst->smartPointer)
         return false;
     if ((src->isIntegral() && dst->isIntegral()) || (src->isFloat() && dst->isFloat())) {
-        const size_t srcSize = ValueFlow::getSizeOf(*src, settings);
-        const size_t dstSize = ValueFlow::getSizeOf(*dst, settings);
+        const size_t srcSize = ValueFlow::getSizeOf(*src, settings, tokenlist, errorLogger);
+        const size_t dstSize = ValueFlow::getSizeOf(*dst, settings, tokenlist, errorLogger);
         if (srcSize > dstSize)
             return true;
         if (srcSize == dstSize && src->sign != dst->sign)
@@ -6024,10 +6036,10 @@ static std::list<ValueFlow::Value> truncateValues(std::list<ValueFlow::Value> va
     if (!dst || !dst->isIntegral())
         return values;
 
-    const size_t sz = ValueFlow::getSizeOf(*dst, settings);
+    const size_t sz = ValueFlow::getSizeOf(*dst, settings, tokenlist, errorLogger);
 
     if (src) {
-        const size_t osz = ValueFlow::getSizeOf(*src, settings);
+        const size_t osz = ValueFlow::getSizeOf(*src, settings, tokenlist, errorLogger);
         if (osz >= sz && dst->sign == ValueType::Sign::SIGNED && src->sign == ValueType::Sign::UNSIGNED) {
             values.remove_if([&](const ValueFlow::Value& value) {
                 if (!value.isIntValue())
@@ -7155,7 +7167,9 @@ static bool valueFlowForLoop2(const Token *tok,
                               ProgramMemory *memory1,
                               ProgramMemory *memory2,
                               ProgramMemory *memoryAfter,
-                              const Settings& settings)
+                              const Settings& settings,
+                              const TokenList& tokenlist,
+                              ErrorLogger& errorLogger)
 {
     // for ( firstExpression ; secondExpression ; thirdExpression )
     const Token *firstExpression  = tok->next()->astOperand2()->astOperand1();
@@ -7195,7 +7209,12 @@ static bool valueFlowForLoop2(const Token *tok,
         if (!error)
             execute(secondExpression, programMemory, &result, &error, settings);
     }
-    // TODO: add bailout message
+    if (maxcount == 0 && settings.debugwarnings) {
+        // TODO: log at function-level?
+        ErrorMessage::FileLocation loc(tokenlist.getSourceFilePath(), 0, 0);
+        const ErrorMessage errmsg({std::move(loc)}, tokenlist.getSourceFilePath(), Severity::debug, "Limiting analysis of for loop.", "valueFlowBailoutMaxForLoop", Certainty::normal);
+        errorLogger.reportErr(errmsg);
+    }
 
     if (memory1)
         memory1->swap(startMemory);
@@ -7382,7 +7401,7 @@ static void valueFlowForLoop(TokenList &tokenlist, const SymbolDatabase& symbold
             valueFlowForLoopSimplifyAfter(tok, varid, afterValue, tokenlist, errorLogger, settings);
         } else {
             ProgramMemory mem1, mem2, memAfter;
-            if (valueFlowForLoop2(tok, &mem1, &mem2, &memAfter, settings)) {
+            if (valueFlowForLoop2(tok, &mem1, &mem2, &memAfter, settings, tokenlist, errorLogger)) {
                 for (const auto& p : mem1) {
                     if (!p.second.isIntValue())
                         continue;
@@ -9497,7 +9516,12 @@ struct ValueFlowPassRunner {
     {
         auto start = Clock::now();
         if (start > stop) {
-            // TODO: add bailout message
+            if (state.settings.debugwarnings) {
+                // TODO: log at function-level?
+                ErrorMessage::FileLocation loc(state.tokenlist.getSourceFilePath(), 0, 0);
+                const ErrorMessage errmsg({std::move(loc)}, state.tokenlist.getSourceFilePath(), Severity::debug, "Limiting analyzing because maximum time exceeded.", "valueFlowBailoutMaxTime", Certainty::normal);
+                state.errorLogger.reportErr(errmsg);
+            }
             return true;
         }
         if (!state.tokenlist.isCPP() && pass->cpp())
@@ -9547,7 +9571,7 @@ struct ValueFlowPassRunner {
                                                   Severity::information,
                                                   "Limiting ValueFlow analysis in function '" + functionName + "' since it is too complex. "
                                                   "Please specify --check-level=exhaustive to perform full analysis.",
-                                                  "checkLevelNormal",
+                                                  "checkLevelNormal", // TOOD: use more specific ID
                                                   Certainty::normal);
                         state.errorLogger.reportErr(errmsg);
                     }
