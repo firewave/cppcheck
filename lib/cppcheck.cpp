@@ -1004,10 +1004,14 @@ unsigned int CppCheck::checkFile(const std::string& filename, const std::string 
         mAnalyzerInformation.close();
     }
 
+    // TODO: this is done too early causing the whole program analysis suppressions to be reported as unmatched
     if (mSettings.severity.isEnabled(Severity::information) || mSettings.checkConfiguration) {
-        // TODO: check result?
-        // defer reporting of unusedFunction to later
-        SuppressionList::reportUnmatchedSuppressions(mSettings.supprs.nomsg.getUnmatchedInlineSuppressions(SuppressionList::UnusedFunction::Exclude), *this);
+        if (mSettings.inlineSuppressions)
+        {
+            // TODO: check result?
+            // defer reporting of unusedFunction to later
+            SuppressionList::reportUnmatchedSuppressions(mSettings.supprs.nomsg.getUnmatchedInlineSuppressions(SuppressionList::UnusedFunction::Exclude), *this);
+        }
 
         // In jointSuppressionReport mode, unmatched suppressions are
         // collected after all files are processed
