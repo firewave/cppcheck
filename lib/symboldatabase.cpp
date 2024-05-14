@@ -7611,10 +7611,16 @@ void SymbolDatabase::setValueTypeInTokenList(bool reportDebugWarnings, Token *to
                             vt.smartPointerType = vt.typeScope->definedType;
                             vt.typeScope = nullptr;
                         }
-                        if (e == "std::make_shared" && mSettings.library.smartPointers().count("std::shared_ptr") > 0)
-                            vt.smartPointer = &mSettings.library.smartPointers().at("std::shared_ptr");
-                        if (e == "std::make_unique" && mSettings.library.smartPointers().count("std::unique_ptr") > 0)
-                            vt.smartPointer = &mSettings.library.smartPointers().at("std::unique_ptr");
+                        if (e == "std::make_shared") {
+                            const auto it = mSettings.library.smartPointers().find("std::shared_ptr");
+                            if (it != mSettings.library.smartPointers().cend())
+                                vt.smartPointer = &it->second;
+                        }
+                        else if (e == "std::make_unique") {
+                            const auto it = mSettings.library.smartPointers().find("std::make_unique");
+                            if (it != mSettings.library.smartPointers().cend())
+                                vt.smartPointer = &it->second;
+                        }
                         vt.type = ValueType::Type::SMART_POINTER;
                         vt.smartPointerTypeToken = tok->astOperand1()->tokAt(3);
                         setValueType(tok, vt);
