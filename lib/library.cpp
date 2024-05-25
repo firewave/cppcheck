@@ -1207,6 +1207,8 @@ const std::unordered_map<std::string, Library::Container>& Library::containers()
 
 const Library::Container* Library::detectContainerInternal(const Token* const typeStart, DetectContainer detect, bool* isIterator, bool withoutStd) const
 {
+    const bool typeIsStd = Token::Match(typeStart, "std ::");
+
     const Token* firstLinkedTok = nullptr;
     for (const Token* tok = typeStart; tok && !tok->varId(); tok = tok->next()) {
         if (!tok->link())
@@ -1221,7 +1223,11 @@ const Library::Container* Library::detectContainerInternal(const Token* const ty
         if (container.startPattern.empty())
             continue;
 
-        const int offset = (withoutStd && startsWith(container.startPattern2, "std :: ")) ? 7 : 0;
+        const bool conIsStd = startsWith(container.startPattern2, "std :: ");
+        if (!withoutStd && (typeIsStd != conIsStd))
+            continue;
+        // TODO: do not match "std ::" again
+        const int offset = (withoutStd && conIsStd) ? 7 : 0;
 
         // If endPattern is undefined, it will always match, but itEndPattern has to be defined.
         if (detect != IteratorOnly && container.endPattern.empty()) {
