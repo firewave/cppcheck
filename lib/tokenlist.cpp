@@ -1449,6 +1449,10 @@ const Token* isLambdaCaptureList(const Token * tok)
     // `-(  <<-- optional
     //   `-{
     // see compilePrecedence2
+    if (!tok)
+        return nullptr;
+    if (!tok->isCpp())
+        return nullptr;
     if (!Token::simpleMatch(tok, "["))
         return nullptr;
     if (!Token::Match(tok->link(), "] (|{"))
@@ -1464,6 +1468,10 @@ const Token* isLambdaCaptureList(const Token * tok)
 }
 
 const Token* findLambdaEndTokenWithoutAST(const Token* tok) {
+    if (!tok)
+        return nullptr;
+    if (!tok->isCpp())
+        return nullptr;
     if (!(Token::simpleMatch(tok, "[") && tok->link()))
         return nullptr;
     tok = tok->link()->next();

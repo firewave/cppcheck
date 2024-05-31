@@ -1976,6 +1976,8 @@ const Library::Container * getLibraryContainer(const Token * tok)
 {
     if (!tok)
         return nullptr;
+    if (!tok->isCpp())
+        return nullptr;
     // TODO: Support dereferencing iterators
     // TODO: Support dereferencing with ->
     if (tok->isUnaryOp("*") && astIsPointer(tok->astOperand1())) {

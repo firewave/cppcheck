@@ -1073,6 +1073,8 @@ static bool isSameToken(const Token* tok1, const Token* tok2)
 
 static void valueFlowImpossibleValues(TokenList& tokenList, const Settings& settings)
 {
+    const bool cpp = tokenList.isCPP();
+
     for (Token* tok = tokenList.front(); tok; tok = tok->next()) {
         if (tok->hasKnownIntValue())
             continue;
@@ -1150,7 +1152,7 @@ static void valueFlowImpossibleValues(TokenList& tokenList, const Settings& sett
             value.bound = ValueFlow::Value::Bound::Upper;
             value.setImpossible();
             setTokenValue(tok->next(), std::move(value), settings);
-        } else if (Token::Match(tok, ". data|c_str (") && astIsContainerOwned(tok->astOperand1())) {
+        } else if (cpp && Token::Match(tok, ". data|c_str (") && astIsContainerOwned(tok->astOperand1())) {
             const Library::Container* container = getLibraryContainer(tok->astOperand1());
             if (!container)
                 continue;
@@ -1161,11 +1163,11 @@ static void valueFlowImpossibleValues(TokenList& tokenList, const Settings& sett
             ValueFlow::Value value{0};
             value.setImpossible();
             setTokenValue(tok->tokAt(2), std::move(value), settings);
-        } else if (Token::Match(tok, "make_shared|make_unique <") && Token::simpleMatch(tok->linkAt(1), "> (")) {
+        } else if (cpp && Token::Match(tok, "make_shared|make_unique <") && Token::simpleMatch(tok->linkAt(1), "> (")) {
             ValueFlow::Value value{0};
             value.setImpossible();
             setTokenValue(tok->linkAt(1)->next(), std::move(value), settings);
-        } else if ((tokenList.isCPP() && Token::simpleMatch(tok, "this")) || tok->isUnaryOp("&")) {
+        } else if ((cpp && Token::simpleMatch(tok, "this")) || tok->isUnaryOp("&")) {
             ValueFlow::Value value{0};
             value.setImpossible();
             setTokenValue(tok, std::move(value), settings);

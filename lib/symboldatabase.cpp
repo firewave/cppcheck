@@ -1405,7 +1405,7 @@ void SymbolDatabase::createSymbolDatabaseSetVariablePointers()
                         setMemberVar(membervar, membertok, tok->function()->retDef);
                     }
                 }
-            } else if (mSettings.library.detectSmartPointer(tok->function()->retDef)) {
+            } else if (tok->isCpp() && mSettings.library.detectSmartPointer(tok->function()->retDef)) {
                 if (const Token* templateArg = Token::findsimplematch(tok->function()->retDef, "<")) {
                     if (const Type* spType = findTypeInNested(templateArg->next(), tok->scope())) {
                         if (spType->classScope) {

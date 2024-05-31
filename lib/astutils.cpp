@@ -291,7 +291,7 @@ bool astIsContainerString(const Token* tok)
 static std::pair<const Token*, const Library::Container*> getContainerFunction(const Token* tok, const Library& library)
 {
     const Library::Container* cont{};
-    if (!tok || !tok->valueType() || (!tok->valueType()->container && (!(cont = library.detectContainerOrIterator(tok->valueType()->smartPointerTypeToken)))))
+    if (!tok || !tok->isCpp() || !tok->valueType() || (!tok->valueType()->container && (!(cont = library.detectContainerOrIterator(tok->valueType()->smartPointerTypeToken)))))
         return {};
     const Token* parent = tok->astParent();
     if (Token::Match(parent, ". %name% [(<]") && astIsLHS(tok)) {
@@ -789,7 +789,7 @@ std::vector<ValueType> getParentValueTypes(const Token* tok, const Settings& set
             }
         }
     }
-    if (Token::Match(tok->astParent()->tokAt(-2), ". push_back|push_front|insert|push (") &&
+    if (tok->isCpp() && Token::Match(tok->astParent()->tokAt(-2), ". push_back|push_front|insert|push (") &&
         astIsContainer(tok->astParent()->tokAt(-2)->astOperand1())) {
         const Token* contTok = tok->astParent()->tokAt(-2)->astOperand1();
         const ValueType* vtCont = contTok->valueType();
