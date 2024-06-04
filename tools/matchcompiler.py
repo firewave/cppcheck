@@ -676,6 +676,33 @@ class MatchCompiler:
         line = line.replace('MatchCompiler::makeConstStringEnd', '")')
         return line
 
+    def _replaceStrAt(self, line):
+        while True:
+            match = re.search('strAt\\(-?\\d+\\)', line)
+            if not match:
+                break
+
+            if self._isInString(line, match.start()):
+                break
+
+            idx = int(match[0].split('(')[1].split(')')[0])
+            chain = ''
+            if idx > 0:
+                for i in range(idx):
+                    chain += 'next()->'
+            else:
+                for i in range(-idx):
+                    chain += 'previous()->'
+            chain += 'str()'
+
+            line_new = line[:match.start()]
+            line_new += chain
+            line_new += line[match.end():]
+
+            line = line_new
+
+        return line
+
     def convertFile(self, srcname, destname, line_directive):
         self._reset()
 
@@ -702,6 +729,9 @@ class MatchCompiler:
 
             # Cache plain C-strings in C++ strings
             line = self._replaceCStrings(line)
+
+            #
+            line = self._replaceStrAt(line)
 
             if not modified and not line_orig == line:
                 modified = True
