@@ -18,10 +18,16 @@ ifeq ($(MATCHCOMPILER),yes)
     ifeq ($(PYTHON_INTERPRETER),)
         $(error Did not find a Python interpreter)
     endif
+    ifdef VERBOSE
+        $(info found Python interpreter $(PYTHON_INTERPRETER))
+    endif
     ifdef VERIFY
         matchcompiler_S := $(shell $(PYTHON_INTERPRETER) ../tools/matchcompiler.py --read-dir ../lib --verify)
     else
         matchcompiler_S := $(shell $(PYTHON_INTERPRETER) ../tools/matchcompiler.py --read-dir ../lib)
+    endif
+    ifdef VERBOSE
+        $(info $(matchcompiler_S))
     endif
     libcppdir:=build
 else ifeq ($(MATCHCOMPILER),)
