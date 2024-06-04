@@ -678,7 +678,7 @@ class MatchCompiler:
 
     def _replaceStrAt(self, line):
         while True:
-            match = re.search('strAt\\(-?\\d+\\)', line)
+            match = re.search('linkAt\\(-?\\d+\\)', line)
             if not match:
                 break
 
@@ -693,7 +693,7 @@ class MatchCompiler:
             else:
                 for i in range(-idx):
                     chain += 'previous()->'
-            chain += 'str()'
+            chain += 'link()'
 
             line_new = line[:match.start()]
             line_new += chain
