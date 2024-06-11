@@ -99,7 +99,7 @@ namespace ValueFlow
 
     bool getMinMaxValues(const std::string &typestr, const Settings &settings, bool cpp, MathLib::bigint &minvalue, MathLib::bigint &maxvalue)
     {
-        TokenList typeTokens(&settings);
+        TokenList typeTokens(settings);
         std::istringstream istr(typestr+";");
         if (!typeTokens.createTokens(istr, cpp ? Standards::Language::CPP : Standards::Language::C))
             return false;
