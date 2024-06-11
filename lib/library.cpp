@@ -951,7 +951,8 @@ bool Library::isIntArgValid(const Token *ftok, int argnr, const MathLib::bigint 
         return true;
     if (ac->valid.find('.') != std::string::npos)
         return isFloatArgValid(ftok, argnr, argvalue);
-    TokenList tokenList(nullptr);
+    const Settings settings;
+    TokenList tokenList(settings); // TODO
     gettokenlistfromvalid(ac->valid, ftok->isCpp(), tokenList);
     for (const Token *tok = tokenList.front(); tok; tok = tok->next()) {
         if (tok->isNumber() && argvalue == MathLib::toBigNumber(tok->str()))
@@ -971,7 +972,8 @@ bool Library::isFloatArgValid(const Token *ftok, int argnr, double argvalue) con
     const ArgumentChecks *ac = getarg(ftok, argnr);
     if (!ac || ac->valid.empty())
         return true;
-    TokenList tokenList(nullptr);
+    const Settings settings;
+    TokenList tokenList(settings); // TODO
     gettokenlistfromvalid(ac->valid, ftok->isCpp(), tokenList);
     for (const Token *tok = tokenList.front(); tok; tok = tok->next()) {
         if (Token::Match(tok, "%num% : %num%") && argvalue >= MathLib::toDoubleNumber(tok->str()) && argvalue <= MathLib::toDoubleNumber(tok->strAt(2)))
@@ -1806,7 +1808,7 @@ std::shared_ptr<Token> createTokenFromExpression(const std::string& returnValue,
                                                  bool cpp,
                                                  std::unordered_map<nonneg int, const Token*>* lookupVarId)
 {
-    std::shared_ptr<TokenList> tokenList = std::make_shared<TokenList>(&settings);
+    std::shared_ptr<TokenList> tokenList = std::make_shared<TokenList>(settings);
     {
         const std::string code = "return " + returnValue + ";";
         std::istringstream istr(code);

@@ -2925,7 +2925,8 @@ static bool isNotEqual(std::pair<const Token*, const Token*> x, std::pair<const 
 }
 static bool isNotEqual(std::pair<const Token*, const Token*> x, const std::string& y, bool cpp)
 {
-    TokenList tokenList(nullptr);
+    const Settings settings;
+    TokenList tokenList(settings); // TODO
     std::istringstream istr(y);
     tokenList.createTokens(istr, cpp ? Standards::Language::CPP : Standards::Language::C); // TODO: check result?
     return isNotEqual(x, std::make_pair(tokenList.front(), tokenList.back()));
@@ -8263,7 +8264,7 @@ static void valueFlowDynamicBufferSize(const TokenList& tokenlist, const SymbolD
 
 static bool getMinMaxValues(const std::string &typestr, const Settings &settings, bool cpp, MathLib::bigint &minvalue, MathLib::bigint &maxvalue)
 {
-    TokenList typeTokens(&settings);
+    TokenList typeTokens(settings);
     std::istringstream istr(typestr+";");
     if (!typeTokens.createTokens(istr, cpp ? Standards::Language::CPP : Standards::Language::C))
         return false;

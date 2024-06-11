@@ -123,7 +123,7 @@ public:
 
 private:
     const Settings settings;
-    TokenList list{&settings};
+    TokenList list{settings};
 };
 
 
