@@ -53,7 +53,7 @@ const Settings SimpleTokenizer::s_settings;
 // TODO: better path-only usage
 ScopedFile::ScopedFile(std::string name, const std::string &content, std::string path)
     : mName(std::move(name))
-    , mPath(Path::toNativeSeparators(std::move(path)))
+    , mPath(std::move(path))
     , mFullPath(Path::join(mPath, mName))
 {
     if (!mPath.empty() && mPath != Path::getCurrentPath()) {
