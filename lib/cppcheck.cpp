@@ -102,9 +102,8 @@ namespace {
     };
 }
 
-static std::string cmdFileName(std::string f)
+static std::string cmdFileName(const std::string& f)
 {
-    f = Path::toNativeSeparators(std::move(f));
     if (f.find(' ') != std::string::npos)
         return "\"" + f + "\"";
     return f;
@@ -388,12 +387,11 @@ static bool reportClangErrors(std::istream &is, const std::function<void(const E
         const std::string colnr = line.substr(pos2+1, pos3-pos2-1);
         const std::string msg = line.substr(line.find(':', pos3+1) + 2);
 
-        const std::string locFile = Path::toNativeSeparators(filename);
         const int line_i = strToInt<int>(linenr);
         const int column = strToInt<unsigned int>(colnr);
-        ErrorMessage::FileLocation loc(locFile, line_i, column);
+        ErrorMessage::FileLocation loc(filename, line_i, column);
         ErrorMessage errmsg({std::move(loc)},
-                            locFile,
+                            filename,
                             Severity::error,
                             msg,
                             "syntaxError",
@@ -612,8 +610,7 @@ unsigned int CppCheck::checkFile(const std::string& filename, const std::string 
     const Timer fileTotalTimer(mSettings.showtime == SHOWTIME_MODES::SHOWTIME_FILE_TOTAL, filename);
 
     if (!mSettings.quiet) {
-        std::string fixedpath = Path::toNativeSeparators(filename);
-        mErrorLogger.reportOut(std::string("Checking ") + fixedpath + ' ' + cfgname + std::string("..."), Color::FgGreen);
+        mErrorLogger.reportOut("Checking " + Path::toNativeSeparators(filename) + ' ' + cfgname + std::string("..."), Color::FgGreen);
 
         if (mSettings.verbose) {
             mErrorLogger.reportOut("Defines:" + mSettings.userDefines);
@@ -791,7 +788,7 @@ unsigned int CppCheck::checkFile(const std::string& filename, const std::string 
 
         if (!mSettings.force && configurations.size() > mSettings.maxConfigs) {
             if (mSettings.severity.isEnabled(Severity::information)) {
-                tooManyConfigsError(Path::toNativeSeparators(filename),configurations.size());
+                tooManyConfigsError(filename,configurations.size());
             } else {
                 mTooManyConfigs = true;
             }
@@ -866,8 +863,7 @@ unsigned int CppCheck::checkFile(const std::string& filename, const std::string 
 
                 // If only errors are printed, print filename after the check
                 if (!mSettings.quiet && (!mCurrentConfig.empty() || checkCount > 1)) {
-                    std::string fixedpath = Path::toNativeSeparators(filename);
-                    mErrorLogger.reportOut("Checking " + fixedpath + ": " + mCurrentConfig + "...", Color::FgGreen);
+                    mErrorLogger.reportOut("Checking " + Path::toNativeSeparators(filename) + ": " + mCurrentConfig + "...", Color::FgGreen);
                 }
 
                 if (!tokenizer.tokens())
@@ -954,10 +950,9 @@ unsigned int CppCheck::checkFile(const std::string& filename, const std::string 
             for (const std::string &s : configurationError)
                 msg += '\n' + s;
 
-            const std::string locFile = Path::toNativeSeparators(filename);
-            ErrorMessage::FileLocation loc(locFile, 0, 0);
+            ErrorMessage::FileLocation loc(filename, 0, 0);
             ErrorMessage errmsg({std::move(loc)},
-                                locFile,
+                                filename,
                                 Severity::information,
                                 msg,
                                 "noValidConfiguration",
@@ -1728,7 +1723,6 @@ void CppCheck::analyseClangTidy(const FileSettings &fileSettings)
         std::string fixedpath = Path::simplifyPath(line.substr(0, endNamePos));
         const auto lineNumber = strToInt<int64_t>(lineNumString);
         const auto column = strToInt<int64_t>(columnNumString);
-        fixedpath = Path::toNativeSeparators(std::move(fixedpath));
 
         ErrorMessage errmsg;
         errmsg.callStack.emplace_back(fixedpath, lineNumber, column);

@@ -247,7 +247,7 @@ std::string FileLister::addFiles(std::list<FileWithDetails> &files, const std::s
     if (path.empty())
         return "no path specified";
 
-    std::string corrected_path = path;
+    std::string corrected_path = Path::fromNativeSeparators(path);
     if (endsWith(corrected_path, '/'))
         corrected_path.erase(corrected_path.end() - 1);
 

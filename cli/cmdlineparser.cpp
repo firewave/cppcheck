@@ -168,14 +168,13 @@ bool CmdLineParser::fillSettingsFromArgs(int argc, const char* const argv[])
         for (std::list<std::string>::iterator iter = mSettings.includePaths.begin();
              iter != mSettings.includePaths.end();
              ) {
-            const std::string path(Path::toNativeSeparators(*iter));
-            if (Path::isDirectory(path))
+            if (Path::isDirectory(*iter))
                 ++iter;
             else {
                 // TODO: this bypasses the template format and other settings
                 // If the include path is not found, warn user and remove the non-existing path from the list.
                 if (mSettings.severity.isEnabled(Severity::information))
-                    std::cout << "(information) Couldn't find path given by -I '" << path << '\'' << std::endl;
+                    std::cout << "(information) Couldn't find path given by -I '" << Path::toNativeSeparators(*iter) << '\'' << std::endl;
                 iter = mSettings.includePaths.erase(iter);
             }
         }
@@ -245,7 +244,7 @@ bool CmdLineParser::fillSettingsFromArgs(int argc, const char* const argv[])
         // TODO: verbose log which files were ignored?
         const PathMatch matcher(ignored, caseSensitive);
         for (const std::string &pathname : pathnamesRef) {
-            const std::string err = FileLister::recursiveAddFiles(filesResolved, Path::toNativeSeparators(pathname), mSettings.library.markupExtensions(), matcher);
+            const std::string err = FileLister::recursiveAddFiles(filesResolved, pathname, mSettings.library.markupExtensions(), matcher);
             if (!err.empty()) {
                 // TODO: bail out?
                 mLogger.printMessage(err);
@@ -937,10 +936,9 @@ CmdLineParser::Result CmdLineParser::parseFromArgs(int argc, const char* const a
                 if (mSettings.plistOutput.empty())
                     mSettings.plistOutput = ".";
 
-                const std::string plistOutput = Path::toNativeSeparators(mSettings.plistOutput);
-                if (!Path::isDirectory(plistOutput)) {
+                if (!Path::isDirectory(mSettings.plistOutput)) {
                     std::string message("plist folder does not exist: '");
-                    message += plistOutput;
+                    message += Path::toNativeSeparators(mSettings.plistOutput);
                     message += "'.";
                     mLogger.printError(message);
                     return Result::Fail;
