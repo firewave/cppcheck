@@ -1254,14 +1254,16 @@ static void pruneConditions(std::vector<const Token*>& conds,
 
 namespace {
     struct Executor {
-        ProgramMemory* pm = nullptr;
-        const Settings* settings = nullptr;
-        int fdepth = 4;
-        int depth = 10;
+        ProgramMemory* pm;
+        const Settings* settings;
+        int fdepth;
+        int depth;
 
         Executor(ProgramMemory* pm, const Settings* settings) : pm(pm), settings(settings)
         {
             assert(settings != nullptr);
+            fdepth = settings->vfOptions.maxPmFDepth;
+            depth = settings->vfOptions.maxPmDepth;
         }
 
         static ValueFlow::Value unknown() {
@@ -1574,6 +1576,7 @@ namespace {
                         return execute(tok);
                     });
                     if (f) {
+                        // TODO: add bailout message
                         if (fdepth >= 0 && !f->isImplicitlyVirtual()) {
                             ProgramMemory functionState;
                             for (std::size_t i = 0; i < args.size(); ++i) {
@@ -1662,6 +1665,7 @@ namespace {
             OnExit onExit{[&] {
                     depth++;
                 }};
+            // TODO: add bailout message
             if (depth < 0)
                 return unknown();
             ValueFlow::Value v = unknown();

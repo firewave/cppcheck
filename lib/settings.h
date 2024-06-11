@@ -420,6 +420,12 @@ public:
 
         /** @brief Maximum expression varid depth */
         int maxExprVarIdDepth = 4;
+
+        /** @brief Maximum ProgramMemory execution depth */
+        int maxPmDepth = 10;
+
+        /** @brief Maximum ProgramMemory execution f depth */
+        int maxPmFDepth = 4;
     };
 
     /** @brief The ValueFlow options */
