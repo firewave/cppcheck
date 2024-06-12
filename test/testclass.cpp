@@ -9088,7 +9088,8 @@ private:
             Tokenizer tokenizer(settingsDefault, *this);
             std::istringstream istr(c);
             const std::string filename = std::to_string(fileInfo.size()) + ".cpp";
-            ASSERT(tokenizer.list.createTokens(istr, filename));
+            FileWithDetails file(filename, Standards::Language::CPP, c.size());
+            ASSERT(tokenizer.list.createTokens(istr, file));
             ASSERT(tokenizer.simplifyTokens1(""));
             fileInfo.push_back(check.getFileInfo(tokenizer, settingsDefault));
         }

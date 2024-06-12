@@ -366,9 +366,8 @@ static void createDumpFile(const Settings& settings,
         std::ofstream fout(getCtuInfoFileName(dumpFile));
     }
 
-    // TODO: enforcedLang should be already applied in FileWithDetails object
     std::string language;
-    switch (settings.enforcedLang) {
+    switch (file.lang()) {
     case Standards::Language::C:
         language = " language=\"c\"";
         break;
@@ -376,16 +375,8 @@ static void createDumpFile(const Settings& settings,
         language = " language=\"cpp\"";
         break;
     case Standards::Language::None:
-    {
-        // TODO: get language from FileWithDetails object
         // TODO: error out on unknown language?
-        const Standards::Language lang = Path::identify(file.spath(), settings.cppHeaderProbe);
-        if (lang == Standards::Language::CPP)
-            language = " language=\"cpp\"";
-        else if (lang == Standards::Language::C)
-            language = " language=\"c\"";
         break;
-    }
     }
 
     fdump << "<?xml version=\"1.0\"?>\n";
@@ -717,7 +708,7 @@ unsigned int CppCheck::checkClang(const FileWithDetails &file)
 
     try {
         Tokenizer tokenizer(mSettings, mErrorLogger);
-        tokenizer.list.appendFileIfNew(file.spath());
+        tokenizer.list.appendFileIfNew(file);
         std::istringstream ast(output2);
         clangimport::parseClangAstDump(tokenizer, ast);
         ValueFlow::setValues(tokenizer.list,
@@ -898,7 +889,7 @@ unsigned int CppCheck::checkFile(const FileWithDetails& file, const std::string 
                 // this is not a real source file - we just want to tokenize it. treat it as C anyways as the language needs to be determined.
                 Tokenizer tokenizer(mSettings, mErrorLogger);
                 // enforce the language since markup files are special and do not adhere to the enforced language
-                tokenizer.list.setLang(Standards::Language::C, true);
+                tokenizer.list.setLang(file.lang(), true);
                 if (fileStream) {
                     std::vector<std::string> files{file.spath()};
                     simplecpp::TokenList tokens(*fileStream, files);
@@ -1043,7 +1034,7 @@ unsigned int CppCheck::checkFile(const FileWithDetails& file, const std::string 
             TokenList tokenlist(&mSettings);
             std::istringstream istr2(code);
             // TODO: asserts when file has unknown extension
-            tokenlist.createTokens(istr2, Path::identify(*files.begin(), false)); // TODO: check result?
+            tokenlist.createTokens(istr2, file.lang()); // TODO: check result?
             executeRules("define", tokenlist);
         }
 #endif

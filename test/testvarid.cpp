@@ -286,7 +286,8 @@ private:
     std::string tokenizeHeader_(const char* file, int line, const char (&code)[size], const char filename[]) {
         Tokenizer tokenizer(settings, *this);
         std::istringstream istr(code);
-        ASSERT_LOC(tokenizer.list.createTokens(istr, filename), file, line);
+        FileWithDetails f(filename, Standards::Language::None, size-1); // TODO
+        ASSERT_LOC(tokenizer.list.createTokens(istr, f), file, line);
         ASSERT_EQUALS(true, tokenizer.simplifyTokens1(""));
 
         // result..
