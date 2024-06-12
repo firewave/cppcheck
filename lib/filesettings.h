@@ -22,6 +22,7 @@
 #include "config.h"
 #include "path.h"
 #include "platform.h"
+#include "standards.h"
 
 #include <list>
 #include <set>
@@ -37,8 +38,13 @@ public:
     {}
 
     FileWithDetails(std::string path, std::size_t size)
+        : FileWithDetails(std::move(path), Standards::Language::None, size)
+    {}
+
+    FileWithDetails(std::string path, Standards::Language lang, std::size_t size)
         : mPath(std::move(path))
         , mPathSimplified(Path::simplifyPath(mPath))
+        , mLang(lang)
         , mSize(size)
     {
         if (mPath.empty())
@@ -59,9 +65,20 @@ public:
     {
         return mSize;
     }
+
+    void setLang(Standards::Language lang)
+    {
+        mLang = lang;
+    }
+
+    Standards::Language lang() const
+    {
+        return mLang;
+    }
 private:
     std::string mPath;
     std::string mPathSimplified;
+    Standards::Language mLang = Standards::Language::None;
     std::size_t mSize;
 };
 
