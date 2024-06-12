@@ -217,6 +217,25 @@ bool CmdLineParser::fillSettingsFromArgs(int argc, const char* const argv[])
 
         mFileSettings.clear();
 
+        if (mSettings.enforcedLang != Standards::Language::None)
+        {
+            // apply enforced language
+            for (auto& fs : fileSettings)
+            {
+                if (mSettings.library.markupFile(fs.filename()))
+                    continue;
+                fs.file.setLang(mSettings.enforcedLang);
+            }
+        }
+        else
+        {
+            // identify files
+            for (auto& fs : fileSettings)
+            {
+                fs.file.setLang(Path::identify(fs.filename(), mSettings.cppHeaderProbe));
+            }
+        }
+
         // sort the markup last
         std::copy_if(fileSettings.cbegin(), fileSettings.cend(), std::back_inserter(mFileSettings), [&](const FileSettings &fs) {
             return !mSettings.library.markupFile(fs.filename()) || !mSettings.library.processMarkupAfterCode(fs.filename());
@@ -285,6 +304,27 @@ bool CmdLineParser::fillSettingsFromArgs(int argc, const char* const argv[])
         }
         else {
             files = std::move(filesResolved);
+        }
+
+        if (mSettings.enforcedLang != Standards::Language::None)
+        {
+            // apply enforced language
+            for (auto& f : files)
+            {
+                if (mSettings.library.markupFile(f.path()))
+                    continue;
+                f.setLang(mSettings.enforcedLang);
+            }
+        }
+        else
+        {
+            // identify remaining files
+            for (auto& f : files)
+            {
+                if (f.lang() != Standards::Language::None)
+                    continue;
+                f.setLang(Path::identify(f.path(), mSettings.cppHeaderProbe));
+            }
         }
 
         // sort the markup last

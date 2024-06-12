@@ -171,9 +171,8 @@ static void createDumpFile(const Settings& settings,
         std::ofstream fout(getCtuInfoFileName(dumpFile));
     }
 
-    // TODO: enforcedLang should be already applied in FileWithDetails object
     std::string language;
-    switch (settings.enforcedLang) {
+    switch (file.lang()) {
     case Standards::Language::C:
         language = " language=\"c\"";
         break;
@@ -181,16 +180,8 @@ static void createDumpFile(const Settings& settings,
         language = " language=\"cpp\"";
         break;
     case Standards::Language::None:
-    {
-        // TODO: get language from FileWithDetails object
         // TODO: error out on unknown language?
-        const Standards::Language lang = Path::identify(file.spath(), settings.cppHeaderProbe);
-        if (lang == Standards::Language::CPP)
-            language = " language=\"cpp\"";
-        else if (lang == Standards::Language::C)
-            language = " language=\"c\"";
         break;
-    }
     }
 
     fdump << "<?xml version=\"1.0\"?>\n";
@@ -421,9 +412,7 @@ unsigned int CppCheck::checkClang(const FileWithDetails &file)
     if (!mSettings.quiet)
         mErrorLogger.reportOut(std::string("Checking ") + file.spath() + " ...", Color::FgGreen);
 
-    // TODO: get language from FileWithDetails object
-    // TODO: this ignores the configured language
-    const bool isCpp = Path::identify(file.spath(), mSettings.cppHeaderProbe) == Standards::Language::CPP;
+    const bool isCpp = (file.lang() == Standards::Language::CPP);
     const std::string langOpt = isCpp ? "-x c++" : "-x c";
     const std::string analyzerInfo = mSettings.buildDir.empty() ? std::string() : AnalyzerInformation::getAnalyzerInfoFile(mSettings.buildDir, file.spath(), emptyString);
     const std::string clangcmd = analyzerInfo + ".clang-cmd";
@@ -787,7 +776,7 @@ unsigned int CppCheck::checkFile(const FileWithDetails& file, const std::string 
             TokenList tokenlist(&mSettings);
             std::istringstream istr2(code);
             // TODO: asserts when file has unknown extension
-            tokenlist.createTokens(istr2, Path::identify(*files.begin(), false)); // TODO: check result?
+            tokenlist.createTokens(istr2, file.lang()); // TODO: check result?
             executeRules("define", tokenlist);
         }
 #endif

@@ -229,12 +229,13 @@ static std::string addFiles2(std::list<FileWithDetails> &files,
                 }
             }
         } else {
-            if (Path::acceptFile(new_path, extra) && !ignored.match(new_path)) {
+            Standards::Language lang = Standards::Language::None;
+            if (Path::acceptFile(new_path, extra, &lang) && !ignored.match(new_path)) {
                 if (stat(new_path.c_str(), &file_stat) == -1) {
                     const int err = errno;
                     return "could not stat file '" + new_path + "' (errno: " + std::to_string(err) + ")";
                 }
-                files.emplace_back(new_path, file_stat.st_size);
+                files.emplace_back(new_path, lang, file_stat.st_size);
             }
         }
     }
