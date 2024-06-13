@@ -295,11 +295,11 @@ bool CmdLineParser::fillSettingsFromArgs(int argc, const char* const argv[])
 
         // sort the markup last
         std::copy_if(files.cbegin(), files.cend(), std::inserter(mFiles, mFiles.end()), [&](const FileWithDetails& entry) {
-            return !mSettings.library.markupFile(entry.path()) || !mSettings.library.processMarkupAfterCode(entry.path());
+            return !mSettings.library.markupFile(entry.spath()) || !mSettings.library.processMarkupAfterCode(entry.spath());
         });
 
         std::copy_if(files.cbegin(), files.cend(), std::inserter(mFiles, mFiles.end()), [&](const FileWithDetails& entry) {
-            return mSettings.library.markupFile(entry.path()) && mSettings.library.processMarkupAfterCode(entry.path());
+            return mSettings.library.markupFile(entry.spath()) && mSettings.library.processMarkupAfterCode(entry.spath());
         });
 
         if (mFiles.empty()) {
