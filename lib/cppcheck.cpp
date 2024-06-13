@@ -133,7 +133,7 @@ static std::vector<std::string> split(const std::string &str, const std::string 
     return ret;
 }
 
-static std::string getDumpFileName(const Settings& settings, const std::string& filename)
+static std::string getDumpFileName(const Settings& settings, const FileWithDetails& file)
 {
     if (!settings.dumpFile.empty())
         return settings.dumpFile;
@@ -145,8 +145,8 @@ static std::string getDumpFileName(const Settings& settings, const std::string& 
         extension = "." + std::to_string(settings.pid) + ".dump";
 
     if (!settings.dump && !settings.buildDir.empty())
-        return AnalyzerInformation::getAnalyzerInfoFile(settings.buildDir, filename, emptyString) + extension;
-    return filename + extension;
+        return AnalyzerInformation::getAnalyzerInfoFile(settings.buildDir, file.spath(), emptyString) + extension;
+    return file.spath() + extension;
 }
 
 static std::string getCtuInfoFileName(const std::string &dumpFile)
@@ -161,7 +161,7 @@ static void createDumpFile(const Settings& settings,
 {
     if (!settings.dump && settings.addons.empty())
         return;
-    dumpFile = getDumpFileName(settings, file.spath());
+    dumpFile = getDumpFileName(settings, file);
 
     fdump.open(dumpFile);
     if (!fdump.is_open())
@@ -1470,7 +1470,7 @@ void CppCheck::executeAddonsWholeProgram(const std::list<FileWithDetails> &files
 
     std::vector<std::string> ctuInfoFiles;
     for (const auto &f: files) {
-        const std::string &dumpFileName = getDumpFileName(mSettings, f.path());
+        const std::string &dumpFileName = getDumpFileName(mSettings, f);
         ctuInfoFiles.push_back(getCtuInfoFileName(dumpFileName));
     }
 
@@ -1851,12 +1851,12 @@ void CppCheck::removeCtuInfoFiles(const std::list<FileWithDetails> &files, const
 {
     if (mSettings.buildDir.empty()) {
         for (const auto& f: files) {
-            const std::string &dumpFileName = getDumpFileName(mSettings, f.path());
+            const std::string &dumpFileName = getDumpFileName(mSettings, f);
             const std::string &ctuInfoFileName = getCtuInfoFileName(dumpFileName);
             std::remove(ctuInfoFileName.c_str());
         }
         for (const auto& fs: fileSettings) {
-            const std::string &dumpFileName = getDumpFileName(mSettings, fs.filename());
+            const std::string &dumpFileName = getDumpFileName(mSettings, fs.file);
             const std::string &ctuInfoFileName = getCtuInfoFileName(dumpFileName);
             std::remove(ctuInfoFileName.c_str());
         }
