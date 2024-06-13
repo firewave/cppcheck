@@ -367,8 +367,8 @@ unsigned int ProcessExecutor::check()
                 pipeFile[pipes[0]] = iFileSettings->filename() + ' ' + iFileSettings->cfg;
                 ++iFileSettings;
             } else {
-                childFile[pid] = iFile->path();
-                pipeFile[pipes[0]] = iFile->path();
+                childFile[pid] = iFile->spath();
+                pipeFile[pipes[0]] = iFile->spath();
                 ++iFile;
             }
         }
@@ -397,7 +397,7 @@ unsigned int ProcessExecutor::check()
                             if (p != pipeFile.cend()) {
                                 pipeFile.erase(p);
                                 const auto fs = std::find_if(mFiles.cbegin(), mFiles.cend(), [&name](const FileWithDetails& entry) {
-                                    return entry.path() == name;
+                                    return entry.spath() == name;
                                 });
                                 if (fs != mFiles.end()) {
                                     size = fs->size();
