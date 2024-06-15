@@ -921,7 +921,7 @@ CmdLineParser::Result CmdLineParser::parseFromArgs(int argc, const char* const a
 
                 std::string errstr;
                 const std::vector<std::string> paths = {argv[0]};
-                if (!mSettings.platform.set(platform, errstr, paths)) {
+                if (!mSettings.platform.set(platform, errstr, paths, mSettings.debuglookup)) {
                     mLogger.printError(errstr);
                     return Result::Fail;
                 }
@@ -1015,7 +1015,7 @@ CmdLineParser::Result CmdLineParser::parseFromArgs(int argc, const char* const a
                     if (!platform.empty()) {
                         std::string errstr;
                         const std::vector<std::string> paths = {projectFile, argv[0]};
-                        if (!mSettings.platform.set(platform, errstr, paths)) {
+                        if (!mSettings.platform.set(platform, errstr, paths, mSettings.debuglookup)) {
                             mLogger.printError(errstr);
                             return Result::Fail;
                         }
