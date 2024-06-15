@@ -236,8 +236,7 @@ SuppressionList::Suppression SuppressionList::parseLine(const std::string &line)
                 suppression.fileName.find('.', pos) == std::string::npos) {
                 // Try to parse out the line number
                 try {
-                    std::istringstream istr1(suppression.fileName.substr(pos+1));
-                    istr1 >> suppression.lineNumber;
+                    suppression.lineNumber = strToInt<int>(suppression.fileName.substr(pos+1));
                 } catch (...) {
                     suppression.lineNumber = SuppressionList::Suppression::NO_LINE;
                 }
