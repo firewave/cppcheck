@@ -1774,7 +1774,7 @@ ValueFlow::Value evaluateLibraryFunction(const std::unordered_map<nonneg int, Va
         std::shared_ptr<Token> expr = createTokenFromExpression(returnValue, settings, cpp, &lookupVarId);
 
         functions[returnValue] =
-            [lookupVarId, expr, settings](const std::unordered_map<nonneg int, ValueFlow::Value>& xargs) {
+            [lookupVarId, expr, &settings](const std::unordered_map<nonneg int, ValueFlow::Value>& xargs) {
             if (!expr)
                 return ValueFlow::Value::unknown();
             ProgramMemory pm{};
