@@ -760,7 +760,7 @@ std::vector<ValueType> getParentValueTypes(const Token* tok, const Settings& set
             }
         }
     }
-    if (Token::Match(tok->astParent()->tokAt(-2), ". push_back|push_front|insert|push (") &&
+    if (tok->isCpp() && Token::Match(tok->astParent()->tokAt(-2), ". push_back|push_front|insert|push (") &&
         astIsContainer(tok->astParent()->tokAt(-2)->astOperand1())) {
         const Token* contTok = tok->astParent()->tokAt(-2)->astOperand1();
         const ValueType* vtCont = contTok->valueType();
