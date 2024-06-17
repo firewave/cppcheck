@@ -376,7 +376,7 @@ static void write_ossfuzz_makefile(std::vector<std::string> libfiles_prio, std::
     fout << "\tmkdir -p corpus\n";
     fout << "\t./oss-fuzz-client -only_ascii=1 -timeout=5 -detect_leaks=0 corpus samples ../test/cli/fuzz-crash ../test/cli/fuzz-crash_c ../test/cli/fuzz-timeout\n";
     fout << '\n';
-    fout << "dedup-corpus: oss-fuzz-client preprare-samples\n";
+    fout << "dedup-corpus: preprare-samples\n";
     fout << "\tmv corpus corpus_\n";
     fout << "\tmkdir -p corpus\n";
     fout << "\t./oss-fuzz-client -only_ascii=1 -timeout=5 -detect_leaks=0 corpus corpus_ samples ../test/cli/fuzz-crash ../test/cli/fuzz-crash_c ../test/cli/fuzz-timeout -merge=1\n";
