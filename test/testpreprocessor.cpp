@@ -50,11 +50,11 @@ public:
     TestPreprocessor() : TestFixture("TestPreprocessor") {}
 
 private:
-    std::string expandMacros(const char code[], ErrorLogger &errorLogger) const {
-        std::istringstream istr(code);
+    template<size_t size>
+    std::string expandMacros(const char (&code)[size], ErrorLogger &errorLogger) {
         simplecpp::OutputList outputList;
         std::vector<std::string> files;
-        const simplecpp::TokenList tokens1 = simplecpp::TokenList(istr, files, "file.cpp", &outputList);
+        const simplecpp::TokenList tokens1 = simplecpp::TokenList(code, size-1, files, "file.cpp", &outputList);
         Preprocessor p(settingsDefault, errorLogger, Path::identify(tokens1.getFiles()[0], false));
         simplecpp::TokenList tokens2 = p.preprocess(tokens1, "", files, true);
         p.reportOutput(outputList, true);
@@ -301,16 +301,16 @@ private:
         TEST_CASE(standard);
     }
 
-    std::string getConfigsStr(const char filedata[], const char *arg = nullptr) {
+    template<size_t size>
+    std::string getConfigsStr(const char (&code)[size], const char *arg = nullptr) {
         Settings settings;
         if (arg && std::strncmp(arg,"-D",2)==0)
             settings.userDefines = arg + 2;
         if (arg && std::strncmp(arg,"-U",2)==0)
             settings.userUndefs.insert(arg+2);
         std::vector<std::string> files;
-        std::istringstream istr(filedata);
         // TODO: this adds an empty filename
-        simplecpp::TokenList tokens(istr,files);
+        simplecpp::TokenList tokens(code,size-1,files);
         tokens.removeComments();
         Preprocessor preprocessor(settings, *this, Standards::Language::C); // TODO: do we need to consider #file?
         const std::set<std::string> configs = preprocessor.getConfigs(tokens);
@@ -320,11 +320,11 @@ private:
         return ret;
     }
 
-    std::size_t getHash(const char filedata[]) {
+    template<size_t size>
+    std::size_t getHash(const char (&code)[size]) {
         std::vector<std::string> files;
-        std::istringstream istr(filedata);
         // TODO: this adds an empty filename
-        simplecpp::TokenList tokens(istr,files);
+        simplecpp::TokenList tokens(code,size-1,files);
         tokens.removeComments();
         Preprocessor preprocessor(settingsDefault, *this, Standards::Language::C); // TODO: do we need to consider #file?
         return preprocessor.calculateHash(tokens, "");
@@ -478,9 +478,8 @@ private:
                                 "#else\n"
                                 "2\n"
                                 "#endif\n";
-        std::istringstream istr(filedata);
         std::vector<std::string> files;
-        simplecpp::TokenList tokens(istr, files, "test.c");
+        simplecpp::TokenList tokens(filedata, sizeof(filedata), files, "test.c");
 
         // preprocess code with unix32 platform..
         {
@@ -803,37 +802,37 @@ private:
     }
 
     void if_macro_eq_macro() {
-        const char *code = "#define A B\n"
-                           "#define B 1\n"
-                           "#define C 1\n"
-                           "#if A == C\n"
-                           "Wilma\n"
-                           "#else\n"
-                           "Betty\n"
-                           "#endif\n";
+        const char code[] = "#define A B\n"
+                            "#define B 1\n"
+                            "#define C 1\n"
+                            "#if A == C\n"
+                            "Wilma\n"
+                            "#else\n"
+                            "Betty\n"
+                            "#endif\n";
         ASSERT_EQUALS("\n", getConfigsStr(code));
     }
 
     void ticket_3675() {
-        const char* code = "#ifdef YYSTACKSIZE\n"
-                           "#define YYMAXDEPTH YYSTACKSIZE\n"
-                           "#else\n"
-                           "#define YYSTACKSIZE YYMAXDEPTH\n"
-                           "#endif\n"
-                           "#if YYDEBUG\n"
-                           "#endif\n";
+        const char code[] = "#ifdef YYSTACKSIZE\n"
+                            "#define YYMAXDEPTH YYSTACKSIZE\n"
+                            "#else\n"
+                            "#define YYSTACKSIZE YYMAXDEPTH\n"
+                            "#endif\n"
+                            "#if YYDEBUG\n"
+                            "#endif\n";
         (void)PreprocessorHelper::getcode(settings0, *this, code);
 
         // There's nothing to assert. It just needs to not hang.
     }
 
     void ticket_3699() {
-        const char* code = "#define INLINE __forceinline\n"
-                           "#define inline __forceinline\n"
-                           "#define __forceinline inline\n"
-                           "#if !defined(_WIN32)\n"
-                           "#endif\n"
-                           "INLINE inline __forceinline\n";
+        const char code[] = "#define INLINE __forceinline\n"
+                            "#define inline __forceinline\n"
+                            "#define __forceinline inline\n"
+                            "#if !defined(_WIN32)\n"
+                            "#endif\n"
+                            "INLINE inline __forceinline\n";
         const std::map<std::string, std::string> actual = PreprocessorHelper::getcode(settings0, *this, code);
 
         // First, it must not hang. Second, inline must becomes inline, and __forceinline must become __forceinline.
@@ -841,9 +840,9 @@ private:
     }
 
     void ticket_4922() { // #4922
-        const char* code = "__asm__ \n"
-                           "{ int extern __value) 0; (double return (\"\" } extern\n"
-                           "__typeof __finite (__finite) __finite __inline \"__GI___finite\");";
+        const char code[] = "__asm__ \n"
+                            "{ int extern __value) 0; (double return (\"\" } extern\n"
+                            "__typeof __finite (__finite) __finite __inline \"__GI___finite\");";
         (void)PreprocessorHelper::getcode(settings0, *this, code);
     }
 
@@ -2286,12 +2285,12 @@ private:
     }
 
     void if_sizeof() { // #4071
-        static const char* code = "#if sizeof(unsigned short) == 2\n"
-                                  "Fred & Wilma\n"
-                                  "#elif sizeof(unsigned short) == 4\n"
-                                  "Fred & Wilma\n"
-                                  "#else\n"
-                                  "#endif";
+        const char code[] = "#if sizeof(unsigned short) == 2\n"
+                            "Fred & Wilma\n"
+                            "#elif sizeof(unsigned short) == 4\n"
+                            "Fred & Wilma\n"
+                            "#else\n"
+                            "#endif";
 
         const std::map<std::string, std::string> actual = PreprocessorHelper::getcode(settings0, *this, code);
         ASSERT_EQUALS("\nFred & Wilma", actual.at(""));
