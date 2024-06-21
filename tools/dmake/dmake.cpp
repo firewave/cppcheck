@@ -358,6 +358,7 @@ static void write_ossfuzz_makefile(std::vector<std::string> libfiles_prio, std::
     fout << "EXTOBJ =      " << objfiles(extfiles) << "\n";
     fout << '\n';
     fout << "oss-fuzz-client: $(EXTOBJ) $(LIBOBJ) main.o\n";
+    // TODO: bail out when LIB_FUZZING_ENGINE is not set
     fout << "\t${CXX} $(CPPFLAGS) ${CXXFLAGS} -o $@ $^ ${LIB_FUZZING_ENGINE}\n";
     fout << '\n';
     fout << "no-fuzz: $(EXTOBJ) $(LIBOBJ) main_nofuzz.o\n";
