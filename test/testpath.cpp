@@ -133,7 +133,9 @@ private:
 #ifdef _WIN32
         ASSERT_EQUALS(true, Path::isAbsolute("C:\\foo\\bar"));
         ASSERT_EQUALS(true, Path::isAbsolute("C:/foo/bar"));
-        ASSERT_EQUALS(true, Path::isAbsolute("\\\\foo\\bar"));
+        ASSERT_EQUALS(true, Path::isAbsolute("\\\\host\\foo\\bar"));
+        ASSERT_EQUALS(true, Path::isAbsolute("//host/foo/bar"));
+
         ASSERT_EQUALS(false, Path::isAbsolute("foo\\bar"));
         ASSERT_EQUALS(false, Path::isAbsolute("foo/bar"));
         ASSERT_EQUALS(false, Path::isAbsolute("foo.cpp"));
@@ -141,11 +143,23 @@ private:
         ASSERT_EQUALS(false, Path::isAbsolute("C:foo\\bar.cpp"));
         ASSERT_EQUALS(false, Path::isAbsolute("bar.cpp"));
         TODO_ASSERT_EQUALS(true, false, Path::isAbsolute("\\"));
+        ASSERT_EQUALS(false, Path::isAbsolute("0:\\foo\\bar"));
+        ASSERT_EQUALS(false, Path::isAbsolute("0:/foo/bar"));
+        ASSERT_EQUALS(false, Path::isAbsolute("\\foo\\bar"));
+        ASSERT_EQUALS(false, Path::isAbsolute("\\\\"));
+        ASSERT_EQUALS(false, Path::isAbsolute("//"));
+        ASSERT_EQUALS(false, Path::isAbsolute("/foo/bar"));
+        ASSERT_EQUALS(false, Path::isAbsolute("/"));
 #else
         ASSERT_EQUALS(true, Path::isAbsolute("/foo/bar"));
         ASSERT_EQUALS(true, Path::isAbsolute("/"));
+        ASSERT_EQUALS(true, Path::isAbsolute("//host/foo/bar"));
+
         ASSERT_EQUALS(false, Path::isAbsolute("foo/bar"));
         ASSERT_EQUALS(false, Path::isAbsolute("foo.cpp"));
+        ASSERT_EQUALS(false, Path::isAbsolute("C:\\foo\\bar"));
+        ASSERT_EQUALS(false, Path::isAbsolute("C:/foo/bar"));
+        ASSERT_EQUALS(false, Path::isAbsolute("\\\\foo\\bar"));
 #endif
     }
 

@@ -175,6 +175,8 @@ std::string Path::getCurrentExecutablePath(const char* fallback)
 
 bool Path::isAbsolute(const std::string& path)
 {
+    return simplecpp::isAbsolutePath(path);
+
 #ifdef _WIN32
     if (path.length() < 2)
         return false;

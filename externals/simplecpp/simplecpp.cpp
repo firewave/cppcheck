@@ -2432,6 +2432,26 @@ static bool isAbsolutePath(const std::string &path)
 #endif
 
 namespace simplecpp {
+
+    bool isAbsolutePath(const std::string &path)
+    {
+#ifdef SIMPLECPP_WINDOWS
+        // C:\\path\\file
+        // C:/path/file
+        if (path.length() >= 3 && std::isalpha(path[0]) && path[1] == ':' && (path[2] == '\\' || path[2] == '/'))
+            return true;
+
+        // \\host\path\file
+        // //host/path/file
+        if (path.length >= 2 && (path[0] == '\\' || path[0] == '/') && (path[1] == '\\' || path[1] == '/'))
+            return true;
+
+        return false;
+#else
+        return path.length() > 1U && path[0] == '/';
+#endif
+    }
+
     /**
      * perform path simplifications for . and ..
      */
@@ -2990,7 +3010,7 @@ static std::string openHeaderDirect(std::ifstream &f, const std::string &path)
 
 static std::string openHeader(std::ifstream &f, const simplecpp::DUI &dui, const std::string &sourcefile, const std::string &header, bool systemheader)
 {
-    if (isAbsolutePath(header))
+    if (simplecpp::isAbsolutePath(header))
         return openHeaderDirect(f, simplecpp::simplifyPath(header));
 
     // prefer first to search the header relatively to source file if found, when not a system header
