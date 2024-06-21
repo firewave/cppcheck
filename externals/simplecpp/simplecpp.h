@@ -368,6 +368,9 @@ namespace simplecpp {
 
     /** Returns the __cplusplus value for a given standard */
     SIMPLECPP_LIB std::string getCppStdString(const std::string &std);
+
+    /** Checks if given path is absolute */
+    SIMPLECPP_LIB bool isAbsolutePath(const std::string &path);
 }
 
 #if defined(_MSC_VER)

@@ -2474,23 +2474,31 @@ static std::string realFilename(const std::string &f)
     realFilePathMap.addToCache(f, ret);
     return ret;
 }
-
-static bool isAbsolutePath(const std::string &path)
-{
-    if (path.length() >= 3 && path[0] > 0 && std::isalpha(path[0]) && path[1] == ':' && (path[2] == '\\' || path[2] == '/'))
-        return true;
-    return path.length() > 1U && (path[0] == '/' || path[0] == '\\');
-}
 #else
-#define realFilename(f)  f
-
-static bool isAbsolutePath(const std::string &path)
-{
-    return path.length() > 1U && path[0] == '/';
-}
+    #define realFilename(f)  f
 #endif
 
 namespace simplecpp {
+
+    bool isAbsolutePath(const std::string &path)
+    {
+#ifdef SIMPLECPP_WINDOWS
+        // C:\\path\\file
+        // C:/path/file
+        if (path.length() >= 3 && std::isalpha(path[0]) && path[1] == ':' && (path[2] == '\\' || path[2] == '/'))
+            return true;
+
+        // \\host\path\file
+        // //host/path/file
+        if (path.length >= 2 && (path[0] == '\\' || path[0] == '/') && (path[1] == '\\' || path[1] == '/'))
+            return true;
+
+        return false;
+#else
+        return path.length() > 1U && path[0] == '/';
+#endif
+    }
+
     /**
      * perform path simplifications for . and ..
      */
@@ -3069,7 +3077,7 @@ static std::string openHeaderIncludePath(std::ifstream &f, const simplecpp::DUI 
 
 static std::string openHeader(std::ifstream &f, const simplecpp::DUI &dui, const std::string &sourcefile, const std::string &header, bool systemheader)
 {
-    if (isAbsolutePath(header))
+    if (simplecpp::isAbsolutePath(header))
         return openHeader(f, header);
 
     std::string ret;
@@ -3090,7 +3098,7 @@ static std::string getFileName(const std::map<std::string, simplecpp::TokenList 
     if (filedata.empty()) {
         return "";
     }
-    if (isAbsolutePath(header)) {
+    if (simplecpp::isAbsolutePath(header)) {
         return (filedata.find(header) != filedata.end()) ? simplecpp::simplifyPath(header) : "";
     }
 

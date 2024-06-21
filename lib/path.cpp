@@ -171,6 +171,8 @@ std::string Path::getCurrentExecutablePath(const char* fallback)
 
 bool Path::isAbsolute(const std::string& path)
 {
+    return simplecpp::isAbsolutePath(path);
+
     const std::string& nativePath = toNativeSeparators(path);
 
 #ifdef _WIN32
