@@ -44,6 +44,8 @@ namespace tinyxml2 {
  * @brief Platform settings
  */
 class CPPCHECKLIB Platform {
+    friend class TestPlatform;
+
 private:
     static long long min_value(std::uint8_t bit) {
         assert(bit > 0);
@@ -144,9 +146,11 @@ public:
      */
     bool loadFromFile(const char exename[], const std::string &filename, bool debug = false);
 
+private:
     /** load platform from xml document, primarily for testing */
     bool loadFromXmlDocument(const tinyxml2::XMLDocument *doc);
 
+public:
     /**
      * @brief Returns true if platform type is Windows
      * @return true if Windows platform type.
