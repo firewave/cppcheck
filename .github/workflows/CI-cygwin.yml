@@ -26,6 +26,7 @@ jobs:
         arch: [x64]
         include:
           - platform: 'x86_64'
+            # python3 is necessary so we can execute addons
             packages: |
               gcc-g++
               python3
@@ -42,6 +43,19 @@ jobs:
           platform: ${{ matrix.arch }}
           packages: ${{ matrix.packages }}
 
+      - name: Set up Python 3.12.3
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12.3'
+          check-latest: true
+
+      - name: Install missing Python packages
+        run: |
+          python -m pip install pip --upgrade || exit /b !errorlevel!
+          python -m pip install pytest || exit /b !errorlevel!
+          python -m pip install pytest-custom_exit_code || exit /b !errorlevel!
+          python -m pip install pytest-timeout || exit /b !errorlevel!
+
       # Cygwin will always link the binaries even if they already exist. The linking is also extremely slow. So just run the "check" target which includes all the binaries.
       - name: Build all and run test
         run: |
@@ -49,8 +63,12 @@ jobs:
 
       - name: Extra test for misra
         run: |
-          cd %GITHUB_WORKSPACE%\addons\test
-          ..\..\cppcheck.exe --dump -DDUMMY --suppress=uninitvar --inline-suppr misra\misra-test.c --std=c89 --platform=unix64
-          python3 ..\misra.py -verify misra\misra-test.c.dump
-          ..\..\cppcheck.exe --addon=misra --enable=style --inline-suppr --enable=information --error-exitcode=1 misra\misra-ctu-1-test.c misra\misra-ctu-2-test.c
+          cd %GITHUB_WORKSPACE%\addons\test || exit /b !errorlevel!
+          ..\..\cppcheck.exe --dump -DDUMMY --suppress=uninitvar --inline-suppr misra\misra-test.c --std=c89 --platform=unix64 || exit /b !errorlevel!
+          python3 ..\misra.py -verify misra\misra-test.c.dump || exit /b !errorlevel!
+          ..\..\cppcheck.exe --addon=misra --enable=style --inline-suppr --enable=information --error-exitcode=1 misra\misra-ctu-1-test.c misra\misra-ctu-2-test.c || exit /b !errorlevel!
 
+      - name: Run test/cli
+        run: |
+          cd test/cli || exit /b !errorlevel!
+          python3 -m pytest -Werror --strict-markers -vv || exit /b !errorlevel!
