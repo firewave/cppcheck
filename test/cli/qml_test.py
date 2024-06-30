@@ -29,7 +29,7 @@ def test_unused_functions_j():
         "cppcheck: unusedFunction check can't be used with '-j' option. Disabling unusedFunction check."
     ]
     assert stderr.splitlines() == []
-    assert ret == 0, stdout # TODO: abil out on this
+    assert ret == 0, stdout  # TODO: bail out on this
 
 
 # TODO: fillSampleData is not unused
