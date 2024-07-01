@@ -204,12 +204,14 @@ bool Platform::loadFromFile(const std::vector<std::string>& paths, const std::st
             filenames.push_back(ppath + "platforms/" + fullfilename);
         }
 #ifdef FILESDIR
-        std::string filesdir = FILESDIR;
-        if (!filesdir.empty()) {
-            if (filesdir.back() != '/')
-                filesdir += '/';
-            // TODO: look in filesdir?
-            filenames.push_back(filesdir + "platforms/" + fullfilename);
+        if (useBuiltinFilesdir) {
+            std::string filesdir = FILESDIR;
+            if (!filesdir.empty()) {
+                if (filesdir.back() != '/')
+                    filesdir += '/';
+                // TODO: look in filesdir?
+                filenames.push_back(filesdir + "platforms/" + fullfilename);
+            }
         }
 #endif
     }

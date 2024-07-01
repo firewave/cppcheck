@@ -672,6 +672,9 @@ CmdLineParser::Result CmdLineParser::parseFromArgs(int argc, const char* const a
             }
         }
 
+        else if (std::strcmp(argv[i], "--disable-filesdir") == 0)
+            mSettings.useBuiltinFilesdir = false;
+
         // dump cppcheck data
         else if (std::strcmp(argv[i], "--dump") == 0)
             mSettings.dump = true;
@@ -2149,9 +2152,12 @@ bool CmdLineParser::loadLibraries(Settings& settings)
     if (!tryLoadLibrary(settings.library, settings.exename, "std.cfg", settings.debuglookup || settings.debuglookupLibrary)) {
         const std::string msg("Failed to load std.cfg. Your Cppcheck installation is broken, please re-install.");
 #ifdef FILESDIR
-        const std::string details("The Cppcheck binary was compiled with FILESDIR set to \""
-                                  FILESDIR "\" and will therefore search for "
-                                  "std.cfg in " FILESDIR "/cfg.");
+        std::string details;
+        if (settings.useBuiltinFilesdir) {
+            details = "The Cppcheck binary was compiled with FILESDIR set to \""
+                      FILESDIR "\" and will therefore search for "
+                      "std.cfg in " FILESDIR "/cfg.";
+        }
 #else
         const std::string cfgfolder(Path::fromNativeSeparators(Path::getPathFromFilename(settings.exename)) + "cfg");
         const std::string details("The Cppcheck binary was compiled without FILESDIR set. Either the "
