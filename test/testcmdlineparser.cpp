@@ -64,7 +64,7 @@ private:
 
         void printRaw(const std::string &message) override
         {
-            printInternal(message + '\n');
+            printInternal(message + '\n'); // TODO: should not append newline
         }
 
         std::string str()
@@ -423,6 +423,7 @@ private:
         TEST_CASE(maxTemplateRecursionMissingCount);
         TEST_CASE(emitDuplicates);
         TEST_CASE(debugClangOutput);
+        TEST_CASE(filesdir);
 
         TEST_CASE(ignorepaths1);
         TEST_CASE(ignorepaths2);
@@ -2923,6 +2924,17 @@ private:
         const char * const argv[] = {"cppcheck", "--debug-clang-output", "file.cpp"};
         ASSERT_EQUALS_ENUM(CmdLineParser::Result::Success, parser->parseFromArgs(3, argv));
         ASSERT_EQUALS(true, settings->debugClangOutput);
+    }
+
+    void filesdir() {
+        REDIRECT;
+        const char * const argv[] = {"cppcheck", "--filesdir"};
+        ASSERT_EQUALS_ENUM(CmdLineParser::Result::Exit, parser->parseFromArgs(2, argv));
+#ifdef FILESDIR
+        ASSERT_EQUALS(std::string(FILESDIR) + '\n', logger->str());
+#else
+        ASSERT_EQUALS("", logger->str());
+#endif
     }
 
     void ignorepaths1() {
