@@ -71,6 +71,7 @@ std::string Settings::loadCppcheckCfg(Settings& settings, Suppressions& suppress
     static const std::string cfgFilename = "cppcheck.cfg";
     std::string fileName;
 #ifdef FILESDIR
+    if (useBuiltinFilesdir)
     {
         const std::string filesdirCfg = Path::join(FILESDIR, cfgFilename);
         if (debug)

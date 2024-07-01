@@ -210,10 +210,12 @@ bool Platform::loadFromFile(const char exename[], const std::string &filename, b
             filenames.push_back(Path::getPathFromFilename(Path::fromNativeSeparators(exename)) + "platforms/" + fullfilename);
         }
 #ifdef FILESDIR
-        std::string filesdir = FILESDIR;
-        if (!filesdir.empty() && filesdir[filesdir.size()-1] != '/')
-            filesdir += '/';
-        filenames.push_back(filesdir + ("platforms/" + fullfilename));
+        if (useBuiltinFilesdir) {
+            std::string filesdir = FILESDIR;
+            if (!filesdir.empty() && filesdir[filesdir.size()-1] != '/')
+                filesdir += '/';
+            filenames.push_back(filesdir + ("platforms/" + fullfilename));
+        }
 #endif
     }
 
