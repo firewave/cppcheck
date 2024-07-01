@@ -205,6 +205,9 @@ public:
     /** @brief Is --debug-warnings given? */
     bool debugwarnings{};
 
+    /** @brief Disabled the usage of the built-in FILESDIR */
+    bool useBuiltinFilesdir = true;
+
     /** @brief Is --dump given? */
     bool dump{};
 

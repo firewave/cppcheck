@@ -213,6 +213,7 @@ Library::Error Library::load(const char exename[], const char path[], bool debug
         {
             std::list<std::string> cfgfolders;
     #ifdef FILESDIR
+            // TODO: only use when configured to do so
             cfgfolders.emplace_back(FILESDIR "/cfg");
     #endif
             if (exename) {

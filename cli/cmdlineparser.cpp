@@ -421,6 +421,13 @@ CmdLineParser::Result CmdLineParser::parseFromArgs(int argc, const char* const a
             return Result::Exit;
         }
 
+        if (std::strcmp(argv[i], "--show-filesdir") == 0) {
+#ifdef FILESDIR
+            std::cout << FILESDIR << std::endl;
+#endif
+            return Result::Exit;
+        }
+
         if (std::strcmp(argv[i], "--version") == 0) {
             if (!loadCppcheckCfg())
                 return Result::Fail;
@@ -661,6 +668,9 @@ CmdLineParser::Result CmdLineParser::parseFromArgs(int argc, const char* const a
                     return Result::Fail;
                 }
             }
+
+            else if (std::strcmp(argv[i], "--disable-filesdir") == 0)
+                mSettings.useBuiltinFilesdir = false;
 
             // dump cppcheck data
             else if (std::strcmp(argv[i], "--dump") == 0)
