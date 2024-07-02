@@ -155,6 +155,21 @@ static std::string getCtuInfoFileName(const std::string &dumpFile)
     return dumpFile.substr(0, dumpFile.size()-4) + "ctu-info";
 }
 
+static std::vector<std::string> getCtuInfoFileNames(const Settings& settings, const std::list<FileWithDetails> &files, const std::list<FileSettings>& fileSettings)
+{
+    std::vector<std::string> ctuInfoFiles;
+    for (const auto &f: files) {
+        const std::string &dumpFileName = getDumpFileName(settings, f.path());
+        ctuInfoFiles.push_back(getCtuInfoFileName(dumpFileName));
+    }
+
+    for (const auto &f: fileSettings) {
+        const std::string &dumpFileName = getDumpFileName(settings, f.filename());
+        ctuInfoFiles.push_back(getCtuInfoFileName(dumpFileName));
+    }
+    return ctuInfoFiles;
+}
+
 static void createDumpFile(const Settings& settings,
                            const FileWithDetails& file,
                            std::ofstream& fdump,
@@ -1467,32 +1482,16 @@ void CppCheck::executeAddons(const std::vector<std::string>& files, const std::s
     }
 }
 
-void CppCheck::executeAddonsWholeProgram(const std::list<FileWithDetails> &files, const std::list<FileSettings>& fileSettings)
+void CppCheck::executeAddonsWholeProgram(const std::vector<std::string> &ctuInfoFiles)
 {
     if (mSettings.addons.empty())
         return;
-
-    std::vector<std::string> ctuInfoFiles;
-    for (const auto &f: files) {
-        const std::string &dumpFileName = getDumpFileName(mSettings, f.path());
-        ctuInfoFiles.push_back(getCtuInfoFileName(dumpFileName));
-    }
-
-    for (const auto &f: fileSettings) {
-        const std::string &dumpFileName = getDumpFileName(mSettings, f.filename());
-        ctuInfoFiles.push_back(getCtuInfoFileName(dumpFileName));
-    }
 
     try {
         executeAddons(ctuInfoFiles, "");
     } catch (const InternalError& e) {
         const ErrorMessage errmsg = ErrorMessage::fromInternalError(e, nullptr, "", "Bailing out from analysis: Whole program analysis failed");
         reportErr(errmsg);
-    }
-
-    if (mSettings.buildDir.empty()) {
-        for (const std::string &f: ctuInfoFiles)
-            std::remove(f.c_str());
     }
 }
 
@@ -1788,9 +1787,11 @@ bool CppCheck::analyseWholeProgram()
 
 unsigned int CppCheck::analyseWholeProgram(const std::string &buildDir, const std::list<FileWithDetails> &files, const std::list<FileSettings>& fileSettings)
 {
-    executeAddonsWholeProgram(files, fileSettings);
+    const std::vector<std::string> ctuInfoFiles = getCtuInfoFileNames(mSettings, files, fileSettings);
+    executeAddonsWholeProgram(ctuInfoFiles);
     if (buildDir.empty()) {
-        removeCtuInfoFiles(files, fileSettings);
+        for (const std::string &f: ctuInfoFiles)
+            std::remove(f.c_str());
         return mExitCode;
     }
     if (mSettings.checks.isEnabled(Checks::unusedFunction))
@@ -1854,22 +1855,6 @@ unsigned int CppCheck::analyseWholeProgram(const std::string &buildDir, const st
         delete fi;
 
     return mExitCode;
-}
-
-void CppCheck::removeCtuInfoFiles(const std::list<FileWithDetails> &files, const std::list<FileSettings>& fileSettings)
-{
-    if (mSettings.buildDir.empty()) {
-        for (const auto& f: files) {
-            const std::string &dumpFileName = getDumpFileName(mSettings, f.path());
-            const std::string &ctuInfoFileName = getCtuInfoFileName(dumpFileName);
-            std::remove(ctuInfoFileName.c_str());
-        }
-        for (const auto& fs: fileSettings) {
-            const std::string &dumpFileName = getDumpFileName(mSettings, fs.filename());
-            const std::string &ctuInfoFileName = getCtuInfoFileName(dumpFileName);
-            std::remove(ctuInfoFileName.c_str());
-        }
-    }
 }
 
 // cppcheck-suppress unusedFunction - only used in tests
