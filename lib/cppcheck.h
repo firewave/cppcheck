@@ -148,9 +148,6 @@ public:
     /** analyse whole program use .analyzeinfo files */
     unsigned int analyseWholeProgram(const std::string &buildDir, const std::list<FileWithDetails> &files, const std::list<FileSettings>& fileSettings);
 
-    /** Remove *.ctu-info files */
-    void removeCtuInfoFiles(const std::list<FileWithDetails>& files, const std::list<FileSettings>& fileSettings); // cppcheck-suppress functionConst // has side effects
-
     static void resetTimerResults();
     static void printTimerResults(SHOWTIME_MODES mode);
 
@@ -198,7 +195,7 @@ private:
     /**
      * Execute addons
      */
-    void executeAddonsWholeProgram(const std::list<FileWithDetails> &files, const std::list<FileSettings>& fileSettings);
+    void executeAddonsWholeProgram(const std::vector<std::string> &ctuInfoFiles);
 
 #ifdef HAVE_RULES
     /**
