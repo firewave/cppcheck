@@ -270,7 +270,7 @@ def test_addon_ctu_exitcode(tmpdir):
     assert exitcode == 1
 
 
-# TODO: test with -j2
+# TODO: test with -j2 - the output from the script is being supressed because it is run in a different process
 def test_addon_misra(tmpdir):
     test_file = os.path.join(tmpdir, 'test.cpp')
     with open(test_file, 'wt') as f:
@@ -541,7 +541,7 @@ namespace _invalid_namespace { }
     assert lines == expect
 
 
-# TODO: test with -j2
+# TODO: test with -j2 - the output from the script is being supressed because it is run in a different process
 def test_addon_namingng_config(tmpdir):
     addon_file = os.path.join(tmpdir, 'namingng.json')
     addon_config_file = os.path.join(tmpdir, 'namingng.config.json')
@@ -714,7 +714,7 @@ typedef int MISRA_5_6_VIOLATION;
     assert stderr == "{}:0:0: error: Bailing out from analysis: Checking file failed: Failed to execute addon 'addon1' - exitcode is 1 [internalError]\n\n^\n".format(test_file)
 
 
-# TODO: test with -j2
+# TODO: test with -j2 - the output from the script is being supressed because it is run in a different process
 def test_invalid_addon_py_verbose(tmpdir):
     addon_file = os.path.join(tmpdir, 'addon1.py')
     with open(addon_file, 'wt') as f:
