@@ -734,7 +734,9 @@ unsigned int CppCheck::checkFile(const FileWithDetails& file, const std::string 
         tokens1.removeComments();
         preprocessor.removeComments();
 
-        if (mAnalyzerInformation) {
+        if (!mSettings.buildDir.empty()) {
+            mAnalyzerInformation.reset(new AnalyzerInformation);
+
             // Get toolinfo
             std::ostringstream toolinfo;
             toolinfo << CPPCHECK_VERSION_STRING;
@@ -1090,9 +1092,6 @@ void CppCheck::checkNormalTokens(const Tokenizer &tokenizer)
         // TODO: Use CTU for Clang analysis
         return;
     }
-
-    if (!mSettings.buildDir.empty())
-        mAnalyzerInformation.reset(new AnalyzerInformation);
 
     if (mSettings.useSingleJob() || mAnalyzerInformation) {
         // Analyse the tokens..
