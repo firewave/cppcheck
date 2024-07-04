@@ -674,7 +674,9 @@ unsigned int CppCheck::checkFile(const FileWithDetails& file, const std::string 
                     tokenizer.list.createTokens(in, file.spath());
                 }
                 mUnusedFunctionsCheck->parseTokens(tokenizer, mSettings);
-                // TODO: set analyzer information
+
+                // TODO: open file so we can set the fileinfo
+                mAnalyzerInformation.setFileInfo("CheckUnusedFunctions", mUnusedFunctionsCheck->analyzerInfo());
             }
             return EXIT_SUCCESS;
         }
