@@ -119,7 +119,7 @@ def test_unused_functions_builddir(tmpdir):
     assert ret == 0, stdout
 
 
-# TODO: only f3_3 is unused
+# TODO: only f3_3 is unused - the inline suppressions are not working
 def test_unused_functions_builddir_j(tmpdir):
     build_dir = os.path.join(tmpdir, 'b1')
     os.mkdir(build_dir)
