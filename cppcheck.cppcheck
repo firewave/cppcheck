@@ -23,4 +23,9 @@
         <path name="test/cli/"/>
         <path name="test/tools/"/>
     </exclude>
+    <libraries>
+      <library>gnu</library>
+      <library>qt</library>
+      <library>cppcheck-lib</library>
+    </libraries>
 </project>
