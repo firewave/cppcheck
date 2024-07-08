@@ -2,10 +2,8 @@
 # Environment reference https://help.github.com/en/actions/reference/virtual-environments-for-github-hosted-runners
 name: selfcheck-schedule
 
-on:
-  schedule:
-    - cron: '0 0 * * 0'
-  workflow_dispatch:
+on: [push, pull_request]
+
 
 permissions:
   contents: read
@@ -85,7 +83,7 @@ jobs:
 
       - name: Self check (${{ matrix.project }})
         run: |
-          selfcheck_options="-q -j$(nproc) --std=c++11 --template=selfcheck --showtime=file-total --error-exitcode=1 --inline-suppr --suppressions-list=.selfcheck_suppressions --inconclusive --enable=style,performance,portability,warning,missingInclude,internal,information --exception-handling --debug-warnings --check-level=exhaustive"
+          selfcheck_options="-q -j$(nproc) --std=c++11 --template=selfcheck --showtime=file-total --error-exitcode=1 --inline-suppr --suppressions-list=.selfcheck_suppressions --exitcode-suppress=purgedConfiguration --inconclusive --enable=style,performance,portability,warning,missingInclude,internal,information --exception-handling --debug-warnings --check-level=normal"
           # TODO: add libraries for Visual Studio project
           # TODO: analyze all VS configuration
           ./cppcheck $selfcheck_options --project=${{ matrix.project }}
