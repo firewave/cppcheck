@@ -32,6 +32,7 @@
 #include <cstring>
 #include <functional> // std::bind, std::placeholders
 #include <istream>
+#include <ostream>
 #include <sstream>
 #include <utility>
 
