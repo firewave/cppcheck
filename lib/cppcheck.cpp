@@ -1288,7 +1288,7 @@ void CppCheck::internalError(const std::string &filename, const std::string &msg
     ErrorMessage::FileLocation loc1(filename, 0, 0);
 
     ErrorMessage errmsg({std::move(loc1)},
-                        emptyString,
+                        "",
                         Severity::error,
                         fullmsg,
                         "internalError",
@@ -1323,7 +1323,7 @@ void CppCheck::checkNormalTokens(const Tokenizer &tokenizer, AnalyzerInformation
                 if (mSettings.debugwarnings) {
                     ErrorMessage::FileLocation loc(tokenizer.list.getFiles()[0], 0, 0);
                     ErrorMessage errmsg({std::move(loc)},
-                                        emptyString,
+                                        "",
                                         Severity::debug,
                                         "Checks maximum time exceeded",
                                         "checksMaxTime",
@@ -1831,7 +1831,7 @@ void CppCheck::tooManyConfigsError(const std::string &file, const int numberOfCo
 
 
     ErrorMessage errmsg(std::move(loclist),
-                        emptyString,
+                        "",
                         Severity::information,
                         msg.str(),
                         "toomanyconfigs", CWE398,
@@ -1853,7 +1853,7 @@ void CppCheck::purgedConfigurationMessage(const std::string &file, const std::st
     }
 
     ErrorMessage errmsg(std::move(loclist),
-                        emptyString,
+                        "",
                         Severity::information,
                         "The configuration '" + configuration + "' was not checked because its code equals another one.",
                         "purgedConfiguration",
