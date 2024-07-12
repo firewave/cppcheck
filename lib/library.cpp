@@ -1207,7 +1207,8 @@ const std::unordered_map<std::string, Library::Container>& Library::containers()
 
 enum DetectContainer : std::uint8_t { ContainerOnly, IteratorOnly, Both };
 
-static const Library::Container* detectContainerInternal(const std::unordered_map<std::string, Library::Container>& containers, const Token* const typeStart, DetectContainer detect, bool* isIterator = nullptr, bool withoutStd = false)
+template<DetectContainer detect>
+static const Library::Container* detectContainerInternal(const std::unordered_map<std::string, Library::Container>& containers, const Token* const typeStart, bool* isIterator = nullptr, bool withoutStd = false)
 {
     const bool typeIsStd = Token::Match(typeStart, "std ::");
 
@@ -1264,18 +1265,18 @@ static const Library::Container* detectContainerInternal(const std::unordered_ma
 
 const Library::Container* Library::detectContainer(const Token* typeStart) const
 {
-    return detectContainerInternal(mContainers, typeStart, ContainerOnly);
+    return detectContainerInternal<ContainerOnly>(mContainers, typeStart);
 }
 
 const Library::Container* Library::detectIterator(const Token* typeStart) const
 {
-    return detectContainerInternal(mContainers, typeStart, IteratorOnly);
+    return detectContainerInternal<IteratorOnly>(mContainers, typeStart);
 }
 
 const Library::Container* Library::detectContainerOrIterator(const Token* typeStart, bool* isIterator, bool withoutStd) const
 {
     bool res;
-    const Library::Container* c = detectContainerInternal(mContainers, typeStart, Both, &res, withoutStd);
+    const Library::Container* c = detectContainerInternal<Both>(mContainers, typeStart, &res, withoutStd);
     if (c && isIterator)
         *isIterator = res;
     return c;
