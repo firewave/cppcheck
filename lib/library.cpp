@@ -1205,7 +1205,9 @@ const std::unordered_map<std::string, Library::Container>& Library::containers()
     return mContainers;
 }
 
-const Library::Container* Library::detectContainerInternal(const Token* const typeStart, DetectContainer detect, bool* isIterator, bool withoutStd) const
+enum DetectContainer : std::uint8_t { ContainerOnly, IteratorOnly, Both };
+
+static const Library::Container* detectContainerInternal(const std::unordered_map<std::string, Library::Container>& containers, const Token* const typeStart, DetectContainer detect, bool* isIterator = nullptr, bool withoutStd = false)
 {
     const bool typeIsStd = Token::Match(typeStart, "std ::");
 
@@ -1218,8 +1220,8 @@ const Library::Container* Library::detectContainerInternal(const Token* const ty
         break;
     }
 
-    for (const std::pair<const std::string, Library::Container> & c : mContainers) {
-        const Container& container = c.second;
+    for (const std::pair<const std::string, Library::Container> & c : containers) {
+        const Library::Container& container = c.second;
         if (container.startPattern.empty())
             continue;
 
@@ -1262,18 +1264,18 @@ const Library::Container* Library::detectContainerInternal(const Token* const ty
 
 const Library::Container* Library::detectContainer(const Token* typeStart) const
 {
-    return detectContainerInternal(typeStart, ContainerOnly);
+    return detectContainerInternal(mContainers, typeStart, ContainerOnly);
 }
 
 const Library::Container* Library::detectIterator(const Token* typeStart) const
 {
-    return detectContainerInternal(typeStart, IteratorOnly);
+    return detectContainerInternal(mContainers, typeStart, IteratorOnly);
 }
 
 const Library::Container* Library::detectContainerOrIterator(const Token* typeStart, bool* isIterator, bool withoutStd) const
 {
     bool res;
-    const Library::Container* c = detectContainerInternal(typeStart, Both, &res, withoutStd);
+    const Library::Container* c = detectContainerInternal(mContainers, typeStart, Both, &res, withoutStd);
     if (c && isIterator)
         *isIterator = res;
     return c;

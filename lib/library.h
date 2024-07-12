@@ -559,9 +559,6 @@ private:
         const std::map<std::string, AllocFunc>::const_iterator it = data.find(name);
         return (it == data.end()) ? nullptr : &it->second;
     }
-
-    enum DetectContainer : std::uint8_t { ContainerOnly, IteratorOnly, Both };
-    const Library::Container* detectContainerInternal(const Token* typeStart, DetectContainer detect, bool* isIterator = nullptr, bool withoutStd = false) const;
 };
 
 CPPCHECKLIB const Library::Container * getLibraryContainer(const Token * tok);
