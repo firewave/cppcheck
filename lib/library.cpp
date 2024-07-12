@@ -1381,7 +1381,9 @@ const std::unordered_map<std::string, Library::Container>& Library::containers()
     return mData->mContainers;
 }
 
-const Library::Container* Library::detectContainerInternal(const Token* const typeStart, DetectContainer detect, bool* isIterator, bool withoutStd) const
+enum DetectContainer : std::uint8_t { ContainerOnly, IteratorOnly, Both };
+
+static const Library::Container* detectContainerInternal(const std::unordered_map<std::string, Library::Container>& containers, const Token* const typeStart, DetectContainer detect, bool* isIterator = nullptr, bool withoutStd = false)
 {
     if (!typeStart)
         return nullptr;
@@ -1399,8 +1401,8 @@ const Library::Container* Library::detectContainerInternal(const Token* const ty
     const bool hasScope = typeStart->strAt(1) == "::";
     const bool bailIfHasStd = !withoutStd && !hasScope;
 
-    for (const std::pair<const std::string, Library::Container> & c : mData->mContainers) {
-        const Container& container = c.second;
+    for (const std::pair<const std::string, Library::Container> & c : containers) {
+        const Library::Container& container = c.second;
         if (container.startPattern.empty())
             continue;
 
@@ -1442,18 +1444,18 @@ const Library::Container* Library::detectContainerInternal(const Token* const ty
 
 const Library::Container* Library::detectContainer(const Token* typeStart) const
 {
-    return detectContainerInternal(typeStart, ContainerOnly);
+    return detectContainerInternal(mData->mContainers, typeStart, ContainerOnly);
 }
 
 const Library::Container* Library::detectIterator(const Token* typeStart) const
 {
-    return detectContainerInternal(typeStart, IteratorOnly);
+    return detectContainerInternal(mData->mContainers, typeStart, IteratorOnly);
 }
 
 const Library::Container* Library::detectContainerOrIterator(const Token* typeStart, bool* isIterator, bool withoutStd) const
 {
     bool res;
-    const Library::Container* c = detectContainerInternal(typeStart, Both, &res, withoutStd);
+    const Library::Container* c = detectContainerInternal(mData->mContainers, typeStart, Both, &res, withoutStd);
     if (c && isIterator)
         *isIterator = res;
     return c;
