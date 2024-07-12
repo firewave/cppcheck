@@ -48,6 +48,7 @@
 #include <iterator>
 #include <exception>
 #include <memory>
+#include <ostream>
 #include <set>
 #include <sstream>
 #include <stack>
