@@ -301,7 +301,7 @@ int CppCheckExecutor::check_internal(const Settings& settings) const
     }
 
     if (!settings.checkConfiguration) {
-        cppcheck.tooManyConfigsError(emptyString,0U);
+        cppcheck.tooManyConfigsError("",0U);
     }
 
     if (settings.safety || settings.severity.isEnabled(Severity::information) || !settings.checkersReportFilename.empty())

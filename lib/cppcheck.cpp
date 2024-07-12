@@ -1683,9 +1683,9 @@ void CppCheck::getErrorMessages(ErrorLogger &errorlogger)
     s.severity.enable(Severity::information);
 
     CppCheck cppcheck(errorlogger, true, nullptr);
-    cppcheck.purgedConfigurationMessage(emptyString,emptyString);
+    cppcheck.purgedConfigurationMessage("","");
     cppcheck.mTooManyConfigs = true;
-    cppcheck.tooManyConfigsError(emptyString,0U);
+    cppcheck.tooManyConfigsError("",0U);
     // TODO: add functions to get remaining error messages
 
     // call all "getErrorMessages" in all registered Check classes
