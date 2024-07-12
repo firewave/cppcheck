@@ -72,7 +72,7 @@ protected:
     bool assert_(const char * const filename, const unsigned int linenr, const bool condition) const;
 
     template<typename T>
-    bool assertEquals(const char* const filename, const unsigned int linenr, const T& expected, const T& actual, const std::string& msg = emptyString) const {
+    bool assertEquals(const char* const filename, const unsigned int linenr, const T& expected, const T& actual, const std::string& msg = "") const {
         if (expected != actual) {
             std::ostringstream expectedStr;
             expectedStr << expected;
@@ -85,7 +85,7 @@ protected:
     }
 
     template<typename T>
-    bool assertEqualsEnum(const char* const filename, const unsigned int linenr, const T& expected, const T& actual, const std::string& msg = emptyString) const {
+    bool assertEqualsEnum(const char* const filename, const unsigned int linenr, const T& expected, const T& actual, const std::string& msg = "") const {
         if (std::is_unsigned<T>())
             return assertEquals(filename, linenr, static_cast<std::uint64_t>(expected), static_cast<std::uint64_t>(actual), msg);
         return assertEquals(filename, linenr, static_cast<std::int64_t>(expected), static_cast<std::int64_t>(actual), msg);
@@ -95,13 +95,13 @@ protected:
     //Writes the appropriate failure message to errmsg and increments fails_counter
     void assertEqualsFailed(const char* const filename, const unsigned int linenr, const std::string& expected, const std::string& actual, const std::string& msg) const;
 
-    bool assertEquals(const char * const filename, const unsigned int linenr, const std::string &expected, const std::string &actual, const std::string &msg = emptyString) const;
-    void assertEqualsWithoutLineNumbers(const char * const filename, const unsigned int linenr, const std::string &expected, const std::string &actual, const std::string &msg = emptyString) const;
-    bool assertEquals(const char * const filename, const unsigned int linenr, const char expected[], const std::string& actual, const std::string &msg = emptyString) const;
-    bool assertEquals(const char * const filename, const unsigned int linenr, const char expected[], const char actual[], const std::string &msg = emptyString) const;
-    bool assertEquals(const char * const filename, const unsigned int linenr, const std::string& expected, const char actual[], const std::string &msg = emptyString) const;
-    bool assertEquals(const char * const filename, const unsigned int linenr, const long long expected, const long long actual, const std::string &msg = emptyString) const;
-    void assertEqualsDouble(const char * const filename, const unsigned int linenr, const double expected, const double actual, const double tolerance, const std::string &msg = emptyString) const;
+    bool assertEquals(const char * const filename, const unsigned int linenr, const std::string &expected, const std::string &actual, const std::string &msg = "") const;
+    void assertEqualsWithoutLineNumbers(const char * const filename, const unsigned int linenr, const std::string &expected, const std::string &actual, const std::string &msg = "") const;
+    bool assertEquals(const char * const filename, const unsigned int linenr, const char expected[], const std::string& actual, const std::string &msg = "") const;
+    bool assertEquals(const char * const filename, const unsigned int linenr, const char expected[], const char actual[], const std::string &msg = "") const;
+    bool assertEquals(const char * const filename, const unsigned int linenr, const std::string& expected, const char actual[], const std::string &msg = "") const;
+    bool assertEquals(const char * const filename, const unsigned int linenr, const long long expected, const long long actual, const std::string &msg = "") const;
+    void assertEqualsDouble(const char * const filename, const unsigned int linenr, const double expected, const double actual, const double tolerance, const std::string &msg = "") const;
 
     void todoAssertEquals(const char * const filename, const unsigned int linenr, const std::string &wanted,
                           const std::string &current, const std::string &actual) const;
