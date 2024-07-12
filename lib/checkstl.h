@@ -277,8 +277,8 @@ private:
         c.uselessCallsRemoveError(nullptr, "remove");
         c.dereferenceInvalidIteratorError(nullptr, "i");
         c.eraseIteratorOutOfBoundsError(nullptr, nullptr);
-        c.useStlAlgorithmError(nullptr, emptyString);
-        c.knownEmptyContainerError(nullptr, emptyString);
+        c.useStlAlgorithmError(nullptr, "");
+        c.knownEmptyContainerError(nullptr, "");
         c.globalLockGuardError(nullptr);
         c.localMutexError(nullptr);
     }

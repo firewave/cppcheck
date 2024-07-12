@@ -175,7 +175,7 @@ private:
     void getErrorMessages(ErrorLogger *errorLogger, const Settings *settings) const override {
         CheckCondition c(nullptr, settings, errorLogger);
 
-        c.assignIfError(nullptr, nullptr, emptyString, false);
+        c.assignIfError(nullptr, nullptr, "", false);
         c.badBitmaskCheckError(nullptr);
         c.comparisonError(nullptr, "&", 6, "==", 1, false);
         c.duplicateConditionError(nullptr, nullptr, ErrorPath{});

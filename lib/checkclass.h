@@ -224,7 +224,7 @@ private:
         c.uninitVarError(nullptr, false, Function::eConstructor, "classname", "varname", true, false);
         c.uninitVarError(nullptr, true, Function::eConstructor, "classname", "varnamepriv", true, false);
         c.missingMemberCopyError(nullptr, Function::eConstructor, "classname", "varnamepriv");
-        c.operatorEqVarError(nullptr, "classname", emptyString, false);
+        c.operatorEqVarError(nullptr, "classname", "", false);
         c.unusedPrivateFunctionError(nullptr, "classname", "funcname");
         c.memsetError(nullptr, "memfunc", "classname", "class");
         c.memsetErrorReference(nullptr, "memfunc", "class");
