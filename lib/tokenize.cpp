@@ -1181,7 +1181,7 @@ void Tokenizer::simplifyTypedefCpp()
             if (mSettings.debugwarnings) {
                 ErrorMessage::FileLocation loc(list.getFiles()[0], 0, 0);
                 ErrorMessage errmsg({std::move(loc)},
-                                    emptyString,
+                                    "",
                                     Severity::debug,
                                     "Typedef simplification instantiation maximum time exceeded",
                                     "typedefMaxTime",

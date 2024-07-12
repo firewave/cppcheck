@@ -3672,7 +3672,7 @@ bool CheckClass::analyseWholeProgram(const CTU::FileInfo *ctu, const std::list<C
             locationList.emplace_back(it->second.fileName, it->second.lineNumber, it->second.column);
 
             const ErrorMessage errmsg(std::move(locationList),
-                                      emptyString,
+                                      "",
                                       Severity::error,
                                       "$symbol:" + nameLoc.className +
                                       "\nThe one definition rule is violated, different classes/structs have the same name '$symbol'",
