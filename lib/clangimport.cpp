@@ -34,6 +34,7 @@
 #include <cstring>
 #include <iostream>
 #include <iterator>
+#include <istream>
 #include <list>
 #include <map>
 #include <memory>
