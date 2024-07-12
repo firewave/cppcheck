@@ -31,6 +31,7 @@
 #include <cctype>   // std::isdigit, std::isalnum, etc
 #include <cstring>
 #include <functional> // std::bind, std::placeholders
+#include <istream>
 #include <sstream>
 #include <utility>
 

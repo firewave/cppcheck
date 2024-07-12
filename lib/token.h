@@ -32,9 +32,9 @@
 #include <cstdint>
 #include <cstddef>
 #include <functional>
+#include <iosfwd>
 #include <list>
 #include <memory>
-#include <ostream>
 #include <set>
 #include <string>
 #include <utility>
