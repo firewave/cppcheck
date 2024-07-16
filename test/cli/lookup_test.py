@@ -327,6 +327,47 @@ def test_lib_lookup_multi(tmpdir):
     ]
 
 
+# TODO: GUI projects look for libraries in the project folder first
+@pytest.mark.xfail(strict=False)
+def test_lib_lookup_project(tmpdir):
+    test_file = os.path.join(tmpdir, 'test.c')
+    with open(test_file, 'wt'):
+        pass
+
+    project_file = os.path.join(tmpdir, 'test.cppcheck')
+    with open(project_file, 'wt') as f:
+        f.write(
+            """
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="1">
+  <paths>
+    <dir name="{}"/>
+  </paths>
+  <libraries>
+    <library>gnu</library> 
+  </libraries>
+</project>
+            """.format(test_file))
+
+    args = [
+        '--debug-lookup',
+        '--project={}'.format(project_file)
+    ]
+    exitcode, stdout, _, exe = cppcheck_ex(args)
+    exepath = os.path.dirname(exe)
+    if sys.platform == 'win32':
+        exepath = exepath.replace('\\', '/')
+    assert exitcode == 0, stdout
+    lines = __remove_std_lookup_log(stdout.splitlines(), exepath)
+    assert lines == [
+        "looking for library '{}/gnu.cfg'".format(tmpdir),
+        "looking for library 'gnu.cfg'",
+        "looking for library '{}/gnu.cfg'".format(exepath),
+        "looking for library '{}/cfg/gnu.cfg'".format(exepath),
+        'Checking {} ...'.format(test_file)
+    ]
+
+
 def test_platform_lookup_builtin(tmpdir):
     test_file = os.path.join(tmpdir, 'test.c')
     with open(test_file, 'wt'):
