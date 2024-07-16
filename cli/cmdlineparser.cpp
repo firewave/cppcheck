@@ -1009,6 +1009,7 @@ CmdLineParser::Result CmdLineParser::parseFromArgs(int argc, const char* const a
                 ImportProject::Type projType = project.import(projectFile, &mSettings);
                 project.projectType = projType;
                 if (projType == ImportProject::Type::CPPCHECK_GUI) {
+                    // TODO: need to look up libraries in project folder first
                     for (const std::string &lib : project.guiProject.libraries)
                         mSettings.libraries.emplace_back(lib);
 
