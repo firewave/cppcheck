@@ -1629,7 +1629,6 @@ def test_lib_lookup(tmpdir):
     assert exitcode == 0, stdout
     lines = __remove_std_lookup_log(stdout.splitlines(), exepath)
     assert lines == [
-        "looking for library 'gnu'",
         "looking for library 'gnu.cfg'",
         "looking for library '{}/gnu.cfg'".format(exepath),
         "looking for library '{}/cfg/gnu.cfg'".format(exepath),
@@ -1650,7 +1649,6 @@ def test_lib_lookup_notfound(tmpdir):
     assert exitcode == 1, stdout
     lines = __remove_std_lookup_log(stdout.splitlines(), exepath)
     assert lines == [
-        "looking for library 'none'",
         "looking for library 'none.cfg'",
         "looking for library '{}/none.cfg'".format(exepath),
         "looking for library '{}/cfg/none.cfg'".format(exepath),
@@ -1722,7 +1720,6 @@ def test_lib_lookup_nofile(tmpdir):
     assert exitcode == 0, stdout
     lines = __remove_std_lookup_log(stdout.splitlines(), exepath)
     assert lines == [
-        "looking for library 'gtk'",
         "looking for library 'gtk.cfg'",
         "looking for library '{}/gtk.cfg'".format(exepath),
         "looking for library '{}/cfg/gtk.cfg'".format(exepath),
@@ -1742,11 +1739,9 @@ def test_lib_lookup_multi(tmpdir):
     assert exitcode == 0, stdout
     lines = __remove_std_lookup_log(stdout.splitlines(), exepath)
     assert lines == [
-        "looking for library 'posix'",
         "looking for library 'posix.cfg'",
         "looking for library '{}/posix.cfg'".format(exepath),
         "looking for library '{}/cfg/posix.cfg'".format(exepath),
-        "looking for library 'gnu'",
         "looking for library 'gnu.cfg'",
         "looking for library '{}/gnu.cfg'".format(exepath),
         "looking for library '{}/cfg/gnu.cfg'".format(exepath),
@@ -1788,7 +1783,6 @@ def test_lib_lookup_project(tmpdir):
     lines = __remove_std_lookup_log(stdout.splitlines(), exepath)
     assert lines == [
         "looking for library '{}/gnu.cfg'".format(tmpdir),
-        "looking for library 'gnu'",
         "looking for library 'gnu.cfg'",
         "looking for library '{}/gnu.cfg'".format(exepath),
         "looking for library '{}/cfg/gnu.cfg'".format(exepath),
