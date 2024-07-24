@@ -1762,3 +1762,102 @@ def test_checkers_report(tmpdir):
     assert exitcode == 0, stdout
     assert 'Active checkers:' in stderr
     assert '--checkers-report' not in stderr
+
+
+def test_ignore(tmpdir):
+    os.mkdir(os.path.join(tmpdir, 'src'))
+    test_file = os.path.join(tmpdir, 'src', 'test.cpp')
+    with open(test_file, 'wt'):
+        pass
+
+    lines_exp = [
+        'cppcheck: error: could not find or open any of the paths given.',
+        'cppcheck: Maybe all paths were ignored?'
+    ]
+
+    args = [
+        '-itest.cpp',
+        test_file
+    ]
+
+    exitcode, stdout, _ = cppcheck(args, cwd=tmpdir)
+    assert exitcode == 1, stdout
+    assert stdout.splitlines() == lines_exp
+
+    args = [
+        '-isrc/test.cpp',
+        test_file
+    ]
+
+    exitcode, stdout, _ = cppcheck(args, cwd=tmpdir)
+    assert exitcode == 1, stdout
+    assert stdout.splitlines() == lines_exp
+
+    args = [
+        '-isrc\\test.cpp',
+        test_file
+    ]
+
+    exitcode, stdout, _ = cppcheck(args, cwd=tmpdir)
+    assert exitcode == 1, stdout
+    assert stdout.splitlines() == lines_exp
+
+    args = [
+        '-i{}'.format(test_file),
+        test_file
+    ]
+
+    exitcode, stdout, _ = cppcheck(args, cwd=tmpdir)
+    assert exitcode == 1, stdout
+    assert stdout.splitlines() == lines_exp
+
+
+def test_ignore_project(tmpdir):
+    # TODO
+    os.mkdir(os.path.join(tmpdir, 'src'))
+    test_file = os.path.join(tmpdir, 'src', 'test.cpp')
+    with open(test_file, 'wt'):
+        pass
+
+    lines_exp = [
+        'cppcheck: error: could not find or open any of the paths given.',
+        'cppcheck: Maybe all paths were ignored?'
+    ]
+
+    args = [
+        '-itest.cpp',
+        test_file
+    ]
+
+    exitcode, stdout, _ = cppcheck(args, cwd=tmpdir)
+    assert exitcode == 1, stdout
+    assert stdout.splitlines() == lines_exp
+
+    args = [
+        '-isrc/test.cpp',
+        test_file
+    ]
+
+    exitcode, stdout, _ = cppcheck(args, cwd=tmpdir)
+    assert exitcode == 1, stdout
+    assert stdout.splitlines() == lines_exp
+
+    args = [
+        '-isrc\\test.cpp',
+        test_file
+    ]
+
+    exitcode, stdout, _ = cppcheck(args, cwd=tmpdir)
+    assert exitcode == 1, stdout
+    assert stdout.splitlines() == lines_exp
+
+    args = [
+        '-i{}'.format(test_file),
+        test_file
+    ]
+
+    exitcode, stdout, _ = cppcheck(args, cwd=tmpdir)
+    assert exitcode == 1, stdout
+    assert stdout.splitlines() == lines_exp
+
+# TODO: test with FileSettings

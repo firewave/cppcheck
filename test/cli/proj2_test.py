@@ -84,7 +84,7 @@ def test_gui_project_loads_compile_commands_1():
 
 def test_gui_project_loads_compile_commands_2():
     __create_compile_commands()
-    exclude_path_1 = os.path.join('proj2', 'b')
+    exclude_path_1 = 'proj2/b'
     create_gui_project_file(os.path.join(__proj_dir, 'test.cppcheck'),
                             import_project='compile_commands.json',
                             exclude_paths=[exclude_path_1])
