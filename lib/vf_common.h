@@ -53,6 +53,14 @@ namespace ValueFlow
                            SourceLocation local = SourceLocation::current());
 
     std::list<Value> getIteratorValues(std::list<Value> values, const Value::ValueKind* kind = nullptr);
+
+    bool isNonConditionalPossibleIntValue(const Value& v);
+
+    void changeKnownToPossible(std::list<Value> &values, int indirect=-1);
+
+    bool isBreakOrContinueScope(const Token* endToken);
+
+    const Scope* getLoopScope(const Token* tok);
 }
 
 #endif // vfCommonH

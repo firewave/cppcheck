@@ -21,8 +21,10 @@
 #define valueflowH
 //---------------------------------------------------------------------------
 
+#include "analyzer.h"
 #include "config.h"
 #include "mathlib.h"
+#include "sourcelocation.h"
 #include "vfvalue.h"
 
 #include <cstdlib>
@@ -133,6 +135,32 @@ namespace ValueFlow {
     const Token* getEndOfExprScope(const Token* tok, const Scope* defaultScope = nullptr, bool smallest = true);
 
     void combineValueProperties(const Value& value1, const Value& value2, Value& result);
+
+    Analyzer::Result valueFlowForward(Token* startToken,
+                                             const Token* endToken,
+                                             const Token* exprTok,
+                                             std::list<ValueFlow::Value> values,
+                                             const TokenList& tokenlist,
+                                             ErrorLogger& errorLogger,
+                                             const Settings& settings,
+                                             SourceLocation loc = SourceLocation::current());
+
+    Analyzer::Result valueFlowForwardRecursive(Token* top,
+                                                      const Token* exprTok,
+                                                      std::list<ValueFlow::Value> values,
+                                                      const TokenList& tokenlist,
+                                                      ErrorLogger& errorLogger,
+                                                      const Settings& settings,
+                                                      SourceLocation loc = SourceLocation::current());
+
+    void valueFlowReverse(Token* tok,
+                                 const Token* const endToken,
+                                 const Token* const varToken,
+                                 std::list<ValueFlow::Value> values,
+                                 const TokenList& tokenlist,
+                                 ErrorLogger& errorLogger,
+                                 const Settings& settings,
+                                 SourceLocation loc = SourceLocation::current());
 }
 
 #endif // valueflowH

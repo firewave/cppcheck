@@ -404,4 +404,43 @@ namespace ValueFlow
         });
         return values;
     }
+
+    bool isNonConditionalPossibleIntValue(const Value& v)
+    {
+        if (v.conditional)
+            return false;
+        if (v.condition)
+            return false;
+        if (!v.isPossible())
+            return false;
+        if (!v.isIntValue())
+            return false;
+        return true;
+    }
+
+    void changeKnownToPossible(std::list<Value> &values, int indirect)
+    {
+        for (Value& v: values) {
+            if (indirect >= 0 && v.indirect != indirect)
+                continue;
+            v.changeKnownToPossible();
+        }
+    }
+
+    bool isBreakOrContinueScope(const Token* endToken)
+    {
+        if (!Token::simpleMatch(endToken, "}"))
+            return false;
+        return Token::Match(endToken->tokAt(-2), "break|continue ;");
+    }
+
+    const Scope* getLoopScope(const Token* tok)
+    {
+        if (!tok)
+            return nullptr;
+        const Scope* scope = tok->scope();
+        while (scope && scope->type != Scope::eWhile && scope->type != Scope::eFor && scope->type != Scope::eDo)
+            scope = scope->nestedIn;
+        return scope;
+    }
 }
