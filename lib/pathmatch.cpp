@@ -22,6 +22,7 @@
 #include "utils.h"
 
 #include <cstddef>
+#include <iostream>
 #include <utility>
 
 PathMatch::PathMatch(std::vector<std::string> excludedPaths, bool caseSensitive)
@@ -75,6 +76,7 @@ bool PathMatch::match(const std::string &path) const
 
         }
     }
+    std::cout << "excluded path: " << path << std::endl;
     return false;
 }
 

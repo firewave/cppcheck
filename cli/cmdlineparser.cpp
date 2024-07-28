@@ -547,6 +547,10 @@ CmdLineParser::Result CmdLineParser::parseFromArgs(int argc, const char* const a
                 mSettings.cppHeaderProbe = true;
             }
 
+            // Show debug messages for ignored files
+            else if (std::strcmp(argv[i], "--debug-ignore") == 0)
+                mSettings.debugignore = true;
+
             // Show --debug output after the first simplifications
             else if (std::strcmp(argv[i], "--debug") == 0 ||
                      std::strcmp(argv[i], "--debug-normal") == 0)
@@ -1436,7 +1440,7 @@ CmdLineParser::Result CmdLineParser::parseFromArgs(int argc, const char* const a
         mPathNames = project.guiProject.pathNames;
 
     if (!project.fileSettings.empty()) {
-        project.ignorePaths(mIgnoredPaths);
+        project.ignorePaths(mIgnoredPaths, mSettings.debugignore);
         if (project.fileSettings.empty()) {
             mLogger.printError("no C or C++ source files found.");
             mLogger.printMessage("all paths were ignored"); // TODO: log this differently?

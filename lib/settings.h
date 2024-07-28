@@ -174,6 +174,9 @@ public:
     /** @brief Are we running from DACA script? */
     bool daca{};
 
+    /** @brief Is --debug-ignore given? */
+    bool debugignore{};
+
     /** @brief Internal: Is --debug-lookup given? */
     bool debuglookup{};
 
