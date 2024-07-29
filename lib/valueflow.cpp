@@ -7592,10 +7592,8 @@ struct ValueFlowPassRunner {
 
                     if (state.settings.severity.isEnabled(Severity::information)) {
                         const std::string& functionName = functionScope->className;
-                        const std::list<ErrorMessage::FileLocation> callstack(
-                            1,
-                            ErrorMessage::FileLocation(functionScope->bodyStart, &state.tokenlist));
-                        const ErrorMessage errmsg(callstack,
+                        ErrorMessage::FileLocation loc(functionScope->bodyStart, &state.tokenlist);
+                        const ErrorMessage errmsg({std::move(loc)},
                                                   state.tokenlist.getSourceFilePath(),
                                                   Severity::information,
                                                   "Limiting ValueFlow analysis in function '" + functionName + "' since it is too complex. "

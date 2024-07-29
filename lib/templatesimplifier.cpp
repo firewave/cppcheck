@@ -1173,8 +1173,8 @@ void TemplateSimplifier::useDefaultArgumentValues(TokenAndName &declaration)
                 // check for end
                 if (!it->end) {
                     if (mSettings.debugwarnings && mSettings.severity.isEnabled(Severity::debug)) {
-                        const std::list<const Token*> locationList(1, it->eq);
-                        const ErrorMessage errmsg(locationList, &mTokenizer.list,
+                        const ErrorMessage errmsg({it->eq},
+                                                  &mTokenizer.list,
                                                   Severity::debug,
                                                   "noparamend",
                                                   "TemplateSimplifier couldn't find end of template parameter.",
@@ -3084,8 +3084,7 @@ bool TemplateSimplifier::simplifyTemplateInstantiations(
                     std::list<std::string> typeStringsUsedInTemplateInstantiation;
                     const std::string typeForNewName = templateDeclaration.name() + "<" + getNewName(instantiation.token(), typeStringsUsedInTemplateInstantiation) + ">";
 
-                    const std::list<const Token *> callstack(1, instantiation.token());
-                    const ErrorMessage errmsg(callstack,
+                    const ErrorMessage errmsg({instantiation.token()},
                                               &mTokenizer.list,
                                               Severity::information,
                                               "templateRecursion",
@@ -3204,9 +3203,13 @@ bool TemplateSimplifier::simplifyTemplateInstantiations(
         if ((typeForNewName.empty() && !templateDeclaration.isVariadic()) ||
             (!typeParametersInDeclaration.empty() && !instantiateMatch(tok2, typeParametersInDeclaration.size(), templateDeclaration.isVariadic(), nullptr))) {
             if (printDebug) {
-                std::list<const Token *> callstack(1, tok2);
-                mErrorLogger.reportErr(ErrorMessage(callstack, &mTokenList, Severity::debug, "templateInstantiation",
-                                                    "Failed to instantiate template \"" + instantiation.name() + "\". The checking continues anyway.", Certainty::normal));
+                ErrorMessage errmsg({tok2},
+                                    &mTokenList,
+                                    Severity::debug,
+                                    "templateInstantiation",
+                                    "Failed to instantiate template \"" + instantiation.name() + "\". The checking continues anyway.",
+                                    Certainty::normal);
+                mErrorLogger.reportErr(errmsg);
             }
             if (typeForNewName.empty())
                 continue;
@@ -3281,9 +3284,13 @@ bool TemplateSimplifier::simplifyTemplateInstantiations(
 
         if (typeForNewName.empty()) {
             if (printDebug) {
-                std::list<const Token *> callstack(1, tok2);
-                mErrorLogger.reportErr(ErrorMessage(callstack, &mTokenList, Severity::debug, "templateInstantiation",
-                                                    "Failed to instantiate template \"" + templateDeclaration.name() + "\". The checking continues anyway.", Certainty::normal));
+                ErrorMessage errmsg({tok2},
+                                    &mTokenList,
+                                    Severity::debug,
+                                    "templateInstantiation",
+                                    "Failed to instantiate template \"" + templateDeclaration.name() + "\". The checking continues anyway.",
+                                    Certainty::normal)
+                mErrorLogger.reportErr(errmsg);
             }
             return false;
         }
@@ -3975,8 +3982,8 @@ void TemplateSimplifier::simplifyTemplates(const std::time_t maxtime)
 
     if (passCount == passCountMax) {
         if (mSettings.debugwarnings) {
-            const std::list<const Token*> locationList(1, mTokenList.front());
-            const ErrorMessage errmsg(locationList, &mTokenizer.list,
+            const ErrorMessage errmsg({mTokenList.front()},
+                                      &mTokenizer.list,
                                       Severity::debug,
                                       "debug",
                                       "TemplateSimplifier: pass count limit hit before simplifications were finished.",

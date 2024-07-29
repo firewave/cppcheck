@@ -2098,9 +2098,10 @@ void SymbolDatabase::validateExecutableScopes() const
         const Scope* const scope = functionScopes[i];
         const Function* const function = scope->function;
         if (scope->isExecutable() && !function) {
-            const std::list<const Token*> callstack(1, scope->classDef);
             const std::string msg = std::string("Executable scope '") + scope->classDef->str() + "' with unknown function.";
-            const ErrorMessage errmsg(callstack, &mTokenizer.list, Severity::debug,
+            const ErrorMessage errmsg({scope->classDef},
+                                      &mTokenizer.list,
+                                      Severity::debug,
                                       "symbolDatabaseWarning",
                                       msg,
                                       Certainty::normal);
@@ -3599,8 +3600,8 @@ std::string Type::name() const
 void SymbolDatabase::debugMessage(const Token *tok, const std::string &type, const std::string &msg) const
 {
     if (tok && mSettings.debugwarnings) {
-        const std::list<const Token*> locationList(1, tok);
-        const ErrorMessage errmsg(locationList, &mTokenizer.list,
+        const ErrorMessage errmsg({tok},
+                                  &mTokenizer.list,
                                   Severity::debug,
                                   type,
                                   msg,
@@ -3612,8 +3613,8 @@ void SymbolDatabase::debugMessage(const Token *tok, const std::string &type, con
 void SymbolDatabase::returnImplicitIntError(const Token *tok) const
 {
     if (tok && mSettings.severity.isEnabled(Severity::portability) && (tok->isC() && mSettings.standards.c != Standards::C89)) {
-        const std::list<const Token*> locationList(1, tok);
-        const ErrorMessage errmsg(locationList, &mTokenizer.list,
+        const ErrorMessage errmsg({tok},
+                                  &mTokenizer.list,
                                   Severity::portability,
                                   "returnImplicitInt",
                                   "Omitted return type of function '" + tok->str() + "' defaults to int, this is not supported by ISO C99 and later standards.",

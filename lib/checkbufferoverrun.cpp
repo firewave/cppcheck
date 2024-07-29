@@ -1012,7 +1012,7 @@ bool CheckBufferOverrun::analyseWholeProgram1(const std::map<std::string, std::l
 {
     const CTU::FileInfo::FunctionCall *functionCall = nullptr;
 
-    const std::list<ErrorMessage::FileLocation> &locationList =
+    std::list<ErrorMessage::FileLocation> locationList =
         CTU::FileInfo::getErrorPath(CTU::FileInfo::InvalidValueType::bufferOverflow,
                                     unsafeUsage,
                                     callsMap,
@@ -1039,7 +1039,7 @@ bool CheckBufferOverrun::analyseWholeProgram1(const std::map<std::string, std::l
         cwe = CWE_POINTER_ARITHMETIC_OVERFLOW;
     }
 
-    const ErrorMessage errorMessage(locationList,
+    const ErrorMessage errorMessage(std::move(locationList),
                                     emptyString,
                                     Severity::error,
                                     errmsg,

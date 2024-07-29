@@ -3385,9 +3385,13 @@ void Tokenizer::simplifyUsingError(const Token* usingStart, const Token* usingEn
             str += tok->str();
         }
         str += " ;";
-        std::list<const Token *> callstack(1, usingStart);
-        mErrorLogger.reportErr(ErrorMessage(callstack, &list, Severity::debug, "simplifyUsing",
-                                            "Failed to parse \'" + str + "\'. The checking continues anyway.", Certainty::normal));
+        ErrorMessage errmsg({usingStart},
+                            &list,
+                            Severity::debug,
+                            "simplifyUsing",
+                            "Failed to parse \'" + str + "\'. The checking continues anyway.",
+                            Certainty::normal);
+        mErrorLogger.reportErr(errmsg);
     }
 }
 
