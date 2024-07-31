@@ -1331,7 +1331,8 @@ namespace {
         ValueFlow::Value executeMultiCondition(bool b, const Token* expr)
         {
             if (pm->hasValue(expr->exprId())) {
-                const ValueFlow::Value& v = pm->at(expr->exprId());
+                const auto& pm2 = *pm;
+                const ValueFlow::Value& v = pm2.at(expr->exprId());
                 if (v.isIntValue())
                     return v;
             }
@@ -1700,7 +1701,8 @@ namespace {
             if (!expr)
                 return v;
             if (expr->exprId() > 0 && pm->hasValue(expr->exprId())) {
-                if (updateValue(v, pm->at(expr->exprId())))
+                const auto& pm2 = *pm;
+                if (updateValue(v, pm2.at(expr->exprId())))
                     return v;
             }
             // Find symbolic values
@@ -1711,7 +1713,8 @@ namespace {
                     continue;
                 if (value.tokvalue->exprId() > 0 && !pm->hasValue(value.tokvalue->exprId()))
                     continue;
-                ValueFlow::Value v2 = pm->at(value.tokvalue->exprId());
+                const auto& pm2 = *pm;
+                ValueFlow::Value v2 = pm2.at(value.tokvalue->exprId());
                 if (!v2.isIntValue() && value.intvalue != 0)
                     continue;
                 v2.intvalue += value.intvalue;
