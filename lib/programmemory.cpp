@@ -1641,14 +1641,19 @@ namespace {
                 // Check if function modifies argument
                 visitAstNodes(expr->astOperand2(), [&](const Token* child) {
                     if (child->exprId() > 0 && pm->hasValue(child->exprId())) {
-                        ValueFlow::Value& v = pm->at(child->exprId());
+                        const auto& pm2 = *pm;
+                        const ValueFlow::Value& v = pm2.at(child->exprId());
                         assert(settings != nullptr);
                         if (v.valueType == ValueFlow::Value::ValueType::CONTAINER_SIZE) {
-                            if (ValueFlow::isContainerSizeChanged(child, v.indirect, *settings))
-                                v = unknown();
+                            if (ValueFlow::isContainerSizeChanged(child, v.indirect, *settings)) {
+                                ValueFlow::Value& v2 = pm->at(child->exprId());
+                                v2 = unknown();
+                            }
                         } else if (v.valueType != ValueFlow::Value::ValueType::UNINIT) {
-                            if (isVariableChanged(child, v.indirect, *settings))
-                                v = unknown();
+                            if (isVariableChanged(child, v.indirect, *settings)) {
+                                ValueFlow::Value& v2 = pm->at(child->exprId());
+                                v2 = unknown();
+                            }
                         }
                     }
                     return ChildrenToVisit::op1_and_op2;
