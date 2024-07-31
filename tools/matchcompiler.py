@@ -189,7 +189,7 @@ class MatchCompiler:
         elif (len(tok) > 2) and (tok[0] == "%"):
             print("unhandled:" + tok)
         elif tok in tokTypes:
-            cond = ' || '.join(['tok->tokType() == Token::{}'.format(tokType) for tokType in tokTypes[tok]])
+            cond = 'tok->tokType() & (' +  '|'.join(['Token::{}'.format(tokType) for tokType in tokTypes[tok]]) + ')'
             return '(({cond}) && tok->str() == MatchCompiler::makeConstString("{tok}"))'.format(cond=cond, tok=tok)
         return (
             '(tok->str() == MatchCompiler::makeConstString("' + tok + '"))'

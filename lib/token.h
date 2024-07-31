@@ -169,15 +169,38 @@ public:
     Token(const Token &) = delete;
     Token& operator=(const Token &) = delete;
 
-    enum Type : std::uint8_t {
-        eVariable, eType, eFunction, eKeyword, eName, // Names: Variable (varId), Type (typeId, later), Function (FuncId, later), Language keyword, Name (unknown identifier)
-        eNumber, eString, eChar, eBoolean, eLiteral, eEnumerator, // Literals: Number, String, Character, Boolean, User defined literal (C++11), Enumerator
-        eArithmeticalOp, eComparisonOp, eAssignmentOp, eLogicalOp, eBitOp, eIncDecOp, eExtendedOp, // Operators: Arithmetical, Comparison, Assignment, Logical, Bitwise, ++/--, Extended
-        eBracket, // {, }, <, >: < and > only if link() is set. Otherwise they are comparison operators.
-        eLambda, // A function without a name
-        eEllipsis, // "..."
-        eOther,
-        eNone
+    enum Type : std::uint32_t {
+        // Names
+        eVariable = (1ULL << 0),      // Variable (varId)
+        eType = (1ULL << 1),          // Type (typeId, later)
+        eFunction = (1ULL << 2),      // Function (FuncId, later)
+        eKeyword = (1ULL << 3),       // Language keyword
+        eName = (1ULL << 4),          // Name (unknown identifier)
+        // Literals
+        eNumber = (1ULL << 5),        // Number
+        eString = (1ULL << 6),        // String
+        eChar = (1ULL << 7),          // Character
+        eBoolean = (1ULL << 8),       // Boolean
+        eLiteral = (1ULL << 9),       // User defined literal (C++11)
+        eEnumerator = (1ULL << 10),    // Enumerator
+        // Operators:
+        eArithmeticalOp = (1ULL << 11), // Arithmetical
+        eComparisonOp = (1ULL << 12),   // Comparison
+        eAssignmentOp = (1ULL << 13),   // Assignment
+        eLogicalOp = (1ULL << 14),      // Logical
+        eBitOp = (1ULL << 15),         // Bitwise
+        eIncDecOp = (1ULL << 16),      // ++/--
+        eExtendedOp = (1ULL << 17),     // Extended
+        // Bracket
+        eBracket = (1ULL << 18), // {, }, <, >: < and > only if link() is set. Otherwise they are comparison operators.
+        // Lamdba
+        eLambda = (1ULL << 19), // A function without a name
+        // Ellipsis
+        eEllipsis = (1ULL << 20), // "..."
+        // Other
+        eOther = (1ULL << 21),
+        // None
+        eNone = (1ULL << 22)
     };
 
     explicit Token(TokensFrontBack &tokensFrontBack);
