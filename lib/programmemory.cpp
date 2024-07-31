@@ -1577,7 +1577,8 @@ namespace {
                 return execute(expr->astOperand1());
             }
             if (expr->exprId() > 0 && pm->hasValue(expr->exprId())) {
-                ValueFlow::Value result = pm->at(expr->exprId());
+                const ProgramMemory& pm2 = *pm;
+                ValueFlow::Value result = pm2.at(expr->exprId());
                 if (result.isImpossible() && result.isIntValue() && result.intvalue == 0 && isUsedAsBool(expr, *settings)) {
                     result.intvalue = !result.intvalue;
                     result.setKnown();
