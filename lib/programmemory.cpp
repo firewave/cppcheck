@@ -476,8 +476,12 @@ ProgramMemoryState::ProgramMemoryState(const Settings* s) : settings(s)
 void ProgramMemoryState::replace(ProgramMemory pm, const Token* origin)
 {
     if (origin)
-        for (const auto& p : pm)
+    {
+        // use const object otherwise it will call the non-const begin()
+        const auto& pm2 = pm;
+        for (const auto& p : pm2)
             origins[p.first.getExpressionId()] = origin;
+    }
     state.replace(std::move(pm));
 }
 
@@ -1370,7 +1374,9 @@ namespace {
             if (!sortConditions(conditions1))
                 return unknown();
 
-            for (const auto& p : *pm) {
+            // use const object otherwise it will call the non-const begin()
+            const auto& pm2 = *pm;
+            for (const auto& p : pm2) {
                 const Token* tok = p.first.tok;
                 if (!tok)
                     continue;
