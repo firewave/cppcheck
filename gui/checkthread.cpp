@@ -63,7 +63,7 @@ int CheckThread::executeCommand(std::string exe, std::vector<std::string> args, 
     output.clear();
 
     QStringList args2;
-    for (const std::string &arg: args)
+    for (const std::string &arg: utils::as_const(args))
         args2 << QString::fromStdString(arg);
 
     QProcess process;
@@ -203,7 +203,7 @@ void CheckThread::runAddonsAndTools(const Settings& settings, const FileSettings
                 args << ("-I" + QString::fromStdString(*incIt));
             for (auto i = fileSettings->systemIncludePaths.cbegin(); i != fileSettings->systemIncludePaths.cend(); ++i)
                 args << "-isystem" << QString::fromStdString(*i);
-            for (const QString& def : QString::fromStdString(fileSettings->defines).split(";")) {
+            for (const QString& def : utils::as_const(QString::fromStdString(fileSettings->defines).split(";"))) {
                 args << ("-D" + def);
             }
             for (const std::string& U : fileSettings->undefs) {
@@ -213,7 +213,7 @@ void CheckThread::runAddonsAndTools(const Settings& settings, const FileSettings
             const QString clangPath = CheckThread::clangTidyCmd();
             if (!clangPath.isEmpty()) {
                 QDir dir(clangPath + "/../lib/clang");
-                for (const QString& ver : dir.entryList()) {
+                for (const QString& ver : utils::as_const(dir.entryList())) {
                     QString includePath = dir.absolutePath() + '/' + ver + "/include";
                     if (ver[0] != '.' && QDir(includePath).exists()) {
                         args << "-isystem" << includePath;
@@ -418,7 +418,7 @@ void CheckThread::parseClangErrors(const QString &tool, const QString &file0, QS
     }
     errorItems.append(errorItem);
 
-    for (const ErrorItem &e : errorItems) {
+    for (const ErrorItem &e : utils::as_const(errorItems)) {
         if (e.errorPath.isEmpty())
             continue;
         SuppressionList::ErrorMessage errorMessage;
