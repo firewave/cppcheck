@@ -359,7 +359,7 @@ CmdLineParser::Result CmdLineParser::parseFromArgs(int argc, const char* const a
         if (std::strcmp(argv[i], "--doc") == 0) {
             std::ostringstream doc;
             // Get documentation..
-            for (const Check * it : Check::instances()) {
+            for (const Check * it : utils::as_const(Check::instances())) {
                 const std::string& name(it->name());
                 const std::string info(it->classInfo());
                 if (!name.empty() && !info.empty())
@@ -1168,7 +1168,7 @@ CmdLineParser::Result CmdLineParser::parseFromArgs(int argc, const char* const a
             std::string projectFile = argv[i]+10;
             projectType = project.import(projectFile, &mSettings, &mSuppressions);
             if (projectType == ImportProject::Type::CPPCHECK_GUI) {
-                for (const std::string &lib : project.guiProject.libraries)
+                for (const std::string &lib : utils::as_const(project.guiProject.libraries))
                     mSettings.libraries.emplace_back(lib);
 
                 const auto& excludedPaths = project.guiProject.excludedPaths;
@@ -2187,7 +2187,7 @@ bool CmdLineParser::loadLibraries(Settings& settings)
     }
 
     bool result = true;
-    for (const auto& lib : settings.libraries) {
+    for (const auto& lib : utils::as_const(settings.libraries)) {
         if (!tryLoadLibrary(settings.library, settings.exename, lib.c_str(), settings.debuglookup || settings.debuglookupLibrary)) {
             result = false;
         }
@@ -2198,7 +2198,7 @@ bool CmdLineParser::loadLibraries(Settings& settings)
 bool CmdLineParser::loadAddons(Settings& settings)
 {
     bool result = true;
-    for (const std::string &addon: settings.addons) {
+    for (const std::string &addon: utils::as_const(settings.addons)) {
         AddonInfo addonInfo;
         const std::string failedToGetAddonInfo = addonInfo.getAddonInfo(addon, settings.exename, settings.debuglookup || settings.debuglookupAddon);
         if (!failedToGetAddonInfo.empty()) {

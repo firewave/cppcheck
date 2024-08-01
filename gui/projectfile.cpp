@@ -732,39 +732,39 @@ void ProjectFile::readStringList(QStringList &stringlist, QXmlStreamReader &read
     } while (!allRead);
 }
 
-void ProjectFile::setIncludes(const QStringList &includes)
+void ProjectFile::setIncludes(QStringList includes)
 {
-    mIncludeDirs = includes;
+    mIncludeDirs = std::move(includes);
 }
 
-void ProjectFile::setDefines(const QStringList &defines)
+void ProjectFile::setDefines(QStringList defines)
 {
-    mDefines = defines;
+    mDefines = std::move(defines);
 }
 
-void ProjectFile::setUndefines(const QStringList &undefines)
+void ProjectFile::setUndefines(QStringList undefines)
 {
-    mUndefines = undefines;
+    mUndefines = std::move(undefines);
 }
 
-void ProjectFile::setCheckPaths(const QStringList &paths)
+void ProjectFile::setCheckPaths(QStringList paths)
 {
-    mPaths = paths;
+    mPaths = std::move(paths);
 }
 
-void ProjectFile::setExcludedPaths(const QStringList &paths)
+void ProjectFile::setExcludedPaths(QStringList paths)
 {
-    mExcludedPaths = paths;
+    mExcludedPaths = std::move(paths);
 }
 
-void ProjectFile::setLibraries(const QStringList &libraries)
+void ProjectFile::setLibraries(QStringList libraries)
 {
-    mLibraries = libraries;
+    mLibraries = std::move(libraries);
 }
 
-void ProjectFile::setPlatform(const QString &platform)
+void ProjectFile::setPlatform(QString platform)
 {
-    mPlatform = platform;
+    mPlatform = std::move(platform);
 }
 
 QList<SuppressionList::Suppression> ProjectFile::getCheckingSuppressions() const
@@ -782,9 +782,9 @@ QList<SuppressionList::Suppression> ProjectFile::getCheckingSuppressions() const
     return result;
 }
 
-void ProjectFile::setSuppressions(const QList<SuppressionList::Suppression> &suppressions)
+void ProjectFile::setSuppressions(QList<SuppressionList::Suppression> suppressions)
 {
-    mSuppressions = suppressions;
+    mSuppressions = std::move(suppressions);
 }
 
 void ProjectFile::addSuppression(const SuppressionList::Suppression &suppression)
@@ -792,14 +792,14 @@ void ProjectFile::addSuppression(const SuppressionList::Suppression &suppression
     mSuppressions.append(suppression);
 }
 
-void ProjectFile::setAddons(const QStringList &addons)
+void ProjectFile::setAddons(QStringList addons)
 {
-    mAddons = addons;
+    mAddons = std::move(addons);
 }
 
-void ProjectFile::setVSConfigurations(const QStringList &vsConfigs)
+void ProjectFile::setVSConfigurations(QStringList vsConfigs)
 {
-    mVsConfigurations = vsConfigs;
+    mVsConfigurations = std::move(vsConfigs);
 }
 
 void ProjectFile::setCheckLevel(ProjectFile::CheckLevel checkLevel)
@@ -997,14 +997,14 @@ bool ProjectFile::write(const QString &filename)
     writeStringList(xmlWriter, mTags, CppcheckXml::TagsElementName, CppcheckXml::TagElementName);
     if (!mWarningTags.empty()) {
         QStringList tags;
-        for (const auto& wt: mWarningTags) {
+        for (const auto& wt: utils::as_const(mWarningTags)) {
             if (!tags.contains(wt.second))
                 tags.append(wt.second);
         }
-        for (const QString &tag: tags) {
+        for (const QString &tag: utils::as_const(tags)) {
             xmlWriter.writeStartElement(CppcheckXml::TagWarningsElementName);
             xmlWriter.writeAttribute(CppcheckXml::TagAttributeName, tag);
-            for (const auto& wt: mWarningTags) {
+            for (const auto& wt: utils::as_const(mWarningTags)) {
                 if (wt.second == tag) {
                     xmlWriter.writeStartElement(CppcheckXml::WarningElementName);
                     xmlWriter.writeAttribute(CppcheckXml::HashAttributeName, QString::number(wt.first));

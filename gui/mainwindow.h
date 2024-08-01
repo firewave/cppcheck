@@ -360,7 +360,7 @@ private:
      * @param includeDirs List of include directories to add.
      * @param result Settings class where include directories are added.
      */
-    void addIncludeDirs(const QStringList &includeDirs, Settings &result);
+    void addIncludeDirs(const QStringList &includeDirs, Settings &result) const;
 
     /**
      * @brief Handle command line parameters given to GUI.
@@ -399,7 +399,7 @@ private:
      * @param filename filename (no path)
      * @return error code
      */
-    Library::Error loadLibrary(Library &library, const QString &filename);
+    Library::Error loadLibrary(Library &library, const QString &filename) const;
 
     /**
      * @brief Tries to load library file, prints message on error
@@ -409,7 +409,7 @@ private:
      */
     bool tryLoadLibrary(Library &library, const QString& filename);
 
-    QString loadAddon(Settings &settings, const QString &filesDir, const QString &pythonCmd, const QString& addon);
+    QString loadAddon(Settings &settings, const QString &filesDir, const QString &pythonCmd, const QString& addon) const;
 
     /**
      * @brief Update project MRU items in File-menu.

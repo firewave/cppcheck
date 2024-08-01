@@ -894,7 +894,7 @@ void MainWindow::analyzeDirectory()
     }
 }
 
-void MainWindow::addIncludeDirs(const QStringList &includeDirs, Settings &result)
+void MainWindow::addIncludeDirs(const QStringList &includeDirs, Settings &result) const
 {
     for (const QString& dir : includeDirs) {
         QString incdir;
@@ -910,7 +910,7 @@ void MainWindow::addIncludeDirs(const QStringList &includeDirs, Settings &result
     }
 }
 
-Library::Error MainWindow::loadLibrary(Library &library, const QString &filename)
+Library::Error MainWindow::loadLibrary(Library &library, const QString &filename) const
 {
     Library::Error ret;
 
@@ -1023,7 +1023,7 @@ bool MainWindow::tryLoadLibrary(Library &library, const QString& filename)
     return true;
 }
 
-QString MainWindow::loadAddon(Settings &settings, const QString &filesDir, const QString &pythonCmd, const QString& addon)
+QString MainWindow::loadAddon(Settings &settings, const QString &filesDir, const QString &pythonCmd, const QString& addon) const
 {
     const QString addonFilePath = fromNativePath(ProjectFile::getAddonFilePath(filesDir, addon));
 
@@ -1109,7 +1109,7 @@ bool MainWindow::getCppcheckSettings(Settings& settings, Suppressions& supprs)
 
         settings.inlineSuppressions = mProjectFile->getInlineSuppression();
 
-        const QStringList defines = mProjectFile->getDefines();
+        const QStringList& defines = mProjectFile->getDefines();
         for (const QString& define : defines) {
             if (!settings.userDefines.empty())
                 settings.userDefines += ";";
@@ -1118,13 +1118,13 @@ bool MainWindow::getCppcheckSettings(Settings& settings, Suppressions& supprs)
 
         settings.clang = mProjectFile->clangParser;
 
-        const QStringList undefines = mProjectFile->getUndefines();
+        const QStringList& undefines = mProjectFile->getUndefines();
         for (const QString& undefine : undefines)
             settings.userUndefs.insert(undefine.toStdString());
 
         mProjectFile->setSettingsUserIncludes(settings);
 
-        const QStringList libraries = mProjectFile->getLibraries();
+        const QStringList& libraries = mProjectFile->getLibraries();
         for (const QString& library : libraries) {
             settings.libraries.emplace_back(library.toStdString());
             const QString filename = library + ".cfg";
@@ -2223,7 +2223,7 @@ void MainWindow::suppressIds(QStringList ids)
     ids.removeDuplicates();
 
     QList<SuppressionList::Suppression> suppressions = mProjectFile->getSuppressions();
-    for (const QString& id : ids) {
+    for (const QString& id : utils::as_const(ids)) {
         // Remove all matching suppressions
         std::string id2 = id.toStdString();
         for (int i = 0; i < suppressions.size();) {
@@ -2238,7 +2238,7 @@ void MainWindow::suppressIds(QStringList ids)
         suppressions << newSuppression;
     }
 
-    mProjectFile->setSuppressions(suppressions);
+    mProjectFile->setSuppressions(std::move(suppressions));
     mProjectFile->write();
 }
 

@@ -288,10 +288,30 @@ void CheckClass::constructors()
             std::list<const Function *> callstack;
             initializeVarList(func, callstack, scope, usageList);
 
-            handleUnionMembers(usageList);
+            // Assign 1 union member => assign all union members
+            for (const Usage &usage : utils::as_const(usageList)) {
+                const Variable& var = *usage.var;
+                if (!usage.assign && !usage.init)
+                    continue;
+                const Scope* varScope1 = var.nameToken()->scope();
+                while (varScope1->type == ScopeType::eStruct)
+                    varScope1 = varScope1->nestedIn;
+                if (varScope1->type == ScopeType::eUnion) {
+                    for (Usage &usage2 : usageList) {
+                        const Variable& var2 = *usage2.var;
+                        if (usage2.assign || usage2.init || var2.isStatic())
+                            continue;
+                        const Scope* varScope2 = var2.nameToken()->scope();
+                        while (varScope2->type == ScopeType::eStruct)
+                            varScope2 = varScope2->nestedIn;
+                        if (varScope1 == varScope2)
+                            usage2.assign = true;
+                    }
+                }
+            }
 
             // Check if any variables are uninitialized
-            for (const Usage &usage : usageList) {
+            for (const Usage &usage : utils::as_const(usageList)) {
                 if (isInitialized(usage, func.type))
                     continue;
 
@@ -2864,7 +2884,7 @@ void CheckClass::initializerListOrder()
 
                     for (std::size_t j = 0; j < vars.size(); j++) {
                         // check for use of uninitialized arguments
-                        for (const auto& arg : vars[j].initArgs)
+                        for (const auto& arg : utils::as_const(vars[j].initArgs))
                             if (vars[j].var->index() < arg->index())
                                 initializerListError(vars[j].tok, vars[j].var->nameToken(), scope->className, vars[j].var->name(), arg->name());
 

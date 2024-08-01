@@ -277,16 +277,16 @@ public:
      * @brief Set project root path.
      * @param rootpath new project root path.
      */
-    void setRootPath(const QString &rootpath) {
-        mRootPath = rootpath;
+    void setRootPath(QString rootpath) {
+        mRootPath = std::move(rootpath);
     }
 
-    void setBuildDir(const QString &buildDir) {
-        mBuildDir = buildDir;
+    void setBuildDir(QString buildDir) {
+        mBuildDir = std::move(buildDir);
     }
 
-    void setImportProject(const QString &importProject) {
-        mImportProject = importProject;
+    void setImportProject(QString importProject) {
+        mImportProject = std::move(importProject);
     }
 
     void setAnalyzeAllVsConfigs(bool b) {
@@ -297,49 +297,49 @@ public:
      * @brief Set list of includes.
      * @param includes List of defines.
      */
-    void setIncludes(const QStringList &includes);
+    void setIncludes(QStringList includes);
 
     /**
      * @brief Set list of defines.
      * @param defines List of defines.
      */
-    void setDefines(const QStringList &defines);
+    void setDefines(QStringList defines);
 
     /**
      * @brief Set list of undefines.
      * @param undefines List of undefines.
      */
-    void setUndefines(const QStringList &undefines);
+    void setUndefines(QStringList undefines);
 
     /**
      * @brief Set list of paths to check.
      * @param paths List of paths.
      */
-    void setCheckPaths(const QStringList &paths);
+    void setCheckPaths(QStringList paths);
 
     /**
      * @brief Set list of paths to exclude from the check.
      * @param paths List of paths.
      */
-    void setExcludedPaths(const QStringList &paths);
+    void setExcludedPaths(QStringList paths);
 
     /**
      * @brief Set list of libraries.
      * @param libraries List of libraries.
      */
-    void setLibraries(const QStringList &libraries);
+    void setLibraries(QStringList libraries);
 
     /**
      * @brief Set platform.
      * @param platform platform.
      */
-    void setPlatform(const QString &platform);
+    void setPlatform(QString platform);
 
     /**
      * @brief Set list of suppressions.
      * @param suppressions List of suppressions.
      */
-    void setSuppressions(const QList<SuppressionList::Suppression> &suppressions);
+    void setSuppressions(QList<SuppressionList::Suppression> suppressions);
 
     /** Add suppression */
     void addSuppression(const SuppressionList::Suppression &suppression);
@@ -348,12 +348,12 @@ public:
      * @brief Set list of addons.
      * @param addons List of addons.
      */
-    void setAddons(const QStringList &addons);
+    void setAddons(QStringList addons);
 
     /** @brief Set list of Visual Studio configurations to be checked
      *  @param vsConfigs List of configurations
      */
-    void setVSConfigurations(const QStringList &vsConfigs);
+    void setVSConfigurations(QStringList vsConfigs);
 
     /** CheckLevel: normal/exhaustive */
     void setCheckLevel(CheckLevel checkLevel);
@@ -405,8 +405,8 @@ public:
     }
 
     /** Cppcheck Premium: License file */
-    void setLicenseFile(const QString& licenseFile) {
-        mPremiumLicenseFile = licenseFile;
+    void setLicenseFile(QString licenseFile) {
+        mPremiumLicenseFile = std::move(licenseFile);
     }
     const QString& getLicenseFile() const {
         return mPremiumLicenseFile;
@@ -422,8 +422,8 @@ public:
      * @brief Set filename for the project file.
      * @param filename Filename to use.
      */
-    void setFilename(const QString &filename) {
-        mFilename = filename;
+    void setFilename(QString filename) {
+        mFilename = std::move(filename);
     }
 
     /** Do not only check how interface is used. Also check that interface is safe. */

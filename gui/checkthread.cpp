@@ -63,7 +63,7 @@ int CheckThread::executeCommand(std::string exe, std::vector<std::string> args, 
     output.clear();
 
     QStringList args2;
-    for (const std::string &arg: args)
+    for (const std::string &arg: utils::as_const(args))
         args2 << QString::fromStdString(arg);
 
     QProcess process;
@@ -418,7 +418,7 @@ void CheckThread::parseClangErrors(const QString &tool, const QString &file0, QS
     }
     errorItems.append(errorItem);
 
-    for (const ErrorItem &e : errorItems) {
+    for (const ErrorItem &e : utils::as_const(errorItems)) {
         if (e.errorPath.isEmpty())
             continue;
         SuppressionList::ErrorMessage errorMessage;

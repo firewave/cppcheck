@@ -529,7 +529,7 @@ void ProjectFileDialog::saveToProjectFile(ProjectFile *projectFile) const
         addons << "y2038";
     if (mUI->mMisraC->isChecked())
         addons << ADDON_MISRA;
-    projectFile->setAddons(addons);
+    projectFile->setAddons(std::move(addons));
     QStringList codingStandards;
     if (mUI->mCertC2016->isChecked())
         codingStandards << CODING_STANDARD_CERT_C;
@@ -838,7 +838,7 @@ void ProjectFileDialog::setSuppressions(const QList<SuppressionList::Suppression
     mUI->mListSuppressions->clear();
     QList<SuppressionList::Suppression> new_suppressions = suppressions;
     mSuppressions.clear();
-    for (const SuppressionList::Suppression &suppression : new_suppressions) {
+    for (const SuppressionList::Suppression &suppression : utils::as_const(new_suppressions)) {
         addSingleSuppression(suppression);
     }
     mUI->mListSuppressions->sortItems();
