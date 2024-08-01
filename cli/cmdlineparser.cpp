@@ -1066,7 +1066,7 @@ CmdLineParser::Result CmdLineParser::parseFromArgs(int argc, const char* const a
                 ImportProject::Type projType = project.import(projectFile, &mSettings);
                 project.projectType = projType;
                 if (projType == ImportProject::Type::CPPCHECK_GUI) {
-                    for (const std::string &lib : project.guiProject.libraries)
+                    for (const std::string &lib : utils::as_const(project.guiProject.libraries))
                         mSettings.libraries.emplace_back(lib);
 
                     const auto& excludedPaths = project.guiProject.excludedPaths;
@@ -1953,7 +1953,7 @@ bool CmdLineParser::loadLibraries(Settings& settings)
     }
 
     bool result = true;
-    for (const auto& lib : settings.libraries) {
+    for (const auto& lib : utils::as_const(settings.libraries)) {
         if (!tryLoadLibrary(settings.library, settings.exename, lib.c_str(), settings.debuglookup || settings.debuglookupLibrary)) {
             result = false;
         }
@@ -1964,7 +1964,7 @@ bool CmdLineParser::loadLibraries(Settings& settings)
 bool CmdLineParser::loadAddons(Settings& settings)
 {
     bool result = true;
-    for (const std::string &addon: settings.addons) {
+    for (const std::string &addon: utils::as_const(settings.addons)) {
         AddonInfo addonInfo;
         const std::string failedToGetAddonInfo = addonInfo.getAddonInfo(addon, settings.exename, settings.debuglookup || settings.debuglookupAddon);
         if (!failedToGetAddonInfo.empty()) {
