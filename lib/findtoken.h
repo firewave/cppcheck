@@ -41,36 +41,20 @@ inline std::vector<MathLib::bigint> evaluateKnownValues(const Token* tok)
     return {tok->getKnownIntValue()};
 }
 
-template<class T, class Predicate, class Found, REQUIRES("T must be a Token class", std::is_convertible<T*, const Token*> )>
-void findTokensImpl(T* start, const Token* end, const Predicate& pred, Found found)
+template<class T, class Predicate, REQUIRES("T must be a Token class", std::is_convertible<T*, const Token*> )>
+T* findToken(T* start, const Token* end, const Predicate& pred)
 {
+    T* result = nullptr;
+    auto found = [&](T* tok) {
+        result = tok;
+        return true;
+    };
     for (T* tok = start; precedes(tok, end); tok = tok->next()) {
         if (pred(tok)) {
             if (found(tok))
                 break;
         }
     }
-}
-
-template<class T, class Predicate, REQUIRES("T must be a Token class", std::is_convertible<T*, const Token*> )>
-std::vector<T*> findTokens(T* start, const Token* end, const Predicate& pred)
-{
-    std::vector<T*> result;
-    findTokensImpl(start, end, pred, [&](T* tok) {
-        result.push_back(tok);
-        return false;
-    });
-    return result;
-}
-
-template<class T, class Predicate, REQUIRES("T must be a Token class", std::is_convertible<T*, const Token*> )>
-T* findToken(T* start, const Token* end, const Predicate& pred)
-{
-    T* result = nullptr;
-    findTokensImpl(start, end, pred, [&](T* tok) {
-        result = tok;
-        return true;
-    });
     return result;
 }
 
@@ -175,41 +159,9 @@ bool findTokensSkipDeadCodeImpl(const Library& library,
     return false;
 }
 
-template<class T, class Predicate, class Evaluate, REQUIRES("T must be a Token class", std::is_convertible<T*, const Token*> )>
-std::vector<T*> findTokensSkipDeadCode(const Library& library,
-                                       T* start,
-                                       const Token* end,
-                                       const Predicate& pred,
-                                       const Evaluate& evaluate)
-{
-    std::vector<T*> result;
-    (void)findTokensSkipDeadCodeImpl(
-        library,
-        start,
-        end,
-        pred,
-        [&](T* tok) {
-        result.push_back(tok);
-        return false;
-    },
-        evaluate,
-        false);
-    return result;
-}
-
 template<class T, class Predicate, REQUIRES("T must be a Token class", std::is_convertible<T*, const Token*> )>
 std::vector<T*> findTokensSkipDeadCode(const Library& library, T* start, const Token* end, const Predicate& pred)
 {
-    return findTokensSkipDeadCode(library, start, end, pred, &evaluateKnownValues);
-}
-
-template<class T, class Predicate, class Evaluate, REQUIRES("T must be a Token class", std::is_convertible<T*, const Token*> )>
-std::vector<T*> findTokensSkipDeadAndUnevaluatedCode(const Library& library,
-                                                     T* start,
-                                                     const Token* end,
-                                                     const Predicate& pred,
-                                                     const Evaluate& evaluate)
-{
     std::vector<T*> result;
     (void)findTokensSkipDeadCodeImpl(
         library,
@@ -220,15 +172,27 @@ std::vector<T*> findTokensSkipDeadAndUnevaluatedCode(const Library& library,
         result.push_back(tok);
         return false;
     },
-        evaluate,
-        true);
+        &evaluateKnownValues,
+        false);
     return result;
 }
 
 template<class T, class Predicate, REQUIRES("T must be a Token class", std::is_convertible<T*, const Token*> )>
 std::vector<T*> findTokensSkipDeadAndUnevaluatedCode(const Library& library, T* start, const Token* end, const Predicate& pred)
 {
-    return findTokensSkipDeadAndUnevaluatedCode(library, start, end, pred, &evaluateKnownValues);
+    std::vector<T*> result;
+    (void)findTokensSkipDeadCodeImpl(
+        library,
+        start,
+        end,
+        pred,
+        [&](T* tok) {
+        result.push_back(tok);
+        return false;
+    },
+        &evaluateKnownValues,
+        true);
+    return result;
 }
 
 
@@ -248,12 +212,6 @@ T* findTokenSkipDeadCode(const Library& library, T* start, const Token* end, con
         evaluate,
         false);
     return result;
-}
-
-template<class T, class Predicate, REQUIRES("T must be a Token class", std::is_convertible<T*, const Token*> )>
-T* findTokenSkipDeadCode(const Library& library, T* start, const Token* end, const Predicate& pred)
-{
-    return findTokenSkipDeadCode(library, start, end, pred, &evaluateKnownValues);
 }
 
 #endif // findtokenH
