@@ -67,7 +67,7 @@ bool findTokensSkipDeadCodeImpl(const Library& library,
                                 T* start,
                                 const Token* end,
                                 const Predicate& pred,
-                                Found found,
+                                const Found& found,
                                 const Evaluate& evaluate,
                                 bool skipUnevaluated)
 {
