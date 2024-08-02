@@ -3051,10 +3051,10 @@ namespace {
                                       const std::function<std::vector<MathLib::bigint>(const Token* tok)>& evaluate)
             : library(library), evaluate(&evaluate)
         {}
-        template<class F>
-        const Token* operator()(const Token* start, const Token* end, F f) const
+        template<class Predicate>
+        const Token* operator()(const Token* start, const Token* end, Predicate pred) const
         {
-            return findTokenSkipDeadCode(library, start, end, f, *evaluate);
+            return findTokenSkipDeadCode(library, start, end, pred, *evaluate);
         }
     };
 }
