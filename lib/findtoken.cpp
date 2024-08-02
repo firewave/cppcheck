@@ -20,17 +20,3 @@
 
 #include "token.h"
 
-bool findTokensSkipDeadCodeImplMatch_1(const Token* tok)
-{
-    return Token::Match(tok, "if|for|while (") && Token::simpleMatch(tok->linkAt(1), ") {");
-}
-
-bool findTokensSkipDeadCodeImplMatch_2(const Token* tok)
-{
-    return Token::Match(tok->astParent(), "&&|?|%oror%");
-}
-
-bool findTokensSkipDeadCodeImplMatch_3(const Token* tok)
-{
-    return Token::simpleMatch(tok, "[") && Token::Match(tok->link(), "] (|{");
-}

@@ -74,10 +74,6 @@ T* findToken(T* start, const Token* end, const Predicate& pred)
     return result;
 }
 
-bool findTokensSkipDeadCodeImplMatch_1(const Token* tok);
-bool findTokensSkipDeadCodeImplMatch_2(const Token* tok);
-bool findTokensSkipDeadCodeImplMatch_3(const Token* tok);
-
 template<class T,
          class Predicate,
          class Found,
@@ -96,8 +92,7 @@ bool findTokensSkipDeadCodeImpl(const Library& library,
             if (found(tok))
                 return true;
         }
-        //if (Token::Match(tok, "if|for|while (") && Token::simpleMatch(tok->linkAt(1), ") {")) {
-        if (findTokensSkipDeadCodeImplMatch_1(tok)) {
+        if (Token::Match(tok, "if|for|while (") && Token::simpleMatch(tok->linkAt(1), ") {")) {
             const Token* condTok = getCondTok(tok);
             if (!condTok)
                 continue;
@@ -129,8 +124,7 @@ bool findTokensSkipDeadCodeImpl(const Library& library,
                     return true;
                 tok = thenStart->link();
             }
-        //} else if (Token::Match(tok->astParent(), "&&|?|%oror%") && astIsLHS(tok)) {
-        } else if (findTokensSkipDeadCodeImplMatch_2(tok) && astIsLHS(tok)) {
+        } else if (Token::Match(tok->astParent(), "&&|?|%oror%") && astIsLHS(tok)) {
             auto result = evaluate(tok);
             if (result.empty())
                 continue;
@@ -164,8 +158,7 @@ bool findTokensSkipDeadCodeImpl(const Library& library,
             if (r != 0) {
                 tok = tok->linkAt(2);
             }
-        //} else if (Token::simpleMatch(tok, "[") && Token::Match(tok->link(), "] (|{")) {
-        } else if (findTokensSkipDeadCodeImplMatch_3(tok)) {
+        } else if (Token::simpleMatch(tok, "[") && Token::Match(tok->link(), "] (|{")) {
             T* afterCapture = tok->link()->next();
             if (Token::simpleMatch(afterCapture, "(") && afterCapture->link())
                 tok = afterCapture->link()->next();
