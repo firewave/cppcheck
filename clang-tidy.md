@@ -141,7 +141,6 @@ To be evaluated (need to remove exclusion).
 `cppcoreguidelines-macro-usage`<br/>
 `cppcoreguidelines-pro-type-member-init`<br/>
 `cppcoreguidelines-prefer-member-initializer`<br/>
-`cppcoreguidelines-misleading-capture-default-by-value`<br/>
 `bugprone-argument-comment.CommentBoolLiterals`<br/>
 `cert-err33-c`<br/>
 `google-readability-namespace-comments`<br/>
