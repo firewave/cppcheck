@@ -104,6 +104,7 @@ private:
         TEST_CASE(clarifyCondition8);
 
         TEST_CASE(alwaysTrue);
+        TEST_CASE(alwaysTrue2);
         TEST_CASE(alwaysTrueSymbolic);
         TEST_CASE(alwaysTrueInfer);
         TEST_CASE(alwaysTrueContainer);
@@ -4678,6 +4679,81 @@ private:
         ASSERT_EQUALS("", errout_str());
     }
 
+    void alwaysTrue2() {
+        check("void foo() {\n" // #11199
+              "    float f = 1.0;\n"
+              "    if (f > 1.0f) {}\n"
+              "}\n");
+        ASSERT_EQUALS("", errout_str());
+
+        check("void foo() {\n" // #11199
+              "    float f = 1.0;\n"
+              "    if (f > 1.0f) {}\n"
+              "}\n");
+        ASSERT_EQUALS("", errout_str());
+
+        check("void foo() {\n" // #11200
+              "    float f = 1.0;\n"
+              "    if (f > 1.0) {}\n"
+              "    if (f > +1.0) {}\n"
+              "    if (f > -1.0) {}\n"
+              "}\n");
+        ASSERT_EQUALS("", errout_str()); // TODO
+
+        check("void foo() {\n" // #11200
+              "    float pf = +1.0;\n"
+              "    if (pf > 1.0) {}\n"
+              "    if (pf > +1.0) {}\n"
+              "    if (pf > -1.0) {}\n"
+              "}\n");
+        ASSERT_EQUALS("", errout_str()); // TODO
+
+        check("void foo() {\n" // #11200
+              "    float nf = -1.0;\n"
+              "    if (nf > 1.0) {}\n"
+              "    if (nf > +1.0) {}\n"
+              "    if (nf > -1.0) {}\n"
+              "}\n");
+        ASSERT_EQUALS("", errout_str()); // TODO
+
+        check("void foo() {\n" // #11201
+              "    float f = 0x1.4p+3;\n"
+              "    if (f > 9.9) {}\n"
+              "    if (f < 9.9) {}\n"
+              "}\n");
+        ASSERT_EQUALS("", errout_str());
+
+        check("void foo() {\n" // #12330
+              "    double d = 1.0;\n"
+              "    if (d < 0.0) {}\n"
+              "}\n");
+        ASSERT_EQUALS("", errout_str());
+
+        check("void foo() {\n" // #12330
+              "    long double ld = 1.0;\n"
+              "    if (ld < 0.0) {}\n"
+              "}\n");
+        ASSERT_EQUALS("", errout_str());
+
+        check("void foo() {\n" // #12330
+              "    float f = 1.0;\n"
+              "    if (f < 0.0) {}\n"
+              "}\n");
+        ASSERT_EQUALS("", errout_str());
+
+        check("void foo() {\n" // #12774
+              "    float f = 1.0f;\n"
+              "    if (f > 1.01f) {}\n"
+              "}\n");
+        ASSERT_EQUALS("", errout_str());
+
+        check("void foo() {\n" // #12774
+              "    float f = 1.0;\n"
+              "    if (f > 1.01) {}\n"
+              "}\n");
+        ASSERT_EQUALS("", errout_str());
+    }
+
     void alwaysTrueSymbolic()
     {
         check("void f(const uint32_t x) {\n"
@@ -5725,6 +5801,14 @@ private:
               "    if (other.mPA.cols > 0 && other.mPA.rows > 0)\n"
               "        ;\n"
               "}");
+        ASSERT_EQUALS("", errout_str());
+
+        check("void foo() {\n" // #11202
+              "    float f = 0x1.4p+3;\n"
+              "    if (f > 10.0) {}\n"
+              "    if (f < 10.0) {}\n"
+              "}\n");
+        TODO_ASSERT_EQUALS("", "[test.cpp:2] -> [test.cpp:3] -> [test.cpp:4]: (style) The if condition is the same as the previous if condition\n", errout_str());
     }
 
     void checkInvalidTestForOverflow() {
