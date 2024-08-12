@@ -81,3 +81,5 @@ CheckOptions:
     value:           '1'
   - key:             readability-simplify-boolean-expr.SimplifyDeMorgan
     value:           '0'
+  - key:             cppcoreguidelines-special-member-functions.AllowImplicitlyDeletedCopyOrMove
+    value:           true
