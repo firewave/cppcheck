@@ -21,6 +21,7 @@ Checks: >
         cert-err34-c,
         cppcoreguidelines-pro-type-static-cast-downcast,
         cppcoreguidelines-rvalue-reference-param-not-moved,
+        cppcoreguidelines-special-member-functions,
         google-explicit-constructor,
         -bugprone-assignment-in-if-condition,
         -bugprone-branch-clone,
