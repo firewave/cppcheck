@@ -56,10 +56,13 @@ To be documented.
 
 This does not appear to be useful as it is reported on very common code.
 
-`bugprone-narrowing-conversions`<br/>
 `performance-no-automatic-move`<br/>
 
 It was decided not to apply these.
+
+`bugprone-narrowing-conversions`<br/>
+
+It was decided not to apply these (needs to be evaluated).
 
 `modernize-raw-string-literal`<br/>
 
@@ -83,7 +86,7 @@ This produces a lot of noise and they are not fixable that easily.
 
 `readability-container-data-pointer`<br/>
 
-Disable because of false positives and inconsistent warnings (need to file an upstream bug report).
+Disabled because of false positives and inconsistent warnings - see https://github.com/llvm/llvm-project/issues/54076.
 
 `misc-const-correctness`<br/>
 
@@ -135,6 +138,13 @@ To be evaluated (need to remove exclusion).
 `cert-err33-c`<br/>
 `google-readability-namespace-comments`<br/>
 `cppcoreguidelines-special-member-functions`<br/>
+`cppcoreguidelines-slicing`<br/>
+`google-readability-casting`<br/>
+`hicpp-ignored-remove-result`<br/>
+`hicpp-signed-bitwise`<br/>
+`cert-oop58-cpp`<br/>
+`cert-oop57-cpp`<br/>
+`cert-err60-cpp`<br/>
 
 To be evaluated (need to enable explicitly).
 
