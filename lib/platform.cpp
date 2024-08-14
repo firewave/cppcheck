@@ -193,17 +193,21 @@ bool Platform::loadFromFile(const char exename[], const std::string &filename, b
 {
     // TODO: only append .xml if missing
     // TODO: use native separators
-    std::vector<std::string> filenames{
-        filename,
-        filename + ".xml",
-        "platforms/" + filename,
-        "platforms/" + filename + ".xml"
-    };
-    if (exename && (std::string::npos != Path::fromNativeSeparators(exename).find('/'))) {
-        filenames.push_back(Path::getPathFromFilename(Path::fromNativeSeparators(exename)) + filename);
-        filenames.push_back(Path::getPathFromFilename(Path::fromNativeSeparators(exename)) + filename + ".xml");
-        filenames.push_back(Path::getPathFromFilename(Path::fromNativeSeparators(exename)) + "platforms/" + filename);
-        filenames.push_back(Path::getPathFromFilename(Path::fromNativeSeparators(exename)) + "platforms/" + filename + ".xml");
+    std::vector<std::string> filenames;
+    filenames.push_back(filename);
+    filenames.push_back(filename + ".xml");
+    filenames.push_back("platforms/" + filename);
+    filenames.push_back("platforms/" + filename + ".xml");
+    if (exename) {
+        const std::string exename_native = Path::fromNativeSeparators(exename);
+        if (exename_native.find('/') != std::string::npos)
+        {
+            const std::string exepath = Path::getPathFromFilename(exename_native);
+            filenames.push_back(exepath + filename);
+            filenames.push_back(exepath + filename + ".xml");
+            filenames.push_back(exepath + "platforms/" + filename);
+            filenames.push_back(exepath + "platforms/" + filename + ".xml");
+        }
     }
 #ifdef FILESDIR
     std::string filesdir = FILESDIR;
