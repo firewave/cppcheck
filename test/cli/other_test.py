@@ -1636,7 +1636,6 @@ def test_lib_lookup(tmpdir):
     ]
 
 
-# TODO: test with extension
 # TODO: test with FILESDIR
 def test_lib_lookup_notfound(tmpdir):
     test_file = os.path.join(tmpdir, 'test.c')
@@ -1659,6 +1658,27 @@ def test_lib_lookup_notfound(tmpdir):
         "looking for library '{}/cfg/none.cfg'".format(exepath),
         "library not found: 'none'",
         "cppcheck: Failed to load library configuration file 'none'. File not found"
+    ]
+
+
+def test_lib_lookup_ext_notfound(tmpdir):
+    test_file = os.path.join(tmpdir, 'test.c')
+    with open(test_file, 'wt'):
+        pass
+
+    exitcode, stdout, _, exe = cppcheck_ex(['--debug-lookup=library', '--library=none.cfg', test_file])
+    exepath = os.path.dirname(exe)
+    if sys.platform == 'win32':
+        exepath = exepath.replace('\\', '/')
+    assert exitcode == 1, stdout
+    lines = __remove_std_lookup_log(stdout.splitlines(), exepath)
+    assert lines == [
+        # TODO: specify which folder is actually used for lookup here
+        "looking for library 'none.cfg'",
+        "looking for library '{}/none.cfg'".format(exepath),
+        "looking for library '{}/cfg/none.cfg'".format(exepath),
+        "library not found: 'none.cfg'",
+        "cppcheck: Failed to load library configuration file 'none.cfg'. File not found"
     ]
 
 
