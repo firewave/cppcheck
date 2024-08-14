@@ -1699,6 +1699,7 @@ def test_lib_lookup(tmpdir):
     ]
 
 
+# TODO: test with extension
 # TODO: test with FILESDIR
 def test_lib_lookup_notfound(tmpdir):
     test_file = os.path.join(tmpdir, 'test.c')
@@ -1882,6 +1883,29 @@ def test_platform_lookup_external_notfound(tmpdir):
         "try to load platform file '{}/platforms/none' ... Error=XML_ERROR_FILE_NOT_FOUND ErrorID=3 (0x3) Line number=0: filename={}/platforms/none".format(exepath, exepath),
         "try to load platform file '{}/platforms/none.xml' ... Error=XML_ERROR_FILE_NOT_FOUND ErrorID=3 (0x3) Line number=0: filename={}/platforms/none.xml".format(exepath, exepath),
         "cppcheck: error: unrecognized platform: 'none'."
+    ]
+
+
+def test_platform_lookup_ext_external_notfound(tmpdir):
+    test_file = os.path.join(tmpdir, 'test.c')
+    with open(test_file, 'wt'):
+        pass
+
+    exitcode, stdout, _, exe = cppcheck_ex(['--debug-lookup=platform', '--platform=none.xml', test_file])
+    exepath = os.path.dirname(exe)
+    exepath_bin = os.path.join(exepath, 'cppcheck')
+    if sys.platform == 'win32':
+        exepath = exepath.replace('\\', '/')
+        exepath_bin += '.exe'
+    assert exitcode == 1, stdout
+    lines = stdout.splitlines()
+    assert lines == [
+        "looking for platform 'none.xml' in '{}'".format(exepath_bin),  # TODO: this is not the path *of* the executable but the the path *to* the executable
+        "try to load platform file 'none.xml' ... Error=XML_ERROR_FILE_NOT_FOUND ErrorID=3 (0x3) Line number=0: filename=none.xml",
+        "try to load platform file 'platforms/none.xml' ... Error=XML_ERROR_FILE_NOT_FOUND ErrorID=3 (0x3) Line number=0: filename=platforms/none.xml",
+        "try to load platform file '{}/none.xml' ... Error=XML_ERROR_FILE_NOT_FOUND ErrorID=3 (0x3) Line number=0: filename={}/none.xml".format(exepath, exepath),
+        "try to load platform file '{}/platforms/none.xml' ... Error=XML_ERROR_FILE_NOT_FOUND ErrorID=3 (0x3) Line number=0: filename={}/platforms/none.xml".format(exepath, exepath),
+        "cppcheck: error: unrecognized platform: 'none.xml'."
     ]
 
 
