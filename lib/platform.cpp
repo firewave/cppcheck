@@ -201,6 +201,7 @@ bool Platform::loadFromFile(const char exename[], const std::string &filename, b
     };
     if (exename && (std::string::npos != Path::fromNativeSeparators(exename).find('/'))) {
         filenames.push_back(Path::getPathFromFilename(Path::fromNativeSeparators(exename)) + filename);
+        filenames.push_back(Path::getPathFromFilename(Path::fromNativeSeparators(exename)) + filename + ".xml");
         filenames.push_back(Path::getPathFromFilename(Path::fromNativeSeparators(exename)) + "platforms/" + filename);
         filenames.push_back(Path::getPathFromFilename(Path::fromNativeSeparators(exename)) + "platforms/" + filename + ".xml");
     }
