@@ -65,7 +65,7 @@ if(BUILD_CORE_DLL)
 endif()
 option(CPPCHK_GLIBCXX_DEBUG "Usage of STL debug checks in Debug build"                      ON)
 option(DISALLOW_THREAD_EXECUTOR "Disallow usage of ThreadExecutor for -j"                   OFF)
-option(USE_BOOST            "Usage of Boost"                                                OFF)
+option(USE_BOOST            "Force usage of Boost"                                          OFF)
 option(USE_LIBCXX           "Use libc++ instead of libstdc++"                               OFF)
 
 if(DISALLOW_THREAD_EXECUTOR AND WIN32)

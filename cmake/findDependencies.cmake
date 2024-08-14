@@ -83,9 +83,11 @@ endif()
 
 find_package(Threads REQUIRED)
 
+# we are only using the header-only "container" component so we can unconditionally search for it
 if(USE_BOOST)
-    # we are using the header-only "container" component
-    find_package(Boost QUIET)
+    find_package(Boost REQUIRED)
+else()
+    find_package(Boost)
 endif()
 
 find_program(LIBXML2_XMLLINT_EXECUTABLE xmllint)
