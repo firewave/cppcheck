@@ -127,11 +127,12 @@ jobs:
           make -C cmake.output gui-build-deps triage-build-ui-deps
 
       # TODO: this is currently way too slow (~60 minutes) to enable it
-      # TODO: only fail the step on sanitizer issues - since we use processes it will only fail the underlying process which will result in an cppcheckError
+      # set --error-exitcode=0 so we only fail on sanitizer issues - since it uses threads for execution it will exit the whole process on the first issue
       - name: Self check
         if: false
         run: |
-          selfcheck_options="-q -j$(nproc) --std=c++11 --template=selfcheck --showtime=top5_summary -D__GNUC__ --error-exitcode=1 --inline-suppr --suppressions-list=.selfcheck_suppressions --library=gnu --inconclusive --enable=style,performance,portability,warning,missingInclude --exception-handling --debug-warnings --check-level=exhaustive"
+          selfcheck_options="-q -j$(nproc) --std=c++11 --template=selfcheck --showtime=top5_summary -D__GNUC__ --error-exitcode=0 --inline-suppr --suppressions-list=.selfcheck_suppressions --library=gnu --inconclusive --enable=style,performance,portability,warning,missingInclude --exception-handling --debug-warnings --check-level=exhaustive"
+          selfcheck_options="$selfcheck_options --executor=thread"
           cppcheck_options="-D__CPPCHECK__ -DCHECK_INTERNAL -DHAVE_RULES --library=cppcheck-lib -Ilib -Iexternals/simplecpp/ -Iexternals/tinyxml2"
           ec=0
           ./cmake.output/bin/cppcheck $selfcheck_options externals/simplecpp || ec=1

@@ -66,7 +66,7 @@ jobs:
           python3 -m pip install pytest-timeout
           python3 -m pip install psutil
 
-      # TODO: disable warnings
+      # TODO: disable all warnings
       - name: CMake
         run: |
           cmake -S . -B cmake.output -DCMAKE_BUILD_TYPE=RelWithDebInfo -DHAVE_RULES=On -DBUILD_TESTS=On -DBUILD_GUI=On -DUSE_QT6=On -DWITH_QCHART=On -DUSE_MATCHCOMPILER=Verify -DANALYZE_UNDEFINED=On -DENABLE_CHECK_INTERNAL=On -DUSE_BOOST=On -DCPPCHK_GLIBCXX_DEBUG=Off -DCMAKE_DISABLE_PRECOMPILE_HEADERS=On -DCMAKE_GLOBAL_AUTOGEN_TARGET=On -DDISABLE_DMAKE=On -DFILESDIR= -DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=ccache
@@ -124,10 +124,11 @@ jobs:
           make -C cmake.output autogen
           make -C cmake.output gui-build-deps triage-build-ui-deps
 
-      # TODO: only fail the step on sanitizer issues - since we use processes it will only fail the underlying process which will result in an cppcheckError
+      # set --error-exitcode=0 so we only fail on sanitizer issues - since it uses threads for execution it will exit the whole process on the first issue
       - name: Self check
         run: |
-          selfcheck_options="-q -j$(nproc) --std=c++11 --template=selfcheck --showtime=top5_summary -D__GNUC__ --error-exitcode=1 --inline-suppr --suppressions-list=.selfcheck_suppressions --library=gnu --inconclusive --enable=style,performance,portability,warning,missingInclude --exception-handling --debug-warnings --check-level=exhaustive"
+          selfcheck_options="-q -j$(nproc) --std=c++11 --template=selfcheck --showtime=top5_summary -D__GNUC__ --error-exitcode=0 --inline-suppr --suppressions-list=.selfcheck_suppressions --library=gnu --inconclusive --enable=style,performance,portability,warning,missingInclude --exception-handling --debug-warnings --check-level=exhaustive"
+          selfcheck_options="$selfcheck_options --executor=thread"
           cppcheck_options="-D__CPPCHECK__ -DCHECK_INTERNAL -DHAVE_RULES --library=cppcheck-lib -Ilib -Iexternals/simplecpp/ -Iexternals/tinyxml2"
           ec=0
           ./cmake.output/bin/cppcheck $selfcheck_options externals/simplecpp || ec=1
