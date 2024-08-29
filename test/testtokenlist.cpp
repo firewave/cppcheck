@@ -59,8 +59,7 @@ private:
 
     void testaddtoken2() const {
         const std::string code = "0xF0000000";
-        /*const*/ Settings settings1;
-        settings1.platform.int_bit = 32;
+        const auto settings1 = dinit(Settings, $.platform.int_bit = 32);
         TokenList tokenlist(&settings1);
         tokenlist.addtoken(code, 1, 1, false);
         ASSERT_EQUALS("0xF0000000", tokenlist.front()->str());
