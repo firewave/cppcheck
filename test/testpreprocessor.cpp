@@ -1887,9 +1887,9 @@ private:
     }
 
     void inline_suppressions() {
-        /*const*/ Settings settings;
-        settings.inlineSuppressions = true;
-        settings.checks.enable(Checks::missingInclude);
+        const auto settings = dinit(Settings,
+        $.inlineSuppressions = true,
+        $.checks.enable(Checks::missingInclude));
 
         const std::string code("// cppcheck-suppress missingInclude\n"
                                "#include \"missing.h\"\n"
@@ -2277,10 +2277,11 @@ private:
 
     // test for existing local include
     void testMissingInclude() {
-        /*const*/ Settings settings;
-        settings.clearIncludeCache = true;
-        settings.checks.enable(Checks::missingInclude);
-        settings.templateFormat = "simple"; // has no effect
+        const auto settings = dinit(Settings,
+        $.clearIncludeCache = true,
+        $.checks.enable(Checks::missingInclude),
+        $.templateFormat = "simple" // has no effect
+        );
         setTemplateFormat("simple");
 
         ScopedFile header("header.h", "");
@@ -2293,10 +2294,11 @@ private:
 
     // test for missing local include
     void testMissingInclude2() {
-        /*const*/ Settings settings;
-        settings.clearIncludeCache = true;
-        settings.checks.enable(Checks::missingInclude);
-        settings.templateFormat = "simple"; // has no effect
+        const auto settings = dinit(Settings,
+        $.clearIncludeCache = true,
+        $.checks.enable(Checks::missingInclude),
+        $.templateFormat = "simple" // has no effect
+        );
         setTemplateFormat("simple");
 
         std::string code("#include \"header.h\"");
@@ -2307,11 +2309,12 @@ private:
 
     // test for missing local include - no include path given
     void testMissingInclude3() {
-        /*const*/ Settings settings;
-        settings.clearIncludeCache = true;
-        settings.checks.enable(Checks::missingInclude);
-        settings.templateFormat = "simple"; // has no effect
-        setTemplateFormat("simple");
+         const auto settings = dinit(Settings,
+         $.clearIncludeCache = true,
+         $.checks.enable(Checks::missingInclude),
+         $.templateFormat = "simple" // has no effect
+         );
+       setTemplateFormat("simple");
 
         ScopedFile header("header.h", "", "inc");
 
@@ -2323,11 +2326,12 @@ private:
 
     // test for existing local include - include path provided
     void testMissingInclude4() {
-        /*const*/ Settings settings;
-        settings.clearIncludeCache = true;
-        settings.checks.enable(Checks::missingInclude);
-        settings.includePaths.emplace_back("inc");
-        settings.templateFormat = "simple"; // has no effect
+        const auto settings = dinit(Settings,
+        $.clearIncludeCache = true,
+        $.checks.enable(Checks::missingInclude),
+        $.includePaths.emplace_back("inc"),
+        $.templateFormat = "simple" // has no effect
+        );
         setTemplateFormat("simple");
 
         ScopedFile header("header.h", "", "inc");
@@ -2340,11 +2344,12 @@ private:
 
     // test for existing local include - absolute path
     void testMissingInclude5() {
-        /*const*/ Settings settings;
-        settings.clearIncludeCache = true;
-        settings.checks.enable(Checks::missingInclude);
-        settings.includePaths.emplace_back("inc");
-        settings.templateFormat = "simple"; // has no effect
+        const auto settings = dinit(Settings,
+                $.clearIncludeCache = true,
+                $.checks.enable(Checks::missingInclude),
+                $.includePaths.emplace_back("inc"),
+                $.templateFormat = "simple" // has no effect
+                );
         setTemplateFormat("simple");
 
         ScopedFile header("header.h", "", Path::getCurrentPath());
@@ -2357,10 +2362,11 @@ private:
 
     // test for missing local include - absolute path
     void testMissingInclude6() {
-        /*const*/ Settings settings;
-        settings.clearIncludeCache = true;
-        settings.checks.enable(Checks::missingInclude);
-        settings.templateFormat = "simple"; // has no effect
+const auto settings = dinit(Settings,
+        $.clearIncludeCache = true,
+        $.checks.enable(Checks::missingInclude),
+        $.templateFormat = "simple" // has no effect
+        );
         setTemplateFormat("simple");
 
         const std::string header = Path::join(Path::getCurrentPath(), "header.h");
@@ -2373,10 +2379,11 @@ private:
 
     // test for missing system include - system includes are not searched for in relative path
     void testMissingSystemInclude() {
-        /*const*/ Settings settings;
-        settings.clearIncludeCache = true;
-        settings.checks.enable(Checks::missingInclude);
-        settings.templateFormat = "simple"; // has no effect
+const auto settings = dinit(Settings,
+        $.clearIncludeCache = true,
+        $.checks.enable(Checks::missingInclude),
+        $.templateFormat = "simple" // has no effect
+        );
         setTemplateFormat("simple");
 
         ScopedFile header("header.h", "");
@@ -2389,10 +2396,11 @@ private:
 
     // test for missing system include
     void testMissingSystemInclude2() {
-        /*const*/ Settings settings;
-        settings.clearIncludeCache = true;
-        settings.checks.enable(Checks::missingInclude);
-        settings.templateFormat = "simple"; // has no effect
+const auto settings = dinit(Settings,
+        $.clearIncludeCache = true,
+        $.checks.enable(Checks::missingInclude),
+        $.templateFormat = "simple" // has no effect
+        );
         setTemplateFormat("simple");
 
         std::string code("#include <header.h>");
@@ -2403,12 +2411,13 @@ private:
 
     // test for existing system include in system include path
     void testMissingSystemInclude3() {
-        /*const*/ Settings settings;
-        settings.clearIncludeCache = true;
-        settings.checks.enable(Checks::missingInclude);
-        settings.templateFormat = "simple"; // has no effect
+const auto settings = dinit(Settings,
+        $.clearIncludeCache = true,
+        $.checks.enable(Checks::missingInclude),
+        $.templateFormat = "simple" // has no effect
+        $.includePaths.emplace_back("system");
+        );
         setTemplateFormat("simple");
-        settings.includePaths.emplace_back("system");
 
         ScopedFile header("header.h", "", "system");
 
@@ -2420,11 +2429,12 @@ private:
 
     // test for existing system include - absolute path
     void testMissingSystemInclude4() {
-        /*const*/ Settings settings;
-        settings.clearIncludeCache = true;
-        settings.checks.enable(Checks::missingInclude);
-        settings.includePaths.emplace_back("inc");
-        settings.templateFormat = "simple"; // has no effect
+const auto settings = dinit(Settings,
+        $.clearIncludeCache = true,
+        $.checks.enable(Checks::missingInclude),
+        $.includePaths.emplace_back("inc");
+       $.templateFormat = "simple" // has no effect
+        );
         setTemplateFormat("simple");
 
         ScopedFile header("header.h", "", Path::getCurrentPath());
@@ -2437,10 +2447,11 @@ private:
 
     // test for missing system include - absolute path
     void testMissingSystemInclude5() {
-        /*const*/ Settings settings;
-        settings.clearIncludeCache = true;
-        settings.checks.enable(Checks::missingInclude);
-        settings.templateFormat = "simple"; // has no effect
+const auto settings = dinit(Settings,
+        $.clearIncludeCache = true,
+        $.checks.enable(Checks::missingInclude),
+       $.templateFormat = "simple" // has no effect
+        );
         setTemplateFormat("simple");
 
         const std::string header = Path::join(Path::getCurrentPath(), "header.h");
@@ -2453,10 +2464,12 @@ private:
 
     // test for missing local and system include
     void testMissingIncludeMixed() {
-        /*const*/ Settings settings;
-        settings.clearIncludeCache = true;
-        settings.checks.enable(Checks::missingInclude);
-        settings.templateFormat = "simple"; // has no effect
+const auto settings = dinit(Settings,
+        $.clearIncludeCache = true,
+        $.checks.enable(Checks::missingInclude),
+
+       $.templateFormat = "simple" // has no effect
+        );
         setTemplateFormat("simple");
 
         ScopedFile header("header.h", "");
@@ -2474,11 +2487,12 @@ private:
     }
 
     void testMissingIncludeCheckConfig() {
-        /*const*/ Settings settings;
-        settings.clearIncludeCache = true;
-        settings.checks.enable(Checks::missingInclude);
-        settings.includePaths.emplace_back("system");
-        settings.templateFormat = "simple"; // has no effect
+const auto settings = dinit(Settings,
+        $.clearIncludeCache = true,
+        $.checks.enable(Checks::missingInclude),
+        $.includePaths.emplace_back("system");
+       $.templateFormat = "simple" // has no effect
+        );
         setTemplateFormat("simple");
 
         ScopedFile header("header.h", "");
