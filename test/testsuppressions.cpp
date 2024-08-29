@@ -285,8 +285,9 @@ private:
         /*const*/ auto settings = dinit(Settings,
                                         $.jobs = 2,
                                             $.quiet = true,
-                                            $.inlineSuppressions = true);
-        settings.severity.enable(Severity::information);
+                                            $.inlineSuppressions = true,
+                                            $.severity.enable (Severity::information)
+                                        );
         if (!suppression.empty()) {
             ASSERT_EQUALS("", settings.supprs.nomsg.addSuppressionLine(suppression));
         }
