@@ -711,16 +711,21 @@ static simplecpp::DUI createDUI(const Settings &mSettings, const std::string &cf
     dui.undefined = mSettings.userUndefs; // -U
     dui.includePaths = mSettings.includePaths; // -I
     dui.includes = mSettings.userIncludes;  // --include
-    // TODO: use mSettings.standards.stdValue instead
     // TODO: error out on unknown language?
     const Standards::Language lang = Path::identify(filename, mSettings.cppHeaderProbe);
     if (lang == Standards::Language::CPP) {
-        dui.std = mSettings.standards.getCPP();
-        splitcfg(mSettings.platform.getLimitsDefines(Standards::getCPP(dui.std)), dui.defines, "");
+        if (!mSettings.standards.stdValueCPP.empty())
+            dui.std = mSettings.standards.stdValueCPP;
+        else
+            dui.std = mSettings.standards.getCPP();
+        splitcfg(mSettings.platform.getLimitsDefines(mSettings.standards.cpp), dui.defines, "");
     }
     else if (lang == Standards::Language::C) {
-        dui.std = mSettings.standards.getC();
-        splitcfg(mSettings.platform.getLimitsDefines(Standards::getC(dui.std)), dui.defines, "");
+        if (!mSettings.standards.stdValueC.empty())
+            dui.std = mSettings.standards.stdValueC;
+        else
+            dui.std = mSettings.standards.getC();
+        splitcfg(mSettings.platform.getLimitsDefines(mSettings.standards.c), dui.defines, "");
     }
     dui.clearIncludeCache = mSettings.clearIncludeCache;
     return dui;

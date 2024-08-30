@@ -738,6 +738,7 @@ unsigned int CppCheck::checkClang(const FileWithDetails &file)
             for (const ErrorMessage& errmsg: compilerWarnings)
                 fdump << "  <clang-warning file=\"" << ErrorLogger::toxml(errmsg.callStack.front().getfile()) << "\" line=\"" << errmsg.callStack.front().line << "\" column=\"" << errmsg.callStack.front().column << "\" message=\"" << ErrorLogger::toxml(errmsg.shortMessage()) << "\"/>\n";
             fdump << "  <standards>\n";
+            // TODO: use stdValueX?
             fdump << "    <c version=\"" << mSettings.standards.getC() << "\"/>\n";
             fdump << "    <cpp version=\"" << mSettings.standards.getCPP() << "\"/>\n";
             fdump << "  </standards>\n";
@@ -794,10 +795,7 @@ unsigned int CppCheck::check(const FileSettings &fs)
         temp.mSettings.userDefines += fs.cppcheckDefines();
     temp.mSettings.includePaths = fs.includePaths;
     temp.mSettings.userUndefs.insert(fs.undefs.cbegin(), fs.undefs.cend());
-    if (fs.standard.find("++") != std::string::npos)
-        temp.mSettings.standards.setCPP(fs.standard);
-    else if (!fs.standard.empty())
-        temp.mSettings.standards.setC(fs.standard);
+    temp.mSettings.standards.setStd(fs.standard);
     if (fs.platformType != Platform::Type::Unspecified)
         temp.mSettings.platform.set(fs.platformType);
     if (mSettings.clang) {
