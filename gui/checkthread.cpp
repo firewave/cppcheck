@@ -229,7 +229,7 @@ void CheckThread::runAddonsAndTools(const Settings& settings, const FileSettings
                 args << ("-std=" + QString::fromStdString(fileSettings->standard));
             else {
                 // TODO: pass C or C++ standard based on file type
-                const std::string std = settings.standards.getCPP();
+                const std::string std = settings.standards.stdValueCPP;
                 if (!std.empty()) {
                     args << ("-std=" + QString::fromStdString(std));
                 }
