@@ -1444,7 +1444,7 @@ void ImportProject::selectVsConfigurations(Platform::Type platform, const std::v
         const FileSettings &fs = *it;
         const auto config = fs.cfg.substr(0, fs.cfg.find('|'));
         bool remove = false;
-        if (std::none_of(configurations.begin(), configurations.end(), config))
+        if (std::find(configurations.cbegin(), configurations.cend(), config) == configurations.cend())
             remove = true;
         if (platform == Platform::Type::Win64 && fs.platformType != platform)
             remove = true;

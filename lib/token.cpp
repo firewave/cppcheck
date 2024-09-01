@@ -2059,7 +2059,7 @@ static void mergeAdjacent(std::list<ValueFlow::Value>& values)
             continue;
         }
         std::vector<ValueIterator> adjValues;
-        for (auto y = values.cbegin(); y != values.cend(); y++) {
+        for (auto y = values.begin(); y != values.end(); y++) {
             if (x == y)
                 continue;
             if (y->isNonValue())

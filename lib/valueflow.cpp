@@ -805,7 +805,7 @@ static bool isAliasOf(const Variable * var, const Token *tok, nonneg int varid, 
     if (var && !var->isPointer())
         return false;
     // Search through non value aliases
-    return std::any_of(values.cbegin(), values.cend(), [&](const ValueFlow::Value& val) {
+    return std::any_of(values.begin(), values.end(), [&](const ValueFlow::Value& val) {
         if (!val.isNonValue())
             return false;
         if (val.isInconclusive())
@@ -7535,20 +7535,20 @@ struct ValueFlowPassRunner {
         setStopTime();
     }
 
-    bool run_once(std::initializer_list<ValuePtr<ValueFlowPass>> passes) const
+    bool run_once(const std::initializer_list<ValuePtr<ValueFlowPass>>& passes) const
     {
-        return std::any_of(passes.cbegin(), passes.cend(), [&](const ValuePtr<ValueFlowPass>& pass) {
+        return std::any_of(passes.begin(), passes.end(), [&](const ValuePtr<ValueFlowPass>& pass) {
             return run(pass);
         });
     }
 
-    bool run(std::initializer_list<ValuePtr<ValueFlowPass>> passes) const
+    bool run(const std::initializer_list<ValuePtr<ValueFlowPass>>& passes) const
     {
         std::size_t values = 0;
         std::size_t n = state.settings.vfOptions.maxIterations;
         while (n > 0 && values != getTotalValues()) {
             values = getTotalValues();
-            if (std::any_of(passes.cbegin(), passes.cend(), [&](const ValuePtr<ValueFlowPass>& pass) {
+            if (std::any_of(passes.begin(), passes.end(), [&](const ValuePtr<ValueFlowPass>& pass) {
                 return run(pass);
             }))
                 return true;
