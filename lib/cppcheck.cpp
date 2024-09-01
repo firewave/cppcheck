@@ -1057,7 +1057,7 @@ unsigned int CppCheck::checkFile(const FileWithDetails& file, const std::string 
             TokenList tokenlist(&mSettings);
             std::istringstream istr2(code);
             // TODO: asserts when file has unknown extension
-            tokenlist.createTokens(istr2, Path::identify(*files.begin(), false)); // TODO: check result?
+            tokenlist.createTokens(istr2, Path::identify(*files.cbegin(), false)); // TODO: check result?
             executeRules("define", tokenlist);
         }
 #endif

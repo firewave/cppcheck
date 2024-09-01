@@ -255,7 +255,7 @@ std::string SuppressionList::addSuppressionLine(const std::string &line)
 std::string SuppressionList::addSuppression(SuppressionList::Suppression suppression)
 {
     // Check if suppression is already in list
-    auto foundSuppression = std::find_if(mSuppressions.begin(), mSuppressions.end(),
+    auto foundSuppression = std::find_if(mSuppressions.cbegin(), mSuppressions.cend(),
                                          std::bind(&Suppression::isSameParameters, &suppression, std::placeholders::_1));
     if (foundSuppression != mSuppressions.end()) {
         return "suppression '" + suppression.toString() + "' already exists";

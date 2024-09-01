@@ -484,7 +484,7 @@ static size_t getAlignOf(const ValueType& vt, const Settings& settings, int maxR
         };
         size_t total = 0;
         if (const Type* dt = vt.typeScope->definedType) {
-            total = std::accumulate(dt->derivedFrom.begin(), dt->derivedFrom.end(), total, [&](size_t v, const Type::BaseInfo& bi) {
+            total = std::accumulate(dt->derivedFrom.cbegin(), dt->derivedFrom.cend(), total, [&](size_t v, const Type::BaseInfo& bi) {
                 if (bi.type && bi.type->classScope)
                     v += accumulateStructMembers(bi.type->classScope, accHelper);
                 return v;
@@ -537,7 +537,7 @@ size_t ValueFlow::getSizeOf(const ValueType &vt, const Settings &settings, int m
         };
         size_t total = accumulateStructMembers(vt.typeScope, accHelper);
         if (const Type* dt = vt.typeScope->definedType) {
-            total = std::accumulate(dt->derivedFrom.begin(), dt->derivedFrom.end(), total, [&](size_t v, const Type::BaseInfo& bi) {
+            total = std::accumulate(dt->derivedFrom.cbegin(), dt->derivedFrom.cend(), total, [&](size_t v, const Type::BaseInfo& bi) {
                 if (bi.type && bi.type->classScope)
                     v += accumulateStructMembers(bi.type->classScope, accHelper);
                 return v;
@@ -2286,7 +2286,7 @@ static bool hasBorrowingVariables(const std::list<Variable>& vars, const std::ve
     return std::any_of(vars.cbegin(), vars.cend(), [&](const Variable& var) {
         if (const ValueType* vt = var.valueType()) {
             if (vt->pointer > 0 &&
-                std::none_of(args.begin(), args.end(), [vt](const Token* arg) {
+                std::none_of(args.cbegin(), args.cend(), [vt](const Token* arg) {
                 return arg->valueType() && arg->valueType()->type == vt->type;
             }))
                 return false;
@@ -3921,12 +3921,12 @@ static void valueFlowForwardAssign(Token* const tok,
         // Check if variable is only incremented or decremented
         ValueFlow::Value::Bound b = findVarBound(expr->variable(), nextExpression, endOfVarScope, settings);
         if (b != ValueFlow::Value::Bound::Point) {
-            auto knownValueIt = std::find_if(values.begin(), values.end(), [](const ValueFlow::Value& value) {
+            auto knownValueIt = std::find_if(values.cbegin(), values.cend(), [](const ValueFlow::Value& value) {
                 if (!value.isKnown())
                     return false;
                 return value.isIntValue();
             });
-            if (knownValueIt != values.end()) {
+            if (knownValueIt != values.cend()) {
                 ValueFlow::Value value = *knownValueIt;
                 value.bound = b;
                 value.invertRange();
@@ -4265,7 +4265,7 @@ struct ConditionHandler {
             });
             if (it == values.end())
                 return 0;
-            assert(std::all_of(it, values.end(), [&](const ValueFlow::Value& v) {
+            assert(std::all_of(it, values.cend(), [&](const ValueFlow::Value& v) {
                 return v.path == 0 || v.path == it->path;
             }));
             return it->path;
@@ -5351,7 +5351,7 @@ static bool productParams(const Settings& settings, const std::unordered_map<Key
         }
         if (p.second.empty())
             continue;
-        std::for_each(std::next(p.second.begin()), p.second.end(), [&](const ValueFlow::Value& value) {
+        std::for_each(std::next(p.second.cbegin()), p.second.cend(), [&](const ValueFlow::Value& value) {
             Args new_args;
             for (auto arg : args) {
                 if (value.path != 0) {
@@ -5670,7 +5670,7 @@ static const ValueFlow::Value* getKnownValueFromToken(const Token* tok)
 {
     if (!tok)
         return nullptr;
-    auto it = std::find_if(tok->values().begin(), tok->values().end(), [&](const ValueFlow::Value& v) {
+    auto it = std::find_if(tok->values().cbegin(), tok->values().cend(), [&](const ValueFlow::Value& v) {
         return (v.isIntValue() || v.isContainerSizeValue() || v.isFloatValue()) && v.isKnown();
     });
     if (it == tok->values().end())
@@ -5685,8 +5685,8 @@ static const ValueFlow::Value* getKnownValueFromTokens(const std::vector<const T
     const ValueFlow::Value* result = getKnownValueFromToken(toks.front());
     if (!result)
         return nullptr;
-    if (!std::all_of(std::next(toks.begin()), toks.end(), [&](const Token* tok) {
-        return std::any_of(tok->values().begin(), tok->values().end(), [&](const ValueFlow::Value& v) {
+    if (!std::all_of(std::next(toks.cbegin()), toks.cend(), [&](const Token* tok) {
+        return std::any_of(tok->values().cbegin(), tok->values().cend(), [&](const ValueFlow::Value& v) {
             return v.equalValue(*result) && v.valueKind == result->valueKind;
         });
     }))
@@ -5865,7 +5865,7 @@ static Token* findStartToken(const Variable* var, Token* start, const Library& l
         return isLoopExpression ? start : first->previous();
     }
     // If all uses are in the same scope
-    if (std::all_of(uses.begin() + 1, uses.end(), [&](const Token* tok) {
+    if (std::all_of(uses.cbegin() + 1, uses.cend(), [&](const Token* tok) {
         return tok->scope() == scope;
     }))
         return first->previous();
@@ -7072,14 +7072,14 @@ struct ValueFlowPassRunner {
         setStopTime();
     }
 
-    bool run_once(std::initializer_list<ValuePtr<ValueFlowPass>> passes) const
+    bool run_once(const std::initializer_list<ValuePtr<ValueFlowPass>>& passes) const
     {
         return std::any_of(passes.begin(), passes.end(), [&](const ValuePtr<ValueFlowPass>& pass) {
             return run(pass);
         });
     }
 
-    bool run(std::initializer_list<ValuePtr<ValueFlowPass>> passes) const
+    bool run(const std::initializer_list<ValuePtr<ValueFlowPass>>& passes) const
     {
         std::size_t values = 0;
         std::size_t n = state.settings.vfOptions.maxIterations;
