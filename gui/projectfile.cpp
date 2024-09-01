@@ -817,7 +817,7 @@ void ProjectFile::setWarningTags(std::size_t hash, const QString& tags)
 QString ProjectFile::getWarningTags(std::size_t hash) const
 {
     auto it = mWarningTags.find(hash);
-    return (it != mWarningTags.end()) ? it->second : QString();
+    return (it != mWarningTags.cend()) ? it->second : QString();
 }
 
 bool ProjectFile::write(const QString &filename)

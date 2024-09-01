@@ -507,7 +507,7 @@ void CheckOther::suspiciousFloatingPointCast()
             const VTT sourceTypes = vt->type == ValueType::FLOAT ? VTT{ ValueType::DOUBLE, ValueType::LONGDOUBLE } : VTT{ ValueType::LONGDOUBLE };
 
             const Token* source = tok->astOperand2() ? tok->astOperand2() : tok->astOperand1();
-            if (!source || !source->valueType() || std::find(sourceTypes.begin(), sourceTypes.end(), source->valueType()->type) == sourceTypes.end())
+            if (!source || !source->valueType() || std::find(sourceTypes.cbegin(), sourceTypes.cend(), source->valueType()->type) == sourceTypes.cend())
                 continue;
 
             const Token* parent = tok->astParent();
@@ -524,7 +524,7 @@ void CheckOther::suspiciousFloatingPointCast()
                     }
                 }
             }
-            if (!parentVt || std::find(sourceTypes.begin(), sourceTypes.end(), parentVt->type) == sourceTypes.end())
+            if (!parentVt || std::find(sourceTypes.cbegin(), sourceTypes.cend(), parentVt->type) == sourceTypes.end())
                 continue;
 
             suspiciousFloatingPointCastError(tok);
@@ -3236,7 +3236,7 @@ void CheckOther::pointerPositiveError(const Token *tok, const ValueFlow::Value *
 /* check if a constructor in given class scope takes a reference */
 static bool constructorTakesReference(const Scope * const classScope)
 {
-    return std::any_of(classScope->functionList.begin(), classScope->functionList.end(), [&](const Function& constructor) {
+    return std::any_of(classScope->functionList.cbegin(), classScope->functionList.cend(), [&](const Function& constructor) {
         if (constructor.isConstructor()) {
             for (int argnr = 0U; argnr < constructor.argCount(); argnr++) {
                 const Variable * const argVar = constructor.getArgumentVar(argnr);

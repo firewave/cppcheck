@@ -246,8 +246,8 @@ static void addInlineSuppressions(const simplecpp::TokenList &tokens, const Sett
                 if (!inlineSuppressionsBlockBegin.empty()) {
                     const SuppressionList::Suppression lastBeginSuppression = inlineSuppressionsBlockBegin.back();
 
-                    auto supprBegin = inlineSuppressionsBlockBegin.begin();
-                    while (supprBegin != inlineSuppressionsBlockBegin.end())
+                    auto supprBegin = inlineSuppressionsBlockBegin.cbegin();
+                    while (supprBegin != inlineSuppressionsBlockBegin.cend())
                     {
                         if (lastBeginSuppression.lineNumber != supprBegin->lineNumber) {
                             ++supprBegin;

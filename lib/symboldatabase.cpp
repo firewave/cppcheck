@@ -2151,7 +2151,7 @@ namespace {
     const Function* getFunctionForArgumentvariable(const Variable * const var)
     {
         if (const Scope* scope = var->nameToken()->scope()) {
-            auto it = std::find_if(scope->functionList.begin(), scope->functionList.end(), [&](const Function& function) {
+            auto it = std::find_if(scope->functionList.cbegin(), scope->functionList.cend(), [&](const Function& function) {
                 for (nonneg int arg = 0; arg < function.argCount(); ++arg) {
                     if (var == function.getArgumentVar(arg))
                         return true;
@@ -4910,10 +4910,10 @@ const Function * Function::getOverriddenFunctionRecursive(const ::Type* baseType
         }
 
         if (isDestructor()) {
-            auto it = std::find_if(parent->functionList.begin(), parent->functionList.end(), [](const Function& f) {
+            auto it = std::find_if(parent->functionList.cbegin(), parent->functionList.cend(), [](const Function& f) {
                 return f.isDestructor() && f.isImplicitlyVirtual();
             });
-            if (it != parent->functionList.end())
+            if (it != parent->functionList.cend())
                 return &*it;
         }
 
@@ -4932,7 +4932,7 @@ const Function * Function::getOverriddenFunctionRecursive(const ::Type* baseType
 const Variable* Function::getArgumentVar(nonneg int num) const
 {
     if (num < argumentList.size()) {
-        auto it = argumentList.begin();
+        auto it = argumentList.cbegin();
         std::advance(it, num);
         return &*it;
     }
@@ -5237,7 +5237,7 @@ const Token *Scope::checkVariable(const Token *tok, AccessControl varaccess)
 
 const Variable *Scope::getVariable(const std::string &varname) const
 {
-    auto it = std::find_if(varlist.begin(), varlist.end(), [&varname](const Variable& var) {
+    auto it = std::find_if(varlist.cbegin(), varlist.cend(), [&varname](const Variable& var) {
         return var.name() == varname;
     });
     if (it != varlist.end())
@@ -5770,7 +5770,7 @@ static bool hasEmptyCaptureList(const Token* tok) {
 
 bool Scope::hasInlineOrLambdaFunction(const Token** tokStart, bool onlyInline) const
 {
-    return std::any_of(nestedList.begin(), nestedList.end(), [&](const Scope* s) {
+    return std::any_of(nestedList.cbegin(), nestedList.cend(), [&](const Scope* s) {
         // Inline function
         if (s->type == ScopeType::eUnconditional && Token::simpleMatch(s->bodyStart->previous(), ") {")) {
             if (tokStart)
@@ -6161,7 +6161,7 @@ const Function* Scope::findFunction(const Token *tok, bool requireConst, Referen
                     if (unknownDeref)
                         continue;
                     // can't match so remove this function from possible matches
-                    matches.erase(matches.begin() + i);
+                    matches.erase(matches.cbegin() + i);
                     erased = true;
                     break;
                 }
@@ -6217,16 +6217,16 @@ const Function* Scope::findFunction(const Token *tok, bool requireConst, Referen
     }
 
     // remove pure virtual function if there is an overrider
-    auto itPure = std::find_if(matches.begin(), matches.end(), [](const Function* m) {
+    auto itPure = std::find_if(matches.cbegin(), matches.cend(), [](const Function* m) {
         return m->isPure();
     });
-    if (itPure != matches.end() && std::any_of(matches.begin(), matches.end(), [&](const Function* m) {
+    if (itPure != matches.cend() && std::any_of(matches.cbegin(), matches.cend(), [&](const Function* m) {
         return m->isImplicitlyVirtual() && m != *itPure;
     }))
         matches.erase(itPure);
 
     // Only one candidate left
-    if (matches.size() == 1 && std::none_of(functionList.begin(), functionList.end(), [tok](const Function& f) {
+    if (matches.size() == 1 && std::none_of(functionList.cbegin(), functionList.cend(), [tok](const Function& f) {
         return startsWith(f.name(), tok->str() + " <");
     }))
         return matches[0];
@@ -7110,7 +7110,7 @@ void SymbolDatabase::setValueType(Token* tok, const ValueType& valuetype, const 
             const Scope *typeScope = vt1->typeScope;
             if (!typeScope)
                 return;
-            auto it = std::find_if(typeScope->varlist.begin(), typeScope->varlist.end(), [&name](const Variable& v) {
+            auto it = std::find_if(typeScope->varlist.cbegin(), typeScope->varlist.cend(), [&name](const Variable& v) {
                 return v.nameToken()->str() == name;
             });
             if (it != typeScope->varlist.end())

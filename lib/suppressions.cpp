@@ -264,7 +264,7 @@ std::string SuppressionList::addSuppression(SuppressionList::Suppression suppres
     std::lock_guard<std::mutex> lg(mSuppressionsSync);
 
     // Check if suppression is already in list
-    auto foundSuppression = std::find_if(mSuppressions.begin(), mSuppressions.end(),
+    auto foundSuppression = std::find_if(mSuppressions.cbegin(), mSuppressions.cend(),
                                          std::bind(&Suppression::isSameParameters, &suppression, std::placeholders::_1));
     if (foundSuppression != mSuppressions.end()) {
         return "suppression '" + suppression.toString() + "' already exists";
@@ -348,7 +348,7 @@ bool SuppressionList::Suppression::parseComment(std::string comment, std::string
 
     if (extraPos != std::string::npos) {
         extraComment = trim(comment.substr(extraPos + extraDelimiterSize));
-        for (auto it = extraComment.begin(); it != extraComment.end();)
+        for (auto it = extraComment.cbegin(); it != extraComment.cend();)
             it = *it & 0x80 ? extraComment.erase(it) : it + 1;
         comment.erase(extraPos);
     }

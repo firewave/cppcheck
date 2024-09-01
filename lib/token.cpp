@@ -231,7 +231,7 @@ bool Token::isUpperCaseName() const
 {
     if (!isName())
         return false;
-    return std::none_of(mStr.begin(), mStr.end(), [](char c) {
+    return std::none_of(mStr.cbegin(), mStr.cend(), [](char c) {
         return std::islower(c);
     });
 }

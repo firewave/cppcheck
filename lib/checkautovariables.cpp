@@ -252,7 +252,7 @@ static bool hasOverloadedAssignment(const Token* tok, bool& inconclusive)
         if (vt->container && vt->container->stdStringLike)
             return true;
         if (vt->typeScope)
-            return std::any_of(vt->typeScope->functionList.begin(), vt->typeScope->functionList.end(), [](const Function& f) { // TODO: compare argument type
+            return std::any_of(vt->typeScope->functionList.cbegin(), vt->typeScope->functionList.cend(), [](const Function& f) { // TODO: compare argument type
                 return f.name() == "operator=";
             });
         return false;

@@ -407,7 +407,7 @@ static void makeBaseTypeString(std::string& typeStr)
 {
     const auto pos = typeStr.find("signed");
     if (pos != std::string::npos)
-        typeStr.erase(typeStr.begin(), typeStr.begin() + pos + 6 + 1);
+        typeStr.erase(typeStr.cbegin(), typeStr.cbegin() + pos + 6 + 1);
 }
 
 void CheckType::longCastAssignError(const Token *tok, const ValueType* src, const ValueType* tgt)

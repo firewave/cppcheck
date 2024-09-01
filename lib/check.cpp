@@ -38,18 +38,18 @@ Check::Check(const std::string &aname)
     : mName(aname)
 {
     {
-        const auto it = std::find_if(instances().begin(), instances().end(), [&](const Check *i) {
+        const auto b = std::any_of(instances().cbegin(), instances().cend(), [&](const Check *i) {
             return i->name() == aname;
         });
-        if (it != instances().end())
+        if (b)
             throw std::runtime_error("'" + aname + "' instance already exists");
     }
 
     // make sure the instances are sorted
-    const auto it = std::find_if(instances().begin(), instances().end(), [&](const Check* i) {
+    const auto it = std::find_if(instances().cbegin(), instances().cend(), [&](const Check* i) {
         return i->name() > aname;
     });
-    if (it == instances().end())
+    if (it == instances().cend())
         instances().push_back(this);
     else
         instances().insert(it, this);

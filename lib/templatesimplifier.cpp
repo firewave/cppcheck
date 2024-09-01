@@ -3935,10 +3935,10 @@ void TemplateSimplifier::simplifyTemplates(const std::time_t maxtime)
                     return xargs.size() < yargs.size();
                 if (isConstMethod(x.nameToken()) != isConstMethod(y.nameToken()))
                     return isConstMethod(x.nameToken());
-                return std::lexicographical_compare(xargs.begin(),
-                                                    xargs.end(),
-                                                    yargs.begin(),
-                                                    yargs.end(),
+                return std::lexicographical_compare(xargs.cbegin(),
+                                                    xargs.cend(),
+                                                    yargs.cbegin(),
+                                                    yargs.cend(),
                                                     [&](const Token* xarg, const Token* yarg) {
                     if (xarg != yarg)
                         return score(xarg) < score(yarg);
@@ -3976,10 +3976,10 @@ void TemplateSimplifier::simplifyTemplates(const std::time_t maxtime)
         }
 
         for (auto it = mInstantiatedTemplates.cbegin(); it != mInstantiatedTemplates.cend(); ++it) {
-            auto decl = std::find_if(mTemplateDeclarations.begin(), mTemplateDeclarations.end(), [&it](const TokenAndName& decl) {
+            auto decl = std::find_if(mTemplateDeclarations.cbegin(), mTemplateDeclarations.cend(), [&it](const TokenAndName& decl) {
                 return decl.token() == it->token();
             });
-            if (decl != mTemplateDeclarations.end()) {
+            if (decl != mTemplateDeclarations.cend()) {
                 if (it->isSpecialization()) {
                     // delete the "template < >"
                     Token * tok = it->token();
@@ -3998,16 +3998,16 @@ void TemplateSimplifier::simplifyTemplates(const std::time_t maxtime)
 
         // remove out of line member functions
         while (!mMemberFunctionsToDelete.empty()) {
-            const auto it = std::find_if(mTemplateDeclarations.begin(),
-                                         mTemplateDeclarations.end(),
+            const auto it = std::find_if(mTemplateDeclarations.cbegin(),
+                                         mTemplateDeclarations.cend(),
                                          FindToken(mMemberFunctionsToDelete.cbegin()->token()));
             // multiple functions can share the same declaration so make sure it hasn't already been deleted
             if (it != mTemplateDeclarations.end()) {
                 removeTemplate(it->token());
                 mTemplateDeclarations.erase(it);
             } else {
-                const auto it1 = std::find_if(mTemplateForwardDeclarations.begin(),
-                                              mTemplateForwardDeclarations.end(),
+                const auto it1 = std::find_if(mTemplateForwardDeclarations.cbegin(),
+                                              mTemplateForwardDeclarations.cend(),
                                               FindToken(mMemberFunctionsToDelete.cbegin()->token()));
                 // multiple functions can share the same declaration so make sure it hasn't already been deleted
                 if (it1 != mTemplateForwardDeclarations.end()) {
@@ -4015,7 +4015,7 @@ void TemplateSimplifier::simplifyTemplates(const std::time_t maxtime)
                     mTemplateForwardDeclarations.erase(it1);
                 }
             }
-            mMemberFunctionsToDelete.erase(mMemberFunctionsToDelete.begin());
+            mMemberFunctionsToDelete.erase(mMemberFunctionsToDelete.cbegin());
         }
 
         // remove explicit instantiations

@@ -2123,7 +2123,7 @@ bool isUniqueExpression(const Token* tok)
         if (!scope)
             return true;
         const std::string returnType = fun->retType ? fun->retType->name() : fun->retDef->stringifyList(fun->tokenDef);
-        if (!std::all_of(scope->functionList.begin(), scope->functionList.end(), [&](const Function& f) {
+        if (!std::all_of(scope->functionList.cbegin(), scope->functionList.cend(), [&](const Function& f) {
             if (f.type != FunctionType::eFunction)
                 return true;
 
@@ -3407,7 +3407,7 @@ static ExprUsage getFunctionUsage(const Token* tok, int indirect, const Settings
                 return ExprUsage::Used;
             if (nCtor == 1) {
                 const Scope* scope = ftok->variable()->type()->classScope;
-                auto it = std::find_if(scope->functionList.begin(), scope->functionList.end(), [](const Function& f) {
+                auto it = std::find_if(scope->functionList.cbegin(), scope->functionList.cend(), [](const Function& f) {
                     return f.isConstructor();
                 });
                 if (it != scope->functionList.end())

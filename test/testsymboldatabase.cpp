@@ -697,7 +697,7 @@ private:
         ASSERT(db != nullptr);
 
         ASSERT_EQUALS(4, db->variableList().size()); // the first one is not used
-        auto it = db->variableList().begin() + 1;
+        auto it = db->variableList().cbegin() + 1;
 
         ASSERT((*it)->isArray());
         ASSERT(!(*it)->isPointer());
@@ -3058,7 +3058,7 @@ private:
                             "S<T> operator+(const S<T>&lhs, typename S<T>::t) { return lhs; }";
         GET_SYMBOL_DB(code);
         ASSERT(db != nullptr);
-        auto it = db->functionScopes.begin();
+        auto it = db->functionScopes.cbegin();
         const Function *func = (*it)->function;
         ASSERT_EQUALS("f", func->name());
         ASSERT_EQUALS(1, func->argCount());
@@ -3152,7 +3152,7 @@ private:
         auto it = std::find_if(db->scopeList.cbegin(), db->scopeList.cend(), [](const Scope& s) {
             return s.isClassOrStruct();
         });
-        const Scope *scope = (it == db->scopeList.end()) ? nullptr : &*it;
+        const Scope *scope = (it == db->scopeList.cend()) ? nullptr : &*it;
 
         ASSERT(scope != nullptr);
         if (!scope)
@@ -3183,7 +3183,7 @@ private:
         auto it = std::find_if(db->scopeList.cbegin(), db->scopeList.cend(), [](const Scope& s) {
             return s.isClassOrStruct();
         });
-        const Scope* scope = (it == db->scopeList.end()) ? nullptr : &*it;
+        const Scope* scope = (it == db->scopeList.cend()) ? nullptr : &*it;
 
         ASSERT(scope != nullptr);
         if (!scope)
@@ -3520,7 +3520,7 @@ private:
         auto it = std::find_if(db->scopeList.cbegin(), db->scopeList.cend(), [&](const Scope& scope) {
             return scope.isClassOrStruct() && scope.className == "Fred";
         });
-        const Scope* fredScope = (it == db->scopeList.end()) ? nullptr : &*it;
+        const Scope* fredScope = (it == db->scopeList.cend()) ? nullptr : &*it;
         ASSERT(fredScope != nullptr);
 
         // The struct Fred has two functions, a constructor and a destructor
@@ -5541,7 +5541,7 @@ private:
             auto it = std::find_if(db->scopeList.cbegin(), db->scopeList.cend(), [](const Scope& s) {
                 return s.className == "T";
             });
-            ASSERT(it != db->scopeList.end());
+            ASSERT(it != db->scopeList.cend());
             const Function* function = findFunctionByName("f", &*it);
             ASSERT(function && function->token->str() == "f");
             ASSERT(function->hasBody());
@@ -5563,7 +5563,7 @@ private:
             auto it = std::find_if(db->scopeList.cbegin(), db->scopeList.cend(), [](const Scope& s) {
                 return s.className == "A";
             });
-            ASSERT(it != db->scopeList.end());
+            ASSERT(it != db->scopeList.cend());
             const Function* function = findFunctionByName("A", &*it);
             ASSERT(function && function->token->str() == "A");
             ASSERT(function->hasBody());
@@ -5586,7 +5586,7 @@ private:
             auto it = std::find_if(db->scopeList.cbegin(), db->scopeList.cend(), [](const Scope& s) {
                 return s.className == "A";
             });
-            ASSERT(it != db->scopeList.end());
+            ASSERT(it != db->scopeList.cend());
             const Function* function = findFunctionByName("f", &*it);
             ASSERT(function && function->token->str() == "f");
             ASSERT(function->hasBody());
@@ -5749,12 +5749,12 @@ private:
                           "};\n"
                           "S::~S() = default;\n");
             ASSERT_EQUALS(db->scopeList.size(), 3);
-            auto scope = db->scopeList.begin();
+            auto scope = db->scopeList.cbegin();
             ++scope;
             ASSERT_EQUALS(scope->className, "S");
             const auto& flist = scope->functionList;
             ASSERT_EQUALS(flist.size(), 3);
-            auto it = flist.begin();
+            auto it = flist.cbegin();
             ASSERT_EQUALS(it->name(), "S");
             ASSERT_EQUALS(it->tokenDef->linenr(), 2);
             ASSERT(it->isDelete());
@@ -5779,12 +5779,12 @@ private:
                           "};\n"
                           "S::~S() = delete;\n");
             ASSERT_EQUALS(db->scopeList.size(), 2);
-            auto scope = db->scopeList.begin();
+            auto scope = db->scopeList.cbegin();
             ASSERT(!scope->functionOf);
             ++scope;
             ASSERT_EQUALS(scope->className, "S");
             ASSERT_EQUALS(scope->functionList.size(), 1);
-            auto it = scope->functionList.begin();
+            auto it = scope->functionList.cbegin();
             ASSERT_EQUALS(it->name(), "S");
             ASSERT_EQUALS(it->tokenDef->linenr(), 2);
             ASSERT(it->isDelete());
@@ -6002,7 +6002,7 @@ private:
                           "void S::f() {}\n");
             ASSERT(db);
             ASSERT_EQUALS(4, db->scopeList.size());
-            auto anon = db->scopeList.begin();
+            auto anon = db->scopeList.cbegin();
             ++anon;
             ASSERT(anon->className.empty());
             ASSERT_EQUALS_ENUM(anon->type, ScopeType::eNamespace);
@@ -6523,7 +6523,7 @@ private:
                         "    if (t.E0) {}\n"
                         "}\n");
         ASSERT(db != nullptr);
-        auto it = db->scopeList.begin();
+        auto it = db->scopeList.cbegin();
         std::advance(it, 2);
         const Enumerator* E0 = it->findEnumerator("E0");
         ASSERT(E0 && E0->value_known);
@@ -6539,7 +6539,7 @@ private:
                       "    auto e = b ? S::E0 : S::E1;\n"
                       "}\n");
         ASSERT(db != nullptr);
-        auto it = db->scopeList.begin();
+        auto it = db->scopeList.cbegin();
         std::advance(it, 2);
         const Enumerator* E1 = it->findEnumerator("E1");
         ASSERT(E1 && E1->value_known);
@@ -6559,7 +6559,7 @@ private:
                       "    F f = F0;\n"
                       "}\n");
         ASSERT(db != nullptr);
-        auto it = db->scopeList.begin();
+        auto it = db->scopeList.cbegin();
         std::advance(it, 2);
         const Enumerator* B = it->findEnumerator("B");
         ASSERT(B);
@@ -6590,7 +6590,7 @@ private:
                           "    E e = E::E0;\n"
                           "}\n");
             ASSERT(db != nullptr);
-            auto it = db->scopeList.begin();
+            auto it = db->scopeList.cbegin();
             std::advance(it, 2);
             const Enumerator* E0 = it->findEnumerator("E0");
             ASSERT(E0 && E0->value_known && E0->value == 0);
@@ -6608,7 +6608,7 @@ private:
                           "        E e = E::E0;\n"
                           "}\n");
             ASSERT(db != nullptr);
-            auto it = db->scopeList.begin();
+            auto it = db->scopeList.cbegin();
             std::advance(it, 2);
             const Enumerator* E0 = it->findEnumerator("E0");
             ASSERT(E0 && E0->value_known && E0->value == 0);
@@ -6628,7 +6628,7 @@ private:
                           "    if (i != E0) {}\n"
                           "}\n");
             ASSERT(db != nullptr);
-            auto it = db->scopeList.begin();
+            auto it = db->scopeList.cbegin();
             std::advance(it, 2);
             const Enumerator* E0 = it->findEnumerator("E0");
             ASSERT(E0 && E0->value_known && E0->value == 0);
@@ -6649,7 +6649,7 @@ private:
                           "    enum { A, B, C, D };\n"
                           "};\n");
             ASSERT(db != nullptr);
-            auto it = db->scopeList.begin();
+            auto it = db->scopeList.cbegin();
             std::advance(it, 2);
             ASSERT_EQUALS(it->className, "E");
             ASSERT(it->nestedIn);
@@ -6675,7 +6675,7 @@ private:
                           "    }\n"
                           "};\n");
             ASSERT(db != nullptr);
-            auto it = db->scopeList.begin();
+            auto it = db->scopeList.cbegin();
             std::advance(it, 3);
             const Enumerator* E0 = it->findEnumerator("E0");
             ASSERT(E0 && E0->value_known && E0->value == 0);
@@ -6697,7 +6697,7 @@ private:
                           "    s.e = S1::E1;\n"
                           "}\n");
             ASSERT(db != nullptr);
-            auto it = db->scopeList.begin();
+            auto it = db->scopeList.cbegin();
             std::advance(it, 3);
             const Enumerator* E1 = it->findEnumerator("E1");
             ASSERT(E1 && E1->value_known && E1->value == 0);
@@ -6721,7 +6721,7 @@ private:
                           "    s.e = S1::E1;\n"
                           "}\n");
             ASSERT(db != nullptr);
-            auto it = db->scopeList.begin();
+            auto it = db->scopeList.cbegin();
             std::advance(it, 3);
             const Enumerator* E1 = it->findEnumerator("E1");
             ASSERT(E1 && E1->value_known && E1->value == 0);
@@ -6738,7 +6738,7 @@ private:
                           "void C::f1() { const E e = E::inc; }\n"
                           "void C::f2(bool inc) { return false; }\n");
             ASSERT(db != nullptr);
-            auto it = db->scopeList.begin();
+            auto it = db->scopeList.cbegin();
             std::advance(it, 1);
             const Enumerator* inc = it->findEnumerator("inc");
             ASSERT(inc && inc->value_known && inc->value == 0);
@@ -6758,7 +6758,7 @@ private:
                           "    }\n"
                           "};\n");
             ASSERT(db != nullptr);
-            auto it = db->scopeList.begin();
+            auto it = db->scopeList.cbegin();
             std::advance(it, 2);
             const Enumerator* E0 = it->findEnumerator("E0");
             ASSERT(E0 && E0->value_known && E0->value == 0);
@@ -6777,7 +6777,7 @@ private:
                           "    if (0 > E0) {}\n"
                           "}\n");
             ASSERT(db != nullptr);
-            auto it = db->scopeList.begin();
+            auto it = db->scopeList.cbegin();
             std::advance(it, 2);
             const Enumerator* E0 = it->findEnumerator("E0");
             ASSERT(E0 && E0->value_known && E0->value == 0);
@@ -6798,7 +6798,7 @@ private:
                           "    if (0 > C1::V2) {}\n"
                           "}\n");
             ASSERT(db != nullptr);
-            auto it = db->scopeList.begin();
+            auto it = db->scopeList.cbegin();
             std::advance(it, 2);
             const Enumerator* V1 = it->findEnumerator("V1");
             ASSERT(V1 && V1->value_known && V1->value == 0);
@@ -6825,7 +6825,7 @@ private:
                           "    if (0 > C1::V2) {}\n"
                           "}\n");
             ASSERT(db != nullptr);
-            auto it = db->scopeList.begin();
+            auto it = db->scopeList.cbegin();
             std::advance(it, 2);
             const Enumerator* V1 = it->findEnumerator("V1");
             ASSERT(V1 && V1->value_known && V1->value == 0);

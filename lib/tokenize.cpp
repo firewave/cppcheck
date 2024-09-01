@@ -6474,7 +6474,7 @@ void Tokenizer::splitTemplateRightAngleBrackets(bool check)
             vars.emplace_back(tok->strAt(2), scopeLevel);
 
         // Ticket #6181: normalize C++11 template parameter list closing syntax
-        if (tok->previous() && tok->str() == "<" && TemplateSimplifier::templateParameters(tok) && std::none_of(vars.begin(), vars.end(), [&](const std::pair<std::string, int>& v) {
+        if (tok->previous() && tok->str() == "<" && TemplateSimplifier::templateParameters(tok) && std::none_of(vars.cbegin(), vars.cend(), [&](const std::pair<std::string, int>& v) {
             return v.first == tok->strAt(-1);
         })) {
             Token *endTok = tok->findClosingBracket();
@@ -6491,7 +6491,7 @@ void Tokenizer::splitTemplateRightAngleBrackets(bool check)
                 endTok->insertToken("=");
                 endTok->insertToken(">");
             }
-        } else if (Token::Match(tok, "class|struct|union|=|:|public|protected|private %name% <") && std::none_of(vars.begin(), vars.end(), [&](const std::pair<std::string, int>& v) {
+        } else if (Token::Match(tok, "class|struct|union|=|:|public|protected|private %name% <") && std::none_of(vars.cbegin(), vars.cend(), [&](const std::pair<std::string, int>& v) {
             return v.first == tok->strAt(1);
         })) {
             Token *endTok = tok->tokAt(2)->findClosingBracket();

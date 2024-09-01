@@ -64,7 +64,7 @@ static bool isAutoDeallocType(const Type* type) {
     if (type->classScope->numConstructors > 0)
         return true;
     const std::list<Variable>& varlist = type->classScope->varlist;
-    if (std::any_of(varlist.begin(), varlist.end(), [](const Variable& v) {
+    if (std::any_of(varlist.cbegin(), varlist.cend(), [](const Variable& v) {
         return !v.valueType() || (!v.valueType()->isPrimitive() && !v.valueType()->container);
     }))
         return true;
@@ -601,7 +601,7 @@ bool CheckLeakAutoVar::checkScope(const Token * const startToken,
                             (notzero.find(vartok->varId()) != notzero.end()))
                             varInfo2.clear();
 
-                        if (std::any_of(varInfo1.alloctype.begin(), varInfo1.alloctype.end(), [&](const std::pair<int, VarInfo::AllocInfo>& info) {
+                        if (std::any_of(varInfo1.alloctype.cbegin(), varInfo1.alloctype.cend(), [&](const std::pair<int, VarInfo::AllocInfo>& info) {
                             if (info.second.status != VarInfo::ALLOC)
                                 return false;
                             const Token* ret = getReturnValueFromOutparamAlloc(info.second.allocTok, *mSettings);

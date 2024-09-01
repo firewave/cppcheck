@@ -718,8 +718,8 @@ static bool isSameIteratorContainerExpression(const Token* tok1,
     if (kind == ValueFlow::Value::LifetimeKind::Address || kind == ValueFlow::Value::LifetimeKind::Iterator) {
         const auto address1 = getAddressContainer(tok1);
         const auto address2 = getAddressContainer(tok2);
-        return std::any_of(address1.begin(), address1.end(), [&](const Token* tok1) {
-            return std::any_of(address2.begin(), address2.end(), [&](const Token* tok2) {
+        return std::any_of(address1.cbegin(), address1.cend(), [&](const Token* tok1) {
+            return std::any_of(address2.cbegin(), address2.cend(), [&](const Token* tok2) {
                 return isSameExpression(false, tok1, tok2, settings, false, false);
             });
         });
@@ -757,8 +757,8 @@ static ValueFlow::Value getLifetimeIteratorValue(const Token* tok, MathLib::bigi
         });
     };
     std::vector<ValueFlow::Value> values = pruneLifetimes(ValueFlow::getLifetimeObjValues(tok, false, path));
-    auto it = findIterVal(values, values.begin());
-    if (it != values.end()) {
+    auto it = findIterVal(values, values.cbegin());
+    if (it != values.cend()) {
         auto it2 = findIterVal(values, it + 1);
         if (it2 == values.cend())
             return *it;
@@ -1265,7 +1265,7 @@ void CheckStl::invalidContainerError(const Token *tok, const Token * /*contTok*/
 {
     const bool inconclusive = val ? val->isInconclusive() : false;
     if (val)
-        errorPath.insert(errorPath.begin(), val->errorPath.cbegin(), val->errorPath.cend());
+        errorPath.insert(errorPath.cbegin(), val->errorPath.cbegin(), val->errorPath.cend());
     std::string msg = "Using " + lifetimeMessage(tok, val, errorPath);
     errorPath.emplace_back(tok, "");
     reportError(std::move(errorPath), Severity::error, "invalidContainer", msg + " that may be invalid.", CWE664, inconclusive ? Certainty::inconclusive : Certainty::normal);
@@ -3213,7 +3213,7 @@ static bool isKnownEmptyContainer(const Token* tok)
 {
     if (!tok)
         return false;
-    return std::any_of(tok->values().begin(), tok->values().end(), [&](const ValueFlow::Value& v) {
+    return std::any_of(tok->values().cbegin(), tok->values().cend(), [&](const ValueFlow::Value& v) {
         if (!v.isKnown())
             return false;
         if (!v.isContainerSizeValue())
@@ -3296,7 +3296,7 @@ void CheckStl::eraseIteratorOutOfBoundsError(const Token *ftok, const Token* ite
 
 static const ValueFlow::Value* getOOBIterValue(const Token* tok, const ValueFlow::Value* sizeVal)
 {
-    auto it = std::find_if(tok->values().begin(), tok->values().end(), [&](const ValueFlow::Value& v) {
+    auto it = std::find_if(tok->values().cbegin(), tok->values().cend(), [&](const ValueFlow::Value& v) {
         if (v.isPossible() || v.isKnown()) {
             switch (v.valueType) {
             case ValueFlow::Value::ValueType::ITERATOR_END:

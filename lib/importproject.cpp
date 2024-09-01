@@ -916,8 +916,8 @@ ImportProject::SharedItemsProject ImportProject::importVcxitems(const std::strin
     auto isInCacheCheck = [filename](const ImportProject::SharedItemsProject& e) -> bool {
         return filename == e.pathToProjectFile;
     };
-    const auto iterator = std::find_if(cache.begin(), cache.end(), isInCacheCheck);
-    if (iterator != std::end(cache)) {
+    const auto iterator = std::find_if(cache.cbegin(), cache.cend(), isInCacheCheck);
+    if (iterator != cache.cend()) {
         return *iterator;
     }
 
@@ -1517,7 +1517,7 @@ void ImportProject::selectVsConfigurations(Platform::Type platform, const std::v
         const FileSettings &fs = *it;
         const auto config = fs.cfg.substr(0, fs.cfg.find('|'));
         bool remove = false;
-        if (std::find(configurations.begin(), configurations.end(), config) == configurations.end())
+        if (std::find(configurations.cbegin(), configurations.cend(), config) == configurations.cend())
             remove = true;
         if (platform == Platform::Type::Win64 && fs.platformType != platform)
             remove = true;

@@ -115,7 +115,7 @@ void ThreadResult::setProject(const ImportProject &prj)
 
     // Determine the total size of all of the files to check, so that we can
     // show an accurate progress estimate
-    mMaxProgress = std::accumulate(prj.fileSettings.begin(), prj.fileSettings.end(), quint64{ 0 }, [](quint64 v, const FileSettings& fs) {
+    mMaxProgress = std::accumulate(prj.fileSettings.cbegin(), prj.fileSettings.cend(), quint64{ 0 }, [](quint64 v, const FileSettings& fs) {
         return v + QFile(QString::fromStdString(fs.filename())).size();
     });
 }

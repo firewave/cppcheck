@@ -517,13 +517,13 @@ namespace ValueFlow
                                 std::vector<const Token*> args1 = getArguments(tok1);
                                 std::vector<const Token*> args2 = getArguments(tok2);
                                 if (args1.size() == args2.size()) {
-                                    if (!std::all_of(args1.begin(), args1.end(), std::mem_fn(&Token::hasKnownIntValue)))
+                                    if (!std::all_of(args1.cbegin(), args1.cend(), std::mem_fn(&Token::hasKnownIntValue)))
                                         continue;
-                                    if (!std::all_of(args2.begin(), args2.end(), std::mem_fn(&Token::hasKnownIntValue)))
+                                    if (!std::all_of(args2.cbegin(), args2.cend(), std::mem_fn(&Token::hasKnownIntValue)))
                                         continue;
-                                    equal = std::equal(args1.begin(),
-                                                       args1.end(),
-                                                       args2.begin(),
+                                    equal = std::equal(args1.cbegin(),
+                                                       args1.cend(),
+                                                       args2.cbegin(),
                                                        [&](const Token* atok, const Token* btok) {
                                         return atok->getKnownIntValue() ==
                                                btok->getKnownIntValue();

@@ -143,7 +143,7 @@ static std::string writestr(const std::string &str, bool gccStyle = false)
     for (auto i = str.cbegin(); i != str.cend(); ++i) {
         if (*i == '\n') {
             ostr << "\\n";
-            if ((i+1) != str.end() && !gccStyle)
+            if ((i+1) != str.cend() && !gccStyle)
                 ostr << std::endl;
         } else if (*i == '\t')
             ostr << "\\t";

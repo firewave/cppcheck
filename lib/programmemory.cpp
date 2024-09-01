@@ -1281,7 +1281,7 @@ static bool TokenExprIdEqual(const Token* tok1, const Token* tok2) {
 static std::vector<const Token*> setDifference(const std::vector<const Token*>& v1, const std::vector<const Token*>& v2)
 {
     std::vector<const Token*> result;
-    std::set_difference(v1.begin(), v1.end(), v2.begin(), v2.end(), std::back_inserter(result), &TokenExprIdCompare);
+    std::set_difference(v1.cbegin(), v1.cend(), v2.cbegin(), v2.cend(), std::back_inserter(result), &TokenExprIdCompare);
     return result;
 }
 
@@ -1356,7 +1356,7 @@ namespace {
         }
         static bool sortConditions(std::vector<const Token*>& conditions)
         {
-            if (std::any_of(conditions.begin(), conditions.end(), [](const Token* child) {
+            if (std::any_of(conditions.cbegin(), conditions.cend(), [](const Token* child) {
                 return Token::Match(child, "&&|%oror%");
             }))
                 return false;
@@ -1425,7 +1425,7 @@ namespace {
                     if (!sortConditions(conditions2))
                         return unknown();
                     if (conditions1.size() == conditions2.size() &&
-                        std::equal(conditions1.begin(), conditions1.end(), conditions2.begin(), &TokenExprIdEqual))
+                        std::equal(conditions1.cbegin(), conditions1.cend(), conditions2.cbegin(), &TokenExprIdEqual))
                         return value;
                     std::vector<const Token*> diffConditions1 = setDifference(conditions1, conditions2);
                     pruneConditions(diffConditions1, !b, condValues);
@@ -1436,7 +1436,7 @@ namespace {
                     if (diffConditions1.size() != diffConditions2.size())
                         continue;
                     for (const Token* cond1 : diffConditions1) {
-                        auto it = std::find_if(diffConditions2.begin(), diffConditions2.end(), [&](const Token* cond2) {
+                        auto it = std::find_if(diffConditions2.cbegin(), diffConditions2.cend(), [&](const Token* cond2) {
                             return evalSameCondition(*pm, cond2, cond1, settings);
                         });
                         if (it == diffConditions2.end())
@@ -1712,7 +1712,7 @@ namespace {
                 }
             }
             auto it =
-                std::max_element(values.begin(), values.end(), [](const ValueFlow::Value* x, const ValueFlow::Value* y) {
+                std::max_element(values.cbegin(), values.cend(), [](const ValueFlow::Value* x, const ValueFlow::Value* y) {
                 return x->intvalue < y->intvalue;
             });
             if (it == values.end())
