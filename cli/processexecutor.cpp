@@ -399,7 +399,7 @@ unsigned int ProcessExecutor::check()
                                 const auto fs = std::find_if(mFiles.cbegin(), mFiles.cend(), [&name](const FileWithDetails& entry) {
                                     return entry.path() == name;
                                 });
-                                if (fs != mFiles.end()) {
+                                if (fs != mFiles.cend()) {
                                     size = fs->size();
                                 }
                             }

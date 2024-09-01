@@ -287,7 +287,7 @@ std::string FileLister::addFiles(std::list<FileWithDetails> &files, const std::s
 
     std::string corrected_path = path;
     if (endsWith(corrected_path, '/'))
-        corrected_path.erase(corrected_path.end() - 1);
+        corrected_path.erase(corrected_path.cend() - 1);
 
     std::list<FileWithDetails> filesSorted;
 

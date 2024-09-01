@@ -1164,7 +1164,7 @@ static bool isReturnedByRef(const Variable* var, const Function* func)
     if (!func || !Function::returnsReference(func, true))
         return false;
     const std::vector<const Token*> returns = Function::findReturns(func);
-    return std::any_of(returns.begin(), returns.end(), [var](const Token* tok) {
+    return std::any_of(returns.cbegin(), returns.cend(), [var](const Token* tok) {
         return tok->varId() == var->declarationId();
     });
 }
@@ -1326,7 +1326,7 @@ void CheckUnusedVar::checkFunctionVariableUsage()
                     // Check in the library if we should bailout or not..
                     std::string typeName = op1Var->getTypeName();
                     if (startsWith(typeName, "::"))
-                        typeName.erase(typeName.begin(), typeName.begin() + 2);
+                        typeName.erase(typeName.cbegin(), typeName.cbegin() + 2);
                     switch (mSettings->library.getTypeCheck("unusedvar", typeName)) {
                     case Library::TypeCheck::def:
                         bailoutTypeName = std::move(typeName);

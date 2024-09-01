@@ -59,7 +59,7 @@ int main(int argc, char *argv[])
     auto it = std::find_if(args.cbegin(), args.cend(), [](const QString& arg) {
         return arg.startsWith("--data-dir=");
     });
-    if (it != args.end()) {
+    if (it != args.cend()) {
         settings->setValue("DATADIR", it->mid(11));
         return 0;
     }

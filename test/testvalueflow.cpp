@@ -218,7 +218,7 @@ private:
 
         for (const Token *tok = tokenizer.tokens(); tok; tok = tok->next()) {
             if (tok->str() == "x" && tok->linenr() == linenr) {
-                if (std::any_of(tok->values().begin(), tok->values().end(), [&](const ValueFlow::Value& val) {
+                if (std::any_of(tok->values().cbegin(), tok->values().cend(), [&](const ValueFlow::Value& val) {
                     if (val.isSymbolicValue())
                         return false;
                     if (val.isKnown() && val.intvalue == value)
@@ -239,7 +239,7 @@ private:
 
         for (const Token* tok = tokenizer.tokens(); tok; tok = tok->next()) {
             if (tok->str() == "x" && tok->linenr() == linenr) {
-                if (std::any_of(tok->values().begin(), tok->values().end(), [&](const ValueFlow::Value& val) {
+                if (std::any_of(tok->values().cbegin(), tok->values().cend(), [&](const ValueFlow::Value& val) {
                     if (!val.isSymbolicValue())
                         return false;
                     if (val.isKnown() && val.intvalue == value && val.tokvalue->expressionString() == expr)
@@ -261,7 +261,7 @@ private:
 
         for (const Token *tok = tokenizer.tokens(); tok; tok = tok->next()) {
             if (tok->str() == "x" && tok->linenr() == linenr) {
-                if (std::any_of(tok->values().begin(), tok->values().end(), [&](const ValueFlow::Value& val) {
+                if (std::any_of(tok->values().cbegin(), tok->values().cend(), [&](const ValueFlow::Value& val) {
                     if (val.isSymbolicValue())
                         return false;
                     if (val.isImpossible() && val.intvalue == value)
@@ -283,7 +283,7 @@ private:
 
         for (const Token* tok = tokenizer.tokens(); tok; tok = tok->next()) {
             if (tok->str() == "x" && tok->linenr() == linenr) {
-                if (std::any_of(tok->values().begin(), tok->values().end(), [&](const ValueFlow::Value& val) {
+                if (std::any_of(tok->values().cbegin(), tok->values().cend(), [&](const ValueFlow::Value& val) {
                     if (!val.isSymbolicValue())
                         return false;
                     if (val.isImpossible() && val.intvalue == value && val.tokvalue->expressionString() == expr)
@@ -305,7 +305,7 @@ private:
 
         for (const Token *tok = tokenizer.tokens(); tok; tok = tok->next()) {
             if (tok->str() == "x" && tok->linenr() == linenr) {
-                if (std::any_of(tok->values().begin(), tok->values().end(), [&](const ValueFlow::Value& val) {
+                if (std::any_of(tok->values().cbegin(), tok->values().cend(), [&](const ValueFlow::Value& val) {
                     if (val.isSymbolicValue())
                         return false;
                     if (val.isInconclusive() && val.intvalue == value)
@@ -549,7 +549,7 @@ private:
                               int value)
     {
         std::list<ValueFlow::Value> values = removeImpossible(tokenValues_(file, line, code, tokstr));
-        return std::any_of(values.begin(), values.end(), [&](const ValueFlow::Value& v) {
+        return std::any_of(values.cbegin(), values.cend(), [&](const ValueFlow::Value& v) {
             return v.isKnown() && v.isIntValue() && v.intvalue == value;
         });
     }
@@ -4867,7 +4867,7 @@ private:
                "}\n";
         values = tokenValues(code, "n ]");
         ASSERT_EQUALS(2, values.size());
-        auto it = values.begin();
+        auto it = values.cbegin();
         ASSERT_EQUALS(-1, it->intvalue);
         ASSERT(it->isImpossible());
         ++it;
@@ -4883,7 +4883,7 @@ private:
                "}\n";
         values = tokenValues(code, "n ]");
         ASSERT_EQUALS(2, values.size());
-        it = values.begin();
+        it = values.cbegin();
         ASSERT_EQUALS(-1, it->intvalue);
         ASSERT(it->isImpossible());
         ++it;
@@ -4899,7 +4899,7 @@ private:
                "}\n";
         values = tokenValues(code, "n ]");
         ASSERT_EQUALS(2, values.size());
-        it = values.begin();
+        it = values.cbegin();
         ASSERT_EQUALS(-1, it->intvalue);
         ASSERT(it->isImpossible());
         ++it;
@@ -4915,7 +4915,7 @@ private:
                "}\n";
         values = tokenValues(code, "n ]");
         ASSERT_EQUALS(2, values.size());
-        it = values.begin();
+        it = values.cbegin();
         ASSERT_EQUALS(-1, it->intvalue);
         ASSERT(it->isImpossible());
         ++it;
@@ -4931,7 +4931,7 @@ private:
                "}\n";
         values = tokenValues(code, "n ]");
         ASSERT_EQUALS(2, values.size());
-        it = values.begin();
+        it = values.cbegin();
         ASSERT_EQUALS(-1, it->intvalue);
         ASSERT(it->isImpossible());
         ++it;

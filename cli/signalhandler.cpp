@@ -123,7 +123,7 @@ static void CppcheckSignalHandler(int signo, siginfo_t * info, void * context) /
 #endif
 
     const auto it = listofsignals.find(signo);
-    const char * const signame = (it==listofsignals.end()) ? "unknown" : it->second.c_str();
+    const char * const signame = (it==listofsignals.cend()) ? "unknown" : it->second.c_str();
     bool unexpectedSignal=true; // unexpected indicates program failure
     bool terminate=true; // exit process/thread
     const bool isAddressOnStack = IsAddressOnStack(info->si_addr);
