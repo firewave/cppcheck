@@ -43,10 +43,10 @@ namespace ValueFlow
     {
         if (!tok)
             return nullptr;
-        auto it = std::find_if(tok->values().begin(), tok->values().end(), [&](const Value& v) {
+        auto it = std::find_if(tok->values().cbegin(), tok->values().cend(), [&](const Value& v) {
             return (v.isIntValue() || v.isContainerSizeValue() || v.isFloatValue()) && v.isKnown();
         });
-        if (it == tok->values().end())
+        if (it == tok->values().cend())
             return nullptr;
         return std::addressof(*it);
     }
@@ -59,7 +59,7 @@ namespace ValueFlow
         if (!result)
             return nullptr;
         if (!std::all_of(std::next(toks.begin()), toks.end(), [&](const Token* tok) {
-            return std::any_of(tok->values().begin(), tok->values().end(), [&](const Value& v) {
+            return std::any_of(tok->values().cbegin(), tok->values().cend(), [&](const Value& v) {
                 return v.equalValue(*result) && v.valueKind == result->valueKind;
             });
         }))

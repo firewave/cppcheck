@@ -3874,10 +3874,10 @@ void TemplateSimplifier::simplifyTemplates(const std::time_t maxtime)
                     return xargs.size() < yargs.size();
                 if (isConstMethod(x.nameToken()) != isConstMethod(y.nameToken()))
                     return isConstMethod(x.nameToken());
-                return std::lexicographical_compare(xargs.begin(),
-                                                    xargs.end(),
-                                                    yargs.begin(),
-                                                    yargs.end(),
+                return std::lexicographical_compare(xargs.cbegin(),
+                                                    xargs.cend(),
+                                                    yargs.cbegin(),
+                                                    yargs.cend(),
                                                     [&](const Token* xarg, const Token* yarg) {
                     if (xarg != yarg)
                         return score(xarg) < score(yarg);
@@ -3915,10 +3915,10 @@ void TemplateSimplifier::simplifyTemplates(const std::time_t maxtime)
         }
 
         for (std::list<TokenAndName>::const_iterator it = mInstantiatedTemplates.cbegin(); it != mInstantiatedTemplates.cend(); ++it) {
-            auto decl = std::find_if(mTemplateDeclarations.begin(), mTemplateDeclarations.end(), [&it](const TokenAndName& decl) {
+            auto decl = std::find_if(mTemplateDeclarations.cbegin(), mTemplateDeclarations.cend(), [&it](const TokenAndName& decl) {
                 return decl.token() == it->token();
             });
-            if (decl != mTemplateDeclarations.end()) {
+            if (decl != mTemplateDeclarations.cend()) {
                 if (it->isSpecialization()) {
                     // delete the "template < >"
                     Token * tok = it->token();

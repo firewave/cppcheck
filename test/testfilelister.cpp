@@ -117,7 +117,7 @@ private:
         std::string err = FileLister::recursiveAddFiles(files, basedir + "lib/token.cpp", matcher);
         ASSERT_EQUALS("", err);
         ASSERT_EQUALS(1, files.size());
-        ASSERT_EQUALS(basedir + "lib/token.cpp", files.begin()->path());
+        ASSERT_EQUALS(basedir + "lib/token.cpp", files.cbegin()->path());
     }
 
     // TODO: test errors

@@ -106,7 +106,7 @@ static bool isVclTypeInit(const Type *type)
 {
     if (!type)
         return false;
-    return std::any_of(type->derivedFrom.begin(), type->derivedFrom.end(), [&](const Type::BaseInfo& baseInfo) {
+    return std::any_of(type->derivedFrom.cbegin(), type->derivedFrom.cend(), [&](const Type::BaseInfo& baseInfo) {
         if (!baseInfo.type)
             return true;
         if (isVclTypeInit(baseInfo.type))
@@ -2518,7 +2518,7 @@ bool CheckClass::checkConstFunc(const Scope *scope, const Function *func, Member
                 if (!end || !scope || !Token::simpleMatch(end->astParent(), "."))
                     return false;
                 const std::string op = "operator" + end->astParent()->originalName();
-                auto it = std::find_if(scope->functionList.begin(), scope->functionList.end(), [&op](const Function& f) {
+                auto it = std::find_if(scope->functionList.cbegin(), scope->functionList.cend(), [&op](const Function& f) {
                     return f.isConst() && f.name() == op;
                 });
                 if (it == scope->functionList.end() || !it->retType || !it->retType->classScope)
@@ -3007,7 +3007,7 @@ static std::vector<DuplMemberInfo> getDuplInheritedMembersRecursive(const Type* 
         }
         if (typeCurrent != parentClassIt.type) {
             const auto recursive = getDuplInheritedMembersRecursive(typeCurrent, parentClassIt.type, skipPrivate);
-            results.insert(results.end(), recursive.begin(), recursive.end());
+            results.insert(results.cend(), recursive.cbegin(), recursive.cend());
         }
     }
     return results;
@@ -3038,7 +3038,7 @@ static std::vector<DuplMemberFuncInfo> getDuplInheritedMemberFunctionsRecursive(
         }
         if (typeCurrent != parentClassIt.type) {
             const auto recursive = getDuplInheritedMemberFunctionsRecursive(typeCurrent, parentClassIt.type);
-            results.insert(results.end(), recursive.begin(), recursive.end());
+            results.insert(results.cend(), recursive.cbegin(), recursive.cend());
         }
     }
     return results;
@@ -3103,7 +3103,7 @@ void CheckClass::checkCopyCtorAndEqOperator()
 
     for (const Scope * scope : mSymbolDatabase->classAndStructScopes) {
 
-        const bool hasNonStaticVars = std::any_of(scope->varlist.begin(), scope->varlist.end(), [](const Variable& var) {
+        const bool hasNonStaticVars = std::any_of(scope->varlist.cbegin(), scope->varlist.cend(), [](const Variable& var) {
             return !var.isStatic();
         });
         if (!hasNonStaticVars)
@@ -3274,7 +3274,7 @@ void CheckClass::checkUselessOverride()
             const Function* baseFunc = func.getOverriddenFunction();
             if (!baseFunc || baseFunc->isPure() || baseFunc->access != func.access)
                 continue;
-            if (std::any_of(classScope->functionList.begin(), classScope->functionList.end(), [&func](const Function& f) { // check for overloads
+            if (std::any_of(classScope->functionList.cbegin(), classScope->functionList.cend(), [&func](const Function& f) { // check for overloads
                 if (&f == &func)
                     return false;
                 return f.name() == func.name();
@@ -3307,7 +3307,7 @@ void CheckClass::checkUselessOverride()
                 std::vector<const Token*> funcArgs = getArguments(func.tokenDef);
                 std::vector<const Token*> callArgs = getArguments(call);
                 if (funcArgs.size() != callArgs.size() ||
-                    !std::equal(funcArgs.begin(), funcArgs.end(), callArgs.begin(), [](const Token* t1, const Token* t2) {
+                    !std::equal(funcArgs.cbegin(), funcArgs.cend(), callArgs.cbegin(), [](const Token* t1, const Token* t2) {
                     return t1->str() == t2->str();
                 }))
                     continue;

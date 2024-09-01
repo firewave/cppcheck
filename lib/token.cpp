@@ -197,7 +197,7 @@ bool Token::isUpperCaseName() const
 {
     if (!isName())
         return false;
-    return std::none_of(mStr.begin(), mStr.end(), [](char c) {
+    return std::none_of(mStr.cbegin(), mStr.cend(), [](char c) {
         return std::islower(c);
     });
 }
@@ -2059,7 +2059,7 @@ static void mergeAdjacent(std::list<ValueFlow::Value>& values)
             continue;
         }
         std::vector<ValueIterator> adjValues;
-        for (auto y = values.begin(); y != values.end(); y++) {
+        for (auto y = values.cbegin(); y != values.cend(); y++) {
             if (x == y)
                 continue;
             if (y->isNonValue())

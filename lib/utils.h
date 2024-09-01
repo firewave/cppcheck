@@ -68,13 +68,13 @@ bool contains(const Range& r, const T& x)
 template<class T>
 bool contains(const std::initializer_list<T>& r, const T& x)
 {
-    return std::find(r.begin(), r.end(), x) != r.end();
+    return std::any_of(r.cbegin(), r.cend(), x);
 }
 
 template<class T, class U>
 bool contains(const std::initializer_list<T>& r, const U& x)
 {
-    return std::find(r.begin(), r.end(), x) != r.end();
+    return std::any_of(r.cbegin(), r.cend(), x);
 }
 
 template<class T, class ... Ts>
