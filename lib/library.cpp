@@ -46,8 +46,8 @@ struct Library::LibraryData
 {
     struct Platform {
         const PlatformType *platform_type(const std::string &name) const {
-            const std::map<std::string, PlatformType>::const_iterator it = mPlatformTypes.find(name);
-            return (it != mPlatformTypes.end()) ? &(it->second) : nullptr;
+            const auto it = utils::as_const(mPlatformTypes).find(name);
+            return (it != mPlatformTypes.cend()) ? &(it->second) : nullptr;
         }
         std::map<std::string, PlatformType> mPlatformTypes;
     };
@@ -336,8 +336,8 @@ Library::Error Library::load(const tinyxml2::XMLDocument &doc)
                 if (strcmp(memorynode->Name(),"dealloc")==0) {
                     const auto names = getnames(memorynode->GetText());
                     for (const auto& n : names) {
-                        const std::map<std::string, AllocFunc>::const_iterator it = mData->mDealloc.find(n);
-                        if (it != mData->mDealloc.end()) {
+                        const auto it = utils::as_const(mData->mDealloc).find(n);
+                        if (it != mData->mDealloc.cend()) {
                             allocationId = it->second.groupId;
                             break;
                         }
@@ -542,8 +542,8 @@ Library::Error Library::load(const tinyxml2::XMLDocument &doc)
 
             const char* const inherits = node->Attribute("inherits");
             if (inherits) {
-                const std::unordered_map<std::string, Container>::const_iterator i = mData->mContainers.find(inherits);
-                if (i != mData->mContainers.end())
+                const auto i = utils::as_const(mData->mContainers).find(inherits);
+                if (i != mData->mContainers.cend())
                     container = i->second; // Take values from parent and overwrite them if necessary
                 else
                     return Error(ErrorCode::BAD_ATTRIBUTE_VALUE, inherits);
@@ -781,7 +781,7 @@ Library::Error Library::load(const tinyxml2::XMLDocument &doc)
     }
     if (!unknown_elements.empty()) {
         std::string str;
-        for (std::set<std::string>::const_iterator i = unknown_elements.cbegin(); i != unknown_elements.cend();) {
+        for (auto i = unknown_elements.cbegin(); i != unknown_elements.cend();) {
             str += *i;
             if (++i != unknown_elements.end())
                 str += ", ";
@@ -1175,7 +1175,7 @@ bool Library::isnullargbad(const Token *ftok, int argnr) const
     if (!arg) {
         // scan format string argument should not be null
         const std::string funcname = getFunctionName(ftok);
-        const std::unordered_map<std::string, Function>::const_iterator it = mData->mFunctions.find(funcname);
+        const auto it = utils::as_const(mData->mFunctions).find(funcname);
         if (it != mData->mFunctions.cend() && it->second.formatstr && it->second.formatstr_scan)
             return true;
     }

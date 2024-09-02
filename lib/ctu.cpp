@@ -506,8 +506,8 @@ static bool findPath(const std::string &callId,
     if (index >= CTU::maxCtuDepth || index >= 10)
         return false;
 
-    const std::map<std::string, std::list<const CTU::FileInfo::CallBase *>>::const_iterator it = callsMap.find(callId);
-    if (it == callsMap.end())
+    const auto it = utils::as_const(callsMap).find(callId);
+    if (it == callsMap.cend())
         return false;
 
     for (const CTU::FileInfo::CallBase *c : it->second) {
