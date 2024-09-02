@@ -263,7 +263,22 @@ namespace ValueFlow
         /** The value bound  */
         Bound bound = Bound::Point;
 
-        long long : 48; // padding
+        /** value relies on safe checking */
+        bool safe{};
+
+        /** Conditional value */
+        bool conditional{};
+
+        /** Value is is from an expanded macro */
+        bool macro{};
+
+        /** Is this value passed as default parameter to the function? */
+        bool defaultArg{};
+
+        /** kind of moved  */
+        enum class MoveKind : std::uint8_t { NonMovedVariable, MovedVariable, ForwardedVariable } moveKind = MoveKind::NonMovedVariable;
+
+        enum class LifetimeScope : std::uint8_t { Local, Argument, SubFunction, ThisPointer, ThisValue } lifetimeScope = LifetimeScope::Local;
 
         /** int value (or sometimes bool value?) */
         long long intvalue{};
@@ -287,24 +302,7 @@ namespace ValueFlow
         /** For calculated values - varId that calculated value depends on */
         nonneg int varId{};
 
-        /** value relies on safe checking */
-        bool safe{};
-
-        /** Conditional value */
-        bool conditional{};
-
-        /** Value is is from an expanded macro */
-        bool macro{};
-
-        /** Is this value passed as default parameter to the function? */
-        bool defaultArg{};
-
         int indirect{};
-
-        /** kind of moved  */
-        enum class MoveKind : std::uint8_t { NonMovedVariable, MovedVariable, ForwardedVariable } moveKind = MoveKind::NonMovedVariable;
-
-        long long : 24; // padding
 
         /** Path id */
         MathLib::bigint path{};
@@ -329,8 +327,6 @@ namespace ValueFlow
             // A pointer that holds the address of the lifetime
             Address
         } lifetimeKind = LifetimeKind::Object;
-
-        enum class LifetimeScope : std::uint8_t { Local, Argument, SubFunction, ThisPointer, ThisValue } lifetimeScope = LifetimeScope::Local;
 
         static const char* toString(MoveKind moveKind);
         static const char* toString(LifetimeKind lifetimeKind);
@@ -414,7 +410,7 @@ namespace ValueFlow
             }
         };
 
-        long long : 40; // padding
+        long long : 48; // padding
     };
 }
 
