@@ -33,6 +33,7 @@
 #include "vf_infercondition.h" // IWYU pragma: export
 #include "vf_iteratorinfer.h" // IWYU pragma: export
 #include "vf_iterators.h" // IWYU pragma: export
+#include "vf_lifetime.h" // IWYU pragma: export
 #include "vf_number.h" // IWYU pragma: export
 #include "vf_pointeralias.h" // IWYU pragma: export
 #include "vf_rightshift.h" // IWYU pragma: export

@@ -97,6 +97,7 @@ HEADERS += $${PWD}/addoninfo.h \
            $${PWD}/vf_infercondition.h \
            $${PWD}/vf_iteratorinfer.h \
            $${PWD}/vf_iterators.h \
+           $${PWD}/vf_lifetime.h \
            $${PWD}/vf_number.h \
            $${PWD}/vf_pointeralias.h \
            $${PWD}/vf_reverse.h \
@@ -190,6 +191,7 @@ SOURCES += $${PWD}/valueflow.cpp \
            $${PWD}/vf_infercondition.cpp \
            $${PWD}/vf_iteratorinfer.cpp \
            $${PWD}/vf_iterators.cpp \
+           $${PWD}/vf_lifetime.cpp \
            $${PWD}/vf_number.cpp \
            $${PWD}/vf_pointeralias.cpp \
            $${PWD}/vf_reverse.cpp \

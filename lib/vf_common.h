@@ -63,6 +63,8 @@ namespace ValueFlow
     void setSymbolic(Value& value, const Token* tok);
 
     Value makeSymbolic(const Token* tok, MathLib::bigint delta = 0);
+
+    enum class LifetimeCapture : std::uint8_t { Undefined, ByValue, ByReference };
 }
 
 #endif // vfCommonH
