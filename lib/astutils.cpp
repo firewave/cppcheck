@@ -2881,20 +2881,18 @@ static bool isExpressionChangedAt(const F& getExprTok,
                 return true;
         }
         int i = 1;
-        bool aliased = false;
-        // If we can't find the expression then assume it is an alias
-        auto expr = getExprTok();
-        if (!expr)
-            aliased = true;
-        if (!aliased)
-            aliased = isAliasOf(tok, expr, &i);
-        if (!aliased)
-            return false;
+        auto isAliased = [&](){
+            auto expr = getExprTok();
+            // If we can't find the expression then assume it is an alias
+            if (!expr)
+                return true;
+            return isAliasOf(tok, expr, &i);
+        };
         if (isVariableChanged(tok, indirect + i, settings, depth))
-            return true;
+            return isAliased();
         // TODO: Try to traverse the lambda function
         if (Token::Match(tok, "%var% ("))
-            return true;
+            return isAliased();
         return false;
     }
     return (isVariableChanged(tok, indirect, settings, depth));
