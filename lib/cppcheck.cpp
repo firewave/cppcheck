@@ -1142,7 +1142,7 @@ unsigned int CppCheck::checkFile(const FileWithDetails& file, const std::string 
                 }
 
                 if (!tokenizer.tokens())
-                    continue;
+                    continue; // TODO: add bailout message
 
                 // skip rest of iteration if just checking configuration
                 if (mSettings.checkConfiguration)
