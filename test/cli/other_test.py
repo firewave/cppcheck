@@ -109,11 +109,11 @@ def test_color_non_tty(tmpdir, env, color_expected):
 
 @pytest.mark.skipif(sys.platform == "win32", reason="TTY not supported in Windows")
 @pytest.mark.parametrize("env,color_expected", [({}, True), ({"NO_COLOR": "1"}, False)])
-def test_color_tty(tmpdir, env, color_expected):
-    test_file = os.path.join(tmpdir, 'test.c')
+def test_color_tty(tmp_path_factory, env, color_expected):
+    test_file = tmp_path_factory.mktemp('data') / 'test.c'
     with open(test_file, 'wt') as f:
         f.write('#error test\nx=1;\n')
-    exitcode, _, stderr = cppcheck([test_file], env=env, tty=True)
+    exitcode, _, stderr = cppcheck([str(test_file)], env=env, tty=True)
 
     assert exitcode == 0
     assert stderr
