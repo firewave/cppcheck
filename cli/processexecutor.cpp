@@ -44,7 +44,6 @@
 #include <iostream>
 #include <list>
 #include <map>
-#include <sstream>
 #include <sys/select.h>
 #include <sys/time.h>
 #include <sys/types.h>
@@ -432,14 +431,12 @@ unsigned int ProcessExecutor::check()
                 if (WIFEXITED(stat)) {
                     const int exitstatus = WEXITSTATUS(stat);
                     if (exitstatus != EXIT_SUCCESS) {
-                        std::ostringstream oss;
-                        oss << "Child process exited with " << exitstatus;
-                        reportInternalChildErr(childname, oss.str());
+                        std::string str = "Child process exited with " + std::to_string(exitstatus);
+                        reportInternalChildErr(childname, str);
                     }
                 } else if (WIFSIGNALED(stat)) {
-                    std::ostringstream oss;
-                    oss << "Child process crashed with signal " << WTERMSIG(stat);
-                    reportInternalChildErr(childname, oss.str());
+                    std::string str = "Child process crashed with signal " + std::to_string(WTERMSIG(stat));
+                    reportInternalChildErr(childname, str);
                 }
             }
         }

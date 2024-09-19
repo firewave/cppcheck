@@ -25,7 +25,6 @@
 #include "suppressions.h"
 
 #include <cassert>
-#include <sstream>
 #include <utility>
 
 struct FileSettings;
@@ -64,12 +63,15 @@ bool Executor::hasToLog(const ErrorMessage &msg)
 void Executor::reportStatus(std::size_t fileindex, std::size_t filecount, std::size_t sizedone, std::size_t sizetotal)
 {
     if (filecount > 1) {
-        std::ostringstream oss;
         const unsigned long percentDone = (sizetotal > 0) ? (100 * sizedone) / sizetotal : 0;
-        oss << fileindex << '/' << filecount
-            << " files checked " << percentDone
-            << "% done";
-        mErrorLogger.reportOut(oss.str(), Color::FgBlue);
+        std::string str;
+        str += std::to_string(fileindex);
+        str += '/';
+        str += std::to_string(filecount);
+        str += " files checked ";
+        str += std::to_string(percentDone);
+        str += "% done";
+        mErrorLogger.reportOut(str, Color::FgBlue);
     }
 }
 

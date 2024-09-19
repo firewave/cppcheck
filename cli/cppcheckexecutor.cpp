@@ -58,7 +58,6 @@
 #include <list>
 #include <map>
 #include <set>
-#include <sstream>
 #include <unordered_set>
 #include <utility>
 #include <vector>
@@ -523,13 +522,15 @@ void StdLogger::reportProgress(const std::string &filename, const char stage[], 
         mLatestProgressOutputTime = currentTime;
 
         // format a progress message
-        std::ostringstream ostr;
-        ostr << "progress: "
-             << stage
-             << ' ' << value << '%';
+        std::string pstr;
+        pstr += "progress: ";
+        pstr += stage;
+        pstr += ' ';
+        pstr += std::to_string(value);
+        pstr += '%';
 
         // Report progress message
-        reportOut(ostr.str());
+        reportOut(pstr);
     }
 }
 

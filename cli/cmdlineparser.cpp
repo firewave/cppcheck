@@ -362,17 +362,21 @@ CmdLineParser::Result CmdLineParser::parseFromArgs(int argc, const char* const a
     for (int i = 1; i < argc; i++) {
         // documentation..
         if (std::strcmp(argv[i], "--doc") == 0) {
-            std::ostringstream doc;
+            std::string doc;
             // Get documentation..
             for (const Check * it : Check::instances()) {
                 const std::string& name(it->name());
                 const std::string info(it->classInfo());
-                if (!name.empty() && !info.empty())
-                    doc << "## " << name << " ##\n"
-                        << info << "\n";
+                if (!name.empty() && !info.empty()) {
+                    doc += "## ";
+                    doc += name;
+                    doc += " ##\n";
+                    doc += info;
+                    doc += "\n";
+                }
             }
 
-            mLogger.printRaw(doc.str());
+            mLogger.printRaw(doc);
             return Result::Exit;
         }
 
