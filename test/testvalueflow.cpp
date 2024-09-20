@@ -8822,14 +8822,33 @@ private:
     }
 
     void debug() {
-        const auto s = dinit(Settings, $.debugnormal = true);
+        std::ostringstream ostr;
+        const auto s = dinit(Settings,
+                             $.debugnormal = true,
+                             $.outDebug = &ostr
+                             );
         const char code[] =
                 "void f() {\n"
                 "int i = 0;\n"
                 "}";
         SimpleTokenizer tokenizer(s, *this);
         ASSERT(tokenizer.tokenize(code));
-        // TODO: redirect debug output
+        std::string expected =
+                "\n"
+                "\n"
+                "##file test.cpp\n"
+                "1: void f ( ) {\n"
+                "2: int i@var1 ; i@var1 = 0 ;\n"
+                "3: }\n"
+                "\n"
+                "\n"
+                "\n"
+                "##Value flow\n"
+                "File test.cpp\n"
+                "Line 2\n"
+                "  = always 0\n"
+                "  0 always 0\n";
+        ASSERT_EQUALS(expected, ostr.str());
     }
 };
 

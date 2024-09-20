@@ -3489,7 +3489,7 @@ bool Tokenizer::simplifyTokens1(const std::string &configuration)
         mSymbolDatabase->setArrayDimensionsUsingValueFlow();
     }
 
-    printDebugOutput(1, std::cout);
+    printDebugOutput(1, *mSettings.outDebug);
 
     return true;
 }

@@ -34,6 +34,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <functional>
+#include <iosfwd>
 #include <list>
 #include <map>
 #include <set>
@@ -275,6 +276,8 @@ public:
 
     /** @brief write results (--output-file=&lt;file&gt;) */
     std::string outputFile;
+
+    std::ostream* outDebug;
 
     enum class OutputFormat : std::uint8_t {text, plist, sarif, xml};
     OutputFormat outputFormat = OutputFormat::text;
