@@ -61,6 +61,7 @@ Settings::Settings()
     setCheckLevel(Settings::CheckLevel::exhaustive);
     executor = defaultExecutor();
     pid = getPid();
+    outDebug = &std::cout;
 }
 
 std::string Settings::loadCppcheckCfg(Settings& settings, Suppressions& suppressions, bool debug)
