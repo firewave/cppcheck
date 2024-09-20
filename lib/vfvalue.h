@@ -28,6 +28,7 @@
 #include <cassert>
 #include <cmath>
 #include <cstdint>
+#include <forward_list>
 #include <functional>
 #include <string>
 #include <type_traits>
@@ -299,7 +300,7 @@ namespace ValueFlow
 
         ErrorPath errorPath;
 
-        ErrorPath debugPath; // TODO: make lighter by default
+        std::forward_list<ErrorPathItem> debugPath;
 
         /** For calculated values - varId that calculated value depends on */
         nonneg int varId{};

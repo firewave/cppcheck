@@ -393,7 +393,7 @@ namespace ValueFlow
             return;
         std::string s = Path::stripDirectoryPart(file) + ":" + std::to_string(ctx.line()) + ": " + ctx.function_name() +
                         " => " + local.function_name() + ": " + debugString(v);
-        v.debugPath.emplace_back(tok, std::move(s));
+        v.debugPath.emplace_after(v.debugPath.cend(), tok, std::move(s));
     }
 
     std::list<Value> getIteratorValues(std::list<Value> values, const Value::ValueKind* kind)
