@@ -289,7 +289,32 @@ namespace ValueFlow
 
         enum class LifetimeScope : std::uint8_t { Local, Argument, SubFunction, ThisPointer, ThisValue } lifetimeScope = LifetimeScope::Local;
 
-        long long : 24; // padding
+        enum class LifetimeKind : std::uint8_t {
+            // Pointer points to a member of lifetime
+            Object,
+            // A member of object points to the lifetime
+            SubObject,
+            // Lambda has captured lifetime(similar to SubObject)
+            Lambda,
+            // Iterator points to the lifetime of a container(similar to Object)
+            Iterator,
+            // A pointer that holds the address of the lifetime
+            Address
+        } lifetimeKind = LifetimeKind::Object;
+
+        /** How known is this value */
+        enum class ValueKind : std::uint8_t {
+            /** This value is possible, other unlisted values may also be possible */
+            Possible,
+            /** Only listed values are possible */
+            Known,
+            /** Inconclusive */
+            Inconclusive,
+            /** Listed values are impossible */
+            Impossible
+        } valueKind = ValueKind::Possible;
+
+        std::int8_t indirect{}; // TODO: can we reduce the size?
 
         /** int value (or sometimes bool value?) */
         long long intvalue{};
@@ -313,9 +338,7 @@ namespace ValueFlow
         /** For calculated values - varId that calculated value depends on */
         nonneg int varId{};
 
-        std::uint8_t indirect{};
-
-        long long : 24; // padding
+        long long : 32; // padding
 
         /** Path id */
         MathLib::bigint path{};
@@ -328,35 +351,10 @@ namespace ValueFlow
         // Set to where a lifetime is captured by value
         const Token* capturetok{};
 
-        enum class LifetimeKind : std::uint8_t {
-            // Pointer points to a member of lifetime
-            Object,
-            // A member of object points to the lifetime
-            SubObject,
-            // Lambda has captured lifetime(similar to SubObject)
-            Lambda,
-            // Iterator points to the lifetime of a container(similar to Object)
-            Iterator,
-            // A pointer that holds the address of the lifetime
-            Address
-        } lifetimeKind = LifetimeKind::Object;
-
         static const char* toString(MoveKind moveKind);
         static const char* toString(LifetimeKind lifetimeKind);
         static const char* toString(LifetimeScope lifetimeScope);
         static const char* toString(Bound bound);
-
-        /** How known is this value */
-        enum class ValueKind : std::uint8_t {
-            /** This value is possible, other unlisted values may also be possible */
-            Possible,
-            /** Only listed values are possible */
-            Known,
-            /** Inconclusive */
-            Inconclusive,
-            /** Listed values are impossible */
-            Impossible
-        } valueKind = ValueKind::Possible;
 
         void setKnown() {
             valueKind = ValueKind::Known;
@@ -422,8 +420,6 @@ namespace ValueFlow
                 x--;
             }
         };
-
-        long long : 48; // padding
     };
 }
 
