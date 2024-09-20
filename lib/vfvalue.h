@@ -34,6 +34,8 @@
 #include <utility>
 #include <vector>
 
+FORCE_WARNING_CLANG_PUSH("-Wpadded")
+
 class Token;
 
 namespace ValueFlow
@@ -263,6 +265,8 @@ namespace ValueFlow
         /** The value bound  */
         Bound bound = Bound::Point;
 
+        long long : 48; // padding
+
         /** int value (or sometimes bool value?) */
         long long intvalue{};
 
@@ -301,6 +305,8 @@ namespace ValueFlow
 
         /** kind of moved  */
         enum class MoveKind : std::uint8_t { NonMovedVariable, MovedVariable, ForwardedVariable } moveKind = MoveKind::NonMovedVariable;
+
+        long long : 24; // padding
 
         /** Path id */
         MathLib::bigint path{};
@@ -409,7 +415,11 @@ namespace ValueFlow
                 x--;
             }
         };
+
+        long long : 40; // padding
     };
 }
+
+FORCE_WARNING_CLANG_POP
 
 #endif // vfvalueH
