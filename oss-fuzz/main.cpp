@@ -37,7 +37,7 @@ public:
 };
 
 static DummyErrorLogger s_errorLogger;
-static const FileWithDetails s_file("test.cpp");
+static const FileWithDetails s_file("test.c");
 
 static void doCheck(const uint8_t *data, size_t dataSize)
 {
