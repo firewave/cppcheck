@@ -380,6 +380,7 @@ bool TokenList::createTokens(const uint8_t* data, size_t size, Standards::Langua
 #include <fstream>
 #include <sstream>
 
+#if 0
 static void storeInput(std::istream &code)
 {
     static std::atomic_uint64_t num(0);
@@ -392,13 +393,18 @@ static void storeInput(std::istream &code)
     }
 }
 #endif
+static void storeInput(const std::string& code)
+{
+    static std::atomic_uint64_t num(0);
+    {
+        std::ofstream out("/home/user/_test/" + std::to_string(num++)); // TODO: how to configure?
+        out << code;
+    }
+}
+#endif
 
 bool TokenList::createTokensInternal(const std::string& file0)
 {
-#ifdef STORE_INPUT
-    storeInput(code);
-#endif
-
     simplecpp::OutputList outputList;
     simplecpp::TokenList tokens(file0, mFiles, &outputList);
 
@@ -411,6 +417,10 @@ bool TokenList::createTokensInternal(const std::string& file0)
 
 bool TokenList::createTokensInternal(const uint8_t* data, size_t size, const std::string& file0)
 {
+#ifdef STORE_INPUT
+    storeInput(std::string(reinterpret_cast<const char*>(data), size));
+#endif
+
     simplecpp::OutputList outputList;
     simplecpp::TokenList tokens(data, size, mFiles, file0, &outputList);
 
