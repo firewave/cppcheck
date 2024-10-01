@@ -247,4 +247,6 @@ struct LibraryHelper
     static Library::Error loadxmldoc(Library &lib, const tinyxml2::XMLDocument& doc);
 };
 
+#define ARRAY_LEN(x) sizeof(x) / sizeof(x[0])
+
 #endif // helpersH
