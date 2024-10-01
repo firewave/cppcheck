@@ -1294,7 +1294,7 @@ private:
                                    "    <arg nr=\"2\"/>\n"
                                    "  </function>\n"
                                    "</def>";
-        const Settings settings2 = settingsBuilder().severity(Severity::warning).libraryxml(xmldata, sizeof(xmldata)).build();
+        const Settings settings2 = settingsBuilder().severity(Severity::warning).libraryxml(xmldata).build();
 
         check("void foo() {\n"
               "  mystrcmp(a, b);\n"
@@ -1455,7 +1455,7 @@ private:
                                "    <arg nr=\"2\"/>\n"
                                "  </function>\n"
                                "</def>";
-        const Settings settings2 = settingsBuilder().severity(Severity::style).libraryxml(xmldata, sizeof(xmldata)).build();
+        const Settings settings2 = settingsBuilder().severity(Severity::style).libraryxml(xmldata).build();
 
         check("void foo() {\n"
               "  mystrcmp(a, b);\n"

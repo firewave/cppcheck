@@ -216,7 +216,10 @@ protected:
 
         SettingsBuilder& library(const char lib[]);
 
-        SettingsBuilder& libraryxml(const char xmldata[], std::size_t len);
+        template<size_t size>
+        SettingsBuilder& libraryxml(const char (&xmldata)[size]) {
+            return libraryxml(xmldata, size-1);
+        }
 
         SettingsBuilder& platform(Platform::Type type);
 
@@ -238,6 +241,8 @@ protected:
             return std::move(settings);
         }
     private:
+        SettingsBuilder& libraryxml(const char xmldata[], std::size_t len);
+
         const TestFixture &fixture;
         Settings settings;
 

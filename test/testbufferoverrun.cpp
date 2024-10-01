@@ -3671,7 +3671,7 @@ private:
                                    "    <arg nr=\"2\"/>\n"
                                    "  </function>\n"
                                    "</def>";
-        const Settings settings = settingsBuilder().libraryxml(xmldata, sizeof(xmldata)).build();
+        const Settings settings = settingsBuilder().libraryxml(xmldata).build();
 
         // Attempt to get size from Cfg files, no false positives if size is not specified
         check("void f() {\n"
@@ -4223,7 +4223,7 @@ private:
                                    "    <arg nr=\"3\"/>\n"
                                    "  </function>\n"
                                    "</def>";
-        /*const*/ Settings settings = settingsBuilder().libraryxml(xmldata, sizeof(xmldata)).severity(Severity::warning).build();
+        /*const*/ Settings settings = settingsBuilder().libraryxml(xmldata).severity(Severity::warning).build();
         settings.platform.sizeof_wchar_t = 4;
 
         check("void f() {\n"
@@ -4361,7 +4361,7 @@ private:
                                    "    <arg nr=\"3\"/>\n"
                                    "  </function>\n"
                                    "</def>";
-        const Settings settings = settingsBuilder().libraryxml(xmldata, sizeof(xmldata)).build();
+        const Settings settings = settingsBuilder().libraryxml(xmldata).build();
 
         check("void f() {\n"
               "    char c[7];\n"
@@ -4422,7 +4422,7 @@ private:
                                    "    </arg>\n"
                                    "  </function>\n"
                                    "</def>";
-        const Settings settings = settingsBuilder().libraryxml(xmldata, sizeof(xmldata)).build();
+        const Settings settings = settingsBuilder().libraryxml(xmldata).build();
 
         // formatstr..
         check("void f() {\n"
@@ -4533,7 +4533,7 @@ private:
                                    "    <arg nr=\"4\"/>\n"
                                    "  </function>\n"
                                    "</def>";
-        const Settings settings = settingsBuilder().libraryxml(xmldata, sizeof(xmldata)).build();
+        const Settings settings = settingsBuilder().libraryxml(xmldata).build();
 
         check("void f() {\n"
               "    char c[5];\n"
