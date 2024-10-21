@@ -241,8 +241,8 @@ TemplateSimplifier::TokenAndName::~TokenAndName()
         mToken->templateSimplifierPointers()->erase(this);
 }
 
-std::string TemplateSimplifier::TokenAndName::dump(const std::vector<std::string>& fileNames) const {
-    std::string ret = "    <TokenAndName name=\"" + ErrorLogger::toxml(mName) + "\" file=\"" + ErrorLogger::toxml(fileNames.at(mToken->fileIndex())) + "\" line=\"" + std::to_string(mToken->linenr()) + "\">\n";
+std::string TemplateSimplifier::TokenAndName::dump() const {
+    std::string ret = "    <TokenAndName name=\"" + ErrorLogger::toxml(mName) + "\" file=\"" + ErrorLogger::toxml(mToken->fileName()) + "\" line=\"" + std::to_string(mToken->linenr()) + "\">\n";
     for (const Token* tok = mToken; tok && !Token::Match(tok, "[;{}]"); tok = tok->next())
         ret += "      <template-token str=\"" + ErrorLogger::toxml(tok->str()) + "\"/>\n";
     return ret + "    </TokenAndName>\n";
@@ -3800,9 +3800,9 @@ void TemplateSimplifier::simplifyTemplates(const std::time_t maxtime)
         if (passCount == 0) {
             mDump.clear();
             for (const TokenAndName& t: mTemplateDeclarations)
-                mDump += t.dump(mTokenizer.list.getFiles());
+                mDump += t.dump();
             for (const TokenAndName& t: mTemplateForwardDeclarations)
-                mDump += t.dump(mTokenizer.list.getFiles());
+                mDump += t.dump();
             if (!mDump.empty())
                 mDump = "  <TemplateSimplifier>\n" + mDump + "  </TemplateSimplifier>\n";
         }
@@ -3813,7 +3813,7 @@ void TemplateSimplifier::simplifyTemplates(const std::time_t maxtime)
 
         if (mSettings.debugtemplate && mSettings.debugnormal) {
             std::string title("Template Simplifier pass " + std::to_string(passCount + 1));
-            mTokenList.front()->printOut(std::cout, title.c_str(), mTokenList.getFiles());
+            mTokenList.front()->printOut(std::cout, title.c_str(), false);
         }
 
         // Copy default argument values from forward declaration to declaration

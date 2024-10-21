@@ -160,7 +160,7 @@ public:
                    mNameToken == rhs.mNameToken && mParamEnd == rhs.mParamEnd && mFlags == rhs.mFlags;
         }
 
-        std::string dump(const std::vector<std::string>& fileNames) const;
+        std::string dump() const;
 
         // TODO: do not return non-const pointer from const object
         Token * token() const {

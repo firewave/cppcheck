@@ -5921,7 +5921,7 @@ void Tokenizer::printDebugOutput(int simplification, std::ostream &out) const
                        (simplification != 2U && mSettings.debugnormal);
 
     if (debug && list.front()) {
-        list.front()->printOut(out, nullptr, list.getFiles());
+        list.front()->printOut(out, nullptr, false);
 
         if (mSettings.xml)
             out << "<debug>" << std::endl;
@@ -5935,7 +5935,7 @@ void Tokenizer::printDebugOutput(int simplification, std::ostream &out) const
         }
 
         if (mSettings.verbose)
-            list.front()->printAst(mSettings.verbose, mSettings.xml, list.getFiles(), out);
+            list.front()->printAst(mSettings.verbose, mSettings.xml, out);
 
         list.front()->printValueFlow(mSettings.xml, out);
 

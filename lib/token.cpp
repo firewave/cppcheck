@@ -1183,18 +1183,11 @@ void Token::printOut() const
     printOut(std::cout, "");
 }
 
-void Token::printOut(std::ostream& out, const char *title) const
+void Token::printOut(std::ostream& out, const char *title, bool useFileIdx) const
 {
     if (title && title[0])
         out << "\n### " << title << " ###\n";
-    out << stringifyList(stringifyOptions::forPrintOut(), nullptr, nullptr) << std::endl;
-}
-
-void Token::printOut(std::ostream& out, const char *title, const std::vector<std::string> &fileNames) const
-{
-    if (title && title[0])
-        out << "\n### " << title << " ###\n";
-    out << stringifyList(stringifyOptions::forPrintOut(), &fileNames, nullptr) << std::endl;
+    out << stringifyList(stringifyOptions::forPrintOut(), useFileIdx, nullptr) << std::endl;
 }
 
 // cppcheck-suppress unusedFunction - used for debugging
@@ -1203,7 +1196,7 @@ void Token::printLines(std::ostream& out, int lines) const
     const Token *end = this;
     while (end && end->linenr() < lines + linenr())
         end = end->next();
-    out << stringifyList(stringifyOptions::forDebugExprId(), nullptr, end) << std::endl;
+    out << stringifyList(stringifyOptions::forDebugExprId(), true, end) << std::endl;
 }
 
 std::string Token::stringify(const stringifyOptions& options) const
@@ -1263,7 +1256,7 @@ std::string Token::stringify(bool varid, bool attributes, bool macro) const
     return stringify(options);
 }
 
-std::string Token::stringifyList(const stringifyOptions& options, const std::vector<std::string>* fileNames, const Token* end) const
+std::string Token::stringifyList(const stringifyOptions& options, bool fileidx, const Token* end) const
 {
     if (this == end)
         return "";
@@ -1287,8 +1280,8 @@ std::string Token::stringifyList(const stringifyOptions& options, const std::vec
             fileIndex = tok->mImpl->mFileIndex;
             if (options.files) {
                 ret += "\n\n##file ";
-                if (fileNames && fileNames->size() > tok->mImpl->mFileIndex)
-                    ret += fileNames->at(tok->mImpl->mFileIndex);
+                if (!fileidx && mTokensFrontBack.list.getFiles().size() > tok->mImpl->mFileIndex)
+                    ret += mTokensFrontBack.list.getFiles()[tok->mImpl->mFileIndex];
                 else
                     ret += std::to_string(fileIndex);
                 ret += '\n';
@@ -1341,7 +1334,7 @@ std::string Token::stringifyList(const stringifyOptions& options, const std::vec
         ret += '\n';
     return ret;
 }
-std::string Token::stringifyList(bool varid, bool attributes, bool linenumbers, bool linebreaks, bool files, const std::vector<std::string>* fileNames, const Token* end) const
+std::string Token::stringifyList(bool varid, bool attributes, bool linenumbers, bool linebreaks, bool files, bool fileidx, const Token* end) const
 {
     stringifyOptions options;
     options.varid = varid;
@@ -1350,17 +1343,17 @@ std::string Token::stringifyList(bool varid, bool attributes, bool linenumbers, 
     options.linenumbers = linenumbers;
     options.linebreaks = linebreaks;
     options.files = files;
-    return stringifyList(options, fileNames, end);
+    return stringifyList(options, fileidx, end);
 }
 
 std::string Token::stringifyList(const Token* end, bool attributes) const
 {
-    return stringifyList(false, attributes, false, false, false, nullptr, end);
+    return stringifyList(false, attributes, false, false, false, true, end);
 }
 
 std::string Token::stringifyList(bool varid) const
 {
-    return stringifyList(varid, false, true, true, true, nullptr, nullptr);
+    return stringifyList(varid, false, true, true, true, true, nullptr);
 }
 
 void Token::astParent(Token* tok)
@@ -1607,7 +1600,7 @@ static void astStringXml(const Token *tok, nonneg int indent, std::ostream &out)
     }
 }
 
-void Token::printAst(bool verbose, bool xml, const std::vector<std::string> &fileNames, std::ostream &out) const
+void Token::printAst(bool verbose, bool xml, std::ostream &out) const
 {
     if (!xml)
         out << "\n\n##AST" << std::endl;
@@ -1625,7 +1618,7 @@ void Token::printAst(bool verbose, bool xml, const std::vector<std::string> &fil
                 astStringXml(tok, 2U, out);
                 out << "</ast>" << std::endl;
             } else if (verbose)
-                out << "[" << fileNames[tok->fileIndex()] << ":" << tok->linenr() << "]" << std::endl << tok->astStringVerbose() << std::endl;
+                out << "[" << tok->fileName() << ":" << tok->linenr() << "]" << std::endl << tok->astStringVerbose() << std::endl;
             else
                 out << tok->astString(" ") << std::endl;
             if (tok->str() == "(")

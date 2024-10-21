@@ -979,16 +979,7 @@ public:
      * @param title Title for the printout or use default parameter or 0
      * for no title.
      */
-    void printOut(std::ostream& out, const char *title = nullptr) const;
-
-    /**
-     * For debugging purposes, prints token and all tokens followed by it.
-     * @param title Title for the printout or use default parameter or 0
-     * for no title.
-     * @param fileNames Prints out file name instead of file index.
-     * File index should match the index of the string in this vector.
-     */
-    void printOut(std::ostream& out, const char *title, const std::vector<std::string> &fileNames) const;
+    void printOut(std::ostream& out, const char *title = nullptr, bool useFileIdx = true) const;
 
     /**
      * print out tokens - used for debugging
@@ -1052,7 +1043,7 @@ public:
      */
     std::string stringify(bool varid, bool attributes, bool macro) const;
 
-    std::string stringifyList(const stringifyOptions& options, const std::vector<std::string>* fileNames = nullptr, const Token* end = nullptr) const;
+    std::string stringifyList(const stringifyOptions& options, bool fileidx = true, const Token* end = nullptr) const;
     std::string stringifyList(const Token* end, bool attributes = true) const;
     std::string stringifyList(bool varid = false) const;
 
@@ -1063,11 +1054,11 @@ public:
      * @param linenumbers Print line number in front of each line
      * @param linebreaks Insert "\\n" into string when line number changes
      * @param files print Files as numbers or as names (if fileNames is given)
-     * @param fileNames Vector of filenames. Used (if given) to print filenames as strings instead of numbers.
+     * @param fileidx Print files as index instead of names.
      * @param end Stringification ends before this token is reached. 0 to stringify until end of list.
      * @return Stringified token list as a string
      */
-    std::string stringifyList(bool varid, bool attributes, bool linenumbers, bool linebreaks, bool files, const std::vector<std::string>* fileNames = nullptr, const Token* end = nullptr) const;
+    std::string stringifyList(bool varid, bool attributes, bool linenumbers, bool linebreaks, bool files, bool fileidx = true, const Token* end = nullptr) const;
 
     /**
      * Remove the contents for this token from the token list.
@@ -1527,7 +1518,7 @@ public:
 
     std::string expressionString() const;
 
-    void printAst(bool verbose, bool xml, const std::vector<std::string> &fileNames, std::ostream &out) const;
+    void printAst(bool verbose, bool xml, std::ostream &out) const;
 
     void printValueFlow(bool xml, std::ostream &out) const;
 
