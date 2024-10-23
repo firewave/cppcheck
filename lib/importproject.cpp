@@ -838,7 +838,7 @@ bool ImportProject::importVcxproj(const std::string &filename, std::map<std::str
             if (p.platform == ProjectConfiguration::Win32)
                 fs.platformType = Platform::Type::Win32W;
             else if (p.platform == ProjectConfiguration::x64) {
-                fs.platformType = Platform::Type::Win64;
+                fs.platformType = Platform::Type::Win64W;
                 fs.defines += ";_WIN64=1";
             }
             std::string additionalIncludePaths;
@@ -1430,9 +1430,9 @@ void ImportProject::selectOneVsConfig(Platform::Type platform)
         bool remove = false;
         if (!startsWith(fs.cfg,"Debug"))
             remove = true;
-        if (platform == Platform::Type::Win64 && fs.platformType != platform)
+        if ((platform == Platform::Type::Win64A || platform == Platform::Type::Win64W) && fs.platformType != platform)
             remove = true;
-        else if ((platform == Platform::Type::Win32A || platform == Platform::Type::Win32W) && fs.platformType == Platform::Type::Win64)
+        else if ((platform == Platform::Type::Win32A || platform == Platform::Type::Win32W) && (platform == Platform::Type::Win64A || platform == Platform::Type::Win64W))
             remove = true;
         else if (filenames.find(fs.filename()) != filenames.end())
             remove = true;
@@ -1458,9 +1458,9 @@ void ImportProject::selectVsConfigurations(Platform::Type platform, const std::v
         bool remove = false;
         if (std::find(configurations.begin(), configurations.end(), config) == configurations.end())
             remove = true;
-        if (platform == Platform::Type::Win64 && fs.platformType != platform)
+        if ((platform == Platform::Type::Win64A || platform == Platform::Type::Win64W) && fs.platformType != platform)
             remove = true;
-        else if ((platform == Platform::Type::Win32A || platform == Platform::Type::Win32W) && fs.platformType == Platform::Type::Win64)
+        else if ((platform == Platform::Type::Win32A || platform == Platform::Type::Win32W) && (fs.platformType == Platform::Type::Win64A || fs.platformType == Platform::Type::Win64W))
             remove = true;
         if (remove) {
             it = fileSettings.erase(it);

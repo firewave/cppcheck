@@ -4894,20 +4894,23 @@ private:
     void microsoftString() {
         const char code1a[] = "void foo() { _tprintf (_T(\"test\") _T(\"1\")); }";
         ASSERT_EQUALS("void foo ( ) { printf ( \"test1\" ) ; }", tokenizeAndStringify(code1a, true, Platform::Type::Win32A));
+        ASSERT_EQUALS("void foo ( ) { printf ( \"test1\" ) ; }", tokenizeAndStringify(code1a, true, Platform::Type::Win64A));
         const char code1b[] = "void foo() { _tprintf (_TEXT(\"test\") _TEXT(\"2\")); }";
         ASSERT_EQUALS("void foo ( ) { printf ( \"test2\" ) ; }", tokenizeAndStringify(code1b, true, Platform::Type::Win32A));
+        ASSERT_EQUALS("void foo ( ) { printf ( \"test2\" ) ; }", tokenizeAndStringify(code1b, true, Platform::Type::Win64A));
         const char code1c[] = "void foo() { _tprintf (TEXT(\"test\") TEXT(\"3\")); }";
         ASSERT_EQUALS("void foo ( ) { printf ( \"test3\" ) ; }", tokenizeAndStringify(code1c, true, Platform::Type::Win32A));
+        ASSERT_EQUALS("void foo ( ) { printf ( \"test3\" ) ; }", tokenizeAndStringify(code1c, true, Platform::Type::Win64A));
 
         const char code2a[] = "void foo() { _tprintf (_T(\"test\") _T(\"1\")); }";
         ASSERT_EQUALS("void foo ( ) { wprintf ( L\"test1\" ) ; }", tokenizeAndStringify(code2a, true, Platform::Type::Win32W));
-        ASSERT_EQUALS("void foo ( ) { wprintf ( L\"test1\" ) ; }", tokenizeAndStringify(code2a, true, Platform::Type::Win64));
+        ASSERT_EQUALS("void foo ( ) { wprintf ( L\"test1\" ) ; }", tokenizeAndStringify(code2a, true, Platform::Type::Win64W));
         const char code2b[] = "void foo() { _tprintf (_TEXT(\"test\") _TEXT(\"2\")); }";
         ASSERT_EQUALS("void foo ( ) { wprintf ( L\"test2\" ) ; }", tokenizeAndStringify(code2b, true, Platform::Type::Win32W));
-        ASSERT_EQUALS("void foo ( ) { wprintf ( L\"test2\" ) ; }", tokenizeAndStringify(code2b, true, Platform::Type::Win64));
+        ASSERT_EQUALS("void foo ( ) { wprintf ( L\"test2\" ) ; }", tokenizeAndStringify(code2b, true, Platform::Type::Win64W));
         const char code2c[] = "void foo() { _tprintf (TEXT(\"test\") TEXT(\"3\")); }";
         ASSERT_EQUALS("void foo ( ) { wprintf ( L\"test3\" ) ; }", tokenizeAndStringify(code2c, true, Platform::Type::Win32W));
-        ASSERT_EQUALS("void foo ( ) { wprintf ( L\"test3\" ) ; }", tokenizeAndStringify(code2c, true, Platform::Type::Win64));
+        ASSERT_EQUALS("void foo ( ) { wprintf ( L\"test3\" ) ; }", tokenizeAndStringify(code2c, true, Platform::Type::Win64W));
     }
 
     void borland() {
@@ -5684,7 +5687,8 @@ private:
         const std::string win32A = tokenizeAndStringifyWindows(code, true, Platform::Type::Win32A);
         ASSERT_EQUALS(expected, win32A);
         ASSERT_EQUALS(win32A, tokenizeAndStringifyWindows(code, true, Platform::Type::Win32W));
-        ASSERT_EQUALS(win32A, tokenizeAndStringifyWindows(code, true, Platform::Type::Win64));
+        ASSERT_EQUALS(win32A, tokenizeAndStringifyWindows(code, true, Platform::Type::Win64A));
+        ASSERT_EQUALS(win32A, tokenizeAndStringifyWindows(code, true, Platform::Type::Win64W));
     }
 
     void platformWin32A() {

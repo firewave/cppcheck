@@ -885,7 +885,8 @@ private:
         ASSERT_EQUALS(exp, tok(code, Platform::Type::Unix64));
         ASSERT_EQUALS(exp, tok(code, Platform::Type::Win32A));
         ASSERT_EQUALS(exp, tok(code, Platform::Type::Win32W));
-        ASSERT_EQUALS(exp, tok(code, Platform::Type::Win64));
+        ASSERT_EQUALS(exp, tok(code, Platform::Type::Win64A));
+        ASSERT_EQUALS(exp, tok(code, Platform::Type::Win64W));
     }
 
     void simplifyUsing9042() {
@@ -905,7 +906,7 @@ private:
                            "} ; "
                            "template < class T > class s { } ;";
 
-        ASSERT_EQUALS(exp, tok(code, Platform::Type::Win64));
+        ASSERT_EQUALS(exp, tok(code, Platform::Type::Win64W));
     }
 
     void simplifyUsing9191() {

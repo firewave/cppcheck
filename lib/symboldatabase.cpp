@@ -7532,7 +7532,7 @@ void SymbolDatabase::setValueTypeInTokenList(bool reportDebugWarnings, Token *to
 
             else if (Token::simpleMatch(tok->previous(), "sizeof (")) {
                 ValueType valuetype(ValueType::Sign::UNSIGNED, ValueType::Type::LONG, 0U);
-                if (mSettings.platform.type == Platform::Type::Win64)
+                if (mSettings.platform.type == Platform::Type::Win64A || mSettings.platform.type == Platform::Type::Win64W)
                     valuetype.type = ValueType::Type::LONGLONG;
 
                 valuetype.originalTypeName = "size_t";

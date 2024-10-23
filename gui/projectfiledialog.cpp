@@ -83,7 +83,8 @@ static constexpr Platform::Type builtinPlatforms[] = {
     Platform::Type::Native,
     Platform::Type::Win32A,
     Platform::Type::Win32W,
-    Platform::Type::Win64,
+    Platform::Type::Win64A,
+    Platform::Type::Win64W,
     Platform::Type::Unix32,
     Platform::Type::Unix64
 };

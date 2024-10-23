@@ -838,7 +838,9 @@ private:
         assertEquals(filename, linenr, emptyString, errout_str());
         check(code, dinit(CheckOptions, $.inconclusive = true, $.platform = Platform::Type::Win32W, $.onlyFormatStr = true, $.cpp = cpp));
         assertEquals(filename, linenr, emptyString, errout_str());
-        check(code, dinit(CheckOptions, $.inconclusive = true, $.platform = Platform::Type::Win64, $.onlyFormatStr = true, $.cpp = cpp));
+        check(code, dinit(CheckOptions, $.inconclusive = true, $.platform = Platform::Type::Win64A, $.onlyFormatStr = true, $.cpp = cpp));
+        assertEquals(filename, linenr, emptyString, errout_str());
+        check(code, dinit(CheckOptions, $.inconclusive = true, $.platform = Platform::Type::Win64W, $.onlyFormatStr = true, $.cpp = cpp));
         assertEquals(filename, linenr, emptyString, errout_str());
     }
 
@@ -854,7 +856,9 @@ private:
         assertEquals(filename, linenr, testScanfErrString, errout_str());
         check(code, dinit(CheckOptions, $.inconclusive = true, $.platform = Platform::Type::Win32W, $.onlyFormatStr = true, $.cpp = cpp));
         assertEquals(filename, linenr, testScanfErrString, errout_str());
-        check(code, dinit(CheckOptions, $.inconclusive = true, $.platform = Platform::Type::Win64, $.onlyFormatStr = true, $.cpp = cpp));
+        check(code, dinit(CheckOptions, $.inconclusive = true, $.platform = Platform::Type::Win64A, $.onlyFormatStr = true, $.cpp = cpp));
+        assertEquals(filename, linenr, testScanfErrString, errout_str());
+        check(code, dinit(CheckOptions, $.inconclusive = true, $.platform = Platform::Type::Win64W, $.onlyFormatStr = true, $.cpp = cpp));
         assertEquals(filename, linenr, testScanfErrString, errout_str());
     }
 
@@ -870,7 +874,9 @@ private:
         assertEquals(filename, linenr, testScanfErrAkaString, errout_str());
         check(code, dinit(CheckOptions, $.inconclusive = true, $.portability = true, $.platform = Platform::Type::Win32W, $.onlyFormatStr = true, $.cpp = cpp));
         assertEquals(filename, linenr, testScanfErrAkaString, errout_str());
-        check(code, dinit(CheckOptions, $.inconclusive = true, $.portability = true, $.platform = Platform::Type::Win64, $.onlyFormatStr = true, $.cpp = cpp));
+        check(code, dinit(CheckOptions, $.inconclusive = true, $.portability = true, $.platform = Platform::Type::Win64A, $.onlyFormatStr = true, $.cpp = cpp));
+        assertEquals(filename, linenr, testScanfErrAkaWin64String, errout_str());
+        check(code, dinit(CheckOptions, $.inconclusive = true, $.portability = true, $.platform = Platform::Type::Win64W, $.onlyFormatStr = true, $.cpp = cpp));
         assertEquals(filename, linenr, testScanfErrAkaWin64String, errout_str());
     }
 
@@ -886,7 +892,9 @@ private:
         assertEquals(filename, linenr, emptyString, errout_str());
         check(code, dinit(CheckOptions, $.inconclusive = true, $.portability = true, $.platform = Platform::Type::Win32W, $.onlyFormatStr = true, $.cpp = cpp));
         assertEquals(filename, linenr, emptyString, errout_str());
-        check(code, dinit(CheckOptions, $.inconclusive = true, $.portability = true, $.platform = Platform::Type::Win64, $.onlyFormatStr = true, $.cpp = cpp));
+        check(code, dinit(CheckOptions, $.inconclusive = true, $.portability = true, $.platform = Platform::Type::Win64A, $.onlyFormatStr = true, $.cpp = cpp));
+        assertEquals(filename, linenr, testScanfErrAkaWin64String, errout_str());
+        check(code, dinit(CheckOptions, $.inconclusive = true, $.portability = true, $.platform = Platform::Type::Win64W, $.onlyFormatStr = true, $.cpp = cpp));
         assertEquals(filename, linenr, testScanfErrAkaWin64String, errout_str());
     }
 
@@ -902,7 +910,9 @@ private:
         assertEquals(filename, linenr, testScanfErrAkaString, errout_str());
         check(code, dinit(CheckOptions, $.inconclusive = true, $.portability = true, $.platform = Platform::Type::Win32W, $.onlyFormatStr = true, $.cpp = cpp));
         assertEquals(filename, linenr, testScanfErrAkaString, errout_str());
-        check(code, dinit(CheckOptions, $.inconclusive = true, $.portability = true, $.platform = Platform::Type::Win64, $.onlyFormatStr = true, $.cpp = cpp));
+        check(code, dinit(CheckOptions, $.inconclusive = true, $.portability = true, $.platform = Platform::Type::Win64A, $.onlyFormatStr = true, $.cpp = cpp));
+        assertEquals(filename, linenr, emptyString, errout_str());
+        check(code, dinit(CheckOptions, $.inconclusive = true, $.portability = true, $.platform = Platform::Type::Win64W, $.onlyFormatStr = true, $.cpp = cpp));
         assertEquals(filename, linenr, emptyString, errout_str());
     }
 
@@ -2164,7 +2174,9 @@ private:
             ASSERT_EQUALS(result, errout_str());
             check(code, dinit(CheckOptions, $.portability = true, $.platform = Platform::Type::Win32W));
             ASSERT_EQUALS(result, errout_str());
-            check(code, dinit(CheckOptions, $.portability = true, $.platform = Platform::Type::Win64));
+            check(code, dinit(CheckOptions, $.portability = true, $.platform = Platform::Type::Win64A));
+            ASSERT_EQUALS(result_win64, errout_str());
+            check(code, dinit(CheckOptions, $.portability = true, $.platform = Platform::Type::Win64W));
             ASSERT_EQUALS(result_win64, errout_str());
         }
         {
@@ -2596,14 +2608,14 @@ private:
         check("void foo(size_t s, ptrdiff_t p) {\n"
               "  printf(\"%zd\", s);\n"
               "  printf(\"%tu\", p);\n"
-              "}", dinit(CheckOptions, $.portability = true, $.platform = Platform::Type::Win64));
+              "}", dinit(CheckOptions, $.portability = true, $.platform = Platform::Type::Win64W));
         ASSERT_EQUALS("[test.cpp:2]: (portability) %zd in format string (no. 1) requires 'ssize_t' but the argument type is 'size_t {aka unsigned long long}'.\n"
                       "[test.cpp:3]: (portability) %tu in format string (no. 1) requires 'unsigned ptrdiff_t' but the argument type is 'ptrdiff_t {aka signed long long}'.\n", errout_str());
 
         check("void foo(std::size_t s, std::ptrdiff_t p) {\n"
               "  printf(\"%zd\", s);\n"
               "  printf(\"%tu\", p);\n"
-              "}", dinit(CheckOptions, $.portability = true, $.platform = Platform::Type::Win64));
+              "}", dinit(CheckOptions, $.portability = true, $.platform = Platform::Type::Win64W));
         ASSERT_EQUALS("[test.cpp:2]: (portability) %zd in format string (no. 1) requires 'ssize_t' but the argument type is 'std::size_t {aka unsigned long long}'.\n"
                       "[test.cpp:3]: (portability) %tu in format string (no. 1) requires 'unsigned ptrdiff_t' but the argument type is 'std::ptrdiff_t {aka signed long long}'.\n", errout_str());
 
@@ -2612,7 +2624,7 @@ private:
               "  printf(\"%lu\", um);\n"
               "  printf(\"%llu\", s);\n"
               "  printf(\"%llu\", um);\n"
-              "}", dinit(CheckOptions, $.portability = true, $.platform = Platform::Type::Win64));
+              "}", dinit(CheckOptions, $.portability = true, $.platform = Platform::Type::Win64W));
         ASSERT_EQUALS("[test.cpp:2]: (portability) %lu in format string (no. 1) requires 'unsigned long' but the argument type is 'size_t {aka unsigned long long}'.\n"
                       "[test.cpp:3]: (portability) %lu in format string (no. 1) requires 'unsigned long' but the argument type is 'uintmax_t {aka unsigned long long}'.\n"
                       "[test.cpp:4]: (portability) %llu in format string (no. 1) requires 'unsigned long long' but the argument type is 'size_t {aka unsigned long long}'.\n"
@@ -2643,7 +2655,7 @@ private:
         check("void foo(intmax_t im, ptrdiff_t p) {\n"
               "  printf(\"%lld\", im);\n"
               "  printf(\"%lld\", p);\n"
-              "}", dinit(CheckOptions, $.portability = true, $.platform = Platform::Type::Win64));
+              "}", dinit(CheckOptions, $.portability = true, $.platform = Platform::Type::Win64W));
         ASSERT_EQUALS("[test.cpp:2]: (portability) %lld in format string (no. 1) requires 'long long' but the argument type is 'intmax_t {aka signed long long}'.\n"
                       "[test.cpp:3]: (portability) %lld in format string (no. 1) requires 'long long' but the argument type is 'ptrdiff_t {aka signed long long}'.\n", errout_str());
 
@@ -2963,7 +2975,7 @@ private:
               "void foo() {\n"
               "    printf(\"%zu %Iu %d %f\", v.size(), v.size(), v.size(), v.size());\n"
               "    printf(\"%zu %Iu %d %f\", s.size(), s.size(), s.size(), s.size());\n"
-              "}\n", dinit(CheckOptions, $.portability = true, $.platform = Platform::Type::Win64));
+              "}\n", dinit(CheckOptions, $.portability = true, $.platform = Platform::Type::Win64W));
         ASSERT_EQUALS("[test.cpp:4]: (portability) %d in format string (no. 3) requires 'int' but the argument type is 'std::size_t {aka unsigned long long}'.\n"
                       "[test.cpp:4]: (portability) %f in format string (no. 4) requires 'double' but the argument type is 'std::size_t {aka unsigned long long}'.\n"
                       "[test.cpp:5]: (portability) %d in format string (no. 3) requires 'int' but the argument type is 'std::size_t {aka unsigned long long}'.\n"
@@ -3185,7 +3197,7 @@ private:
 
         check("void foo (wchar_t c) {\n" // ticket #5051 false positive
               "    printf(\"%c\", c);\n"
-              "}\n", dinit(CheckOptions, $.platform = Platform::Type::Win64));
+              "}\n", dinit(CheckOptions, $.platform = Platform::Type::Win64W));
         ASSERT_EQUALS("", errout_str());
 
         check("void foo() {\n"
@@ -3361,7 +3373,7 @@ private:
 
         check("void f() {\n"
               "    printf(\"%lu\", sizeof(char));\n"
-              "}\n", dinit(CheckOptions, $.portability = true, $.platform = Platform::Type::Win64));
+              "}\n", dinit(CheckOptions, $.portability = true, $.platform = Platform::Type::Win64W));
         ASSERT_EQUALS("[test.cpp:2]: (portability) %lu in format string (no. 1) requires 'unsigned long' but the argument type is 'size_t {aka unsigned long long}'.\n",
                       errout_str());
     }
@@ -4171,7 +4183,7 @@ private:
               "    printf(\"%I32d %I32u %I32x\", u32, u32, u32);\n"
               "    printf(\"%I64d %I64u %I64x\", i64, i64, i64);\n"
               "    printf(\"%I64d %I64u %I64x\", u64, u64, u64);\n"
-              "}", dinit(CheckOptions, $.portability = true, $.platform = Platform::Type::Win64));
+              "}", dinit(CheckOptions, $.portability = true, $.platform = Platform::Type::Win64W));
         ASSERT_EQUALS("[test.cpp:8]: (portability) %Id in format string (no. 1) requires 'ptrdiff_t' but the argument type is 'size_t {aka unsigned long long}'.\n"
                       "[test.cpp:9]: (portability) %Iu in format string (no. 2) requires 'size_t' but the argument type is 'ptrdiff_t {aka signed long long}'.\n"
                       "[test.cpp:9]: (portability) %Ix in format string (no. 3) requires 'size_t' but the argument type is 'ptrdiff_t {aka signed long long}'.\n"
@@ -4216,7 +4228,7 @@ private:
         // ticket #5264
         check("void foo(LPARAM lp, WPARAM wp, LRESULT lr) {\n"
               "    printf(\"%Ix %Ix %Ix\", lp, wp, lr);\n"
-              "}\n", dinit(CheckOptions, $.portability = true, $.platform = Platform::Type::Win64));
+              "}\n", dinit(CheckOptions, $.portability = true, $.platform = Platform::Type::Win64W));
         ASSERT_EQUALS("", errout_str());
 
         check("void foo(LPARAM lp, WPARAM wp, LRESULT lr) {\n"
@@ -4251,7 +4263,7 @@ private:
               "    printf(\"%zd\", s);\n"
               "    printf(\"%zd%i\", s, i);\n"
               "    printf(\"%zu\", s);\n"
-              "}", dinit(CheckOptions, $.portability = true, $.platform = Platform::Type::Win64));
+              "}", dinit(CheckOptions, $.portability = true, $.platform = Platform::Type::Win64W));
         ASSERT_EQUALS("[test.cpp:6]: (portability) %zu in format string (no. 1) requires 'size_t' but the argument type is 'SSIZE_T {aka signed long long}'.\n", errout_str());
 
         check("void foo() {\n"
@@ -4270,7 +4282,7 @@ private:
               "    printf(\"%zd\", s);\n"
               "    printf(\"%zd%i\", s, i);\n"
               "    printf(\"%zu\", s);\n"
-              "}", dinit(CheckOptions, $.portability = true, $.platform = Platform::Type::Win64));
+              "}", dinit(CheckOptions, $.portability = true, $.platform = Platform::Type::Win64W));
         ASSERT_EQUALS("[test.cpp:7]: (portability) %zu in format string (no. 1) requires 'size_t' but the argument type is 'SSIZE_T {aka signed long long}'.\n", errout_str());
 
     }
@@ -4313,7 +4325,7 @@ private:
               "    scanf(\"%I32d %I32u %I32x\", &u32, &u32, &u32);\n"
               "    scanf(\"%I64d %I64u %I64x\", &i64, &i64, &i64);\n"
               "    scanf(\"%I64d %I64u %I64x\", &u64, &u64, &u64);\n"
-              "}", dinit(CheckOptions, $.portability = true, $.platform = Platform::Type::Win64));
+              "}", dinit(CheckOptions, $.portability = true, $.platform = Platform::Type::Win64W));
         ASSERT_EQUALS("[test.cpp:8]: (portability) %Id in format string (no. 1) requires 'ptrdiff_t *' but the argument type is 'size_t * {aka unsigned long long *}'.\n"
                       "[test.cpp:9]: (portability) %Iu in format string (no. 2) requires 'size_t *' but the argument type is 'ptrdiff_t * {aka signed long long *}'.\n"
                       "[test.cpp:9]: (portability) %Ix in format string (no. 3) requires 'size_t *' but the argument type is 'ptrdiff_t * {aka signed long long *}'.\n"
@@ -4372,7 +4384,7 @@ private:
               "    scanf(\"%zd\", &s);\n"
               "    scanf(\"%zd%i\", &s, &i);\n"
               "    scanf(\"%zu\", &s);\n"
-              "}", dinit(CheckOptions, $.portability = true, $.platform = Platform::Type::Win64));
+              "}", dinit(CheckOptions, $.portability = true, $.platform = Platform::Type::Win64W));
         ASSERT_EQUALS("[test.cpp:6]: (portability) %zu in format string (no. 1) requires 'size_t *' but the argument type is 'SSIZE_T * {aka signed long long *}'.\n", errout_str());
 
         check("void foo() {\n"
@@ -4391,7 +4403,7 @@ private:
               "    scanf(\"%zd\", &s);\n"
               "    scanf(\"%zd%i\", &s, &i);\n"
               "    scanf(\"%zu\", &s);\n"
-              "}", dinit(CheckOptions, $.portability = true, $.platform = Platform::Type::Win64));
+              "}", dinit(CheckOptions, $.portability = true, $.platform = Platform::Type::Win64W));
         ASSERT_EQUALS("[test.cpp:7]: (portability) %zu in format string (no. 1) requires 'size_t *' but the argument type is 'SSIZE_T * {aka signed long long *}'.\n", errout_str());
 
     }

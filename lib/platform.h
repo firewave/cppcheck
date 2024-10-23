@@ -109,7 +109,8 @@ public:
         Native, // whatever system this code was compiled on
         Win32A,
         Win32W,
-        Win64,
+        Win64A,
+        Win64W,
         Unix32,
         Unix64,
         File
@@ -143,7 +144,8 @@ public:
     bool isWindows() const {
         return type == Type::Win32A ||
                type == Type::Win32W ||
-               type == Type::Win64;
+               type == Type::Win64A ||
+               type == Type::Win64W;
     }
 
     const char *toString() const {
@@ -160,8 +162,10 @@ public:
             return "win32A";
         case Type::Win32W:
             return "win32W";
-        case Type::Win64:
-            return "win64";
+        case Type::Win64A:
+            return "win64A";
+        case Type::Win64W:
+            return "win64W";
         case Type::Unix32:
             return "unix32";
         case Type::Unix64:

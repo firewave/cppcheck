@@ -356,7 +356,7 @@ private:
 
     void longCastAssign() {
         const Settings settings = settingsBuilder().severity(Severity::style).platform(Platform::Type::Unix64).build();
-        const Settings settingsWin = settingsBuilder().severity(Severity::style).platform(Platform::Type::Win64).build();
+        const Settings settingsWin = settingsBuilder().severity(Severity::style).platform(Platform::Type::Win64W).build();
 
         const char code[] = "long f(int x, int y) {\n"
                             "  const long ret = x * y;\n"
@@ -422,7 +422,7 @@ private:
 
     void longCastReturn() {
         const Settings settings = settingsBuilder().severity(Severity::style).platform(Platform::Type::Unix64).build();
-        const Settings settingsWin = settingsBuilder().severity(Severity::style).platform(Platform::Type::Win64).build();
+        const Settings settingsWin = settingsBuilder().severity(Severity::style).platform(Platform::Type::Win64W).build();
 
         const char code[] = "long f(int x, int y) {\n"
                             "  return x * y;\n"

@@ -40,7 +40,8 @@ void Platforms::init()
     add(tr("Unix 64-bit"), Platform::Type::Unix64);
     add(tr("Windows 32-bit ANSI"), Platform::Type::Win32A);
     add(tr("Windows 32-bit Unicode"), Platform::Type::Win32W);
-    add(tr("Windows 64-bit"), Platform::Type::Win64);
+    add(tr("Windows 64-bit ANSI"), Platform::Type::Win64A);
+    add(tr("Windows 64-bit Unicode"), Platform::Type::Win64W);
 }
 
 int Platforms::getCount() const

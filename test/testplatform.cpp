@@ -36,7 +36,8 @@ private:
         TEST_CASE(valid_config_unix64);
         TEST_CASE(valid_config_win32w);
         TEST_CASE(valid_config_unix32);
-        TEST_CASE(valid_config_win64);
+        TEST_CASE(valid_config_win64a);
+        TEST_CASE(valid_config_win64w);
         TEST_CASE(valid_config_file_1);
         TEST_CASE(valid_config_file_2);
         TEST_CASE(valid_config_file_3);
@@ -163,11 +164,36 @@ private:
         ASSERT_EQUALS(64, platform.long_long_bit);
     }
 
-    void valid_config_win64() const {
+    void valid_config_win64a() const {
         // Verify if native Win64 platform is loaded correctly
         Platform platform;
-        PLATFORM(platform, Platform::Type::Win64);
-        ASSERT_EQUALS(Platform::Type::Win64, platform.type);
+        PLATFORM(platform, Platform::Type::Win64A);
+        ASSERT_EQUALS(Platform::Type::Win64A, platform.type);
+        ASSERT(platform.isWindows());
+        ASSERT_EQUALS(1, platform.sizeof_bool);
+        ASSERT_EQUALS(2, platform.sizeof_short);
+        ASSERT_EQUALS(4, platform.sizeof_int);
+        ASSERT_EQUALS(4, platform.sizeof_long);
+        ASSERT_EQUALS(8, platform.sizeof_long_long);
+        ASSERT_EQUALS(4, platform.sizeof_float);
+        ASSERT_EQUALS(8, platform.sizeof_double);
+        ASSERT_EQUALS(8, platform.sizeof_long_double);
+        ASSERT_EQUALS(2, platform.sizeof_wchar_t);
+        ASSERT_EQUALS(8, platform.sizeof_size_t);
+        ASSERT_EQUALS(8, platform.sizeof_pointer);
+        ASSERT_EQUALS('\0', platform.defaultSign);
+        ASSERT_EQUALS(8, platform.char_bit);
+        ASSERT_EQUALS(16, platform.short_bit);
+        ASSERT_EQUALS(32, platform.int_bit);
+        ASSERT_EQUALS(32, platform.long_bit);
+        ASSERT_EQUALS(64, platform.long_long_bit);
+    }
+
+    void valid_config_win64w() const {
+        // Verify if native Win64 platform is loaded correctly
+        Platform platform;
+        PLATFORM(platform, Platform::Type::Win64W);
+        ASSERT_EQUALS(Platform::Type::Win64W, platform.type);
         ASSERT(platform.isWindows());
         ASSERT_EQUALS(1, platform.sizeof_bool);
         ASSERT_EQUALS(2, platform.sizeof_short);

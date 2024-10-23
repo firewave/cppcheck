@@ -82,7 +82,8 @@ bool Platform::set(Type t)
         long_bit = char_bit * sizeof_long;
         long_long_bit = char_bit * sizeof_long_long;
         return true;
-    case Type::Win64:
+    case Type::Win64A:
+    case Type::Win64W:
         type = t;
         sizeof_bool = 1;
         sizeof_short = 2;
@@ -156,8 +157,12 @@ bool Platform::set(const std::string& platformstr, std::string& errstr, const st
         set(Type::Win32A);
     else if (platformstr == "win32W")
         set(Type::Win32W);
-    else if (platformstr == "win64")
-        set(Type::Win64);
+    else if (platformstr == "win64") // TODO: deprecate
+        set(Type::Win64W);
+    else if (platformstr == "win64A")
+        set(Type::Win64A);
+    else if (platformstr == "win64W")
+        set(Type::Win64W);
     else if (platformstr == "unix32")
         set(Type::Unix32);
     else if (platformstr == "unix64")

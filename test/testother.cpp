@@ -2438,7 +2438,7 @@ private:
               "int g(const std::array<std::vector<int>, 2> a) { return a[0][0]; }\n");
         ASSERT_EQUALS("[test.cpp:2]: (performance) Function parameter 'a' should be passed by const reference.\n", errout_str());
 
-        /*const*/ Settings settings1 = settingsBuilder().platform(Platform::Type::Win64).build();
+        /*const*/ Settings settings1 = settingsBuilder().platform(Platform::Type::Win64W).build();
         check("using ui64 = unsigned __int64;\n"
               "ui64 Test(ui64 one, ui64 two) { return one + two; }\n",
               /*cpp*/ true, /*inconclusive*/ true, /*runSimpleChecks*/ true, /*verbose*/ false, &settings1);
@@ -8584,7 +8584,7 @@ private:
         ASSERT_EQUALS("[test.cpp:3]: (style) Checking if unsigned expression 'value' is less than zero.\n", errout_str());
 
         // #9040
-        /*const*/ Settings settings1 = settingsBuilder().platform(Platform::Type::Win64).build();
+        /*const*/ Settings settings1 = settingsBuilder().platform(Platform::Type::Win64W).build();
         check("using BOOL = unsigned;\n"
               "int i;\n"
               "bool f() {\n"

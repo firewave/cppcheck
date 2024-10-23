@@ -238,6 +238,8 @@ private:
         TEST_CASE(stdmulti1);
         TEST_CASE(stdmulti2);
         TEST_CASE(platformWin64);
+        TEST_CASE(platformWin64A);
+        TEST_CASE(platformWin64W);
         TEST_CASE(platformWin32A);
         TEST_CASE(platformWin32W);
         TEST_CASE(platformUnix32);
@@ -1490,7 +1492,23 @@ private:
         const char * const argv[] = {"cppcheck", "--platform=win64", "file.cpp"};
         ASSERT(settings->platform.set(Platform::Type::Unspecified));
         ASSERT_EQUALS_ENUM(CmdLineParser::Result::Success, parser->parseFromArgs(3, argv));
-        ASSERT_EQUALS(Platform::Type::Win64, settings->platform.type);
+        ASSERT_EQUALS(Platform::Type::Win64W, settings->platform.type);
+    }
+
+    void platformWin64A() {
+        REDIRECT;
+        const char * const argv[] = {"cppcheck", "--platform=win64A", "file.cpp"};
+        ASSERT(settings->platform.set(Platform::Type::Unspecified));
+        ASSERT_EQUALS_ENUM(CmdLineParser::Result::Success, parser->parseFromArgs(3, argv));
+        ASSERT_EQUALS(Platform::Type::Win64A, settings->platform.type);
+    }
+
+    void platformWin64W() {
+        REDIRECT;
+        const char * const argv[] = {"cppcheck", "--platform=win64W", "file.cpp"};
+        ASSERT(settings->platform.set(Platform::Type::Unspecified));
+        ASSERT_EQUALS_ENUM(CmdLineParser::Result::Success, parser->parseFromArgs(3, argv));
+        ASSERT_EQUALS(Platform::Type::Win64W, settings->platform.type);
     }
 
     void platformWin32A() {
