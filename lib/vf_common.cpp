@@ -478,4 +478,75 @@ namespace ValueFlow
         changeKnownToPossible(values, indirect);
         removeImpossible(values, indirect);
     }
+
+    static const Token* skipCVRefs(const Token* tok, const Token* endTok)
+    {
+        while (tok != endTok && Token::Match(tok, "const|volatile|auto|&|&&"))
+            tok = tok->next();
+        return tok;
+    }
+
+    static bool isNotEqual(std::pair<const Token*, const Token*> x, std::pair<const Token*, const Token*> y)
+    {
+        const Token* start1 = x.first;
+        const Token* start2 = y.first;
+        if (start1 == nullptr || start2 == nullptr)
+            return false;
+        while (start1 != x.second && start2 != y.second) {
+            const Token* tok1 = skipCVRefs(start1, x.second);
+            if (tok1 != start1) {
+                start1 = tok1;
+                continue;
+            }
+            const Token* tok2 = skipCVRefs(start2, y.second);
+            if (tok2 != start2) {
+                start2 = tok2;
+                continue;
+            }
+            if (start1->str() != start2->str())
+                return true;
+            start1 = start1->next();
+            start2 = start2->next();
+        }
+        start1 = skipCVRefs(start1, x.second);
+        start2 = skipCVRefs(start2, y.second);
+        return !(start1 == x.second && start2 == y.second);
+    }
+
+    static bool isNotEqual(std::pair<const Token*, const Token*> x, const std::string& y, bool cpp)
+    {
+        TokenList tokenList(nullptr);
+        std::istringstream istr(y);
+        tokenList.createTokens(istr, cpp ? Standards::Language::CPP : Standards::Language::C); // TODO: check result?
+        return isNotEqual(x, std::make_pair(tokenList.front(), tokenList.back()));
+    }
+
+    static bool isNotEqual(std::pair<const Token*, const Token*> x, const ValueType* y, bool cpp)
+    {
+        if (y == nullptr)
+            return false;
+        if (y->originalTypeName.empty())
+            return false;
+        return isNotEqual(x, y->originalTypeName, cpp);
+    }
+
+    bool isDifferentType(const Token* src, const Token* dst)
+    {
+        const Type* t = Token::typeOf(src);
+        const Type* parentT = Token::typeOf(dst);
+        if (t && parentT) {
+            if (t->classDef && parentT->classDef && t->classDef != parentT->classDef)
+                return true;
+        } else {
+            std::pair<const Token*, const Token*> decl = Token::typeDecl(src);
+            std::pair<const Token*, const Token*> parentdecl = Token::typeDecl(dst);
+            if (isNotEqual(decl, parentdecl))
+                return true;
+            if (isNotEqual(decl, dst->valueType(), dst->isCpp()))
+                return true;
+            if (isNotEqual(parentdecl, src->valueType(), src->isCpp()))
+                return true;
+        }
+        return false;
+    }
 }

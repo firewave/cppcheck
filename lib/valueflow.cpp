@@ -123,7 +123,6 @@
 #include <memory>
 #include <numeric>
 #include <set>
-#include <sstream>
 #include <string>
 #include <unordered_map>
 #include <unordered_set>
@@ -873,75 +872,6 @@ static bool isLifetimeBorrowed(const ValueType *vt, const ValueType *vtParent)
             return true;
     }
 
-    return false;
-}
-
-static const Token* skipCVRefs(const Token* tok, const Token* endTok)
-{
-    while (tok != endTok && Token::Match(tok, "const|volatile|auto|&|&&"))
-        tok = tok->next();
-    return tok;
-}
-
-static bool isNotEqual(std::pair<const Token*, const Token*> x, std::pair<const Token*, const Token*> y)
-{
-    const Token* start1 = x.first;
-    const Token* start2 = y.first;
-    if (start1 == nullptr || start2 == nullptr)
-        return false;
-    while (start1 != x.second && start2 != y.second) {
-        const Token* tok1 = skipCVRefs(start1, x.second);
-        if (tok1 != start1) {
-            start1 = tok1;
-            continue;
-        }
-        const Token* tok2 = skipCVRefs(start2, y.second);
-        if (tok2 != start2) {
-            start2 = tok2;
-            continue;
-        }
-        if (start1->str() != start2->str())
-            return true;
-        start1 = start1->next();
-        start2 = start2->next();
-    }
-    start1 = skipCVRefs(start1, x.second);
-    start2 = skipCVRefs(start2, y.second);
-    return !(start1 == x.second && start2 == y.second);
-}
-static bool isNotEqual(std::pair<const Token*, const Token*> x, const std::string& y, bool cpp)
-{
-    TokenList tokenList(nullptr);
-    std::istringstream istr(y);
-    tokenList.createTokens(istr, cpp ? Standards::Language::CPP : Standards::Language::C); // TODO: check result?
-    return isNotEqual(x, std::make_pair(tokenList.front(), tokenList.back()));
-}
-static bool isNotEqual(std::pair<const Token*, const Token*> x, const ValueType* y, bool cpp)
-{
-    if (y == nullptr)
-        return false;
-    if (y->originalTypeName.empty())
-        return false;
-    return isNotEqual(x, y->originalTypeName, cpp);
-}
-
-static bool isDifferentType(const Token* src, const Token* dst)
-{
-    const Type* t = Token::typeOf(src);
-    const Type* parentT = Token::typeOf(dst);
-    if (t && parentT) {
-        if (t->classDef && parentT->classDef && t->classDef != parentT->classDef)
-            return true;
-    } else {
-        std::pair<const Token*, const Token*> decl = Token::typeDecl(src);
-        std::pair<const Token*, const Token*> parentdecl = Token::typeDecl(dst);
-        if (isNotEqual(decl, parentdecl))
-            return true;
-        if (isNotEqual(decl, dst->valueType(), dst->isCpp()))
-            return true;
-        if (isNotEqual(parentdecl, src->valueType(), src->isCpp()))
-            return true;
-    }
     return false;
 }
 
@@ -2368,102 +2298,6 @@ static void valueFlowAfterMove(const TokenList& tokenlist, const SymbolDatabase&
 
                 valueFlowForward(endOfFunctionCall, endOfVarScope, varTok, std::move(value), tokenlist, errorLogger, settings);
             }
-        }
-    }
-}
-
-static bool isTruncated(const ValueType* src, const ValueType* dst, const Settings& settings)
-{
-    if (src->pointer > 0 || dst->pointer > 0)
-        return src->pointer != dst->pointer;
-    if (src->smartPointer && dst->smartPointer)
-        return false;
-    if ((src->isIntegral() && dst->isIntegral()) || (src->isFloat() && dst->isFloat())) {
-        const size_t srcSize = ValueFlow::getSizeOf(*src, settings);
-        const size_t dstSize = ValueFlow::getSizeOf(*dst, settings);
-        if (srcSize > dstSize)
-            return true;
-        if (srcSize == dstSize && src->sign != dst->sign)
-            return true;
-    } else if (src->type == dst->type) {
-        if (src->type == ValueType::Type::RECORD)
-            return src->typeScope != dst->typeScope;
-    } else {
-        return true;
-    }
-    return false;
-}
-
-static std::set<nonneg int> getVarIds(const Token* tok)
-{
-    std::set<nonneg int> result;
-    visitAstNodes(tok, [&](const Token* child) {
-        if (child->varId() > 0)
-            result.insert(child->varId());
-        return ChildrenToVisit::op1_and_op2;
-    });
-    return result;
-}
-
-static void valueFlowSymbolic(const TokenList& tokenlist, const SymbolDatabase& symboldatabase, ErrorLogger& errorLogger, const Settings& settings)
-{
-    for (const Scope* scope : symboldatabase.functionScopes) {
-        for (auto* tok = const_cast<Token*>(scope->bodyStart); tok != scope->bodyEnd; tok = tok->next()) {
-            if (!Token::simpleMatch(tok, "="))
-                continue;
-            if (tok->astParent())
-                continue;
-            if (!tok->astOperand1())
-                continue;
-            if (!tok->astOperand2())
-                continue;
-            if (tok->astOperand1()->hasKnownIntValue())
-                continue;
-            if (tok->astOperand2()->hasKnownIntValue())
-                continue;
-            if (tok->astOperand1()->exprId() == 0)
-                continue;
-            if (tok->astOperand2()->exprId() == 0)
-                continue;
-            if (!isConstExpression(tok->astOperand2(), settings.library))
-                continue;
-            if (tok->astOperand1()->valueType() && tok->astOperand2()->valueType()) {
-                if (isTruncated(
-                        tok->astOperand2()->valueType(), tok->astOperand1()->valueType(), settings))
-                    continue;
-            } else if (isDifferentType(tok->astOperand2(), tok->astOperand1())) {
-                continue;
-            }
-            const std::set<nonneg int> rhsVarIds = getVarIds(tok->astOperand2());
-            const std::vector<const Variable*> vars = getLHSVariables(tok);
-            if (std::any_of(vars.cbegin(), vars.cend(), [&](const Variable* var) {
-                if (rhsVarIds.count(var->declarationId()) > 0)
-                    return true;
-                if (var->isLocal())
-                    return var->isStatic();
-                return !var->isArgument();
-            }))
-                continue;
-
-            if (findAstNode(tok, [](const Token* child) {
-                return child->isIncompleteVar();
-            }))
-                continue;
-
-            Token* start = nextAfterAstRightmostLeaf(tok);
-            const Token* end = ValueFlow::getEndOfExprScope(tok->astOperand1(), scope);
-
-            ValueFlow::Value rhs = ValueFlow::makeSymbolic(tok->astOperand2());
-            rhs.errorPath.emplace_back(tok,
-                                       tok->astOperand1()->expressionString() + " is assigned '" +
-                                       tok->astOperand2()->expressionString() + "' here.");
-            valueFlowForward(start, end, tok->astOperand1(), std::move(rhs), tokenlist, errorLogger, settings);
-
-            ValueFlow::Value lhs = ValueFlow::makeSymbolic(tok->astOperand1());
-            lhs.errorPath.emplace_back(tok,
-                                       tok->astOperand1()->expressionString() + " is assigned '" +
-                                       tok->astOperand2()->expressionString() + "' here.");
-            valueFlowForward(start, end, tok->astOperand2(), std::move(lhs), tokenlist, errorLogger, settings);
         }
     }
 }
@@ -5370,7 +5204,7 @@ void ValueFlow::setValues(TokenList& tokenlist,
         VFA(analyzeGlobalStaticVar(tokenlist, settings)),
         VFA(analyzePointerAlias(tokenlist, settings)),
         VFA(valueFlowLifetime(tokenlist, errorLogger, settings)),
-        VFA(valueFlowSymbolic(tokenlist, symboldatabase, errorLogger, settings)),
+        VFA(analyzeSymbolic(tokenlist, symboldatabase, errorLogger, settings)),
         VFA(analyzeBitAnd(tokenlist, settings)),
         VFA(analyzeSameExpressions(tokenlist, settings)),
         VFA(analyzeConditionExpressions(tokenlist, symboldatabase, errorLogger, settings)),

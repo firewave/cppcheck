@@ -69,6 +69,8 @@ namespace ValueFlow
     void changeKnownToPossible(std::list<Value> &values, int indirect=-1);
 
     void lowerToPossible(std::list<Value>& values, int indirect = -1);
+
+    bool isDifferentType(const Token* src, const Token* dst);
 }
 
 #endif // vfCommonH
