@@ -96,6 +96,7 @@
     <ClCompile Include="vf_common.cpp" />
     <ClCompile Include="vf_conditionexpressions.cpp" />
     <ClCompile Include="vf_debug.cpp" />
+    <ClCompile Include="vf_dynamicbuffersize.cpp" />
     <ClCompile Include="vf_enumvalue.cpp" />
     <ClCompile Include="vf_forward.cpp" />
     <ClCompile Include="vf_functionreturn.cpp" />
@@ -208,6 +209,7 @@
     <ClInclude Include="vf_common.h" />
     <ClInclude Include="vf_conditionexpressions.h" />
     <ClInclude Include="vf_debug.h" />
+    <ClInclude Include="vf_dynamicbuffersize.h" />
     <ClInclude Include="vf_enumvalue.h" />
     <ClInclude Include="vf_forward.h" />
     <ClInclude Include="vf_functionreturn.h" />

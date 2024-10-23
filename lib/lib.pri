@@ -89,6 +89,7 @@ HEADERS += $${PWD}/addoninfo.h \
            $${PWD}/vf_common.h \
            $${PWD}/vf_conditionexpressions.h \
            $${PWD}/vf_debug.h \
+           $${PWD}/vf_dynamicbuffersize.h \
            $${PWD}/vf_enumvalue.h \
            $${PWD}/vf_forward.h \
            $${PWD}/vf_functionreturn.h \
@@ -184,6 +185,7 @@ SOURCES += $${PWD}/valueflow.cpp \
            $${PWD}/vf_common.cpp \
            $${PWD}/vf_conditionexpressions.cpp \
            $${PWD}/vf_debug.cpp \
+           $${PWD}/vf_dynamicbuffersize.cpp \
            $${PWD}/vf_enumvalue.cpp \
            $${PWD}/vf_forward.cpp \
            $${PWD}/vf_functionreturn.cpp \
