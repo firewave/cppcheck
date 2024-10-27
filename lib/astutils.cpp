@@ -2856,6 +2856,7 @@ static bool isExpressionChangedAt(const F& getExprTok,
                                   const nonneg int exprid,
                                   bool globalvar,
                                   const Settings& settings,
+                                  bool indirectIncl,
                                   int depth)
 {
     if (depth < 0)
@@ -2883,14 +2884,27 @@ static bool isExpressionChangedAt(const F& getExprTok,
             aliased = isAliasOf(tok, expr, &i);
         if (!aliased)
             return false;
-        if (isVariableChanged(tok, indirect + i, settings, depth))
-            return true;
+        int i_start = 0;
+        if (!indirectIncl)
+            i_start = indirect;
+        for (int i_it = i_start; i_it <= indirect; ++i_it)
+        {
+            if (isVariableChanged(tok, i_it + i, settings, depth))
+                return true;
+        }
         // TODO: Try to traverse the lambda function
         if (Token::Match(tok, "%var% ("))
             return true;
         return false;
     }
-    return (isVariableChanged(tok, indirect, settings, depth));
+    int i_start = 0;
+    if (!indirectIncl)
+        i_start = indirect;
+    for (int i_it = i_start; i_it <= indirect; ++i_it)
+    {
+        return (isVariableChanged(tok, indirect, settings, depth));
+    }
+    return false;
 }
 
 bool isExpressionChangedAt(const Token* expr,
@@ -2898,11 +2912,12 @@ bool isExpressionChangedAt(const Token* expr,
                            int indirect,
                            bool globalvar,
                            const Settings& settings,
+                           bool indirectIncl,
                            int depth)
 {
     return isExpressionChangedAt([&] {
         return expr;
-    }, tok, indirect, expr->exprId(), globalvar, settings, depth);
+    }, tok, indirect, expr->exprId(), globalvar, settings, indirectIncl, depth);
 }
 
 Token* findVariableChanged(Token *start, const Token *end, int indirect, const nonneg int exprid, bool globalvar, const Settings &settings, int depth)
@@ -2915,7 +2930,7 @@ Token* findVariableChanged(Token *start, const Token *end, int indirect, const n
         return findExpression(start, exprid);
     });
     for (Token *tok = start; tok != end; tok = tok->next()) {
-        if (isExpressionChangedAt(getExprTok, tok, indirect, exprid, globalvar, settings, depth))
+        if (isExpressionChangedAt(getExprTok, tok, indirect, exprid, globalvar, settings, false, depth))
             return tok;
     }
     return nullptr;
@@ -3037,10 +3052,8 @@ static const Token* findExpressionChangedImpl(const Token* expr,
                     if (vt->type == ValueType::ITERATOR)
                         ++indirect;
                 }
-                for (int i = 0; i <= indirect; ++i) {
-                    if (isExpressionChangedAt(tok, tok2, i, global, settings, depth))
-                        return true;
-                }
+                if (isExpressionChangedAt(tok, tok2, indirect, global, settings, true, depth))
+                    return true;
                 return false;
             });
             if (modifedTok) {
