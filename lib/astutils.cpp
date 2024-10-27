@@ -2847,6 +2847,8 @@ static std::function<R()> memoize(F f)
     };
 }
 
+#include <iostream>
+
 template<class F,
          REQUIRES("F must be a function that returns a Token class",
                   std::is_convertible<decltype(std::declval<F>()()), const Token*> )>
@@ -2889,6 +2891,7 @@ static bool isExpressionChangedAt(const F& getExprTok,
             i_start = indirect;
         for (int i_it = i_start; i_it <= indirect; ++i_it)
         {
+            std::cout << tok->str() << " " << i_it << std::endl;
             if (isVariableChanged(tok, i_it + i, settings, depth))
                 return true;
         }
