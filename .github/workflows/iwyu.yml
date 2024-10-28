@@ -17,7 +17,7 @@ jobs:
       matrix:
         image: ["fedora:latest"] # "opensuse/tumbleweed:latest" / "fedora:latest" / "debian:unstable" / "archlinux:latest"
 
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     if: ${{ github.repository_owner == 'danmar' }}
 
     container:
@@ -126,7 +126,7 @@ jobs:
 
   clang-include-cleaner:
 
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     if: ${{ github.repository_owner == 'danmar' }}
 
     env:

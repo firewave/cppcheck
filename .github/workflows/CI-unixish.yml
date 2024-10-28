@@ -20,7 +20,7 @@ jobs:
 
     strategy:
       matrix:
-        os: [ubuntu-20.04, ubuntu-22.04, macos-13]
+        os: [ubuntu-20.04, ubuntu-22.04, ubuntu-24.04, macos-13]
         include:
           - use_qt6: On
           - os: ubuntu-20.04
@@ -83,7 +83,7 @@ jobs:
 
     strategy:
       matrix:
-        os: [ubuntu-20.04, ubuntu-22.04, macos-13]
+        os: [ubuntu-20.04, ubuntu-22.04, ubuntu-24.04, macos-13]
         include:
           - use_qt6: On
           - os: ubuntu-20.04
@@ -165,7 +165,7 @@ jobs:
 
     strategy:
       matrix:
-        os: [ubuntu-20.04, ubuntu-22.04, macos-13]
+        os: [ubuntu-20.04, ubuntu-22.04, ubuntu-24.04, macos-13]
       fail-fast: false # Prefer quick result
 
     runs-on: ${{ matrix.os }}
@@ -197,7 +197,7 @@ jobs:
 
     strategy:
       matrix:
-        os: [ubuntu-20.04, ubuntu-22.04, macos-13]
+        os: [ubuntu-20.04, ubuntu-22.04, ubuntu-24.04, macos-13]
       fail-fast: false # Prefer quick result
 
     runs-on: ${{ matrix.os }}
@@ -229,7 +229,7 @@ jobs:
 
     strategy:
       matrix:
-        os: [ubuntu-20.04, ubuntu-22.04, macos-13]
+        os: [ubuntu-20.04, ubuntu-22.04, ubuntu-24.04, macos-13]
       fail-fast: false # Prefer quick result
 
     runs-on: ${{ matrix.os }}
@@ -251,7 +251,11 @@ jobs:
 
     strategy:
       matrix:
-        os: [ubuntu-20.04, ubuntu-22.04, macos-13]
+        os: [ubuntu-20.04, ubuntu-22.04, ubuntu-24.04, macos-13]
+        include:
+          - latest: false
+          - os: ubuntu-24.04
+            latest: true
       fail-fast: false # Prefer quick result
 
     runs-on: ${{ matrix.os }}
@@ -271,8 +275,8 @@ jobs:
           sudo apt-get install libxml2-utils
 
       # packages for strict cfg checks
-      - name: Install missing software on ubuntu 22.04 (cfg)
-        if: matrix.os == 'ubuntu-22.04'
+      - name: Install missing software on ubuntu (cfg)
+        if: matrix.latest
         run: |
           sudo apt-get install libcairo2-dev libcurl4-openssl-dev liblua5.3-dev libssl-dev libsqlite3-dev libcppunit-dev libsigc++-2.0-dev libgtk-3-dev libboost-all-dev libselinux-dev libwxgtk3.0-gtk3-dev xmlstarlet qtbase5-dev
 
@@ -337,12 +341,12 @@ jobs:
           TEST_CPPCHECK_INJECT_CLANG: clang
 
       - name: Run cfg tests
-        if: matrix.os != 'ubuntu-22.04'
+        if: ${{ !matrix.latest }}
         run: |
           make -j$(nproc) checkcfg
 
       - name: Run cfg tests (strict)
-        if: matrix.os == 'ubuntu-22.04'
+        if: matrix.latest
         run: |
           make -j$(nproc) checkcfg
         env:
@@ -407,7 +411,7 @@ jobs:
           python3 ../naming.py --var='[a-z].*' --function='[a-z].*' naming_test.cpp.dump
 
       - name: Build democlient
-        if: matrix.os == 'ubuntu-22.04'
+        if: matrix.latest
         run: |
           warnings="-pedantic -Wall -Wextra -Wcast-qual -Wno-deprecated-declarations -Wfloat-equal -Wmissing-declarations -Wmissing-format-attribute -Wno-long-long -Wpacked -Wredundant-decls -Wundef -Wno-shadow -Wno-missing-field-initializers -Wno-missing-braces -Wno-sign-compare -Wno-multichar"
           g++ $warnings -c -Ilib -Iexternals/tinyxml2 democlient/democlient.cpp
@@ -415,7 +419,7 @@ jobs:
   selfcheck:
     needs: build # wait for all tests to be successful first
 
-    runs-on: ubuntu-22.04 # run on the latest image only
+    runs-on: ubuntu-24.04 # run on the latest image only
 
     steps:
       - uses: actions/checkout@v4
