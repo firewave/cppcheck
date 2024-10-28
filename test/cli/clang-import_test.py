@@ -122,7 +122,7 @@ def test_log(tmpdir):
 
     args = ['--clang', test_file]
     out_lines = [
-        'Checking {} ...'.format(test_file).replace('\\', '/'),
+        f'Checking {test_file} ...'.replace('\\', '/'),
     ]
 
     assert_cppcheck(args, ec_exp=0, err_exp=[], out_exp=out_lines)
@@ -160,8 +160,8 @@ def __test_cmd(tmp_path, file_name, extra_args, stdout_exp_1, content=''):
     assert exitcode == 0, stderr if not stdout else stdout
     assert stderr == ''
     assert stdout.splitlines() == [
-        'Checking {} ...'.format(file_name),
-        'clang -fsyntax-only -Xclang -ast-dump -fno-color-diagnostics {}{}'.format(stdout_exp_1, file_name)
+        f'Checking {file_name} ...',
+        f'clang -fsyntax-only -Xclang -ast-dump -fno-color-diagnostics {stdout_exp_1}{file_name}'
     ]
 
 
@@ -220,7 +220,7 @@ def test_cmd_std_c(tmp_path):  # #13129
 def test_cmd_std_c_builddir(tmp_path):  # #13129
     build_dir = tmp_path / 'b1'
     os.makedirs(build_dir)
-    __test_cmd(tmp_path, 'test.cpp',['--std=c89', '--std=c++14', '--cppcheck-build-dir={}'.format(build_dir)], '-x c++ -std=c++14')
+    __test_cmd(tmp_path, 'test.cpp',['--std=c89', '--std=c++14', f'--cppcheck-build-dir={build_dir}'], '-x c++ -std=c++14')
 
 
 def test_cmd_std_cpp(tmp_path):  # #13129

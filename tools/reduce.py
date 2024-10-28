@@ -316,7 +316,7 @@ def main():
         sys.exit(1)
     elapsed_time = time.time() - t
     reduce.set_elapsed_time(elapsed_time)
-    print('elapsed_time: {}'.format(elapsed_time))
+    print(f'elapsed_time: {elapsed_time}')
 
     with open(arg_file, 'rt') as f:
         filedata = f.readlines()

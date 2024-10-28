@@ -21,7 +21,6 @@ disable=
         arguments-renamed,
         duplicate-string-formatting-argument,
         # C start
-        consider-using-f-string,
         invalid-name,
         line-too-long,
         missing-module-docstring,
