@@ -383,7 +383,7 @@ if filename is not None:
                     lines[line_number] += ' // ' + res.group(3)
                     code = '\n'.join(lines)
                 else:
-                    print('filename:%s expected:%s' % (filename, expected))
+                    print(f'filename:{filename} expected:{expected}')
 
             # source code
             with open(codedir + filename, 'w') as fout:
