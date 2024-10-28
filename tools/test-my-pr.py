@@ -65,13 +65,13 @@ if __name__ == "__main__":
     try:
         lib.clone_cppcheck(repo_dir, old_repo_dir)
     except Exception as e:
-        print('Failed to clone Cppcheck repository ({}), retry later'.format(e))
+        print(f'Failed to clone Cppcheck repository ({e}), retry later')
         sys.exit(1)
 
     try:
         lib.checkout_cppcheck_version(repo_dir, 'main', main_dir)
     except Exception as e:
-        print('Failed to checkout main ({}), retry later'.format(e))
+        print(f'Failed to checkout main ({e}), retry later')
         sys.exit(1)
 
     try:
@@ -87,7 +87,7 @@ if __name__ == "__main__":
         subprocess.check_call(['git', 'fetch', '--depth=1', 'origin', commit_id])
         subprocess.check_call(['git', 'checkout', '-f', commit_id])
     except BaseException as e:
-        print('Error: {}'.format(e))
+        print(f'Error: {e}')
         print('Failed to switch to common ancestor of your branch and main')
         sys.exit(1)
 

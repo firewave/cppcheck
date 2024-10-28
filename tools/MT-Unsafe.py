@@ -50,7 +50,7 @@ def vprint(level, fmt, varlist=()):
 
 def man_search(manpage):
     """Search one manpage for tokens  in the attributes table."""
-    vprint(1, '-- %s --' % (manpage))
+    vprint(1, f'-- {manpage} --')
 
     try:
         if manpage.endswith('.gz'):
@@ -61,23 +61,23 @@ def man_search(manpage):
         print('cannot open %s' % filename, file=sys.stderr)
         return  # None, None
 
-    vprint(1, '%s opened' % (manpage))
+    vprint(1, f'{manpage} opened')
 
     TSmatch = None
     for lineread in MANPAGE:
         vprint(4, 'type %s', type(lineread))
         lineread = str(lineread)
-        vprint(3, '--%s' % lineread)
+        vprint(3, f'--{lineread}')
         # TSmatch = lineread.startswith('.TS')
         TSmatch = re.search('\\.TS', lineread)
         if TSmatch:
-            dprint(1, '%s:\treached .TS' % (manpage))
+            dprint(1, f'{manpage}:\treached .TS')
             break
 
     # dprint(2, '%s', lineread)
 
     if not TSmatch:
-        dprint(1, '.TS not found in %s' % manpage)
+        dprint(1, '.TS not found in {manpage}')
         return  # None, None
 
     vprint(1, 'Started reading the attribute table')
@@ -85,7 +85,7 @@ def man_search(manpage):
     apis = set()
     for lineread in MANPAGE:
         lineread = str(lineread)
-        dprint(2, '%s' % (lineread))
+        dprint(2, lineread)
         if 'MT-Safe' in lineread:
             vprint(1, 'clearing MT-Safe %s', lineread)
             apis.clear()
@@ -102,7 +102,7 @@ def man_search(manpage):
 
             if resUnsafe:
                 values = resUnsafe.group(1)
-                dprint(1, 'a %s' % values)
+                dprint(1, f'a {values}')
                 values = re.sub(r'\\n\'$', '', values)
                 #
                 values = values.split(' ')
@@ -130,22 +130,22 @@ def man_search(manpage):
 
 def do_man_page(manpage):
     """Wrap man_search(), with logging."""
-    dprint(1, 'do_man_page(%s)' % (manpage))
+    dprint(1, f'do_man_page({manpage})')
     man_search(manpage)
     if unsafe_types:
         dprint(1, '%d new types in %s' % (len(unsafe_types), manpage))
     else:
-        dprint(1, 'No new types in %s' % (manpage))
+        dprint(1, f'No new types in {manpage}')
 
     if unsafe_apis:
         dprint(1, '%d unsafe_apis in %s' % (len(unsafe_apis), manpage))
     else:
-        dprint(1, 'No new apis in %s' % (manpage))
+        dprint(1, f'No new apis in {manpage}')
 
 
 def do_man_dir(directory):
     """Recursively process a directory of man-pages."""
-    dprint(1, 'do_man_dir(%s)' % (directory))
+    dprint(1, f'do_man_dir{directory})')
     if os.path.isfile(directory):
         do_man_page(directory)
         return
@@ -162,16 +162,16 @@ for arg in sys.argv[1:]:
     if arg.startswith('-'):
         if re.match('^-+debug', arg):
             debug = debug+1
-            dprint(1, 'debug %d' % debug)
+            dprint(1, f'debug {debug}')
             continue
     else:
         if os.access(arg, os.R_OK):
             manpages.add(arg)
-            dprint(1, 'manpages+= %s' % (arg))
+            dprint(1, f'manpages+= {arg}')
         else:
             dprint(0, 'skipping arg - not readable')
 
-dprint(2, 'manpages: %s' % manpages)
+dprint(2, f'manpages: {manpages}')
 
 
 for manpage in manpages:
@@ -187,14 +187,14 @@ print('{\n    # Types marked MT-Unsafe')
 # unsafe_types is not the whole of the list,
 # so the last item *is* followed by a comma:
 for u_type in sorted(unsafe_types):
-    print("    '%s'," % u_type)
+    print(f"    f'{u_type}',")
 
 
 print('    # APIs marked MT-Unsafe')
 # unsafe_apis completes the list,
 # so we ought to remove the last comma.
 for u_api in sorted(unsafe_apis):
-    print("    '%s'," % u_api)
+    print(f"    f'{u_api}',")
 
 print('}\n')
 
