@@ -127,7 +127,8 @@ private:
             const Settings s = settingsBuilder().c(Standards::C89).build();
             TokenList tokenlist(&s);
             std::istringstream istr(code2);
-            ASSERT(tokenlist.createTokens(istr, "a.c"));
+            FileWithDetails file("a.c", Standards::Language::C, strlen(code2));
+            ASSERT(tokenlist.createTokens(istr, file));
             ASSERT_EQUALS(false, tokenlist.front()->isKeyword());
         }
 
@@ -148,7 +149,8 @@ private:
             const Settings s = settingsBuilder().cpp(Standards::CPP03).build();
             TokenList tokenlist(&s);
             std::istringstream istr(code2);
-            ASSERT(tokenlist.createTokens(istr, "a.cpp"));
+            FileWithDetails file("a.cpp", Standards::Language::CPP, strlen(code2));
+            ASSERT(tokenlist.createTokens(istr, file));
             ASSERT_EQUALS(false, tokenlist.front()->isKeyword());
         }
     }

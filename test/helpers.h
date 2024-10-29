@@ -83,7 +83,8 @@ public:
                   const std::string &configuration = emptyString)
     {
         std::istringstream istr(code);
-        if (!list.createTokens(istr, cpp ? "test.cpp" : "test.c"))
+        FileWithDetails file(cpp ? "test.cpp" : "test.c", cpp ? Standards::Language::CPP : Standards::Language::C, size-1);
+        if (!list.createTokens(istr, file))
             return false;
 
         return simplifyTokens1(configuration);
@@ -95,7 +96,8 @@ public:
                   const std::string &configuration = emptyString)
     {
         std::istringstream istr(code);
-        if (!list.createTokens(istr, cpp ? "test.cpp" : "test.c"))
+        FileWithDetails file(cpp ? "test.cpp" : "test.c", cpp ? Standards::Language::CPP : Standards::Language::C, code.size());
+        if (!list.createTokens(istr, file))
             return false;
 
         return simplifyTokens1(configuration);

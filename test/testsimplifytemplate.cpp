@@ -5306,7 +5306,8 @@ private:
         Tokenizer tokenizer(settings, *this);
 
         std::istringstream istr(code);
-        if (!tokenizer.list.createTokens(istr, "test.cpp"))
+        FileWithDetails file("test.cpp", Standards::Language::CPP, strlen(code));
+        if (!tokenizer.list.createTokens(istr, file))
             return false;
         tokenizer.createLinks();
         tokenizer.splitTemplateRightAngleBrackets(false);
@@ -5374,7 +5375,8 @@ private:
         Tokenizer tokenizer(settings, *this);
 
         std::istringstream istr(code);
-        if (!tokenizer.list.createTokens(istr, "test.cpp"))
+        FileWithDetails file("test.cpp", Standards::Language::CPP, strlen(code));
+        if (!tokenizer.list.createTokens(istr, file))
             return false;
         tokenizer.createLinks();
         tokenizer.splitTemplateRightAngleBrackets(false);
@@ -5445,7 +5447,8 @@ private:
         Tokenizer tokenizer(settings, *this);
 
         std::istringstream istr(code);
-        if (!tokenizer.list.createTokens(istr, "test.cpp"))
+        FileWithDetails file("test.cpp", Standards::Language::CPP, strlen(code));
+        if (!tokenizer.list.createTokens(istr, file))
             return false;
         tokenizer.createLinks();
         tokenizer.splitTemplateRightAngleBrackets(false);
@@ -5475,7 +5478,8 @@ private:
         Tokenizer tokenizer(settings, *this);
 
         std::istringstream istr(code);
-        if (!tokenizer.list.createTokens(istr, "test.cpp"))
+        FileWithDetails file("test.cpp", Standards::Language::CPP, strlen(code));
+        if (!tokenizer.list.createTokens(istr, file))
             return false;
         tokenizer.createLinks();
         tokenizer.splitTemplateRightAngleBrackets(false);

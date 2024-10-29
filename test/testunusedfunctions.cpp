@@ -589,7 +589,8 @@ private:
 
             Tokenizer tokenizer(settings, *this);
             std::istringstream istr(code);
-            ASSERT(tokenizer.list.createTokens(istr, fname));
+            FileWithDetails file(fname, Standards::Language::CPP, strlen(code));
+            ASSERT(tokenizer.list.createTokens(istr, file));
             ASSERT(tokenizer.simplifyTokens1(""));
 
             c.parseTokens(tokenizer, settings);
