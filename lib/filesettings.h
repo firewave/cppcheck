@@ -34,11 +34,7 @@ class FileWithDetails
 {
 public:
     explicit FileWithDetails(std::string path)
-        : FileWithDetails(std::move(path), 0)
-    {}
-
-    FileWithDetails(std::string path, std::size_t size)
-        : FileWithDetails(std::move(path), Standards::Language::None, size)
+        : FileWithDetails(std::move(path), Standards::Language::None, 0)
     {}
 
     FileWithDetails(std::string path, Standards::Language lang, std::size_t size)
@@ -89,7 +85,7 @@ struct CPPCHECKLIB FileSettings {
     {}
 
     FileSettings(std::string path, std::size_t size)
-        : file(std::move(path), size)
+        : file(std::move(path), Standards::Language::None, size)
     {}
 
     std::string cfg;

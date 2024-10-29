@@ -192,7 +192,7 @@ static std::string addFiles2(std::list<FileWithDetails> &files,
         return ""; // TODO: return error?
     if ((file_stat.st_mode & S_IFMT) != S_IFDIR)
     {
-        files.emplace_back(path, file_stat.st_size);
+        files.emplace_back(path, Standards::Language::None, file_stat.st_size);
         return "";
     }
 
