@@ -79,7 +79,7 @@ private:
                 std::string f_s = fprefix() + "_" + zpad3(i) + ".cpp";
                 filelist.emplace_back(f_s, Standards::Language::CPP, data.size());
                 if (useFS) {
-                    fileSettings.emplace_back(std::move(f_s), data.size());
+                    fileSettings.emplace_back(std::move(f_s), Standards::Language::CPP, data.size());
                 }
             }
         }
@@ -88,8 +88,7 @@ private:
             {
                 filelist.emplace_back(f, Standards::Language::CPP, data.size());
                 if (useFS) {
-
-                    fileSettings.emplace_back(f, data.size());
+                    fileSettings.emplace_back(f, Standards::Language::CPP, data.size());
                 }
             }
         }

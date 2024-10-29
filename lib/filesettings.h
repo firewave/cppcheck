@@ -84,8 +84,8 @@ struct CPPCHECKLIB FileSettings {
         : file(std::move(path))
     {}
 
-    FileSettings(std::string path, std::size_t size)
-        : file(std::move(path), Standards::Language::None, size)
+    FileSettings(std::string path, Standards::Language lang, std::size_t size)
+        : file(std::move(path), lang, size)
     {}
 
     std::string cfg;
