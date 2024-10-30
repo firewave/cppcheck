@@ -171,7 +171,7 @@ namespace {
             run["tool"] = picojson::value(tool);
             run["results"] = picojson::value(serializeResults());
             picojson::array runs{picojson::value(run)};
-            return picojson::value(runs);
+            return picojson::value(std::move(runs));
         }
 
         std::string serialize(std::string productName) const {

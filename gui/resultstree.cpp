@@ -290,7 +290,7 @@ void ResultsTree::setReportType(ReportType reportType) {
         for (int j = 0; j < fileItem->rowCount(); ++j) {
             const auto& data = fileItem->child(j,0)->data().toMap();
             const QString& errorId = data[ERRORID].toString();
-            Severity severity = ShowTypes::ShowTypeToSeverity(ShowTypes::VariantToShowType(data[SEVERITY]));
+            const Severity severity = ShowTypes::ShowTypeToSeverity(ShowTypes::VariantToShowType(data[SEVERITY]));
             const QString& guideline = getGuideline(mReportType, mGuideline, errorId, severity);
             const QString& classification = getClassification(mReportType, guideline);
             fileItem->child(j, COLUMN_CERT_LEVEL)->setText(classification);

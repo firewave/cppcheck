@@ -82,7 +82,7 @@ public:
     void stop();
 
     static void run(std::string str, SHOWTIME_MODES showtimeMode, TimerResultsIntf* timerResults, const std::function<void()>& f) {
-        Timer t(std::move(str), showtimeMode, timerResults);
+        const Timer t(std::move(str), showtimeMode, timerResults);
         f();
     }
 

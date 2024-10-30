@@ -112,7 +112,7 @@ private:
 #define GET_REDIRECT_OUTPUT redir.getOutput()
 #define GET_REDIRECT_ERROUT redir.getErrout()
 
-#define SUPPRESS SuppressOutput supprout
+#define SUPPRESS const SuppressOutput supprout
 
 
 class RedirectInput {

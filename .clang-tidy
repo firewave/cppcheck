@@ -33,7 +33,6 @@ Checks: >
         -bugprone-unchecked-optional-access,
         -clang-analyzer-*,
         -concurrency-mt-unsafe,
-        -misc-const-correctness,
         -misc-no-recursion,
         -misc-non-private-member-variables-in-classes,
         -misc-throw-by-value-catch-by-reference,
