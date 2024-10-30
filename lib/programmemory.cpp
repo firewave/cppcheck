@@ -1345,7 +1345,7 @@ namespace {
                 return unknown();
             }
 
-            nonneg int n = astCount(expr, expr->str().c_str());
+            const nonneg int n = astCount(expr, expr->str().c_str());
             if (n > 50)
                 return unknown();
             std::vector<const Token*> conditions1 = flattenConditions(expr);
@@ -1425,7 +1425,7 @@ namespace {
             if (expr->isNumber()) {
                 if (MathLib::isFloat(expr->str()))
                     return unknown();
-                MathLib::bigint i = MathLib::toBigNumber(expr->str());
+                const MathLib::bigint i = MathLib::toBigNumber(expr->str());
                 if (i < 0 && astIsUnsigned(expr))
                     return unknown();
                 return ValueFlow::Value{i};

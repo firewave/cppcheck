@@ -71,7 +71,7 @@ namespace ValueFlow
             args.back()[p.first] = p.second.front();
         }
         bool bail = false;
-        int max = settings.vfOptions.maxSubFunctionArgs;
+        const int max = settings.vfOptions.maxSubFunctionArgs;
         for (const auto& p:vars) {
             if (args.size() > max) {
                 bail = true;

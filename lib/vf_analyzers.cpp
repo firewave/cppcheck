@@ -342,7 +342,7 @@ struct ValueFlowAnalyzer : Analyzer {
             if (dst) {
                 const size_t sz = ValueFlow::getSizeOf(*dst, settings);
                 if (sz > 0 && sz < sizeof(MathLib::biguint)) {
-                    long long newvalue = ValueFlow::truncateIntValue(value->intvalue, sz, dst->sign);
+                    const long long newvalue = ValueFlow::truncateIntValue(value->intvalue, sz, dst->sign);
 
                     /* Handle overflow/underflow for value bounds */
                     if (value->bound != ValueFlow::Value::Bound::Point) {

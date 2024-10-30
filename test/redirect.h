@@ -108,7 +108,7 @@ private:
     std::streambuf *_oldCerr;
 };
 
-#define REDIRECT RedirectOutputError redir
+#define REDIRECT const RedirectOutputError redir
 #define GET_REDIRECT_OUTPUT redir.getOutput()
 #define GET_REDIRECT_ERROUT redir.getErrout()
 

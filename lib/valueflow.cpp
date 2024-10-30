@@ -408,7 +408,7 @@ static size_t getAlignOf(const ValueType& vt, const Settings& settings, int maxR
     }
     if (vt.type == ValueType::Type::RECORD && vt.typeScope) {
         auto accHelper = [&](size_t max, const ValueType& vt2, size_t /*dim*/) {
-            size_t a = getAlignOf(vt2, settings, ++maxRecursion);
+            const size_t a = getAlignOf(vt2, settings, ++maxRecursion);
             return std::max(max, a);
         };
         size_t total = 0;
@@ -457,11 +457,11 @@ size_t ValueFlow::getSizeOf(const ValueType &vt, const Settings &settings, int m
     if (vt.type == ValueType::Type::RECORD && vt.typeScope) {
         auto accHelper = [&](size_t total, const ValueType& vt2, size_t dim) -> size_t {
             size_t n = ValueFlow::getSizeOf(vt2, settings, ++maxRecursion);
-            size_t a = getAlignOf(vt2, settings);
+            const size_t a = getAlignOf(vt2, settings);
             if (n == 0 || a == 0)
                 return 0;
             n *= dim;
-            size_t padding = (a - (total % a)) % a;
+            const size_t padding = (a - (total % a)) % a;
             return vt.typeScope->type == Scope::eUnion ? std::max(total, n) : total + padding + n;
         };
         size_t total = accumulateStructMembers(vt.typeScope, accHelper);
@@ -474,7 +474,7 @@ size_t ValueFlow::getSizeOf(const ValueType &vt, const Settings &settings, int m
         }
         if (total == 0)
             return 0;
-        size_t align = getAlignOf(vt, settings);
+        const size_t align = getAlignOf(vt, settings);
         if (align == 0)
             return 0;
         total += (align - (total % align)) % align;
@@ -3103,7 +3103,7 @@ struct ConditionHandler {
 
             bool inverted2 = inverted;
             Token* ctx = skipNotAndCasts(condTok, &inverted2);
-            bool then = !inverted || !inverted2;
+            bool bool then = !inverted || !inverted2;
 
             if (!Token::Match(condTok, "!=|=|(|.") && condTok != vartok) {
                 thenValues.insert(thenValues.end(), true_values.cbegin(), true_values.cend());
@@ -5298,7 +5298,7 @@ struct ValueFlowPassRunner {
         if (!state.tokenlist.isCPP() && pass->cpp())
             return false;
         if (timerResults) {
-            Timer t(pass->name(), state.settings.showtime, timerResults);
+            const Timer t(pass->name(), state.settings.showtime, timerResults);
             pass->run(state);
         } else {
             pass->run(state);

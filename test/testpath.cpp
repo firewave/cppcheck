@@ -147,8 +147,8 @@ private:
     }
 
     void isDirectory() const {
-        ScopedFile file("testpath.txt", "", "testpath");
-        ScopedFile file2("testpath2.txt", "");
+        const ScopedFile file("testpath.txt", "", "testpath");
+        const ScopedFile file2("testpath2.txt", "");
         ASSERT_EQUALS(false, Path::isDirectory("testpath.txt"));
         ASSERT_EQUALS(true, Path::isDirectory("testpath"));
         ASSERT_EQUALS(false, Path::isDirectory("testpath/testpath.txt"));
@@ -156,8 +156,8 @@ private:
     }
 
     void isFile() const {
-        ScopedFile file("testpath.txt", "", "testpath");
-        ScopedFile file2("testpath2.txt", "");
+        const ScopedFile file("testpath.txt", "", "testpath");
+        const ScopedFile file2("testpath2.txt", "");
         ASSERT_EQUALS(false, Path::isFile("testpath"));
         ASSERT_EQUALS(false, Path::isFile("testpath.txt"));
         ASSERT_EQUALS(true, Path::isFile("testpath/testpath.txt"));
