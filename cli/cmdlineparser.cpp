@@ -214,6 +214,39 @@ bool CmdLineParser::fillSettingsFromArgs(int argc, const char* const argv[])
 
         mFileSettings.clear();
 
+        if (mSettings.enforcedLang != Standards::Language::None)
+        {
+            // apply enforced language
+            for (auto& fs : fileSettings)
+            {
+                // do not apply enforced language to markup files - they are handled separately
+                if (mSettings.library.markupFile(fs.filename()))
+                    continue;
+                fs.file.setLang(mSettings.enforcedLang);
+            }
+        }
+        else
+        {
+            // identify files
+            for (auto& fs : fileSettings)
+            {
+                // no need to identify markup files
+                if (mSettings.library.markupFile(fs.filename()))
+                    continue;
+                if (fs.file.lang() != Standards::Language::None)
+                    continue;
+                fs.file.setLang(Path::identify(fs.filename(), mSettings.cppHeaderProbe));
+            }
+        }
+
+        // enforce the language since markup files are special and do not adhere to the enforced language
+        for (auto& fs : fileSettings)
+        {
+            if (mSettings.library.markupFile(fs.filename())) {
+                fs.file.setLang(Standards::Language::C);
+            }
+        }
+
         // sort the markup last
         std::copy_if(fileSettings.cbegin(), fileSettings.cend(), std::back_inserter(mFileSettings), [&](const FileSettings &fs) {
             return !mSettings.library.markupFile(fs.filename()) || !mSettings.library.processMarkupAfterCode(fs.filename());
@@ -282,6 +315,40 @@ bool CmdLineParser::fillSettingsFromArgs(int argc, const char* const argv[])
         }
         else {
             files = std::move(filesResolved);
+        }
+
+        if (mSettings.enforcedLang != Standards::Language::None)
+        {
+            // apply enforced language
+            for (auto& f : files)
+            {
+                // do not apply enforced language to markup files - they are handled separately
+                if (mSettings.library.markupFile(f.path()))
+                    continue;
+                f.setLang(mSettings.enforcedLang);
+            }
+        }
+        else
+        {
+            // identify remaining files
+            for (auto& f : files)
+            {
+                // no need to identify markup files
+                if (mSettings.library.markupFile(f.path()))
+                    continue;
+                if (f.lang() != Standards::Language::None)
+                    continue;
+                // explicitly specified files were not accepted i.e. have no language set
+                f.setLang(Path::identify(f.path(), mSettings.cppHeaderProbe));
+            }
+        }
+
+        // enforce the language since markup files are special and do not adhere to the enforced language
+        for (auto& f : files)
+        {
+            if (mSettings.library.markupFile(f.path())) {
+                f.setLang(Standards::Language::C);
+            }
         }
 
         // sort the markup last
