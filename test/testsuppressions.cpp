@@ -230,7 +230,7 @@ private:
 
         std::list<FileWithDetails> filelist;
         for (std::map<std::string, std::string>::const_iterator i = f.cbegin(); i != f.cend(); ++i) {
-            filelist.emplace_back(i->first, i->second.size());
+            filelist.emplace_back(i->first, Standards::Language::None, i->second.size()); // TODO: lang
             if (useFS) {
                 fileSettings.emplace_back(i->first, i->second.size());
             }
@@ -277,7 +277,7 @@ private:
         std::list<FileSettings> fileSettings;
 
         std::list<FileWithDetails> filelist;
-        filelist.emplace_back("test.cpp", strlen(code));
+        filelist.emplace_back("test.cpp", Standards::Language::CPP, strlen(code));
         if (useFS) {
             fileSettings.emplace_back("test.cpp", strlen(code));
         }
@@ -321,7 +321,7 @@ private:
         std::list<FileSettings> fileSettings;
 
         std::list<FileWithDetails> filelist;
-        filelist.emplace_back("test.cpp", strlen(code));
+        filelist.emplace_back("test.cpp", Standards::Language::CPP, strlen(code));
         if (useFS) {
             fileSettings.emplace_back("test.cpp", strlen(code));
         }
