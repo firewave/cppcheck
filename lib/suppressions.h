@@ -22,6 +22,7 @@
 
 #include "config.h"
 
+#include <atomic>
 #include <cstddef>
 #include <cstdint>
 #include <istream>
@@ -146,6 +147,7 @@ public:
         std::string macroName;
         std::size_t hash{};
         bool thisAndNextLine{}; // Special case for backwards compatibility: { // cppcheck-suppress something
+        // TODO: make thread-safe
         bool matched{};
         bool checked{}; // for inline suppressions, checked or not
 

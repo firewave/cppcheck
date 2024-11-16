@@ -129,7 +129,9 @@ void CheckThread::run()
 {
     mState = Running;
 
-    CppCheck cppcheck(mResult, true, executeCommand);
+    Suppressions suppressions;
+
+    CppCheck cppcheck(suppressions, mResult, true, executeCommand);
     cppcheck.settings() = std::move(mSettings);
 
     if (!mFiles.isEmpty() || mAnalyseWholeProgram) {

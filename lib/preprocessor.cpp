@@ -240,7 +240,7 @@ static void addInlineSuppressions(const simplecpp::TokenList &tokens, const Sett
                 bool throwError = true;
 
                 if (!inlineSuppressionsBlockBegin.empty()) {
-                    const SuppressionList::Suppression lastBeginSuppression = inlineSuppressionsBlockBegin.back();
+                    const SuppressionList::Suppression& lastBeginSuppression = inlineSuppressionsBlockBegin.back();
 
                     auto supprBegin = inlineSuppressionsBlockBegin.begin();
                     while (supprBegin != inlineSuppressionsBlockBegin.end())

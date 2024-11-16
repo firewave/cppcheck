@@ -334,10 +334,12 @@ static std::string getDefinesFlags(const std::string &semicolonSeparatedString)
     return flags;
 }
 
-CppCheck::CppCheck(ErrorLogger &errorLogger,
+CppCheck::CppCheck(Suppressions& supprs,
+                   ErrorLogger &errorLogger,
                    bool useGlobalSuppressions,
                    ExecuteCmdFn executeCommand)
-    : mErrorLogger(errorLogger)
+    : mSuppressions(supprs)
+    , mErrorLogger(errorLogger)
     , mUseGlobalSuppressions(useGlobalSuppressions)
     , mExecuteCommand(std::move(executeCommand))
 {}
@@ -578,7 +580,7 @@ unsigned int CppCheck::check(const FileSettings &fs)
     if (mSettings.checks.isEnabled(Checks::unusedFunction) && !mUnusedFunctionsCheck)
         mUnusedFunctionsCheck.reset(new CheckUnusedFunctions());
 
-    CppCheck temp(mErrorLogger, mUseGlobalSuppressions, mExecuteCommand);
+    CppCheck temp(mSuppressions, mErrorLogger, mUseGlobalSuppressions, mExecuteCommand);
     temp.mSettings = mSettings;
     if (!temp.mSettings.userDefines.empty())
         temp.mSettings.userDefines += ';';
@@ -604,7 +606,6 @@ unsigned int CppCheck::check(const FileSettings &fs)
         return returnValue;
     }
     const unsigned int returnValue = temp.checkFile(fs.file, fs.cfg);
-    mSettings.supprs.nomsg.addSuppressions(temp.mSettings.supprs.nomsg.getSuppressions());
     if (mUnusedFunctionsCheck)
         mUnusedFunctionsCheck->updateFunctionData(*temp.mUnusedFunctionsCheck);
     while (!temp.mFileInfo.empty()) {
@@ -732,10 +733,10 @@ unsigned int CppCheck::checkFile(const FileWithDetails& file, const std::string 
 
         // Parse comments and then remove them
         mRemarkComments = preprocessor.getRemarkComments(tokens1);
-        preprocessor.inlineSuppressions(tokens1, mSettings.supprs.nomsg);
+        preprocessor.inlineSuppressions(tokens1, mSuppressions.nomsg);
         if (mSettings.dump || !mSettings.addons.empty()) {
             std::ostringstream oss;
-            mSettings.supprs.nomsg.dump(oss);
+            mSuppressions.nomsg.dump(oss);
             dumpProlog += oss.str();
         }
         preprocessor.removeComments(tokens1);
@@ -750,7 +751,7 @@ unsigned int CppCheck::checkFile(const FileWithDetails& file, const std::string 
             toolinfo << (mSettings.severity.isEnabled(Severity::portability) ? 'p' : ' ');
             toolinfo << (mSettings.severity.isEnabled(Severity::information) ? 'i' : ' ');
             toolinfo << mSettings.userDefines;
-            mSettings.supprs.nomsg.dump(toolinfo);
+            mSuppressions.nomsg.dump(toolinfo);
 
             // Calculate hash so it can be compared with old hash / future hashes
             const std::size_t hash = preprocessor.calculateHash(tokens1, toolinfo.str());
@@ -926,7 +927,7 @@ unsigned int CppCheck::checkFile(const FileWithDetails& file, const std::string 
                 }
 
                 // Need to call this even if the hash will skip this configuration
-                mSettings.supprs.nomsg.markUnmatchedInlineSuppressionsAsChecked(tokenizer);
+                mSuppressions.nomsg.markUnmatchedInlineSuppressionsAsChecked(tokenizer);
 
                 // Skip if we already met the same simplified token list
                 if (mSettings.force || mSettings.maxConfigs > 1) {
@@ -1019,7 +1020,7 @@ unsigned int CppCheck::checkFile(const FileWithDetails& file, const std::string 
     // In jointSuppressionReport mode, unmatched suppressions are
     // collected after all files are processed
     if (!mSettings.useSingleJob() && (mSettings.severity.isEnabled(Severity::information) || mSettings.checkConfiguration)) {
-        SuppressionList::reportUnmatchedSuppressions(mSettings.supprs.nomsg.getUnmatchedLocalSuppressions(file, (bool)mUnusedFunctionsCheck), *this);
+        SuppressionList::reportUnmatchedSuppressions(mSuppressions.nomsg.getUnmatchedLocalSuppressions(file, (bool)mUnusedFunctionsCheck), *this);
     }
 
     mErrorList.clear();
@@ -1634,12 +1635,12 @@ void CppCheck::reportErr(const ErrorMessage &msg)
     // TODO: only convert if necessary
     const auto errorMessage = SuppressionList::ErrorMessage::fromErrorMessage(msg, macroNames);
 
-    if (mSettings.supprs.nomsg.isSuppressed(errorMessage, mUseGlobalSuppressions)) {
+    if (mSuppressions.nomsg.isSuppressed(errorMessage, mUseGlobalSuppressions)) {
         // Safety: Report critical errors to ErrorLogger
         if (mSettings.safety && ErrorLogger::isCriticalErrorId(msg.id)) {
             mExitCode = 1;
 
-            if (mSettings.supprs.nomsg.isSuppressedExplicitly(errorMessage, mUseGlobalSuppressions)) {
+            if (mSuppressions.nomsg.isSuppressedExplicitly(errorMessage, mUseGlobalSuppressions)) {
                 // Report with internal severity to signal that there is this critical error but
                 // it is suppressed
                 ErrorMessage temp(msg);
@@ -1667,7 +1668,7 @@ void CppCheck::reportErr(const ErrorMessage &msg)
     if (!mSettings.buildDir.empty())
         mAnalyzerInformation.reportErr(msg);
 
-    if (!mSettings.supprs.nofail.isSuppressed(errorMessage) && !mSettings.supprs.nomsg.isSuppressed(errorMessage)) {
+    if (!mSuppressions.nofail.isSuppressed(errorMessage) && !mSuppressions.nomsg.isSuppressed(errorMessage)) {
         mExitCode = 1;
     }
 
@@ -1692,7 +1693,7 @@ void CppCheck::reportErr(const ErrorMessage &msg)
     }
 
     // check if plistOutput should be populated and the current output file is open and the error is not suppressed
-    if (!mSettings.plistOutput.empty() && mPlistFile.is_open() && !mSettings.supprs.nomsg.isSuppressed(errorMessage)) {
+    if (!mSettings.plistOutput.empty() && mPlistFile.is_open() && !mSuppressions.nomsg.isSuppressed(errorMessage)) {
         // add error to plist output file
         mPlistFile << ErrorLogger::plistData(msg);
     }
@@ -1712,8 +1713,9 @@ void CppCheck::getErrorMessages(ErrorLogger &errorlogger)
 {
     Settings s;
     s.addEnabled("all");
+    Suppressions suppressions;
 
-    CppCheck cppcheck(errorlogger, true, nullptr);
+    CppCheck cppcheck(suppressions, errorlogger, true, nullptr);
     cppcheck.purgedConfigurationMessage(emptyString,emptyString);
     cppcheck.mTooManyConfigs = true;
     cppcheck.tooManyConfigsError(emptyString,0U);

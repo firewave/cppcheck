@@ -124,8 +124,9 @@ MainWindow::MainWindow(TranslationHandler* th, QSettings* settings) :
 {
     {
         Settings tempSettings;
+        Suppressions suppressions;
         tempSettings.exename = QCoreApplication::applicationFilePath().toStdString();
-        Settings::loadCppcheckCfg(tempSettings, tempSettings.supprs); // TODO: how to handle error?
+        Settings::loadCppcheckCfg(tempSettings, suppressions); // TODO: how to handle error?
         mCppcheckCfgProductName = QString::fromStdString(tempSettings.cppcheckCfgProductName);
         mCppcheckCfgAbout = QString::fromStdString(tempSettings.cppcheckCfgAbout);
     }
@@ -679,6 +680,7 @@ void MainWindow::analyzeCode(const QString& code, const QString& filename)
     if (!checkSettingsPair.first)
         return;
     const Settings& checkSettings = checkSettingsPair.second;
+    Suppressions suppressions;
 
     // Initialize dummy ThreadResult as ErrorLogger
     ThreadResult result;
@@ -693,7 +695,7 @@ void MainWindow::analyzeCode(const QString& code, const QString& filename)
             mUI->mResults, SLOT(debugError(ErrorItem)));
 
     // Create CppCheck instance
-    CppCheck cppcheck(result, true, nullptr);
+    CppCheck cppcheck(suppressions, result, true, nullptr);
     cppcheck.settings() = checkSettings;
 
     // Check
@@ -1035,6 +1037,7 @@ QPair<bool,Settings> MainWindow::getCppcheckSettings()
 
     Settings::terminate(true);
     Settings result;
+    Suppressions suppressions;
 
     result.exename = QCoreApplication::applicationFilePath().toStdString();
 
@@ -1051,7 +1054,7 @@ QPair<bool,Settings> MainWindow::getCppcheckSettings()
     const QString pythonCmd = fromNativePath(mSettings->value(SETTINGS_PYTHON_PATH).toString());
 
     {
-        const QString cfgErr = QString::fromStdString(Settings::loadCppcheckCfg(result, result.supprs));
+        const QString cfgErr = QString::fromStdString(Settings::loadCppcheckCfg(result, suppressions));
         if (!cfgErr.isEmpty()) {
             QMessageBox::critical(this, tr("Error"), tr("Failed to load %1 - %2\n\nAnalysis is aborted.").arg("cppcheck.cfg").arg(cfgErr));
             return {false, {}};
@@ -1097,7 +1100,7 @@ QPair<bool,Settings> MainWindow::getCppcheckSettings()
         }
 
         for (const SuppressionList::Suppression &suppression : mProjectFile->getCheckingSuppressions()) {
-            result.supprs.nomsg.addSuppression(suppression);
+            suppressions.nomsg.addSuppression(suppression);
         }
 
         // Only check the given -D configuration

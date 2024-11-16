@@ -380,9 +380,6 @@ public:
     /** Struct contains standards settings */
     Standards standards;
 
-    /** @brief suppressions */
-    Suppressions supprs;
-
     /** @brief The output format in which the errors are printed in text mode,
         e.g. "{severity} {file}:{line} {message} {id}" */
     std::string templateFormat;

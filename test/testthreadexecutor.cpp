@@ -95,6 +95,7 @@ private:
         if (opt.plistOutput)
             s.plistOutput = opt.plistOutput;
         s.clangTidy = opt.clangTidy;
+        Suppressions suppressions;
 
         bool executeCommandCalled = false;
         std::string exe;
@@ -116,7 +117,7 @@ private:
         if (useFS)
             filelist.clear();
 
-        ThreadExecutor executor(filelist, fileSettings, s, s.supprs.nomsg, *this, executeFn);
+        ThreadExecutor executor(filelist, fileSettings, s, suppressions, *this, executeFn);
         ASSERT_EQUALS(result, executor.check());
         ASSERT_EQUALS(opt.executeCommandCalled, executeCommandCalled);
         ASSERT_EQUALS(opt.exe, exe);

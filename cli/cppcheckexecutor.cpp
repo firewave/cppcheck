@@ -242,8 +242,9 @@ namespace {
     class StdLogger : public ErrorLogger
     {
     public:
-        explicit StdLogger(const Settings& settings)
+        explicit StdLogger(const Settings& settings, const SuppressionList& suppressions)
             : mSettings(settings)
+            , mSuppressions(suppressions)
         {
             if (!mSettings.outputFile.empty()) {
                 mErrorOutput = new std::ofstream(settings.outputFile);
@@ -302,6 +303,8 @@ namespace {
          */
         const Settings& mSettings;
 
+        const SuppressionList& mSuppressions;
+
         /**
          * Used to filter out duplicate error messages.
          */
@@ -343,8 +346,9 @@ namespace {
 int CppCheckExecutor::check(int argc, const char* const argv[])
 {
     Settings settings;
+    Suppressions suppressions;
     CmdLineLoggerStd logger;
-    CmdLineParser parser(logger, settings, settings.supprs);
+    CmdLineParser parser(logger, settings, suppressions);
     if (!parser.fillSettingsFromArgs(argc, argv)) {
         return EXIT_FAILURE;
     }
@@ -359,12 +363,12 @@ int CppCheckExecutor::check(int argc, const char* const argv[])
 
     settings.setMisraRuleTexts(executeCommand);
 
-    const int ret = check_wrapper(settings);
+    const int ret = check_wrapper(settings, suppressions);
 
     return ret;
 }
 
-int CppCheckExecutor::check_wrapper(const Settings& settings)
+int CppCheckExecutor::check_wrapper(const Settings& settings, Suppressions& suppressions)
 {
 #ifdef USE_WINDOWS_SEH
     if (settings.exceptionHandling)
@@ -373,7 +377,7 @@ int CppCheckExecutor::check_wrapper(const Settings& settings)
     if (settings.exceptionHandling)
         register_signal_handler(settings.exceptionOutput);
 #endif
-    return check_internal(settings);
+    return check_internal(settings, suppressions);
 }
 
 bool CppCheckExecutor::reportSuppressions(const Settings &settings, const SuppressionList& suppressions, bool unusedFunctionCheckEnabled, const std::list<FileWithDetails> &files, const std::list<FileSettings>& fileSettings, ErrorLogger& errorLogger) {
@@ -405,9 +409,9 @@ bool CppCheckExecutor::reportSuppressions(const Settings &settings, const Suppre
 /*
  * That is a method which gets called from check_wrapper
  * */
-int CppCheckExecutor::check_internal(const Settings& settings) const
+int CppCheckExecutor::check_internal(const Settings& settings, Suppressions& suppressions) const
 {
-    StdLogger stdLogger(settings);
+    StdLogger stdLogger(settings, suppressions.nomsg);
 
     if (settings.reportProgress >= 0)
         stdLogger.resetLatestProgressOutputTime();
@@ -426,9 +430,8 @@ int CppCheckExecutor::check_internal(const Settings& settings) const
     if (!settings.checkersReportFilename.empty())
         std::remove(settings.checkersReportFilename.c_str());
 
-    CppCheck cppcheck(stdLogger, true, executeCommand);
+    CppCheck cppcheck(suppressions, stdLogger, true, executeCommand);
     cppcheck.settings() = settings; // this is a copy
-    auto& suppressions = cppcheck.settings().supprs.nomsg;
 
     unsigned int returnValue = 0;
     if (settings.useSingleJob()) {
@@ -453,7 +456,7 @@ int CppCheckExecutor::check_internal(const Settings& settings) const
     returnValue |= cppcheck.analyseWholeProgram(settings.buildDir, mFiles, mFileSettings, stdLogger.getCtuInfo());
 
     if (settings.severity.isEnabled(Severity::information) || settings.checkConfiguration) {
-        const bool err = reportSuppressions(settings, suppressions, settings.checks.isEnabled(Checks::unusedFunction), mFiles, mFileSettings, stdLogger);
+        const bool err = reportSuppressions(settings, suppressions.nomsg, settings.checks.isEnabled(Checks::unusedFunction), mFiles, mFileSettings, stdLogger);
         if (err && returnValue == 0)
             returnValue = settings.exitCode;
     }
@@ -487,7 +490,7 @@ void StdLogger::writeCheckersReport()
 
     CheckersReport checkersReport(mSettings, mActiveCheckers);
 
-    const auto& suppressions = mSettings.supprs.nomsg.getSuppressions();
+    const auto& suppressions = mSuppressions.getSuppressions();
     const bool summarySuppressed = std::any_of(suppressions.cbegin(), suppressions.cend(), [](const SuppressionList::Suppression& s) {
         return s.errorId == "checkersReport";
     });

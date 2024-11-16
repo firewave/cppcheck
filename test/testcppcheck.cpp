@@ -109,8 +109,9 @@ private:
                         "  return 0;\n"
                         "}");
 
+        Suppressions suppressions;
         ErrorLogger2 errorLogger;
-        CppCheck cppcheck(errorLogger, false, {});
+        CppCheck cppcheck(suppressions, errorLogger, false, {});
         ASSERT_EQUALS(1, cppcheck.check(FileWithDetails(file.path())));
         // TODO: how to properly disable these warnings?
         errorLogger.ids.erase(std::remove_if(errorLogger.ids.begin(), errorLogger.ids.end(), [](const std::string& id) {
@@ -129,8 +130,9 @@ private:
                         "  return 0;\n"
                         "}");
 
+        Suppressions suppressions;
         ErrorLogger2 errorLogger;
-        CppCheck cppcheck(errorLogger, false, {});
+        CppCheck cppcheck(suppressions, errorLogger, false, {});
         FileSettings fs{file.path()};
         ASSERT_EQUALS(1, cppcheck.check(fs));
         // TODO: how to properly disable these warnings?
@@ -150,8 +152,9 @@ private:
                         "  return 0;\n"
                         "}");
 
+        Suppressions suppressions;
         ErrorLogger2 errorLogger;
-        CppCheck cppcheck(errorLogger, false, {});
+        CppCheck cppcheck(suppressions, errorLogger, false, {});
         const char xmldata[] = R"(<def format="2"><markup ext=".cpp" reporterrors="false"/></def>)";
         const Settings s = settingsBuilder().libraryxml(xmldata, sizeof(xmldata)).build();
         cppcheck.settings() = s;
@@ -176,8 +179,9 @@ private:
         ScopedFile test_file_b("b.cpp",
                                "#include \"inc.h\"");
 
+        Suppressions suppressions;
         ErrorLogger2 errorLogger;
-        CppCheck cppcheck(errorLogger, false, {});
+        CppCheck cppcheck(suppressions, errorLogger, false, {});
         ASSERT_EQUALS(1, cppcheck.check(FileWithDetails(test_file_a.path())));
         ASSERT_EQUALS(1, cppcheck.check(FileWithDetails(test_file_b.path())));
         // TODO: how to properly disable these warnings?
@@ -193,8 +197,9 @@ private:
     }
 
     void isPremiumCodingStandardId() const {
+        Suppressions suppressions;
         ErrorLogger2 errorLogger;
-        CppCheck cppcheck(errorLogger, false, {});
+        CppCheck cppcheck(suppressions, errorLogger, false, {});
 
         cppcheck.settings().premiumArgs = "";
         ASSERT_EQUALS(false, cppcheck.isPremiumCodingStandardId("misra-c2012-0.0"));
@@ -218,8 +223,9 @@ private:
     }
 
     void getDumpFileContentsRawTokens() const {
+        Suppressions suppressions;
         ErrorLogger2 errorLogger;
-        CppCheck cppcheck(errorLogger, false, {});
+        CppCheck cppcheck(suppressions, errorLogger, false, {});
         cppcheck.settings() = settingsBuilder().build();
         cppcheck.settings().relativePaths = true;
         cppcheck.settings().basePaths.emplace_back("/some/path");
@@ -232,8 +238,9 @@ private:
     }
 
     void getDumpFileContentsLibrary() const {
+        Suppressions suppressions;
         ErrorLogger2 errorLogger;
-        CppCheck cppcheck(errorLogger, false, {});
+        CppCheck cppcheck(suppressions, errorLogger, false, {});
         cppcheck.settings().libraries.emplace_back("std.cfg");
         std::vector<std::string> files{ "/some/path/test.cpp" };
         const std::string expected1 = "  <library lib=\"std.cfg\"/>\n";

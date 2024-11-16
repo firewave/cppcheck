@@ -67,7 +67,8 @@ public:
     /**
      * @brief Constructor.
      */
-    CppCheck(ErrorLogger &errorLogger,
+    CppCheck(Suppressions& supprs,
+             ErrorLogger &errorLogger,
              bool useGlobalSuppressions,
              ExecuteCmdFn executeCommand);
 
@@ -225,6 +226,7 @@ private:
     // TODO: store hashes instead of the full messages
     std::unordered_set<std::string> mErrorList;
     Settings mSettings;
+    Suppressions& mSuppressions;
 
     void reportProgress(const std::string &filename, const char stage[], std::size_t value) override;
 

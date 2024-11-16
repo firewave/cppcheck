@@ -1858,7 +1858,7 @@ std::string CmdLineParser::getVersion() const {
 
 bool CmdLineParser::isCppcheckPremium() const {
     if (mSettings.cppcheckCfgProductName.empty())
-        Settings::loadCppcheckCfg(mSettings, mSettings.supprs, mSettings.debuglookup || mSettings.debuglookupConfig);
+        Settings::loadCppcheckCfg(mSettings, mSuppressions, mSettings.debuglookup || mSettings.debuglookupConfig);
     return startsWith(mSettings.cppcheckCfgProductName, "Cppcheck Premium");
 }
 

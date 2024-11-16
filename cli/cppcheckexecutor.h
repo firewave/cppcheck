@@ -28,6 +28,7 @@
 class Settings;
 class ErrorLogger;
 class SuppressionList;
+struct Suppressions;
 
 /**
  * This class works as an example of how CppCheck can be used in external
@@ -75,21 +76,23 @@ protected:
      * Wrapper around check_internal
      *   - installs optional platform dependent signal handling
      *
-     * @param settings the settings
+     * @param settings the immutable settings
+     * @param suppressions the mutable suppressions
      **/
-    int check_wrapper(const Settings& settings);
+    int check_wrapper(const Settings& settings, Suppressions& suppressions);
 
     /**
      * Starts the checking.
      *
-     * @param settings the settings
+     * @param settings the immutable settings
+     * @param suppressions the mutable suppressions
      * @return EXIT_FAILURE if arguments are invalid or no input files
      *         were found.
      *         If errors are found and --error-exitcode is used,
      *         given value is returned instead of default 0.
      *         If no errors are found, 0 is returned.
      */
-    int check_internal(const Settings& settings) const;
+    int check_internal(const Settings& settings, Suppressions& suppressions) const;
 
     /**
      * Filename associated with size of file
