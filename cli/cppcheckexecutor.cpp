@@ -420,7 +420,7 @@ int CppCheckExecutor::check_internal(const Settings& settings) const
         std::list<std::string> fileNames;
         for (std::list<FileWithDetails>::const_iterator i = mFiles.cbegin(); i != mFiles.cend(); ++i)
             fileNames.emplace_back(i->path());
-        AnalyzerInformation::writeFilesTxt(settings.buildDir, fileNames, settings.userDefines, mFileSettings);
+        AnalyzerInformation::writeFilesTxt(settings.buildDir, fileNames, ""/*settings.userDefines*/, mFileSettings);
     }
 
     if (!settings.checkersReportFilename.empty())

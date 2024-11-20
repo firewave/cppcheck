@@ -362,7 +362,7 @@ CmdLineParser::Result CmdLineParser::parseFromArgs(int argc, const char* const a
         }
     }
 
-    bool def = false;
+    bool has_config = false;
     bool maxconfigs = false;
 
     ImportProject project;
@@ -390,15 +390,17 @@ CmdLineParser::Result CmdLineParser::parseFromArgs(int argc, const char* const a
                     define = 2 + argv[i];
                 }
 
+                Settings::Define def;
+                def.def = define;
+                // TODO
+
                 // No "=", append a "=1"
                 if (define.find('=') == std::string::npos)
-                    define += "=1";
+                    def.value = "1";
 
-                if (!mSettings.userDefines.empty())
-                    mSettings.userDefines += ";";
-                mSettings.userDefines += define;
+                mSettings.userDefines.push_back(std::move(def));
 
-                def = true;
+                has_config = true;
             }
 
             // -E
@@ -454,7 +456,12 @@ CmdLineParser::Result CmdLineParser::parseFromArgs(int argc, const char* const a
                     undef = 2 + argv[i];
                 }
 
-                mSettings.userUndefs.insert(std::move(undef));
+                Settings::Define def;
+                def.def = undef;
+                def.undef = true;
+                def.value = undef;
+
+                mSettings.userDefines.push_back(std::move(def));
             }
 
             else if (std::strncmp(argv[i], "--addon=", 8) == 0)
@@ -1442,7 +1449,7 @@ CmdLineParser::Result CmdLineParser::parseFromArgs(int argc, const char* const a
     if (mSettings.force)
         mSettings.maxConfigs = INT_MAX;
 
-    else if ((def || mSettings.preprocessOnly) && !maxconfigs)
+    else if ((has_config || mSettings.preprocessOnly) && !maxconfigs)
         mSettings.maxConfigs = 1U;
 
     if (mSettings.jobs > 1 && mSettings.buildDir.empty()) {

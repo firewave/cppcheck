@@ -20,6 +20,7 @@
 #define fileSettingsH
 
 #include "config.h"
+#include "settings.h"
 #include "path.h"
 #include "platform.h"
 
@@ -86,12 +87,11 @@ struct CPPCHECKLIB FileSettings {
     {
         return file.spath();
     }
-    std::string defines;
+    std::list<Settings::Define> defines;
     // TODO: handle differently
     std::string cppcheckDefines() const {
         return defines + (msc ? ";_MSC_VER=1900" : "") + (useMfc ? ";__AFXWIN_H__=1" : "");
     }
-    std::set<std::string> undefs;
     std::list<std::string> includePaths;
     // only used by clang mode
     std::list<std::string> systemIncludePaths;

@@ -397,11 +397,16 @@ public:
     /** @brief The maximum time in seconds for the typedef simplification */
     std::size_t typedefMaxTime{};
 
-    /** @brief defines given by the user */
-    std::string userDefines;
+    struct Define
+    {
+        std::string def;
+        bool undef{false};
+        std::string name;
+        std::string value;
+    };
 
-    /** @brief undefines given by the user */
-    std::set<std::string> userUndefs;
+    /** @brief defines given by the user */
+    std::list<Define> userDefines;
 
     /** @brief forced includes given by the user */
     std::list<std::string> userIncludes;

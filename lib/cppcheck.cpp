@@ -326,11 +326,11 @@ static std::vector<picojson::value> executeAddon(const AddonInfo &addonInfo,
     return addonResult;
 }
 
-static std::string getDefinesFlags(const std::string &semicolonSeparatedString)
+static std::string getDefinesFlags(const std::list<Settings::Define> &userDefines)
 {
     std::string flags;
-    for (const std::string &d: split(semicolonSeparatedString, ";"))
-        flags += "-D" + d + " ";
+    //for (const std::string &d: split(semicolonSeparatedString, ";"))
+    //    flags += "-D" + d + " ";
     return flags;
 }
 
