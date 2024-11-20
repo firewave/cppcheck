@@ -90,7 +90,7 @@ struct CPPCHECKLIB FileSettings {
     std::list<Settings::Define> defines;
     // TODO: handle differently
     std::string cppcheckDefines() const {
-        return defines + (msc ? ";_MSC_VER=1900" : "") + (useMfc ? ";__AFXWIN_H__=1" : "");
+        return ""; //defines + (msc ? ";_MSC_VER=1900" : "") + (useMfc ? ";__AFXWIN_H__=1" : "");
     }
     std::list<std::string> includePaths;
     // only used by clang mode

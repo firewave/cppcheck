@@ -580,14 +580,16 @@ unsigned int CppCheck::check(const FileSettings &fs)
 
     CppCheck temp(mErrorLogger, mUseGlobalSuppressions, mExecuteCommand);
     temp.mSettings = mSettings;
+    /*
     if (!temp.mSettings.userDefines.empty())
         temp.mSettings.userDefines += ';';
     if (mSettings.clang)
         temp.mSettings.userDefines += fs.defines;
     else
         temp.mSettings.userDefines += fs.cppcheckDefines();
+    */
     temp.mSettings.includePaths = fs.includePaths;
-    temp.mSettings.userUndefs.insert(fs.undefs.cbegin(), fs.undefs.cend());
+    //temp.mSettings.userUndefs.insert(fs.undefs.cbegin(), fs.undefs.cend());
     if (fs.standard.find("++") != std::string::npos)
         temp.mSettings.standards.setCPP(fs.standard);
     else if (!fs.standard.empty())
@@ -641,13 +643,15 @@ unsigned int CppCheck::checkFile(const FileWithDetails& file, const std::string 
         mErrorLogger.reportOut(std::string("Checking ") + fixedpath + ' ' + cfgname + std::string("..."), Color::FgGreen);
 
         if (mSettings.verbose) {
-            mErrorLogger.reportOut("Defines:" + mSettings.userDefines);
+            //mErrorLogger.reportOut("Defines:" + mSettings.userDefines);
             std::string undefs;
+            /*
             for (const std::string& U : mSettings.userUndefs) {
                 if (!undefs.empty())
                     undefs += ';';
                 undefs += ' ' + U;
             }
+            */
             mErrorLogger.reportOut("Undefines:" + undefs);
             std::string includePaths;
             for (const std::string &I : mSettings.includePaths)
@@ -749,7 +753,7 @@ unsigned int CppCheck::checkFile(const FileWithDetails& file, const std::string 
             toolinfo << (mSettings.severity.isEnabled(Severity::performance) ? 'p' : ' ');
             toolinfo << (mSettings.severity.isEnabled(Severity::portability) ? 'p' : ' ');
             toolinfo << (mSettings.severity.isEnabled(Severity::information) ? 'i' : ' ');
-            toolinfo << mSettings.userDefines;
+            //toolinfo << mSettings.userDefines;
             mSettings.supprs.nomsg.dump(toolinfo);
 
             // Calculate hash so it can be compared with old hash / future hashes
@@ -789,7 +793,7 @@ unsigned int CppCheck::checkFile(const FileWithDetails& file, const std::string 
                 configurations = preprocessor.getConfigs(tokens1);
             });
         } else {
-            configurations.insert(mSettings.userDefines);
+            //configurations.insert(mSettings.userDefines);
         }
 
         if (mSettings.checkConfiguration) {
@@ -838,8 +842,8 @@ unsigned int CppCheck::checkFile(const FileWithDetails& file, const std::string 
                 break;
 
             if (!mSettings.userDefines.empty()) {
-                mCurrentConfig = mSettings.userDefines;
-                const std::vector<std::string> v1(split(mSettings.userDefines, ";"));
+                //mCurrentConfig = mSettings.userDefines;
+                const std::vector<std::string> v1;//(split(mSettings.userDefines, ";"));
                 for (const std::string &cfg: split(currCfg, ";")) {
                     if (std::find(v1.cbegin(), v1.cend(), cfg) == v1.cend()) {
                         mCurrentConfig += ";" + cfg;

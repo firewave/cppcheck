@@ -108,7 +108,7 @@ void ImportProject::fsSetDefines(FileSettings& fs, std::string defs)
     }
     if (!eq && !defs.empty())
         defs += "=1";
-    fs.defines.swap(defs);
+    //fs.defines.swap(defs);
 }
 
 static bool simplifyPathWithVariables(std::string &s, std::map<std::string, std::string, cppcheck::stricmp> &variables)
@@ -301,8 +301,9 @@ void ImportProject::fsParseCommand(FileSettings& fs, const std::string& command)
             if (!defval.empty())
                 defs += defval;
             defs += ';';
-        } else if (F=='U')
-            fs.undefs.insert(fval);
+        } else if (F=='U') {
+            //fs.undefs.insert(fval);
+        }
         else if (F=='I') {
             std::string i = fval;
             if (i.size() > 1 && i[0] == '\"' && i.back() == '\"')
@@ -834,19 +835,19 @@ bool ImportProject::importVcxproj(const std::string &filename, std::map<std::str
             // TODO: detect actual MSC version
             fs.msc = true;
             fs.useMfc = useOfMfc;
-            fs.defines = "_WIN32=1";
+            //fs.defines = "_WIN32=1";
             if (p.platform == ProjectConfiguration::Win32)
                 fs.platformType = Platform::Type::Win32W;
             else if (p.platform == ProjectConfiguration::x64) {
                 fs.platformType = Platform::Type::Win64;
-                fs.defines += ";_WIN64=1";
+                //fs.defines += ";_WIN64=1";
             }
             std::string additionalIncludePaths;
             for (const ItemDefinitionGroup &i : itemDefinitionGroupList) {
                 if (!i.conditionIsTrue(p))
                     continue;
                 fs.standard = Standards::getCPP(i.cppstd);
-                fs.defines += ';' + i.preprocessorDefinitions;
+                /*fs.defines += ';' + i.preprocessorDefinitions;
                 if (i.enhancedInstructionSet == "StreamingSIMDExtensions")
                     fs.defines += ";__SSE__";
                 else if (i.enhancedInstructionSet == "StreamingSIMDExtensions2")
@@ -858,8 +859,9 @@ bool ImportProject::importVcxproj(const std::string &filename, std::map<std::str
                 else if (i.enhancedInstructionSet == "AdvancedVectorExtensions512")
                     fs.defines += ";__AVX512__";
                 additionalIncludePaths += ';' + i.additionalIncludePaths;
+                 */
             }
-            fsSetDefines(fs, fs.defines);
+            //fsSetDefines(fs, fs.defines);
             fsSetIncludePaths(fs, Path::getPathFromFilename(filename), toStringList(includePath + ';' + additionalIncludePaths), variables);
             for (const auto &path : sharedItemsIncludePaths) {
                 fs.includePaths.emplace_back(path);
@@ -1277,10 +1279,10 @@ bool ImportProject::importCppcheckGuiProject(std::istream &istr, Settings *setti
         else if (strcmp(name, CppcheckXml::IncludeDirElementName) == 0)
             temp.includePaths = readXmlStringList(node, path, CppcheckXml::DirElementName, CppcheckXml::DirNameAttrib);
         else if (strcmp(name, CppcheckXml::DefinesElementName) == 0)
-            temp.userDefines = join(readXmlStringList(node, "", CppcheckXml::DefineName, CppcheckXml::DefineNameAttrib), ";");
+            temp.userDefines;// = join(readXmlStringList(node, "", CppcheckXml::DefineName, CppcheckXml::DefineNameAttrib), ";");
         else if (strcmp(name, CppcheckXml::UndefinesElementName) == 0) {
-            for (const std::string &u : readXmlStringList(node, "", CppcheckXml::UndefineName, nullptr))
-                temp.userUndefs.insert(u);
+            //for (const std::string &u : readXmlStringList(node, "", CppcheckXml::UndefineName, nullptr))
+            //    temp.userUndefs.insert(u);
         } else if (strcmp(name, CppcheckXml::ImportProjectElementName) == 0) {
             const std::string t_str = empty_if_null(node->GetText());
             if (!t_str.empty())
@@ -1390,7 +1392,7 @@ bool ImportProject::importCppcheckGuiProject(std::istream &istr, Settings *setti
     settings->buildDir = temp.buildDir;
     settings->includePaths = temp.includePaths;
     settings->userDefines = temp.userDefines;
-    settings->userUndefs = temp.userUndefs;
+    //settings->userUndefs = temp.userUndefs;
     settings->addons = temp.addons;
     settings->clang = temp.clang;
     settings->clangTidy = temp.clangTidy;
