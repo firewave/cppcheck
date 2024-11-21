@@ -509,7 +509,7 @@ static const simplecpp::Token *gotoEndIf(const simplecpp::Token *cmdtok)
     return nullptr;
 }
 
-static void getConfigs(const simplecpp::TokenList &tokens, std::set<std::string> &defined, const std::string &userDefines, const std::set<std::string> &undefined, std::set<std::string> &ret)
+static void getConfigs(const simplecpp::TokenList &tokens, std::set<std::string> &defined, const std::list<Settings::Define> &userDefines, std::set<std::string> &ret)
 {
     std::vector<std::string> configs_if;
     std::vector<std::string> configs_ifndef;
@@ -595,8 +595,8 @@ static void getConfigs(const simplecpp::TokenList &tokens, std::set<std::string>
             if (!configs_if.empty())
                 configs_if.pop_back();
             if (cmdtok->str() == "elif") {
-                std::string config = readcondition(cmdtok, defined, undefined);
-                if (isUndefined(config,undefined))
+                std::string config = readcondition(cmdtok, defined);
+                if (isUndefined(config,defined))
                     config.clear();
                 configs_if.push_back(std::move(config));
                 ret.insert(cfg(configs_if, userDefines));
@@ -660,11 +660,11 @@ std::set<std::string> Preprocessor::getConfigs(const simplecpp::TokenList &token
 
     std::set<std::string> defined = { "__cplusplus" };
 
-    ::getConfigs(tokens, defined, mSettings.userDefines, mSettings.userUndefs, ret);
+    ::getConfigs(tokens, defined, mSettings.userDefines, ret);
 
     for (std::map<std::string, simplecpp::TokenList*>::const_iterator it = mTokenLists.cbegin(); it != mTokenLists.cend(); ++it) {
         if (!mSettings.configurationExcluded(it->first))
-            ::getConfigs(*(it->second), defined, mSettings.userDefines, mSettings.userUndefs, ret);
+            ::getConfigs(*(it->second), defined, mSettings.userDefines, ret);
     }
 
     return ret;
