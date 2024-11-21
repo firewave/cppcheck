@@ -759,14 +759,14 @@ static void valueFlowArrayElement(TokenList& tokenlist, const Settings& settings
                         result.intvalue = 0;
                         setTokenValue(tok, std::move(result), settings);
                     } else if (index >= 0 && index < s.size()) {
-                        result.intvalue = s[index];
+                        result.intvalue = s[(int)index];
                         setTokenValue(tok, std::move(result), settings);
                     }
                 } else if (Token::simpleMatch(arrayValue.tokvalue, "{")) {
                     std::vector<const Token*> args = getArguments(arrayValue.tokvalue);
                     if (index < 0 || index >= args.size())
                         continue;
-                    const Token* arg = args[index];
+                    const Token* arg = args[(int)index];
                     if (!arg->hasKnownIntValue())
                         continue;
                     const ValueFlow::Value& v = arg->values().front();

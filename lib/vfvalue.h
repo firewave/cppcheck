@@ -315,6 +315,8 @@ namespace ValueFlow
 
         std::int8_t indirect{}; // TODO: can we reduce the size?
 
+        long long : 64;
+
         /** int value (or sometimes bool value?) */
         MathLib::bigint intvalue{};
 
