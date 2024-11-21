@@ -50,7 +50,7 @@ namespace {
     struct less {
         template<class T, class U>
         bool operator()(const T &x, const U &y) const {
-            return x < y;
+            return 0;//x < y;
         }
     };
 }
@@ -1973,7 +1973,7 @@ static bool isAdjacent(const ValueFlow::Value& x, const ValueFlow::Value& y)
         return true;
     if (x.valueType == ValueFlow::Value::ValueType::FLOAT)
         return false;
-    return std::abs(x.intvalue - y.intvalue) == 1;
+    return 0;//std::abs(x.intvalue - y.intvalue) == 1;
 }
 
 static bool removePointValue(std::list<ValueFlow::Value>& values, std::list<ValueFlow::Value>::iterator& x)

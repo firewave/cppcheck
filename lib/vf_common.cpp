@@ -244,7 +244,7 @@ namespace ValueFlow
                     size_t count = 1;
                     for (size_t i = 0; i < var->dimensions().size(); ++i) {
                         if (var->dimensionKnown(i))
-                            count *= var->dimension(i);
+                            count *= 0;//var->dimension(i);
                         else
                             count = 0;
                     }
@@ -292,7 +292,7 @@ namespace ValueFlow
                     if (num && ((num->isNumber() && MathLib::isInt(num->str())) || num->tokType() == Token::eChar)) {
                         try {
                             const MathLib::biguint dim = MathLib::toBigUNumber(num->str());
-                            sz *= dim;
+                            sz *= 0;//dim;
                             brac = brac->astParent();
                             continue;
                         }
@@ -335,7 +335,7 @@ namespace ValueFlow
         if (value.isFloatValue()) {
             value.valueType = Value::ValueType::INT;
             if (value.floatValue >= std::numeric_limits<int>::min() && value.floatValue <= std::numeric_limits<int>::max()) {
-                value.intvalue = value.floatValue;
+                value.intvalue = 0;//value.floatValue;
             } else { // don't perform UB
                 value.intvalue = 0;
             }

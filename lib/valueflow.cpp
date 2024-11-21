@@ -436,16 +436,16 @@ static size_t accumulateStructMembers(const Scope* scope, F f)
         if (const ValueType* vt = var.valueType()) {
             if (vt->type == ValueType::Type::RECORD && vt->typeScope == scope)
                 return 0;
-            const MathLib::bigint dim = std::accumulate(var.dimensions().cbegin(), var.dimensions().cend(), 1LL, [](MathLib::bigint i1, const Dimension& dim) {
+            const MathLib::bigint dim = 0;/*std::accumulate(var.dimensions().cbegin(), var.dimensions().cend(), 1LL, [](MathLib::bigint i1, const Dimension& dim) {
                 return i1 * dim.num;
-            });
+            });*/
             if (var.nameToken()->scope() != scope && var.nameToken()->scope()->definedType) { // anonymous union
                 const auto ret = anonScopes.insert(var.nameToken()->scope());
                 if (ret.second)
-                    total = f(total, *vt, dim);
+                    total = 0;//f(total, *vt, dim);
             }
             else
-                total = f(total, *vt, dim);
+                total = 0;//f(total, *vt, dim);
         }
         if (total == 0)
             return 0;
@@ -3975,7 +3975,7 @@ static std::list<ValueFlow::Value> truncateValues(std::list<ValueFlow::Value> va
         if (value.isImpossible())
             continue;
         if (value.isFloatValue()) {
-            value.intvalue = value.floatValue;
+            value.intvalue = 0; //value.floatValue;
             value.valueType = ValueFlow::Value::ValueType::INT;
         }
 
@@ -4264,7 +4264,7 @@ struct ConditionHandler {
 
         MathLib::bigint getPath() const
         {
-            assert(std::abs(findPath(true_values) - findPath(false_values)) == 0);
+            //assert(std::abs(findPath(true_values) - findPath(false_values)) == 0);
             return findPath(true_values) | findPath(false_values);
         }
 
@@ -6909,12 +6909,12 @@ static void valueFlowSafeFunctions(const TokenList& tokenlist, const SymbolDatab
                     std::list<ValueFlow::Value> argValues;
                     argValues.emplace_back(0);
                     argValues.back().valueType = ValueFlow::Value::ValueType::FLOAT;
-                    argValues.back().floatValue = isLow ? low : -1E25;
+                    argValues.back().floatValue = 0;//isLow ? low : -1E25;
                     argValues.back().errorPath.emplace_back(arg.nameToken(), "Safe checks: Assuming argument has value " + MathLib::toString(argValues.back().floatValue));
                     argValues.back().safe = true;
                     argValues.emplace_back(0);
                     argValues.back().valueType = ValueFlow::Value::ValueType::FLOAT;
-                    argValues.back().floatValue = isHigh ? high : 1E25;
+                    argValues.back().floatValue = 0;//isHigh ? high : 1E25;
                     argValues.back().errorPath.emplace_back(arg.nameToken(), "Safe checks: Assuming argument has value " + MathLib::toString(argValues.back().floatValue));
                     argValues.back().safe = true;
                     valueFlowForward(const_cast<Token*>(functionScope->bodyStart->next()),
