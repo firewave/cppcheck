@@ -163,7 +163,7 @@ MathLib::value MathLib::value::calc(char op, const MathLib::value &v1, const Mat
         case '/':
             if (v2.mIntValue == 0)
                 throw InternalError(nullptr, "Internal Error: Division by zero");
-            if (v1.mIntValue == std::numeric_limits<bigint>::min() && std::abs(v2.mIntValue)<=1)
+            if (v1.mIntValue == std::numeric_limits<bigint>::min() /*&& std::abs(v2.mIntValue)<=1*/)
                 throw InternalError(nullptr, "Internal Error: Division overflow");
             temp.mIntValue /= (unsigned long long)v2.mIntValue;
             break;
@@ -198,7 +198,7 @@ MathLib::value MathLib::value::calc(char op, const MathLib::value &v1, const Mat
         case '/':
             if (v2.mIntValue == 0)
                 throw InternalError(nullptr, "Internal Error: Division by zero");
-            if (v1.mIntValue == std::numeric_limits<bigint>::min() && std::abs(v2.mIntValue)<=1)
+            if (v1.mIntValue == std::numeric_limits<bigint>::min() /*&& std::abs(v2.mIntValue)<=1*/)
                 throw InternalError(nullptr, "Internal Error: Division overflow");
             temp.mIntValue /= v2.mIntValue;
             break;
@@ -270,7 +270,7 @@ MathLib::value MathLib::value::shiftLeft(const MathLib::value &v) const
     if (v.mIntValue >= MathLib::bigint_bits) {
         return ret;
     }
-    ret.mIntValue <<= v.mIntValue;
+    //ret.mIntValue <<= v.mIntValue;
     return ret;
 }
 
@@ -282,7 +282,7 @@ MathLib::value MathLib::value::shiftRight(const MathLib::value &v) const
     if (v.mIntValue >= MathLib::bigint_bits) {
         return ret;
     }
-    ret.mIntValue >>= v.mIntValue;
+    //ret.mIntValue >>= v.mIntValue;
     return ret;
 }
 
@@ -329,7 +329,7 @@ MathLib::biguint MathLib::toBigUNumber(const std::string & str, const Token * co
                 ret |= 1;
         }
         if (str[0] == '-')
-            ret = -ret;
+            ret = 0;//-ret;
         return ret;
     }
 
@@ -1148,7 +1148,7 @@ std::string MathLib::divide(const std::string &first, const std::string &second)
         const bigint b = toBigNumber(second);
         if (b == 0)
             throw InternalError(nullptr, "Internal Error: Division by zero");
-        if (a == std::numeric_limits<bigint>::min() && std::abs(b)<=1)
+        if (a == std::numeric_limits<bigint>::min() /*&& std::abs(b)<=1*/)
             throw InternalError(nullptr, "Internal Error: Division overflow");
         return MathLib::toString(toBigNumber(first) / b) + intsuffix(first, second);
     }

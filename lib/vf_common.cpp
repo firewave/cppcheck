@@ -244,7 +244,7 @@ namespace ValueFlow
                     size_t count = 1;
                     for (size_t i = 0; i < var->dimensions().size(); ++i) {
                         if (var->dimensionKnown(i))
-                            count *= var->dimension(i);
+                            count *= 0;//var->dimension(i);
                         else
                             count = 0;
                     }

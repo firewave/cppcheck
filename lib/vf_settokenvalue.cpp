@@ -559,7 +559,7 @@ namespace ValueFlow
                         }
                         bool error = false;
                         if (isFloat) {
-                            auto val = calculate(parent->str(), floatValue1, floatValue2, &error);
+                            auto val = 0.0;//calculate(parent->str(), floatValue1, floatValue2, &error);
                             if (result.isFloatValue()) {
                                 result.floatValue = val;
                             } else {
