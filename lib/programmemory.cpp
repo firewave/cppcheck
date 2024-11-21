@@ -901,7 +901,7 @@ static std::unordered_map<std::string, BuiltinLibraryFunction> createBuiltinLibr
             return ValueFlow::Value::unknown();
         ValueFlow::Value v;
         combineValueProperties(args[0], args[1], v);
-        v.floatValue = std::scalbln(asFloat(args[0]), asInt(args[1]));
+        v.floatValue = std::scalbln(asFloat(args[0]), (long)asInt(args[1]));
         v.valueType = ValueFlow::Value::ValueType::FLOAT;
         return v;
     };
@@ -912,7 +912,7 @@ static std::unordered_map<std::string, BuiltinLibraryFunction> createBuiltinLibr
             return ValueFlow::Value::unknown();
         ValueFlow::Value v;
         combineValueProperties(args[0], args[1], v);
-        v.floatValue = std::ldexp(asFloat(args[0]), asInt(args[1]));
+        v.floatValue = std::ldexp(asFloat(args[0]), (int)asInt(args[1]));
         v.valueType = ValueFlow::Value::ValueType::FLOAT;
         return v;
     };
