@@ -149,6 +149,10 @@ MathLib::value operator^(const MathLib::value &v1, const MathLib::value &v2);
 MathLib::value operator<<(const MathLib::value &v1, const MathLib::value &v2);
 MathLib::value operator>>(const MathLib::value &v1, const MathLib::value &v2);
 
+#if defined(HAVE_BOOST) && defined(HAVE_BOOST_INT128)
+template<> CPPCHECKLIB std::string MathLib::toString<MathLib::bigint>(MathLib::bigint value);
+template<> CPPCHECKLIB std::string MathLib::toString<MathLib::biguint>(MathLib::biguint value);
+#endif
 template<> CPPCHECKLIB std::string MathLib::toString<double>(double value);
 
 /// @}
