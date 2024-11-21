@@ -391,7 +391,6 @@ CmdLineParser::Result CmdLineParser::parseFromArgs(int argc, const char* const a
                 }
 
                 Settings::Define def;
-                def.def = define;
                 // TODO
 
                 // No "=", append a "=1"
@@ -457,7 +456,6 @@ CmdLineParser::Result CmdLineParser::parseFromArgs(int argc, const char* const a
                 }
 
                 Settings::Define def;
-                def.def = undef;
                 def.undef = true;
                 def.value = undef;
 

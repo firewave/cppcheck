@@ -399,9 +399,8 @@ public:
 
     struct Define
     {
-        std::string def;
-        bool undef{false};
         std::string name;
+        bool undef{false};
         std::string value;
     };
 
