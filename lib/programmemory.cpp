@@ -575,7 +575,7 @@ static bool isNumericValue(const ValueFlow::Value& value) {
 
 static double asFloat(const ValueFlow::Value& value)
 {
-    return value.isFloatValue() ? value.floatValue : value.intvalue;
+    return 0;//value.isFloatValue() ? value.floatValue : value.intvalue;
 }
 
 static std::string removeAssign(const std::string& assign) {
@@ -587,7 +587,7 @@ namespace {
         template<class T, class U>
         void operator()(T& x, const U& y) const
         {
-            x = y;
+            //x = y;
         }
     };
 }
@@ -612,7 +612,7 @@ static ValueFlow::Value evaluate(const std::string& op, const ValueFlow::Value& 
         if (lhs.isFloatValue() || rhs.isFloatValue()) {
             result.valueType = ValueFlow::Value::ValueType::FLOAT;
             bool error = false;
-            result.floatValue = calculate(op, asFloat(lhs), asFloat(rhs), &error);
+            result.floatValue = 0; //calculate(op, asFloat(lhs), asFloat(rhs), &error);
             if (error)
                 return ValueFlow::Value::unknown();
             return result;
@@ -704,8 +704,8 @@ static std::unordered_map<std::string, BuiltinLibraryFunction> createBuiltinLibr
         const ValueFlow::Value& len = args[2];
         if (!len.isIntValue())
             return ValueFlow::Value::unknown();
-        ValueFlow::Value v(getStringLiteral(lhs.tokvalue->str())
-                           .compare(0, len.intvalue, getStringLiteral(rhs.tokvalue->str()), 0, len.intvalue));
+        ValueFlow::Value v;//(getStringLiteral(lhs.tokvalue->str())
+                           //.compare(0, len.intvalue, getStringLiteral(rhs.tokvalue->str()), 0, len.intvalue));
         ValueFlow::combineValueProperties(lhs, rhs, v);
         return v;
     };
@@ -715,7 +715,7 @@ static std::unordered_map<std::string, BuiltinLibraryFunction> createBuiltinLibr
         ValueFlow::Value v = args[0];
         if (!v.isFloatValue() && !v.isIntValue())
             return ValueFlow::Value::unknown();
-        const double value = args[0].isFloatValue() ? args[0].floatValue : args[0].intvalue;
+        const double value = 0;//args[0].isFloatValue() ? args[0].floatValue : args[0].intvalue;
         v.floatValue = std::sin(value);
         v.valueType = ValueFlow::Value::ValueType::FLOAT;
         return v;
@@ -726,7 +726,7 @@ static std::unordered_map<std::string, BuiltinLibraryFunction> createBuiltinLibr
         ValueFlow::Value v = args[0];
         if (!v.isFloatValue() && !v.isIntValue())
             return ValueFlow::Value::unknown();
-        const double value = args[0].isFloatValue() ? args[0].floatValue : args[0].intvalue;
+        const double value = 0;//args[0].isFloatValue() ? args[0].floatValue : args[0].intvalue;
         v.floatValue = std::lgamma(value);
         v.valueType = ValueFlow::Value::ValueType::FLOAT;
         return v;
@@ -737,7 +737,7 @@ static std::unordered_map<std::string, BuiltinLibraryFunction> createBuiltinLibr
         ValueFlow::Value v = args[0];
         if (!v.isFloatValue() && !v.isIntValue())
             return ValueFlow::Value::unknown();
-        const double value = args[0].isFloatValue() ? args[0].floatValue : args[0].intvalue;
+        const double value = 0;//args[0].isFloatValue() ? args[0].floatValue : args[0].intvalue;
         v.floatValue = std::cos(value);
         v.valueType = ValueFlow::Value::ValueType::FLOAT;
         return v;
@@ -748,7 +748,7 @@ static std::unordered_map<std::string, BuiltinLibraryFunction> createBuiltinLibr
         ValueFlow::Value v = args[0];
         if (!v.isFloatValue() && !v.isIntValue())
             return ValueFlow::Value::unknown();
-        const double value = args[0].isFloatValue() ? args[0].floatValue : args[0].intvalue;
+        const double value = 0;//args[0].isFloatValue() ? args[0].floatValue : args[0].intvalue;
         v.floatValue = std::tan(value);
         v.valueType = ValueFlow::Value::ValueType::FLOAT;
         return v;
