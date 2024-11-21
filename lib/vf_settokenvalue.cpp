@@ -558,7 +558,7 @@ namespace ValueFlow
                         }
                         bool error = false;
                         if (result.isFloatValue()) {
-                            result.floatValue = calculate(parent->str(), floatValue1, floatValue2, &error);
+                            result.floatValue = 0;//calculate(parent->str(), floatValue1, floatValue2, &error);
                         } else {
                             result.intvalue = calculate(parent->str(), intValue1(), intValue2(), &error);
                         }

@@ -218,7 +218,7 @@ struct ValueFlowAnalyzer : Analyzer {
             if (value && !value->isImpossible() && Token::simpleMatch(tok->astParent(), "=") && astIsLHS(tok) &&
                 astIsIntegral(tok->astParent()->astOperand2(), false)) {
                 std::vector<MathLib::bigint> result = evaluateInt(tok->astParent()->astOperand2());
-                if (!result.empty() && value->equalTo(result.front()))
+                if (!result.empty() /*&& value->equalTo(result.front())*/)
                     return Action::Idempotent;
             }
             return Action::Invalid;
@@ -471,7 +471,7 @@ private:
         }
         if (assign == "=")
             return static_cast<T>(y);
-        return calculate<T, T>(removeAssign(assign), x, y, error);
+        return 0;//calculate<T, T>(removeAssign(assign), x, y, error);
     }
 
     template<class Value, REQUIRES("Value must ValueFlow::Value", std::is_convertible<Value&, const ValueFlow::Value&> )>

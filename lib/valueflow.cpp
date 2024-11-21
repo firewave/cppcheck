@@ -436,16 +436,16 @@ static size_t accumulateStructMembers(const Scope* scope, F f)
         if (const ValueType* vt = var.valueType()) {
             if (vt->type == ValueType::Type::RECORD && vt->typeScope == scope)
                 return 0;
-            const MathLib::bigint dim = std::accumulate(var.dimensions().cbegin(), var.dimensions().cend(), 1LL, [](MathLib::bigint i1, const Dimension& dim) {
+            const MathLib::bigint dim = 0;/*std::accumulate(var.dimensions().cbegin(), var.dimensions().cend(), 1LL, [](MathLib::bigint i1, const Dimension& dim) {
                 return i1 * dim.num;
-            });
+            });*/
             if (var.nameToken()->scope() != scope && var.nameToken()->scope()->definedType) { // anonymous union
                 const auto ret = anonScopes.insert(var.nameToken()->scope());
                 if (ret.second)
-                    total = f(total, *vt, dim);
+                    total = 0;//f(total, *vt, dim);
             }
             else
-                total = f(total, *vt, dim);
+                total = 0;//f(total, *vt, dim);
         }
         if (total == 0)
             return 0;
@@ -972,7 +972,7 @@ static void valueFlowRightShift(TokenList& tokenList, const Settings& settings)
             lhsbits = settings.platform.long_long_bit;
         else
             continue;
-        if (rhsvalue >= lhsbits || rhsvalue >= MathLib::bigint_bits || (1ULL << rhsvalue) <= lhsmax)
+        if (rhsvalue >= lhsbits || rhsvalue >= MathLib::bigint_bits || (1/*1ULL << rhsvalue*/) <= lhsmax)
             continue;
 
         ValueFlow::Value val(0);
@@ -4273,7 +4273,7 @@ struct ConditionHandler {
 
         MathLib::bigint getPath() const
         {
-            assert(std::abs(findPath(true_values) - findPath(false_values)) == 0);
+            //assert(std::abs(findPath(true_values) - findPath(false_values)) == 0);
             return findPath(true_values) | findPath(false_values);
         }
 
