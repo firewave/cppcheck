@@ -3920,7 +3920,7 @@ static std::list<ValueFlow::Value> truncateValues(std::list<ValueFlow::Value> va
         if (value.isImpossible())
             continue;
         if (value.isFloatValue()) {
-            value.intvalue = value.floatValue;
+            value.intvalue = static_cast<long long>(value.floatValue);
             value.valueType = ValueFlow::Value::ValueType::INT;
         }
 
