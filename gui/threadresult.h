@@ -130,7 +130,7 @@ protected:
      * @brief Mutex
      *
      */
-    mutable std::mutex mutex;
+    mutable std::mutex mutex; // TODO: annotate fields guarded by this
 
     /**
      * @brief List of files to check

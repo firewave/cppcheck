@@ -286,7 +286,7 @@ public:
 private:
     mutable std::mutex mSuppressionsSync;
     /** @brief List of error which the user doesn't want to see. */
-    std::list<Suppression> mSuppressions;
+    std::list<Suppression> mSuppressions GUARDED_BY(mSuppressionsSync);
 };
 
 struct Suppressions

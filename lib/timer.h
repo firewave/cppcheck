@@ -66,7 +66,7 @@ public:
     void reset();
 
 private:
-    std::map<std::string, TimerResultsData> mResults;
+    std::map<std::string, TimerResultsData> mResults GUARDED_BY(mResultsSync);
     mutable std::mutex mResultsSync;
 };
 
