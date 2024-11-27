@@ -128,7 +128,7 @@
 // requires standards library with thread safety annotations (i.e. libc++)
 // before Clang 20 the annotations were not enabled unconditionally
 // and required _LIBCPP_ENABLE_THREAD_SAFETY_ANNOTATIONS to be set
-#if defined(__clang__) && (__clang_major__ >= 20) && defined(_LIBCPP_VERSION)
+#if defined(__clang__) && (defined(_LIBCPP_ENABLE_THREAD_SAFETY_ANNOTATIONS) || (__clang_major__ >= 20)) && defined(_LIBCPP_VERSION)
 #  define GUARDED_BY(x) __attribute__((guarded_by(x)))
 #else
 #  define GUARDED_BY(x)

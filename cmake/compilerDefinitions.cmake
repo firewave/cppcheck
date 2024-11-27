@@ -31,6 +31,11 @@ if(CMAKE_CXX_COMPILER_ID MATCHES "Clang" AND USE_LIBCXX)
     add_definitions(-D_LIBCPP_REMOVE_TRANSITIVE_INCLUDES)
 endif()
 
+if(USE_LIBCXX)
+    # starting with Clang 20 it is enabled unconditionally
+    add_definitions(-D_LIBCPP_ENABLE_THREAD_SAFETY_ANNOTATIONS)
+endif()
+
 if(HAVE_RULES)
     add_definitions(-DHAVE_RULES)
 endif()
