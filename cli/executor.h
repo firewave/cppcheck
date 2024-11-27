@@ -19,6 +19,8 @@
 #ifndef EXECUTOR_H
 #define EXECUTOR_H
 
+#include "config.h"
+
 #include <cstddef>
 #include <list>
 #include <mutex>
@@ -76,7 +78,7 @@ protected:
 private:
     std::mutex mErrorListSync;
     // TODO: store hashes instead of the full messages
-    std::unordered_set<std::string> mErrorList;
+    std::unordered_set<std::string> mErrorList GUARDED_BY(mErrorListSync);
 };
 
 /// @}

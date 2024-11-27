@@ -72,7 +72,7 @@ public:
     }
 
 private:
-    std::mutex mReportSync;
+    std::mutex mReportSync; // TODO: annotate fields guarded by this
     ThreadExecutor &mThreadExecutor;
     ErrorLogger &mErrorLogger;
 };
@@ -149,7 +149,7 @@ private:
     std::size_t mProcessedSize{};
     std::size_t mTotalFileSize{};
 
-    std::mutex mFileSync;
+    std::mutex mFileSync; // TODO: anootate fields guarded by this
     const Settings &mSettings;
     CppCheck::ExecuteCmdFn mExecuteCommand;
 
