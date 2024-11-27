@@ -29,6 +29,11 @@ if(CPPCHK_GLIBCXX_DEBUG AND UNIX AND CMAKE_BUILD_TYPE STREQUAL "Debug")
     endif()
 endif()
 
+if(USE_LIBCXX)
+    # starting with Clang 20 it is enabled unconditionally
+    add_definitions(-D_LIBCPP_ENABLE_THREAD_SAFETY_ANNOTATIONS)
+endif()
+
 if(HAVE_RULES)
     add_definitions(-DHAVE_RULES)
 endif()
