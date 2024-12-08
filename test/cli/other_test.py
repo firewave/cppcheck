@@ -2269,3 +2269,31 @@ def test_dumpfile_platform(tmpdir):
                 break
     assert ' wchar_t_bit="' in platform
     assert ' size_t_bit="' in platform
+
+
+def __test_inline_suppr(tmp_path, extra_args):
+    test_file = tmp_path / 'test.c'
+    with open(test_file, 'wt') as f:
+        f.write("""
+void f() {
+  // cppcheck-suppress memleak
+}
+""")
+
+    args = [
+        '-q',
+        '--template=simple',
+        '--enable=information',
+        '--inline-suppr',
+        str(test_file)
+    ]
+
+    exitcode, stdout, stderr, = cppcheck(args)
+    assert exitcode == 0
+    assert stdout == ''
+    assert stderr.splitlines() == [
+        '{}:4:0: information: Unmatched suppression: memleak [unmatchedSuppression]'.format(test_file)
+    ]
+
+def test_inline_suppr_builddir(tmp_path):
+    __test_inline_suppr(tmp_path, [''])
