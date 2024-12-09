@@ -128,6 +128,12 @@ jobs:
           # TODO: remove -stdlib= - it should have been taken from the compilation database
           iwyu_tool -p cmake.output -j $(nproc) -- -w -Xiwyu --max_line_length=1024 -Xiwyu --comment_style=long -Xiwyu --quoted_includes_first -Xiwyu --update_comments -stdlib=${{ matrix.stdlib }} > iwyu.log
 
+      - name: include-what-you-use
+        run: |
+          include-what-you-use -Xiwyu --max_line_length=1024 -Xiwyu --comment_style=long -Xiwyu --quoted_includes_first -Xiwyu --update_comments -stdlib=${{ matrix.stdlib }} -Ilib democlient/democlient.cpp -- -w >> iwyu.log
+          include-what-you-use -Xiwyu --max_line_length=1024 -Xiwyu --comment_style=long -Xiwyu --quoted_includes_first -Xiwyu --update_comments -stdlib=${{ matrix.stdlib }} -Ilib oss-fuzz/main.cpp -- -w >> iwyu.log
+          include-what-you-use -Xiwyu --max_line_length=1024 -Xiwyu --comment_style=long -Xiwyu --quoted_includes_first -Xiwyu --update_comments -stdlib=${{ matrix.stdlib }} -Ilib -DNO_FUZZ oss-fuzz/main.cpp -- -w >> iwyu.log
+
       - uses: actions/upload-artifact@v4
         if: success() || failure()
         with:
@@ -215,6 +221,15 @@ jobs:
         run: |
           # TODO: run multi-threaded
           find $PWD/cli $PWD/lib $PWD/test $PWD/gui -maxdepth 1 -name "*.cpp" | xargs -t -n 1 clang-include-cleaner-19 --print=changes --extra-arg=-w --extra-arg=-stdlib=${{ matrix.stdlib }} -p cmake.output > clang-include-cleaner.log 2>&1
+
+      - name: clang-include-cleaner
+        run: |
+          echo democlient/democlient.cpp >> clang-include-cleaner.log
+          clang-include-cleaner-19 --print=changes --extra-arg=-w --extra-arg=-stdlib=${{ matrix.stdlib }} -Ilib democlient/democlient.cpp >> clang-include-cleaner.log
+          echo oss-fuzz/main.cpp >> clang-include-cleaner.log
+          clang-include-cleaner-19 --print=changes --extra-arg=-w --extra-arg=-stdlib=${{ matrix.stdlib }} -Ilib oss-fuzz/main.cpp >> clang-include-cleaner.log
+          echo oss-fuzz/main.cpp >> clang-include-cleaner.log
+          clang-include-cleaner-19 --print=changes --extra-arg=-w --extra-arg=-stdlib=${{ matrix.stdlib }} -Ilib -DNO_FUZZ oss-fuzz/main.cpp >> clang-include-cleaner.log
 
       - uses: actions/upload-artifact@v4
         if: success() || failure()
