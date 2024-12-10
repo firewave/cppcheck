@@ -56,7 +56,7 @@ SymbolDatabase::SymbolDatabase(Tokenizer& tokenizer, const Settings& settings, E
     : mTokenizer(tokenizer), mSettings(settings), mErrorLogger(errorLogger)
 {
     if (!mTokenizer.tokens())
-        return;
+        return; // TODO: add bailout message
 
     if (mSettings.platform.defaultSign == 's' || mSettings.platform.defaultSign == 'S')
         mDefaultSignedness = ValueType::SIGNED;
