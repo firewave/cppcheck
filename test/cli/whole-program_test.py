@@ -290,8 +290,7 @@ def test_checkclass_builddir_j(tmpdir):
     os.mkdir(build_dir)
     __test_checkclass(['-j2', '--cppcheck-build-dir={}'.format(build_dir)])
 
-
-def __test_checkclass_project(tmpdir, extra_args):
+def __test_ctu_one_definition_rule_violation_project(tmpdir, extra_args):
     odr_file_1 = os.path.join(__script_dir, 'whole-program', 'odr1.cpp')
 
     compile_db = __create_compile_commands(tmpdir, [
@@ -318,25 +317,69 @@ def __test_checkclass_project(tmpdir, extra_args):
     assert ret == 1, stdout
 
 
-def test_checkclass_project(tmpdir):
-    __test_checkclass_project(tmpdir, ['-j1'])
+def test_ctu_one_definition_rule_violation_project(tmpdir):
+    __test_ctu_one_definition_rule_violation_project(tmpdir, ['-j1'])
 
 
 @pytest.mark.xfail(strict=True) # TODO: check error
-def test_checkclass_project_j(tmpdir):
-    __test_checkclass_project(tmpdir, ['-j2', '--no-cppcheck-build-dir'])
+def test_ctu_one_definition_rule_violation_project_j(tmpdir):
+    __test_ctu_one_definition_rule_violation_project(tmpdir, ['-j2', '--no-cppcheck-build-dir'])
 
 
-def test_checkclass_project_builddir(tmpdir):
+def test_ctu_one_definition_rule_violation_project_builddir(tmpdir):
     build_dir = os.path.join(tmpdir, 'b1')
     os.mkdir(build_dir)
-    __test_checkclass_project(tmpdir, ['-j1', '--cppcheck-build-dir={}'.format(build_dir)])
+    __test_ctu_one_definition_rule_violation_project(tmpdir, ['-j1', '--cppcheck-build-dir={}'.format(build_dir)])
 
 
-def test_checkclass_project_builddir_j(tmpdir):
+def test_ctu_one_definition_rule_violation_project_builddir_j(tmpdir):
     build_dir = os.path.join(tmpdir, 'b1')
     os.mkdir(build_dir)
-    __test_checkclass_project(tmpdir, ['-j2', '--cppcheck-build-dir={}'.format(build_dir)])
+    __test_ctu_one_definition_rule_violation_project(tmpdir, ['-j2', '--cppcheck-build-dir={}'.format(build_dir)])
+
+
+def test_ctu_array_index(tmp_path):
+    test_file_1 = tmp_path / 'test_file_1.c'
+    with open(test_file_1, 'wt') as f:
+        f.write("""
+#include "do_stuff.h"
+
+int main()
+{
+    char buf[4];
+    do_stuff(buf);
+}
+""")
+
+    test_header = tmp_path / 'do_stuff.h'
+    with open(test_header, 'wt') as f:
+        f.write("""
+void do_stuff(char *p);
+""")
+
+    test_file_2 = tmp_path / 'do_stuff.c'
+    with open(test_file_2, 'wt') as f:
+        f.write("""
+void do_stuff(char *p)
+{
+  p[-3] = 0;
+}
+""")
+
+    args = [
+        '-q',
+        '--template=simple',
+        '--enable=information,style',
+        '--error-exitcode=1',
+        str(test_file_1),
+        str(test_file_2)
+    ]
+
+    ret, stdout, stderr = cppcheck(args)
+    assert stderr.splitlines() == [
+    ]
+    assert stdout == ''
+    assert ret == 1, stdout
 
 def test_ctu_odr_config():
     args = [
