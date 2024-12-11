@@ -8,9 +8,10 @@ from testutils import cppcheck
 __script_dir = os.path.dirname(os.path.abspath(__file__))
 
 # TODO: use dedicated addon
-# TODO: test CheckNullPointer
-# TODO: test CheckUninitVar
-# TODO: test CheckBufferOverrun
+# TODO: test CheckNullPointer - ctunullpointer
+# TODO: test CheckUninitVar - ctuuninitvar
+# TODO: test CheckBufferOverrun - ctuArrayIndex
+# TODO: test CheckBufferOverrun - ctuPointerArith
 
 
 def __create_compile_commands(dir, entries):
