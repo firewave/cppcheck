@@ -2466,3 +2466,88 @@ void f()
     assert stderr.splitlines() == [
         '{}:7:16: error: Null pointer dereference: (int*)0 [nullPointer]'.format(test_file)
     ]
+
+
+
+# TODO: test with -j2
+def test_addon_inline_suppr(tmpdir):
+    test_file = os.path.join(tmpdir, 'test.c')
+    with open(test_file, 'wt') as f:
+        f.write("""
+// cppcheck-suppress misra-c2012-2.3
+typedef int MISRA_5_6_VIOLATION;
+typedef int MISRA_5_6_VIOLATION_1;
+        """)
+
+    args = [
+        '-q',
+        '--template=simple',
+        '--enable=all',
+        '--inline-suppr',
+        '--addon=misra',
+        '-j1',
+        test_file
+    ]
+
+    exitcode, stdout, stderr = cppcheck(args)
+    assert exitcode == 0, stdout
+    assert stdout == ''
+    assert stderr.splitlines() == [
+        '{}:4:1: style: misra violation (use --rule-texts=<file> to get proper output) [misra-c2012-2.3]'.format(test_file),
+    ]
+
+
+def test_addon_line_suppr(tmpdir):
+    test_file = os.path.join(tmpdir, 'test.c')
+    with open(test_file, 'wt') as f:
+        f.write("""
+// cppcheck-suppress misra-c2012-2.3
+typedef int MISRA_5_6_VIOLATION;
+typedef int MISRA_5_6_VIOLATION_1;
+        """)
+
+    args = [
+        '-q',
+        '--template=simple',
+        '--enable=all',
+        '--suppress=misra-c2012-2.3:*:3',
+        '--addon=misra',
+        '-j1',
+        test_file
+    ]
+
+    exitcode, stdout, stderr = cppcheck(args)
+    assert exitcode == 0, stdout
+    assert stdout == ''
+    assert stderr.splitlines() == [
+        '{}:4:1: style: misra violation (use --rule-texts=<file> to get proper output) [misra-c2012-2.3]'.format(test_file),
+    ]
+
+
+def test_addon_line_file_suppr(tmpdir):
+    test_file = os.path.join(tmpdir, 'test.c')
+    with open(test_file, 'wt') as f:
+        f.write("""
+// cppcheck-suppress misra-c2012-2.3
+typedef int MISRA_5_6_VIOLATION;
+typedef int MISRA_5_6_VIOLATION_1;
+        """)
+
+    args = [
+        '-q',
+        '--template=simple',
+        '--enable=all',
+        '--suppress=misra-c2012-2.3:test.c:3',
+        '--addon=misra',
+        '-j1',
+        test_file
+    ]
+
+    exitcode, stdout, stderr = cppcheck(args)
+    assert exitcode == 0, stdout
+    assert stdout == ''
+    assert stderr.splitlines() == [
+        '{}:4:1: style: misra violation (use --rule-texts=<file> to get proper output) [misra-c2012-2.3]'.format(test_file),
+    ]
+
+# TODO: test addon file suppression
