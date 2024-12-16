@@ -2468,7 +2468,6 @@ void f()
     ]
 
 
-
 # TODO: test with -j2
 def test_addon_inline_suppr(tmpdir):
     test_file = os.path.join(tmpdir, 'test.c')
