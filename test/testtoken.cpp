@@ -30,12 +30,10 @@
 
 class TestToken : public TestFixture {
 public:
-    TestToken() : TestFixture("TestToken") {
-        list.setLang(Standards::Language::C);
-    }
+    TestToken() : TestFixture("TestToken") {}
 
 private:
-    /*const*/ TokenList list{&settingsDefault};
+    const TokenList list{&settingsDefault, Standards::Language::C};
 
     std::vector<std::string> arithmeticalOps;
     std::vector<std::string> logicalOps;

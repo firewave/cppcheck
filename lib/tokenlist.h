@@ -54,6 +54,7 @@ class CPPCHECKLIB TokenList {
 public:
     // TODO: pass settings as reference
     explicit TokenList(const Settings* settings);
+    TokenList(const Settings* settings, Standards::Language lang);
     ~TokenList();
 
     TokenList(const TokenList &) = delete;
