@@ -67,6 +67,16 @@ TokenList::TokenList(const Settings* settings)
     }
 }
 
+TokenList::TokenList(const Settings* settings, Standards::Language lang)
+    : mTokensFrontBack(*this)
+    , mSettings(settings)
+    , mLang(lang)
+{
+    if (mSettings && (mSettings->enforcedLang != Standards::Language::None)) {
+        mLang = mSettings->enforcedLang;
+    }
+}
+
 TokenList::~TokenList()
 {
     deallocateTokens();
