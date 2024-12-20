@@ -2532,7 +2532,6 @@ def test_syntax_error_builddir(tmp_path):
     __test_syntax_error(tmp_path, ['--cppcheck-build-dir={}'.format(build_dir), '-j1'])
 
 
-@pytest.mark.xfail(strict=False)
 def test_syntax_error_builddir_cached(tmp_path):
     build_dir = tmp_path / 'b1'
     os.mkdir(build_dir)
