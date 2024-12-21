@@ -34,6 +34,8 @@ class ErrorItem;
  * @brief A base class for reports.
  */
 class Report : public QObject {
+    Q_OBJECT
+
 public:
     enum Type : std::uint8_t {
         TXT,

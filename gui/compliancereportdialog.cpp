@@ -191,7 +191,7 @@ void ComplianceReportDialog::save()
         QSet<QString> allFiles;
         for (const QString &sourcefile: fileList.getFileList())
             addHeaders(sourcefile, allFiles);
-        for (const QString& fileName: allFiles) {
+        for (const QString& fileName: utils::as_const(allFiles)) {
             QFile f(fileName);
             if (f.open(QFile::ReadOnly)) {
                 QCryptographicHash hash(QCryptographicHash::Algorithm::Md5);

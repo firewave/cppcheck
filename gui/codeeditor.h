@@ -145,6 +145,8 @@ private:
 
 
 class LineNumberArea : public QWidget {
+    Q_OBJECT
+
 public:
     explicit LineNumberArea(CodeEditor *editor) : QWidget(editor) {
         mCodeEditor = editor;

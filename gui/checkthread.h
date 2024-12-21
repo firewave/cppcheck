@@ -45,7 +45,6 @@ struct FileSettings;
  *
  */
 class CheckThread : public QThread {
-    Q_OBJECT
 public:
     explicit CheckThread(ThreadResult &result);
 

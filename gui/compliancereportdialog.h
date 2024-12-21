@@ -32,8 +32,6 @@ class QAbstractButton;
 
 class ComplianceReportDialog final : public QDialog
 {
-    Q_OBJECT
-
 public:
     explicit ComplianceReportDialog(ProjectFile* projectFile, QString resultsFile, QString checkersReport);
     ~ComplianceReportDialog() final;
