@@ -1916,13 +1916,13 @@ const ValueFlow::Value * Token::getInvalidValue(const Token *ftok, nonneg int ar
     if (!mImpl->mValues)
         return nullptr;
     const ValueFlow::Value *ret = nullptr;
-    for (auto it = mImpl->mValues->begin(); it != mImpl->mValues->end(); ++it) {
-        if (it->isImpossible())
+    for (auto & value : *mImpl->mValues) {
+        if (value.isImpossible())
             continue;
-        if ((it->isIntValue() && !settings.library.isIntArgValid(ftok, argnr, it->intvalue)) ||
-            (it->isFloatValue() && !settings.library.isFloatArgValid(ftok, argnr, it->floatValue))) {
-            if (!ret || ret->isInconclusive() || (ret->condition && !it->isInconclusive()))
-                ret = &(*it);
+        if ((value.isIntValue() && !settings.library.isIntArgValid(ftok, argnr, value.intvalue)) ||
+            (value.isFloatValue() && !settings.library.isFloatArgValid(ftok, argnr, value.floatValue))) {
+            if (!ret || ret->isInconclusive() || (ret->condition && !value.isInconclusive()))
+                ret = &value;
             if (!ret->isInconclusive() && !ret->condition)
                 break;
         }
@@ -1942,14 +1942,14 @@ const Token *Token::getValueTokenMinStrSize(const Settings &settings, MathLib::b
         return nullptr;
     const Token *ret = nullptr;
     int minsize = INT_MAX;
-    for (auto it = mImpl->mValues->begin(); it != mImpl->mValues->end(); ++it) {
-        if (it->isTokValue() && it->tokvalue && it->tokvalue->tokType() == Token::eString) {
-            const int size = getStrSize(it->tokvalue, settings);
+    for (auto & value : *mImpl->mValues) {
+        if (value.isTokValue() && value.tokvalue && value.tokvalue->tokType() == Token::eString) {
+            const int size = getStrSize(value.tokvalue, settings);
             if (!ret || size < minsize) {
                 minsize = size;
-                ret = it->tokvalue;
+                ret = value.tokvalue;
                 if (path)
-                    *path = it->path;
+                    *path = value.path;
             }
         }
     }

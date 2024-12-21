@@ -234,10 +234,10 @@ private:
         std::list<FileSettings> fileSettings;
 
         std::list<FileWithDetails> filelist;
-        for (auto i = f.cbegin(); i != f.cend(); ++i) {
-            filelist.emplace_back(i->first, Standards::Language::CPP, i->second.size());
+        for (const auto & file : utils::as_const(f)) {
+            filelist.emplace_back(file.first, Standards::Language::CPP, file.second.size());
             if (useFS) {
-                fileSettings.emplace_back(i->first, Standards::Language::CPP, i->second.size());
+                fileSettings.emplace_back(file.first, Standards::Language::CPP, file.second.size());
             }
         }
 
@@ -255,8 +255,8 @@ private:
 
         std::vector<std::unique_ptr<ScopedFile>> scopedfiles;
         scopedfiles.reserve(filelist.size());
-        for (auto i = f.cbegin(); i != f.cend(); ++i)
-            scopedfiles.emplace_back(new ScopedFile(i->first, i->second));
+        for (const auto & file : utils::as_const(f))
+            scopedfiles.emplace_back(new ScopedFile(file.first, file.second));
 
         // clear files list so only fileSettings are used
         if (useFS)
@@ -298,8 +298,8 @@ private:
 
         std::vector<std::unique_ptr<ScopedFile>> scopedfiles;
         scopedfiles.reserve(filelist.size());
-        for (auto i = filelist.cbegin(); i != filelist.cend(); ++i)
-            scopedfiles.emplace_back(new ScopedFile(i->path(), code));
+        for (const auto & file : utils::as_const(filelist))
+            scopedfiles.emplace_back(new ScopedFile(file.path(), code));
 
         // clear files list so only fileSettings are used
         if (useFS)
@@ -342,8 +342,8 @@ private:
 
         std::vector<std::unique_ptr<ScopedFile>> scopedfiles;
         scopedfiles.reserve(filelist.size());
-        for (auto i = filelist.cbegin(); i != filelist.cend(); ++i)
-            scopedfiles.emplace_back(new ScopedFile(i->path(), code));
+        for (const auto & file : utils::as_const(filelist))
+            scopedfiles.emplace_back(new ScopedFile(file.path(), code));
 
         // clear files list so only fileSettings are used
         if (useFS)

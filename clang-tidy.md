@@ -61,10 +61,6 @@ This does not appear to be useful as it is reported on very common code.
 
 It was decided not to apply these.
 
-`modernize-loop-convert`<br/>
-
-These might change the behavior of code which might not be intended (need to file an upstream issue)
-
 `modernize-raw-string-literal`<br/>
 
 This leads to a mismatch of raw string literals and regular ones and does reduce the readability.

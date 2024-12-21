@@ -92,12 +92,12 @@ ErrorMessage::ErrorMessage(const std::list<const Token*>& callstack, const Token
     : id(std::move(id)), severity(severity), cwe(0U), certainty(certainty), hash(0)
 {
     // Format callstack
-    for (auto it = callstack.cbegin(); it != callstack.cend(); ++it) {
+    for (const auto *call : callstack) {
         // --errorlist can provide null values here
-        if (!(*it))
+        if (!call)
             continue;
 
-        callStack.emplace_back(*it, list);
+        callStack.emplace_back(call, list);
     }
 
     if (list && !list->getFiles().empty())
@@ -291,17 +291,17 @@ std::string ErrorMessage::serialize() const
     oss += std::to_string(callStack.size());
     oss += " ";
 
-    for (auto loc = callStack.cbegin(); loc != callStack.cend(); ++loc) {
+    for (const auto & loc : callStack) {
         std::string frame;
-        frame += std::to_string(loc->line);
+        frame += std::to_string(loc.line);
         frame += '\t';
-        frame += std::to_string(loc->column);
+        frame += std::to_string(loc.column);
         frame += '\t';
-        frame += loc->getfile(false);
+        frame += loc.getfile(false);
         frame += '\t';
-        frame += loc->getOrigFile(false);
+        frame += loc.getOrigFile(false);
         frame += '\t';
-        frame += loc->getinfo();
+        frame += loc.getinfo();
         serializeString(oss, frame);
     }
 

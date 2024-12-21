@@ -5489,8 +5489,8 @@ static void valueFlowSwitchVariable(const TokenList& tokenlist,
                                                          "case " + tok->strAt(1) + ": " + vartok->str() + " is " +
                                                          tok->strAt(1) + " here.");
                 }
-                for (auto val = values.cbegin(); val != values.cend(); ++val) {
-                    valueFlowReverse(tokenlist, const_cast<Token*>(scope.classDef), vartok, *val, errorLogger, settings);
+                for (const auto & value : values) {
+                    valueFlowReverse(tokenlist, const_cast<Token*>(scope.classDef), vartok, value, errorLogger, settings);
                 }
                 if (vartok->variable()->scope()) {
                     if (known)

@@ -2955,10 +2955,10 @@ bool TemplateSimplifier::matchSpecialization(
     const std::list<const Token *> & specializations)
 {
     // Is there a matching specialization?
-    for (auto it = specializations.cbegin(); it != specializations.cend(); ++it) {
-        if (!Token::Match(*it, "%name% <"))
+    for (const auto *specialization : specializations) {
+        if (!Token::Match(specialization, "%name% <"))
             continue;
-        const Token *startToken = (*it);
+        const Token *startToken = specialization;
         while (startToken->previous() && !Token::Match(startToken->previous(), "[;{}]"))
             startToken = startToken->previous();
         if (!Token::simpleMatch(startToken, "template <"))
@@ -2968,8 +2968,8 @@ bool TemplateSimplifier::matchSpecialization(
         getTemplateParametersInDeclaration(startToken->tokAt(2), templateParameters);
 
         const Token *instToken = templateInstantiationNameToken->tokAt(2);
-        const Token *declToken = (*it)->tokAt(2);
-        const Token * const endToken = (*it)->next()->findClosingBracket();
+        const Token *declToken = specialization->tokAt(2);
+        const Token * const endToken = specialization->next()->findClosingBracket();
         if (!endToken)
             continue;
         while (declToken != endToken) {
@@ -2990,7 +2990,7 @@ bool TemplateSimplifier::matchSpecialization(
 
         if (declToken && instToken && declToken == endToken && instToken->str() == ">") {
             // specialization matches.
-            return templateDeclarationNameToken == *it;
+            return templateDeclarationNameToken == specialization;
         }
     }
 
@@ -3907,12 +3907,12 @@ void TemplateSimplifier::simplifyTemplates(const std::time_t maxtime)
 
             // get specializations..
             std::list<const Token *> specializations;
-            for (auto iter2 = mTemplateDeclarations.cbegin(); iter2 != mTemplateDeclarations.cend(); ++iter2) {
-                if (iter2->isAlias() || iter2->isFriend())
+            for (const auto & templateDeclaration : mTemplateDeclarations) {
+                if (templateDeclaration.isAlias() || templateDeclaration.isFriend())
                     continue;
 
-                if (iter1->fullName() == iter2->fullName())
-                    specializations.push_back(iter2->nameToken());
+                if (iter1->fullName() == templateDeclaration.fullName())
+                    specializations.push_back(templateDeclaration.nameToken());
             }
 
             const bool instantiated = simplifyTemplateInstantiations(
@@ -3926,22 +3926,22 @@ void TemplateSimplifier::simplifyTemplates(const std::time_t maxtime)
             }
         }
 
-        for (auto it = mInstantiatedTemplates.cbegin(); it != mInstantiatedTemplates.cend(); ++it) {
-            auto decl = std::find_if(mTemplateDeclarations.begin(), mTemplateDeclarations.end(), [&it](const TokenAndName& decl) {
-                return decl.token() == it->token();
+        for (const auto & instantiatedTemplate : mInstantiatedTemplates) {
+            auto decl = std::find_if(mTemplateDeclarations.begin(), mTemplateDeclarations.end(), [&instantiatedTemplate](const TokenAndName& decl) {
+                return decl.token() == instantiatedTemplate.token();
             });
             if (decl != mTemplateDeclarations.end()) {
-                if (it->isSpecialization()) {
+                if (instantiatedTemplate.isSpecialization()) {
                     // delete the "template < >"
-                    Token * tok = it->token();
+                    Token * tok = instantiatedTemplate.token();
                     tok->deleteNext(2);
                     tok->deleteThis();
                 } else {
                     // remove forward declaration if found
-                    auto it1 = mTemplateForwardDeclarationsMap.find(it->token());
+                    auto it1 = mTemplateForwardDeclarationsMap.find(instantiatedTemplate.token());
                     if (it1 != mTemplateForwardDeclarationsMap.end())
                         removeTemplate(it1->second, &mTemplateForwardDeclarationsMap);
-                    removeTemplate(it->token(), &mTemplateForwardDeclarationsMap);
+                    removeTemplate(instantiatedTemplate.token(), &mTemplateForwardDeclarationsMap);
                 }
                 mTemplateDeclarations.erase(decl);
             }

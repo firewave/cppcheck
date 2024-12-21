@@ -210,9 +210,9 @@ void Variables::alias(nonneg int varid1, nonneg int varid2, bool replace)
     }
 
     // var1 gets all var2s aliases
-    for (auto i = var2->_aliases.cbegin(); i != var2->_aliases.cend(); ++i) {
-        if (*i != varid1)
-            var1->_aliases.insert(*i);
+    for (int alias : var2->_aliases) {
+        if (alias != varid1)
+            var1->_aliases.insert(alias);
     }
 
     // var2 is an alias of var1
@@ -247,8 +247,8 @@ void Variables::eraseAliases(nonneg int varid)
     VariableUsage *usage = find(varid);
 
     if (usage) {
-        for (auto aliases = usage->_aliases.cbegin(); aliases != usage->_aliases.cend(); ++aliases)
-            erase(*aliases);
+        for (int alias : usage->_aliases)
+            erase(alias);
     }
 }
 
@@ -327,8 +327,8 @@ void Variables::writeAliases(nonneg int varid, const Token* tok)
     VariableUsage *usage = find(varid);
 
     if (usage) {
-        for (auto aliases = usage->_aliases.cbegin(); aliases != usage->_aliases.cend(); ++aliases) {
-            VariableUsage *aliased = find(*aliases);
+        for (int alias : usage->_aliases) {
+            VariableUsage *aliased = find(alias);
 
             if (aliased) {
                 aliased->_write = true;
@@ -352,8 +352,8 @@ void Variables::use(nonneg int varid, const Token* tok)
         usage->use();
         usage->_lastAccess = tok;
 
-        for (auto aliases = usage->_aliases.cbegin(); aliases != usage->_aliases.cend(); ++aliases) {
-            VariableUsage *aliased = find(*aliases);
+        for (int alias : usage->_aliases) {
+            VariableUsage *aliased = find(alias);
 
             if (aliased) {
                 aliased->use();
@@ -373,8 +373,8 @@ void Variables::modified(nonneg int varid, const Token* tok)
         usage->_modified = true;
         usage->_lastAccess = tok;
 
-        for (auto aliases = usage->_aliases.cbegin(); aliases != usage->_aliases.cend(); ++aliases) {
-            VariableUsage *aliased = find(*aliases);
+        for (int alias : usage->_aliases) {
+            VariableUsage *aliased = find(alias);
 
             if (aliased) {
                 aliased->_modified = true;
@@ -1345,10 +1345,8 @@ void CheckUnusedVar::checkFunctionVariableUsage()
 
 
         // Check usage of all variables in the current scope..
-        for (auto it = variables.varUsage().cbegin();
-             it != variables.varUsage().cend();
-             ++it) {
-            const Variables::VariableUsage &usage = it->second;
+        for (const auto & varusage : variables.varUsage()) {
+            const Variables::VariableUsage &usage = varusage.second;
 
             // variable has been marked as unused so ignore it
             if (usage._var->nameToken()->isAttributeUnused() || usage._var->nameToken()->isAttributeUsed())
@@ -1361,7 +1359,7 @@ void CheckUnusedVar::checkFunctionVariableUsage()
                 continue;
 
             const std::string &varname = usage._var->name();
-            const Variable* var = symbolDatabase->getVariableFromVarId(it->first);
+            const Variable* var = symbolDatabase->getVariableFromVarId(varusage.first);
 
             // variable has had memory allocated for it, but hasn't done
             // anything with that memory other than, perhaps, freeing it

@@ -350,19 +350,19 @@ bool CheckUnusedFunctions::check(const Settings& settings, ErrorLogger& errorLog
     using ErrorParams = std::tuple<std::string, unsigned int, unsigned int, std::string>;
     std::vector<ErrorParams> errors; // ensure well-defined order
 
-    for (auto it = mFunctions.cbegin(); it != mFunctions.cend(); ++it) {
-        const FunctionUsage &func = it->second;
+    for (const auto & function : utils::as_const(mFunctions)) {
+        const FunctionUsage &func = function.second;
         if (func.usedOtherFile || func.filename.empty())
             continue;
-        if (settings.library.isentrypoint(it->first))
+        if (settings.library.isentrypoint(function.first))
             continue;
         if (!func.usedSameFile) {
-            if (isOperatorFunction(it->first))
+            if (isOperatorFunction(function.first))
                 continue;
             std::string filename;
             if (func.filename != "+")
                 filename = func.filename;
-            errors.emplace_back(filename, func.fileIndex, func.lineNumber, it->first);
+            errors.emplace_back(filename, func.fileIndex, func.lineNumber, function.first);
         } else if (!func.usedOtherFile) {
             /** @todo add error message "function is only used in <file> it can be static" */
             /*
@@ -475,14 +475,14 @@ void CheckUnusedFunctions::analyseWholeProgram(const Settings &settings, ErrorLo
         }
     }
 
-    for (auto decl = decls.cbegin(); decl != decls.cend(); ++decl) {
-        const std::string &functionName = stripTemplateParameters(decl->first);
+    for (const auto & decl : utils::as_const(decls)) {
+        const std::string &functionName = stripTemplateParameters(decl.first);
 
         if (settings.library.isentrypoint(functionName))
             continue;
 
         if (calls.find(functionName) == calls.end() && !isOperatorFunction(functionName)) {
-            const Location &loc = decl->second;
+            const Location &loc = decl.second;
             unusedFunctionError(errorLogger, loc.fileName, /*fileIndex*/ 0, loc.lineNumber, functionName);
         }
     }

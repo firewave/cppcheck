@@ -190,10 +190,10 @@ void CheckThread::runAddonsAndTools(const Settings& settings, const FileSettings
                 continue;
 
             QStringList args;
-            for (auto incIt = fileSettings->includePaths.cbegin(); incIt != fileSettings->includePaths.cend(); ++incIt)
-                args << ("-I" + QString::fromStdString(*incIt));
-            for (auto i = fileSettings->systemIncludePaths.cbegin(); i != fileSettings->systemIncludePaths.cend(); ++i)
-                args << "-isystem" << QString::fromStdString(*i);
+            for (const auto & includePath : fileSettings->includePaths)
+                args << ("-I" + QString::fromStdString(includePath));
+            for (const auto & systemIncludePath : fileSettings->systemIncludePaths)
+                args << "-isystem" << QString::fromStdString(systemIncludePath);
             for (const QString& def : QString::fromStdString(fileSettings->defines).split(";")) {
                 args << ("-D" + def);
             }

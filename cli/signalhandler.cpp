@@ -326,8 +326,8 @@ void register_signal_handler(FILE * const output)
     memset(&act, 0, sizeof(act));
     act.sa_flags=SA_SIGINFO|SA_ONSTACK;
     act.sa_sigaction=CppcheckSignalHandler;
-    for (auto sig=listofsignals.cbegin(); sig!=listofsignals.cend(); ++sig) {
-        sigaction(sig->first, &act, nullptr);
+    for (const auto & sig : listofsignals) {
+        sigaction(sig.first, &act, nullptr);
     }
 }
 

@@ -780,8 +780,8 @@ void MainWindow::analyzeFiles()
 
         if (file0.endsWith(".sln")) {
             QStringList configs;
-            for (auto it = p.fileSettings.cbegin(); it != p.fileSettings.cend(); ++it) {
-                const QString cfg(QString::fromStdString(it->cfg));
+            for (const auto & fileSetting : p.fileSettings) {
+                const QString cfg(QString::fromStdString(fileSetting.cfg));
                 if (!configs.contains(cfg))
                     configs.push_back(cfg);
             }
@@ -1340,8 +1340,8 @@ void MainWindow::reAnalyzeSelected(const QStringList& files)
     if (mProjectFile) {
         // Clear details, statistics and progress
         mUI->mResults->clear(false);
-        for (int i = 0; i < files.size(); ++i)
-            mUI->mResults->clearRecheckFile(files[i]);
+        for (const auto & file : files)
+            mUI->mResults->clearRecheckFile(file);
 
         analyzeProject(mProjectFile, files);
         return;
@@ -1354,8 +1354,8 @@ void MainWindow::reAnalyzeSelected(const QStringList& files)
 
     // Clear details, statistics and progress
     mUI->mResults->clear(false);
-    for (int i = 0; i < files.size(); ++i)
-        mUI->mResults->clearRecheckFile(files[i]);
+    for (const auto & file : files)
+        mUI->mResults->clearRecheckFile(file);
 
     mCurrentDirectory = mUI->mResults->getCheckDirectory();
     FileList pathList;
@@ -1391,8 +1391,8 @@ void MainWindow::reAnalyze(bool all)
     mUI->mResults->clear(all);
 
     // Clear results for changed files
-    for (int i = 0; i < files.size(); ++i)
-        mUI->mResults->clear(files[i]);
+    for (const auto & file : files)
+        mUI->mResults->clear(file);
 
     checkLockDownUI(); // lock UI while checking
     mUI->mResults->checkingStarted(files.size());

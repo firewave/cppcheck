@@ -106,8 +106,8 @@ static bool isVarTokComparison(const Token * tok, const Token ** vartok,
 void VarInfo::possibleUsageAll(const std::pair<const Token*, Usage>& functionUsage)
 {
     possibleUsage.clear();
-    for (auto it = alloctype.cbegin(); it != alloctype.cend(); ++it)
-        possibleUsage[it->first] = functionUsage;
+    for (const auto & a : alloctype)
+        possibleUsage[a.first] = functionUsage;
 }
 
 
@@ -639,32 +639,32 @@ bool CheckLeakAutoVar::checkScope(const Token * const startToken,
                 }
 
                 // Conditional allocation in varInfo1
-                for (auto it = varInfo1.alloctype.cbegin(); it != varInfo1.alloctype.cend(); ++it) {
-                    if (varInfo2.alloctype.find(it->first) == varInfo2.alloctype.end() &&
-                        old.alloctype.find(it->first) == old.alloctype.end()) {
-                        varInfo.conditionalAlloc.insert(it->first);
+                for (const auto & a : varInfo1.alloctype) {
+                    if (varInfo2.alloctype.find(a.first) == varInfo2.alloctype.end() &&
+                        old.alloctype.find(a.first) == old.alloctype.end()) {
+                        varInfo.conditionalAlloc.insert(a.first);
                     }
                 }
 
                 // Conditional allocation in varInfo2
-                for (auto it = varInfo2.alloctype.cbegin(); it != varInfo2.alloctype.cend(); ++it) {
-                    if (varInfo1.alloctype.find(it->first) == varInfo1.alloctype.end() &&
-                        old.alloctype.find(it->first) == old.alloctype.end()) {
-                        varInfo.conditionalAlloc.insert(it->first);
+                for (const auto & a : varInfo2.alloctype) {
+                    if (varInfo1.alloctype.find(a.first) == varInfo1.alloctype.end() &&
+                        old.alloctype.find(a.first) == old.alloctype.end()) {
+                        varInfo.conditionalAlloc.insert(a.first);
                     }
                 }
 
                 // Conditional allocation/deallocation
-                for (auto it = varInfo1.alloctype.cbegin(); it != varInfo1.alloctype.cend(); ++it) {
-                    if (it->second.managed() && conditionalAlloc.find(it->first) != conditionalAlloc.end()) {
-                        varInfo.conditionalAlloc.erase(it->first);
-                        varInfo2.erase(it->first);
+                for (const auto & a : varInfo1.alloctype) {
+                    if (a.second.managed() && conditionalAlloc.find(a.first) != conditionalAlloc.end()) {
+                        varInfo.conditionalAlloc.erase(a.first);
+                        varInfo2.erase(a.first);
                     }
                 }
-                for (auto it = varInfo2.alloctype.cbegin(); it != varInfo2.alloctype.cend(); ++it) {
-                    if (it->second.managed() && conditionalAlloc.find(it->first) != conditionalAlloc.end()) {
-                        varInfo.conditionalAlloc.erase(it->first);
-                        varInfo1.erase(it->first);
+                for (const auto & a : varInfo2.alloctype) {
+                    if (a.second.managed() && conditionalAlloc.find(a.first) != conditionalAlloc.end()) {
+                        varInfo.conditionalAlloc.erase(a.first);
+                        varInfo1.erase(a.first);
                     }
                 }
 
@@ -1147,16 +1147,16 @@ void CheckLeakAutoVar::ret(const Token *tok, VarInfo &varInfo, const bool isEndO
     std::vector<int> toRemove;
 
     const SymbolDatabase *symbolDatabase = mTokenizer->getSymbolDatabase();
-    for (auto it = alloctype.cbegin(); it != alloctype.cend(); ++it) {
+    for (const auto & a : utils::as_const(alloctype)) {
         // don't warn if variable is conditionally allocated, unless it leaves the scope
-        if (!isEndOfScope && !it->second.managed() && varInfo.conditionalAlloc.find(it->first) != varInfo.conditionalAlloc.end())
+        if (!isEndOfScope && !a.second.managed() && varInfo.conditionalAlloc.find(a.first) != varInfo.conditionalAlloc.end())
             continue;
 
         // don't warn if there is a reference of the variable
-        if (varInfo.referenced.find(it->first) != varInfo.referenced.end())
+        if (varInfo.referenced.find(a.first) != varInfo.referenced.end())
             continue;
 
-        const int varid = it->first;
+        const int varid = a.first;
         const Variable *var = symbolDatabase->getVariableFromVarId(varid);
         if (var) {
             // don't warn if we leave an inner scope
@@ -1196,14 +1196,14 @@ void CheckLeakAutoVar::ret(const Token *tok, VarInfo &varInfo, const bool isEndO
             // don't warn when returning after checking return value of outparam allocation
             const Token* outparamFunc{};
             if ((tok->scope()->type == Scope::ScopeType::eIf || tok->scope()->type== Scope::ScopeType::eElse) &&
-                (outparamFunc = getOutparamAllocation(it->second.allocTok, *mSettings))) {
+                (outparamFunc = getOutparamAllocation(a.second.allocTok, *mSettings))) {
                 const Scope* scope = tok->scope();
                 if (scope->type == Scope::ScopeType::eElse) {
                     scope = scope->bodyStart->tokAt(-2)->scope();
                 }
                 const Token* const ifEnd = scope->bodyStart->previous();
                 const Token* const ifStart = ifEnd->link();
-                const Token* const alloc = it->second.allocTok;
+                const Token* const alloc = a.second.allocTok;
                 if (precedes(ifStart, alloc) && succeeds(ifEnd, alloc)) { // allocation and check in if
                     if (outparamFunc->next()->astParent() == ifStart || Token::Match(outparamFunc->next()->astParent(), "%comp%"))
                         continue;
@@ -1224,13 +1224,13 @@ void CheckLeakAutoVar::ret(const Token *tok, VarInfo &varInfo, const bool isEndO
             }
 
             // return deallocated pointer
-            if (used != PtrUsage::NONE && it->second.status == VarInfo::DEALLOC)
-                deallocReturnError(tok, it->second.allocTok, var->name());
+            if (used != PtrUsage::NONE && a.second.status == VarInfo::DEALLOC)
+                deallocReturnError(tok, a.second.allocTok, var->name());
 
-            else if (used != PtrUsage::PTR && !it->second.managed() && !var->isReference()) {
+            else if (used != PtrUsage::PTR && !a.second.managed() && !var->isReference()) {
                 const auto use = possibleUsage.find(varid);
                 if (use == possibleUsage.end()) {
-                    leakError(tok, var->name(), it->second.type);
+                    leakError(tok, var->name(), a.second.type);
                 } else if (!use->second.first->variable()) { // TODO: handle constructors
                     configurationInfo(tok, use->second);
                 }

@@ -2130,8 +2130,7 @@ namespace {
 
 void SymbolDatabase::validateVariables() const
 {
-    for (auto iter = mVariableList.cbegin(); iter!=mVariableList.cend(); ++iter) {
-        const Variable * const var = *iter;
+    for (const auto *var : mVariableList) {
         if (var) {
             if (!var->scope()) {
                 const Function* function = getFunctionForArgumentvariable(var);
@@ -3303,16 +3302,16 @@ void SymbolDatabase::addClassFunction(Scope *&scope, const Token *&tok, const To
     }
 
     // search for match
-    for (auto it1 = scopeList.begin(); it1 != scopeList.end(); ++it1) {
-        Scope *scope1 = &(*it1);
+    for (auto & it1 : scopeList) {
+        Scope *scope1 = &it1;
 
         bool match = false;
 
         // check in namespace if using found
         if (scope == scope1 && !scope1->usingList.empty()) {
-            for (auto it2 = scope1->usingList.cbegin(); it2 != scope1->usingList.cend(); ++it2) {
-                if (it2->scope) {
-                    Function * func = findFunctionInScope(tok1, it2->scope, path, path_length);
+            for (auto info : scope1->usingList) {
+                if (info.scope) {
+                    Function * func = findFunctionInScope(tok1, info.scope, path, path_length);
                     if (func) {
                         if (!func->hasBody()) {
                             const Token *closeParen = tok->linkAt(1);
@@ -3649,16 +3648,16 @@ bool Type::hasCircularDependencies(std::set<BaseInfo>* ancestors) const
     if (!ancestors) {
         ancestors=&knownAncestors;
     }
-    for (auto parent=derivedFrom.cbegin(); parent!=derivedFrom.cend(); ++parent) {
-        if (!parent->type)
+    for (const auto & parent : derivedFrom) {
+        if (!parent.type)
             continue;
-        if (this==parent->type)
+        if (this==parent.type)
             return true;
-        if (ancestors->find(*parent)!=ancestors->end())
+        if (ancestors->find(parent)!=ancestors->end())
             return true;
 
-        ancestors->insert(*parent);
-        if (parent->type->hasCircularDependencies(ancestors))
+        ancestors->insert(parent);
+        if (parent.type->hasCircularDependencies(ancestors))
             return true;
     }
     return false;
@@ -3673,10 +3672,10 @@ bool Type::findDependency(const Type* ancestor) const
 
 bool Type::isDerivedFrom(const std::string & ancestor) const
 {
-    for (auto parent=derivedFrom.cbegin(); parent!=derivedFrom.cend(); ++parent) {
-        if (parent->name == ancestor)
+    for (const auto & parent : derivedFrom) {
+        if (parent.name == ancestor)
             return true;
-        if (parent->type && parent->type->isDerivedFrom(ancestor))
+        if (parent.type && parent.type->isDerivedFrom(ancestor))
             return true;
     }
     return false;
@@ -3953,103 +3952,103 @@ void SymbolDatabase::printOut(const char *title) const
     if (title)
         std::cout << "\n### " << title << " ###\n";
 
-    for (auto scope = scopeList.cbegin(); scope != scopeList.cend(); ++scope) {
-        std::cout << "Scope: " << &*scope << " " << scope->type << std::endl;
-        std::cout << "    className: " << scope->className << std::endl;
-        std::cout << "    classDef: " << tokenToString(scope->classDef, mTokenizer) << std::endl;
-        std::cout << "    bodyStart: " << tokenToString(scope->bodyStart, mTokenizer) << std::endl;
-        std::cout << "    bodyEnd: " << tokenToString(scope->bodyEnd, mTokenizer) << std::endl;
+    for (const auto & scope : scopeList) {
+        std::cout << "Scope: " << &scope << " " << scope.type << std::endl;
+        std::cout << "    className: " << scope.className << std::endl;
+        std::cout << "    classDef: " << tokenToString(scope.classDef, mTokenizer) << std::endl;
+        std::cout << "    bodyStart: " << tokenToString(scope.bodyStart, mTokenizer) << std::endl;
+        std::cout << "    bodyEnd: " << tokenToString(scope.bodyEnd, mTokenizer) << std::endl;
 
         // find the function body if not implemented inline
-        for (auto func = scope->functionList.cbegin(); func != scope->functionList.cend(); ++func) {
-            std::cout << "    Function: " << &*func << std::endl;
-            std::cout << "        name: " << tokenToString(func->tokenDef, mTokenizer) << std::endl;
-            std::cout << "        type: " << functionTypeToString(func->type) << std::endl;
-            std::cout << "        access: " << accessControlToString(func->access) << std::endl;
-            std::cout << "        hasBody: " << func->hasBody() << std::endl;
-            std::cout << "        isInline: " << func->isInline() << std::endl;
-            std::cout << "        isConst: " << func->isConst() << std::endl;
-            std::cout << "        hasVirtualSpecifier: " << func->hasVirtualSpecifier() << std::endl;
-            std::cout << "        isPure: " << func->isPure() << std::endl;
-            std::cout << "        isStatic: " << func->isStatic() << std::endl;
-            std::cout << "        isStaticLocal: " << func->isStaticLocal() << std::endl;
-            std::cout << "        isExtern: " << func->isExtern() << std::endl;
-            std::cout << "        isFriend: " << func->isFriend() << std::endl;
-            std::cout << "        isExplicit: " << func->isExplicit() << std::endl;
-            std::cout << "        isDefault: " << func->isDefault() << std::endl;
-            std::cout << "        isDelete: " << func->isDelete() << std::endl;
-            std::cout << "        hasOverrideSpecifier: " << func->hasOverrideSpecifier() << std::endl;
-            std::cout << "        hasFinalSpecifier: " << func->hasFinalSpecifier() << std::endl;
-            std::cout << "        isNoExcept: " << func->isNoExcept() << std::endl;
-            std::cout << "        isThrow: " << func->isThrow() << std::endl;
-            std::cout << "        isOperator: " << func->isOperator() << std::endl;
-            std::cout << "        hasLvalRefQual: " << func->hasLvalRefQualifier() << std::endl;
-            std::cout << "        hasRvalRefQual: " << func->hasRvalRefQualifier() << std::endl;
-            std::cout << "        isVariadic: " << func->isVariadic() << std::endl;
-            std::cout << "        isVolatile: " << func->isVolatile() << std::endl;
-            std::cout << "        hasTrailingReturnType: " << func->hasTrailingReturnType() << std::endl;
+        for (const auto & func : scope.functionList) {
+            std::cout << "    Function: " << &func << std::endl;
+            std::cout << "        name: " << tokenToString(func.tokenDef, mTokenizer) << std::endl;
+            std::cout << "        type: " << functionTypeToString(func.type) << std::endl;
+            std::cout << "        access: " << accessControlToString(func.access) << std::endl;
+            std::cout << "        hasBody: " << func.hasBody() << std::endl;
+            std::cout << "        isInline: " << func.isInline() << std::endl;
+            std::cout << "        isConst: " << func.isConst() << std::endl;
+            std::cout << "        hasVirtualSpecifier: " << func.hasVirtualSpecifier() << std::endl;
+            std::cout << "        isPure: " << func.isPure() << std::endl;
+            std::cout << "        isStatic: " << func.isStatic() << std::endl;
+            std::cout << "        isStaticLocal: " << func.isStaticLocal() << std::endl;
+            std::cout << "        isExtern: " << func.isExtern() << std::endl;
+            std::cout << "        isFriend: " << func.isFriend() << std::endl;
+            std::cout << "        isExplicit: " << func.isExplicit() << std::endl;
+            std::cout << "        isDefault: " << func.isDefault() << std::endl;
+            std::cout << "        isDelete: " << func.isDelete() << std::endl;
+            std::cout << "        hasOverrideSpecifier: " << func.hasOverrideSpecifier() << std::endl;
+            std::cout << "        hasFinalSpecifier: " << func.hasFinalSpecifier() << std::endl;
+            std::cout << "        isNoExcept: " << func.isNoExcept() << std::endl;
+            std::cout << "        isThrow: " << func.isThrow() << std::endl;
+            std::cout << "        isOperator: " << func.isOperator() << std::endl;
+            std::cout << "        hasLvalRefQual: " << func.hasLvalRefQualifier() << std::endl;
+            std::cout << "        hasRvalRefQual: " << func.hasRvalRefQualifier() << std::endl;
+            std::cout << "        isVariadic: " << func.isVariadic() << std::endl;
+            std::cout << "        isVolatile: " << func.isVolatile() << std::endl;
+            std::cout << "        hasTrailingReturnType: " << func.hasTrailingReturnType() << std::endl;
             std::cout << "        attributes:";
-            if (func->isAttributeConst())
+            if (func.isAttributeConst())
                 std::cout << " const ";
-            if (func->isAttributePure())
+            if (func.isAttributePure())
                 std::cout << " pure ";
-            if (func->isAttributeNoreturn())
+            if (func.isAttributeNoreturn())
                 std::cout << " noreturn ";
-            if (func->isAttributeNothrow())
+            if (func.isAttributeNothrow())
                 std::cout << " nothrow ";
-            if (func->isAttributeConstructor())
+            if (func.isAttributeConstructor())
                 std::cout << " constructor ";
-            if (func->isAttributeDestructor())
+            if (func.isAttributeDestructor())
                 std::cout << " destructor ";
-            if (func->isAttributeNodiscard())
+            if (func.isAttributeNodiscard())
                 std::cout << " nodiscard ";
             std::cout << std::endl;
-            std::cout << "        noexceptArg: " << (func->noexceptArg ? func->noexceptArg->str() : "none") << std::endl;
-            std::cout << "        throwArg: " << (func->throwArg ? func->throwArg->str() : "none") << std::endl;
-            std::cout << "        tokenDef: " << tokenToString(func->tokenDef, mTokenizer) << std::endl;
-            std::cout << "        argDef: " << tokenToString(func->argDef, mTokenizer) << std::endl;
-            if (!func->isConstructor() && !func->isDestructor())
-                std::cout << "        retDef: " << tokenToString(func->retDef, mTokenizer) << std::endl;
-            if (func->retDef) {
+            std::cout << "        noexceptArg: " << (func.noexceptArg ? func.noexceptArg->str() : "none") << std::endl;
+            std::cout << "        throwArg: " << (func.throwArg ? func.throwArg->str() : "none") << std::endl;
+            std::cout << "        tokenDef: " << tokenToString(func.tokenDef, mTokenizer) << std::endl;
+            std::cout << "        argDef: " << tokenToString(func.argDef, mTokenizer) << std::endl;
+            if (!func.isConstructor() && !func.isDestructor())
+                std::cout << "        retDef: " << tokenToString(func.retDef, mTokenizer) << std::endl;
+            if (func.retDef) {
                 std::cout << "           ";
-                for (const Token * tok = func->retDef; tok && tok != func->tokenDef && !Token::Match(tok, "{|;|override|final"); tok = tok->next())
+                for (const Token * tok = func.retDef; tok && tok != func.tokenDef && !Token::Match(tok, "{|;|override|final"); tok = tok->next())
                     std::cout << " " << tokenType(tok);
                 std::cout << std::endl;
             }
-            std::cout << "        retType: " << func->retType << std::endl;
+            std::cout << "        retType: " << func.retType << std::endl;
 
-            if (const ValueType* valueType = func->tokenDef->next()->valueType()) {
+            if (const ValueType* valueType = func.tokenDef->next()->valueType()) {
                 std::cout << "        valueType: " << valueType << std::endl;
                 std::cout << "            " << valueType->str() << std::endl;
             }
 
-            if (func->hasBody()) {
-                std::cout << "        token: " << tokenToString(func->token, mTokenizer) << std::endl;
-                std::cout << "        arg: " << tokenToString(func->arg, mTokenizer) << std::endl;
+            if (func.hasBody()) {
+                std::cout << "        token: " << tokenToString(func.token, mTokenizer) << std::endl;
+                std::cout << "        arg: " << tokenToString(func.arg, mTokenizer) << std::endl;
             }
-            std::cout << "        nestedIn: " << scopeToString(func->nestedIn, mTokenizer) << std::endl;
-            std::cout << "        functionScope: " << scopeToString(func->functionScope, mTokenizer) << std::endl;
+            std::cout << "        nestedIn: " << scopeToString(func.nestedIn, mTokenizer) << std::endl;
+            std::cout << "        functionScope: " << scopeToString(func.functionScope, mTokenizer) << std::endl;
 
-            for (auto var = func->argumentList.cbegin(); var != func->argumentList.cend(); ++var) {
-                std::cout << "        Variable: " << &*var << std::endl;
-                printVariable(&*var, "            ");
+            for (const auto & var : func.argumentList) {
+                std::cout << "        Variable: " << &var << std::endl;
+                printVariable(&var, "            ");
             }
         }
 
-        for (auto var = scope->varlist.cbegin(); var != scope->varlist.cend(); ++var) {
-            std::cout << "    Variable: " << &*var << std::endl;
-            printVariable(&*var, "        ");
+        for (const auto & var : scope.varlist) {
+            std::cout << "    Variable: " << &var << std::endl;
+            printVariable(&var, "        ");
         }
 
-        if (scope->type == Scope::eEnum) {
+        if (scope.type == Scope::eEnum) {
             std::cout << "    enumType: ";
-            if (scope->enumType) {
-                std::cout << scope->enumType->stringify(false, true, false);
+            if (scope.enumType) {
+                std::cout << scope.enumType->stringify(false, true, false);
             } else
                 std::cout << "int";
             std::cout << std::endl;
-            std::cout << "    enumClass: " << scope->enumClass << std::endl;
-            for (const Enumerator &enumerator : scope->enumeratorList) {
+            std::cout << "    enumClass: " << scope.enumClass << std::endl;
+            for (const Enumerator &enumerator : scope.enumeratorList) {
                 std::cout << "        Enumerator: " << enumerator.name->str() << " = ";
                 if (enumerator.value_known)
                     std::cout << enumerator.value;
@@ -4070,63 +4069,63 @@ void SymbolDatabase::printOut(const char *title) const
             }
         }
 
-        std::cout << "    nestedIn: " << scope->nestedIn;
-        if (scope->nestedIn) {
-            std::cout << " " << scope->nestedIn->type << " "
-                      << scope->nestedIn->className;
+        std::cout << "    nestedIn: " << scope.nestedIn;
+        if (scope.nestedIn) {
+            std::cout << " " << scope.nestedIn->type << " "
+                      << scope.nestedIn->className;
         }
         std::cout << std::endl;
 
-        std::cout << "    definedType: " << scope->definedType << std::endl;
+        std::cout << "    definedType: " << scope.definedType << std::endl;
 
-        std::cout << "    nestedList[" << scope->nestedList.size() << "] = (";
+        std::cout << "    nestedList[" << scope.nestedList.size() << "] = (";
 
-        std::size_t count = scope->nestedList.size();
-        for (auto nsi = scope->nestedList.cbegin(); nsi != scope->nestedList.cend(); ++nsi) {
-            std::cout << " " << (*nsi) << " " << (*nsi)->type << " " << (*nsi)->className;
+        std::size_t count = scope.nestedList.size();
+        for (auto *nsi : scope.nestedList) {
+            std::cout << " " << nsi << " " << nsi->type << " " << nsi->className;
             if (count-- > 1)
                 std::cout << ",";
         }
 
         std::cout << " )" << std::endl;
 
-        for (auto use = scope->usingList.cbegin(); use != scope->usingList.cend(); ++use) {
-            std::cout << "    using: " << use->scope << " " << use->start->strAt(2);
-            const Token *tok1 = use->start->tokAt(3);
+        for (auto use : scope.usingList) {
+            std::cout << "    using: " << use.scope << " " << use.start->strAt(2);
+            const Token *tok1 = use.start->tokAt(3);
             while (tok1 && tok1->str() == "::") {
                 std::cout << "::" << tok1->strAt(1);
                 tok1 = tok1->tokAt(2);
             }
-            std::cout << " " << mTokenizer.list.fileLine(use->start) << std::endl;
+            std::cout << " " << mTokenizer.list.fileLine(use.start) << std::endl;
         }
 
-        std::cout << "    functionOf: " << scopeToString(scope->functionOf, mTokenizer) << std::endl;
+        std::cout << "    functionOf: " << scopeToString(scope.functionOf, mTokenizer) << std::endl;
 
-        std::cout << "    function: " << scope->function;
-        if (scope->function)
-            std::cout << " " << scope->function->name();
+        std::cout << "    function: " << scope.function;
+        if (scope.function)
+            std::cout << " " << scope.function->name();
         std::cout << std::endl;
     }
 
-    for (auto type = typeList.cbegin(); type != typeList.cend(); ++type) {
-        std::cout << "Type: " << &(*type) << std::endl;
-        std::cout << "    name: " << type->name() << std::endl;
-        std::cout << "    classDef: " << tokenToString(type->classDef, mTokenizer) << std::endl;
-        std::cout << "    classScope: " << type->classScope << std::endl;
-        std::cout << "    enclosingScope: " << type->enclosingScope;
-        if (type->enclosingScope) {
-            std::cout << " " << type->enclosingScope->type << " "
-                      << type->enclosingScope->className;
+    for (const auto & type : typeList) {
+        std::cout << "Type: " << &type << std::endl;
+        std::cout << "    name: " << type.name() << std::endl;
+        std::cout << "    classDef: " << tokenToString(type.classDef, mTokenizer) << std::endl;
+        std::cout << "    classScope: " << type.classScope << std::endl;
+        std::cout << "    enclosingScope: " << type.enclosingScope;
+        if (type.enclosingScope) {
+            std::cout << " " << type.enclosingScope->type << " "
+                      << type.enclosingScope->className;
         }
         std::cout << std::endl;
-        std::cout << "    needInitialization: " << (type->needInitialization == Type::NeedInitialization::Unknown ? "Unknown" :
-                                                    type->needInitialization == Type::NeedInitialization::True ? "True" :
-                                                    type->needInitialization == Type::NeedInitialization::False ? "False" :
+        std::cout << "    needInitialization: " << (type.needInitialization == Type::NeedInitialization::Unknown ? "Unknown" :
+                                                    type.needInitialization == Type::NeedInitialization::True ? "True" :
+                                                    type.needInitialization == Type::NeedInitialization::False ? "False" :
                                                     "Invalid") << std::endl;
 
-        std::cout << "    derivedFrom[" << type->derivedFrom.size() << "] = (";
-        std::size_t count = type->derivedFrom.size();
-        for (const Type::BaseInfo & i : type->derivedFrom) {
+        std::cout << "    derivedFrom[" << type.derivedFrom.size() << "] = (";
+        std::size_t count = type.derivedFrom.size();
+        for (const Type::BaseInfo & i : type.derivedFrom) {
             if (i.isVirtual)
                 std::cout << "Virtual ";
 
@@ -4147,17 +4146,17 @@ void SymbolDatabase::printOut(const char *title) const
 
         std::cout << " )" << std::endl;
 
-        std::cout << "    friendList[" << type->friendList.size() << "] = (";
-        for (size_t i = 0; i < type->friendList.size(); i++) {
-            if (type->friendList[i].type)
-                std::cout << type->friendList[i].type;
+        std::cout << "    friendList[" << type.friendList.size() << "] = (";
+        for (size_t i = 0; i < type.friendList.size(); i++) {
+            if (type.friendList[i].type)
+                std::cout << type.friendList[i].type;
             else
                 std::cout << " Unknown";
 
             std::cout << ' ';
-            if (type->friendList[i].nameEnd)
-                std::cout << type->friendList[i].nameEnd->str();
-            if (i+1 < type->friendList.size())
+            if (type.friendList[i].nameEnd)
+                std::cout << type.friendList[i].nameEnd->str();
+            if (i+1 < type.friendList.size())
                 std::cout << ',';
         }
 
@@ -4183,103 +4182,103 @@ void SymbolDatabase::printXml(std::ostream &out) const
 
     // Scopes..
     outs += "  <scopes>\n";
-    for (auto scope = scopeList.cbegin(); scope != scopeList.cend(); ++scope) {
+    for (const auto & scope : scopeList) {
         outs += "    <scope";
         outs += " id=\"";
-        outs += id_string(&*scope);
+        outs += id_string(&scope);
         outs += "\"";
         outs += " type=\"";
-        outs += scopeTypeToString(scope->type);
+        outs += scopeTypeToString(scope.type);
         outs += "\"";
-        if (!scope->className.empty()) {
+        if (!scope.className.empty()) {
             outs += " className=\"";
-            outs += ErrorLogger::toxml(scope->className);
+            outs += ErrorLogger::toxml(scope.className);
             outs += "\"";
         }
-        if (scope->bodyStart) {
+        if (scope.bodyStart) {
             outs += " bodyStart=\"";
-            outs += id_string(scope->bodyStart);
+            outs += id_string(scope.bodyStart);
             outs += '\"';
         }
-        if (scope->bodyEnd) {
+        if (scope.bodyEnd) {
             outs += " bodyEnd=\"";
-            outs += id_string(scope->bodyEnd);
+            outs += id_string(scope.bodyEnd);
             outs += '\"';
         }
-        if (scope->nestedIn) {
+        if (scope.nestedIn) {
             outs += " nestedIn=\"";
-            outs += id_string(scope->nestedIn);
+            outs += id_string(scope.nestedIn);
             outs += "\"";
         }
-        if (scope->function) {
+        if (scope.function) {
             outs += " function=\"";
-            outs += id_string(scope->function);
+            outs += id_string(scope.function);
             outs += "\"";
         }
-        if (scope->definedType) {
+        if (scope.definedType) {
             outs += " definedType=\"";
-            outs += id_string(scope->definedType);
+            outs += id_string(scope.definedType);
             outs += "\"";
         }
-        if (scope->functionList.empty() && scope->varlist.empty())
+        if (scope.functionList.empty() && scope.varlist.empty())
             outs += "/>\n";
         else {
             outs += ">\n";
-            if (!scope->functionList.empty()) {
+            if (!scope.functionList.empty()) {
                 outs += "      <functionList>\n";
-                for (auto function = scope->functionList.cbegin(); function != scope->functionList.cend(); ++function) {
+                for (const auto & function : scope.functionList) {
                     outs += "        <function id=\"";
-                    outs += id_string(&*function);
+                    outs += id_string(&function);
                     outs += "\" token=\"";
-                    outs += id_string(function->token);
+                    outs += id_string(function.token);
                     outs += "\" tokenDef=\"";
-                    outs += id_string(function->tokenDef);
+                    outs += id_string(function.tokenDef);
                     outs += "\" name=\"";
-                    outs += ErrorLogger::toxml(function->name());
+                    outs += ErrorLogger::toxml(function.name());
                     outs += '\"';
                     outs += " type=\"";
-                    outs += functionTypeToString(function->type);
+                    outs += functionTypeToString(function.type);
                     outs += '\"';
-                    if (function->nestedIn->definedType) {
-                        if (function->hasVirtualSpecifier())
+                    if (function.nestedIn->definedType) {
+                        if (function.hasVirtualSpecifier())
                             outs += " hasVirtualSpecifier=\"true\"";
-                        else if (function->isImplicitlyVirtual())
+                        else if (function.isImplicitlyVirtual())
                             outs += " isImplicitlyVirtual=\"true\"";
                     }
-                    if (function->access == AccessControl::Public || function->access == AccessControl::Protected || function->access == AccessControl::Private) {
+                    if (function.access == AccessControl::Public || function.access == AccessControl::Protected || function.access == AccessControl::Private) {
                         outs += " access=\"";
-                        outs += accessControlToString(function->access);
+                        outs += accessControlToString(function.access);
                         outs +="\"";
                     }
-                    if (function->isOperator())
+                    if (function.isOperator())
                         outs += " isOperator=\"true\"";
-                    if (function->isExplicit())
+                    if (function.isExplicit())
                         outs += " isExplicit=\"true\"";
-                    if (function->hasOverrideSpecifier())
+                    if (function.hasOverrideSpecifier())
                         outs += " hasOverrideSpecifier=\"true\"";
-                    if (function->hasFinalSpecifier())
+                    if (function.hasFinalSpecifier())
                         outs += " hasFinalSpecifier=\"true\"";
-                    if (function->isInlineKeyword())
+                    if (function.isInlineKeyword())
                         outs += " isInlineKeyword=\"true\"";
-                    if (function->isStatic())
+                    if (function.isStatic())
                         outs += " isStatic=\"true\"";
-                    if (function->isAttributeNoreturn())
+                    if (function.isAttributeNoreturn())
                         outs += " isAttributeNoreturn=\"true\"";
-                    if (const Function* overriddenFunction = function->getOverriddenFunction()) {
+                    if (const Function* overriddenFunction = function.getOverriddenFunction()) {
                         outs += " overriddenFunction=\"";
                         outs += id_string(overriddenFunction);
                         outs += "\"";
                     }
-                    if (function->isAttributeConst())
+                    if (function.isAttributeConst())
                         outs += " isAttributeConst=\"true\"";
-                    if (function->isAttributePure())
+                    if (function.isAttributePure())
                         outs += " isAttributePure=\"true\"";
-                    if (function->argCount() == 0U)
+                    if (function.argCount() == 0U)
                         outs += "/>\n";
                     else {
                         outs += ">\n";
-                        for (unsigned int argnr = 0; argnr < function->argCount(); ++argnr) {
-                            const Variable *arg = function->getArgumentVar(argnr);
+                        for (unsigned int argnr = 0; argnr < function.argCount(); ++argnr) {
+                            const Variable *arg = function.getArgumentVar(argnr);
                             outs += "          <arg nr=\"";
                             outs += std::to_string(argnr+1);
                             outs += "\" variable=\"";
@@ -4292,11 +4291,11 @@ void SymbolDatabase::printXml(std::ostream &out) const
                 }
                 outs += "      </functionList>\n";
             }
-            if (!scope->varlist.empty()) {
+            if (!scope.varlist.empty()) {
                 outs += "      <varlist>\n";
-                for (auto var = scope->varlist.cbegin(); var != scope->varlist.cend(); ++var) {
+                for (const auto & var : scope.varlist) {
                     outs += "        <var id=\"";
-                    outs += id_string(&*var);
+                    outs += id_string(&var);
                     outs += "\"/>\n";
                 }
                 outs += "      </varlist>\n";
@@ -5274,8 +5273,8 @@ const Enumerator * SymbolDatabase::findEnumerator(const Token * tok, std::set<st
                 if (enumerator) // enum class
                     return enumerator;
                 // enum
-                for (auto it = scope->nestedList.cbegin(), end = scope->nestedList.cend(); it != end; ++it) {
-                    enumerator = (*it)->findEnumerator(tokStr);
+                for (auto *s : scope->nestedList) {
+                    enumerator = s->findEnumerator(tokStr);
 
                     if (enumerator && !(enumerator->scope && enumerator->scope->enumClass))
                         return enumerator;
@@ -5313,8 +5312,8 @@ const Enumerator * SymbolDatabase::findEnumerator(const Token * tok, std::set<st
                 scope = varTok->variable()->scope();
         }
 
-        for (auto s = scope->nestedList.cbegin(); s != scope->nestedList.cend(); ++s) {
-            enumerator = (*s)->findEnumerator(tokStr);
+        for (auto *s : scope->nestedList) {
+            enumerator = s->findEnumerator(tokStr);
 
             if (enumerator && !(enumerator->scope && enumerator->scope->enumClass))
                 return enumerator;
@@ -5346,14 +5345,14 @@ const Enumerator * SymbolDatabase::findEnumerator(const Token * tok, std::set<st
             if (enumerator && !(enumerator->scope && enumerator->scope->enumClass))
                 return enumerator;
 
-            for (auto s = scope->nestedList.cbegin(); s != scope->nestedList.cend(); ++s) {
-                enumerator = (*s)->findEnumerator(tokStr);
+            for (auto *s : scope->nestedList) {
+                enumerator = s->findEnumerator(tokStr);
 
                 if (enumerator && !(enumerator->scope && enumerator->scope->enumClass))
                     return enumerator;
 
-                if (tok->isCpp() && (*s)->type == Scope::eNamespace && Token::simpleMatch((*s)->classDef, "namespace {")) {
-                    for (const Scope* nested : (*s)->nestedList) {
+                if (tok->isCpp() && s->type == Scope::eNamespace && Token::simpleMatch(s->classDef, "namespace {")) {
+                    for (const Scope* nested : s->nestedList) {
                         if (nested->type != Scope::eEnum)
                             continue;
                         enumerator = nested->findEnumerator(tokStr);
@@ -5981,12 +5980,12 @@ const Function* Scope::findFunction(const Token *tok, bool requireConst, Referen
     // Prioritize matches in derived scopes
     for (const auto& fb : { fallback1Func, fallback2Func }) {
         const Function* ret = nullptr;
-        for (std::size_t i = 0; i < fb.size(); ++i) {
-            if (std::find(matches.cbegin(), matches.cend(), fb[i].first) == matches.cend())
+        for (const auto & f : fb) {
+            if (std::find(matches.cbegin(), matches.cend(), f.first) == matches.cend())
                 continue;
-            if (this == fb[i].first->nestedIn) {
+            if (this == f.first->nestedIn) {
                 if (!ret)
-                    ret = fb[i].first;
+                    ret = f.first;
                 else {
                     ret = nullptr;
                     break;

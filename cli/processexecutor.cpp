@@ -318,8 +318,9 @@ unsigned int ProcessExecutor::check()
         if (!rpipes.empty()) {
             fd_set rfds;
             FD_ZERO(&rfds);
-            for (auto rp = rpipes.cbegin(); rp != rpipes.cend(); ++rp)
-                FD_SET(*rp, &rfds);
+            for (auto rp : utils::as_const(rpipes)) {
+                FD_SET(rp, &rfds);
+            }
             timeval tv; // for every second polling of load average condition
             tv.tv_sec = 1;
             tv.tv_usec = 0;

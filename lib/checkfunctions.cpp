@@ -857,8 +857,8 @@ void CheckFunctions::getErrorMessages(ErrorLogger *errorLogger, const Settings *
 {
     CheckFunctions c(nullptr, settings, errorLogger);
 
-    for (auto i = settings->library.functionwarn().cbegin(); i != settings->library.functionwarn().cend(); ++i) {
-        c.reportError(nullptr, Severity::style, i->first+"Called", i->second.message);
+    for (const auto & funcwarn : settings->library.functionwarn()) {
+        c.reportError(nullptr, Severity::style, funcwarn.first+"Called", funcwarn.second.message);
     }
 
     c.invalidFunctionArgError(nullptr, "func_name", 1, nullptr,"1:4");

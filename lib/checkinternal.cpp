@@ -230,13 +230,13 @@ void CheckInternal::checkMissingPercentCharacter()
 
             const std::string pattern = patternTok->strValue();
 
-            for (auto knownPattern = knownPatterns.cbegin(); knownPattern != knownPatterns.cend(); ++knownPattern) {
-                const std::string brokenPattern = knownPattern->substr(0, knownPattern->size() - 1);
+            for (const auto & knownPattern : knownPatterns) {
+                const std::string brokenPattern = knownPattern.substr(0, knownPattern.size() - 1);
 
                 std::string::size_type pos = 0;
                 while ((pos = pattern.find(brokenPattern, pos)) != std::string::npos) {
                     // Check if it's the full pattern
-                    if (pattern.find(*knownPattern, pos) != pos) {
+                    if (pattern.find(knownPattern, pos) != pos) {
                         // Known whitelist of substrings
                         if ((brokenPattern == "%var" && pattern.find("%varid%", pos) == pos) ||
                             (brokenPattern == "%or" && pattern.find("%oror%", pos) == pos)) {

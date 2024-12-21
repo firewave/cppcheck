@@ -135,10 +135,10 @@ private:
     }
 
     static const Scope *findFunctionScopeByToken(const SymbolDatabase * db, const Token *tok) {
-        for (auto scope = db->scopeList.cbegin(); scope != db->scopeList.cend(); ++scope) {
-            if (scope->type == Scope::eFunction) {
-                if (scope->classDef == tok)
-                    return &(*scope);
+        for (const auto & scope : utils::as_const(db->scopeList)) {
+            if (scope.type == Scope::eFunction) {
+                if (scope.classDef == tok)
+                    return &scope;
             }
         }
         return nullptr;

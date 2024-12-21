@@ -4939,8 +4939,8 @@ static Token * matchMemberName(const std::list<std::string> &scope, const Token 
     auto scopeIt = scopeInfo.cbegin();
 
     // Current scope..
-    for (auto it = scope.cbegin(); it != scope.cend(); ++it) {
-        if (scopeIt == scopeInfo.cend() || scopeIt->name != *it)
+    for (const auto & s : utils::as_const(scope)) {
+        if (scopeIt == scopeInfo.cend() || scopeIt->name != s)
             return nullptr;
         ++scopeIt;
     }
@@ -10578,16 +10578,16 @@ void Tokenizer::printUnknownTypes() const
         std::string last;
         int count = 0;
 
-        for (auto it = unknowns.cbegin(); it != unknowns.cend(); ++it) {
+        for (const auto & unknown : unknowns) {
             // skip types is std namespace because they are not interesting
-            if (it->first.find("std::") != 0) {
-                if (it->first != last) {
-                    last = it->first;
+            if (unknown.first.find("std::") != 0) {
+                if (unknown.first != last) {
+                    last = unknown.first;
                     count = 1;
-                    reportError(it->second, Severity::debug, "debug", "Unknown type \'" + it->first + "\'.");
+                    reportError(unknown.second, Severity::debug, "debug", "Unknown type \'" + unknown.first + "\'.");
                 } else {
                     if (count < 3) // limit same type to 3
-                        reportError(it->second, Severity::debug, "debug", "Unknown type \'" + it->first + "\'.");
+                        reportError(unknown.second, Severity::debug, "debug", "Unknown type \'" + unknown.first + "\'.");
                     count++;
                 }
             }
