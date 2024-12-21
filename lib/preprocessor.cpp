@@ -302,9 +302,9 @@ void Preprocessor::inlineSuppressions(const simplecpp::TokenList &tokens, Suppre
         return;
     std::list<BadInlineSuppression> err;
     ::addInlineSuppressions(tokens, mSettings, suppressions, err);
-    for (auto it = mTokenLists.cbegin(); it != mTokenLists.cend(); ++it) {
-        if (it->second)
-            ::addInlineSuppressions(*it->second, mSettings, suppressions, err);
+    for (const auto & tokenlist : mTokenLists) {
+        if (tokenlist.second)
+            ::addInlineSuppressions(*tokenlist.second, mSettings, suppressions, err);
     }
     for (const BadInlineSuppression &bad : err) {
         error(bad.file, bad.line, bad.errmsg);
@@ -315,9 +315,9 @@ std::vector<RemarkComment> Preprocessor::getRemarkComments(const simplecpp::Toke
 {
     std::vector<RemarkComment> ret;
     addRemarkComments(tokens, ret);
-    for (auto it = mTokenLists.cbegin(); it != mTokenLists.cend(); ++it) {
-        if (it->second)
-            addRemarkComments(*it->second, ret);
+    for (const auto & tokenlist : mTokenLists) {
+        if (tokenlist.second)
+            addRemarkComments(*tokenlist.second, ret);
     }
     return ret;
 }
@@ -330,8 +330,8 @@ std::list<Directive> Preprocessor::createDirectives(const simplecpp::TokenList &
     std::vector<const simplecpp::TokenList *> list;
     list.reserve(1U + mTokenLists.size());
     list.push_back(&tokens);
-    for (auto it = mTokenLists.cbegin(); it != mTokenLists.cend(); ++it) {
-        list.push_back(it->second);
+    for (const auto & tokenlist : mTokenLists) {
+        list.push_back(tokenlist.second);
     }
 
     for (const simplecpp::TokenList *tokenList : list) {
@@ -662,9 +662,9 @@ std::set<std::string> Preprocessor::getConfigs(const simplecpp::TokenList &token
 
     ::getConfigs(tokens, defined, mSettings.userDefines, mSettings.userUndefs, ret);
 
-    for (auto it = mTokenLists.cbegin(); it != mTokenLists.cend(); ++it) {
-        if (!mSettings.configurationExcluded(it->first))
-            ::getConfigs(*(it->second), defined, mSettings.userDefines, mSettings.userUndefs, ret);
+    for (const auto & tokenlist : mTokenLists) {
+        if (!mSettings.configurationExcluded(tokenlist.first))
+            ::getConfigs(*(tokenlist.second), defined, mSettings.userDefines, mSettings.userUndefs, ret);
     }
 
     return ret;
@@ -975,8 +975,8 @@ std::size_t Preprocessor::calculateHash(const simplecpp::TokenList &tokens1, con
             hashData += static_cast<char>(tok->location.col);
         }
     }
-    for (auto it = mTokenLists.cbegin(); it != mTokenLists.cend(); ++it) {
-        for (const simplecpp::Token *tok = it->second->cfront(); tok; tok = tok->next) {
+    for (const auto & tokenlist : mTokenLists) {
+        for (const simplecpp::Token *tok = tokenlist.second->cfront(); tok; tok = tok->next) {
             if (!tok->comment) {
                 hashData += tok->str();
                 hashData += static_cast<char>(tok->location.line);

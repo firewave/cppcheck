@@ -457,18 +457,18 @@ void CheckClass::copyconstructors()
             }
             if (!funcDestructor || funcDestructor->isDefault()) {
                 const Token * mustDealloc = nullptr;
-                for (auto it = allocatedVars.cbegin(); it != allocatedVars.cend(); ++it) {
-                    if (!Token::Match(it->second, "%var% [(=] new %type%")) {
-                        mustDealloc = it->second;
+                for (auto allocatedVar : allocatedVars) {
+                    if (!Token::Match(allocatedVar.second, "%var% [(=] new %type%")) {
+                        mustDealloc = allocatedVar.second;
                         break;
                     }
-                    if (it->second->valueType() && it->second->valueType()->isIntegral()) {
-                        mustDealloc = it->second;
+                    if (allocatedVar.second->valueType() && allocatedVar.second->valueType()->isIntegral()) {
+                        mustDealloc = allocatedVar.second;
                         break;
                     }
-                    const Variable *var = it->second->variable();
+                    const Variable *var = allocatedVar.second->variable();
                     if (var && var->typeScope() && var->typeScope()->functionList.empty() && var->type()->derivedFrom.empty()) {
-                        mustDealloc = it->second;
+                        mustDealloc = allocatedVar.second;
                         break;
                     }
                 }
@@ -1232,25 +1232,25 @@ static bool checkFunctionUsage(const Function *privfunc, const Scope* scope)
     if (!scope)
         return true; // Assume it is used, if scope is not seen
 
-    for (auto func = scope->functionList.cbegin(); func != scope->functionList.cend(); ++func) {
-        if (func->functionScope) {
-            if (Token::Match(func->tokenDef, "%name% (")) {
-                for (const Token *ftok = func->tokenDef->tokAt(2); ftok && ftok->str() != ")"; ftok = ftok->next()) {
+    for (const auto & func : scope->functionList) {
+        if (func.functionScope) {
+            if (Token::Match(func.tokenDef, "%name% (")) {
+                for (const Token *ftok = func.tokenDef->tokAt(2); ftok && ftok->str() != ")"; ftok = ftok->next()) {
                     if (Token::Match(ftok, "= %name% [(,)]") && ftok->strAt(1) == privfunc->name())
                         return true;
                     if (ftok->str() == "(")
                         ftok = ftok->link();
                 }
             }
-            for (const Token *ftok = func->functionScope->classDef->linkAt(1); ftok != func->functionScope->bodyEnd; ftok = ftok->next()) {
+            for (const Token *ftok = func.functionScope->classDef->linkAt(1); ftok != func.functionScope->bodyEnd; ftok = ftok->next()) {
                 if (ftok->function() == privfunc)
                     return true;
                 if (ftok->varId() == 0U && ftok->str() == privfunc->name()) // TODO: This condition should be redundant
                     return true;
             }
-        } else if ((func->type != Function::eCopyConstructor &&
-                    func->type != Function::eOperatorEqual) ||
-                   func->access != AccessControl::Private) // Assume it is used, if a function implementation isn't seen, but empty private copy constructors and assignment operators are OK
+        } else if ((func.type != Function::eCopyConstructor &&
+                    func.type != Function::eOperatorEqual) ||
+                   func.access != AccessControl::Private) // Assume it is used, if a function implementation isn't seen, but empty private copy constructors and assignment operators are OK
             return true;
     }
 

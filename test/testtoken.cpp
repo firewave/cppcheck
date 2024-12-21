@@ -815,8 +815,8 @@ private:
         std::vector<std::string> other_ops;
         append_vector(other_ops, extendedOps);
 
-        for (auto other_op = other_ops.cbegin(); other_op != other_ops.cend(); ++other_op) {
-            ASSERT_EQUALS_MSG(false, MatchCheck(*other_op, "%op%"), "Failing other operator: " + *other_op);
+        for (const auto & other_op : other_ops) {
+            ASSERT_EQUALS_MSG(false, MatchCheck(other_op, "%op%"), "Failing other operator: " + other_op);
         }
     }
 
@@ -836,17 +836,17 @@ private:
         append_vector(other_ops, extendedOps);
         append_vector(other_ops, assignmentOps);
 
-        for (auto other_op = other_ops.cbegin(); other_op != other_ops.cend(); ++other_op) {
-            ASSERT_EQUALS_MSG(false, MatchCheck(*other_op, "%cop%"), "Failing other operator: " + *other_op);
+        for (const auto & other_op : utils::as_const(other_ops)) {
+            ASSERT_EQUALS_MSG(false, MatchCheck(other_op, "%cop%"), "Failing other operator: " + other_op);
         }
     }
 
 
     void isArithmeticalOp() const {
-        for (auto test_op = arithmeticalOps.cbegin(); test_op != arithmeticalOps.cend(); ++test_op) {
+        for (const auto & arithmeticalOp : arithmeticalOps) {
             TokensFrontBack tokensFrontBack(list);
             Token tok(tokensFrontBack);
-            tok.str(*test_op);
+            tok.str(arithmeticalOp);
             ASSERT_EQUALS(true, tok.isArithmeticalOp());
         }
 
@@ -858,11 +858,11 @@ private:
         append_vector(other_ops, extendedOps);
         append_vector(other_ops, assignmentOps);
 
-        for (auto other_op = other_ops.cbegin(); other_op != other_ops.cend(); ++other_op) {
+        for (const auto & other_op : other_ops) {
             TokensFrontBack tokensFrontBack(list);
             Token tok(tokensFrontBack);
-            tok.str(*other_op);
-            ASSERT_EQUALS_MSG(false, tok.isArithmeticalOp(), "Failing arithmetical operator: " + *other_op);
+            tok.str(other_op);
+            ASSERT_EQUALS_MSG(false, tok.isArithmeticalOp(), "Failing arithmetical operator: " + other_op);
         }
     }
 
@@ -874,10 +874,10 @@ private:
         append_vector(test_ops, logicalOps);
         append_vector(test_ops, assignmentOps);
 
-        for (auto test_op = test_ops.cbegin(); test_op != test_ops.cend(); ++test_op) {
+        for (const auto & test_op : test_ops) {
             TokensFrontBack tokensFrontBack(list);
             Token tok(tokensFrontBack);
-            tok.str(*test_op);
+            tok.str(test_op);
             ASSERT_EQUALS(true, tok.isOp());
         }
 
@@ -885,11 +885,11 @@ private:
         std::vector<std::string> other_ops;
         append_vector(other_ops, extendedOps);
 
-        for (auto other_op = other_ops.cbegin(); other_op != other_ops.cend(); ++other_op) {
+        for (const auto & other_op : other_ops) {
             TokensFrontBack tokensFrontBack(list);
             Token tok(tokensFrontBack);
-            tok.str(*other_op);
-            ASSERT_EQUALS_MSG(false, tok.isOp(), "Failing normal operator: " + *other_op);
+            tok.str(other_op);
+            ASSERT_EQUALS_MSG(false, tok.isOp(), "Failing normal operator: " + other_op);
         }
     }
 
@@ -900,10 +900,10 @@ private:
         append_vector(test_ops, comparisonOps);
         append_vector(test_ops, logicalOps);
 
-        for (auto test_op = test_ops.cbegin(); test_op != test_ops.cend(); ++test_op) {
+        for (const auto & test_op : test_ops) {
             TokensFrontBack tokensFrontBack(list);
             Token tok(tokensFrontBack);
-            tok.str(*test_op);
+            tok.str(test_op);
             ASSERT_EQUALS(true, tok.isConstOp());
         }
 
@@ -912,11 +912,11 @@ private:
         append_vector(other_ops, extendedOps);
         append_vector(other_ops, assignmentOps);
 
-        for (auto other_op = other_ops.cbegin(); other_op != other_ops.cend(); ++other_op) {
+        for (const auto & other_op : other_ops) {
             TokensFrontBack tokensFrontBack(list);
             Token tok(tokensFrontBack);
-            tok.str(*other_op);
-            ASSERT_EQUALS_MSG(false, tok.isConstOp(), "Failing normal operator: " + *other_op);
+            tok.str(other_op);
+            ASSERT_EQUALS_MSG(false, tok.isConstOp(), "Failing normal operator: " + other_op);
         }
     }
 
@@ -928,27 +928,27 @@ private:
         append_vector(test_ops, logicalOps);
         append_vector(test_ops, extendedOps);
 
-        for (auto test_op = test_ops.cbegin(); test_op != test_ops.cend(); ++test_op) {
+        for (const auto & test_op : test_ops) {
             TokensFrontBack tokensFrontBack(list);
             Token tok(tokensFrontBack);
-            tok.str(*test_op);
+            tok.str(test_op);
             ASSERT_EQUALS(true, tok.isExtendedOp());
         }
 
         // Negative test against assignment operators
-        for (auto other_op = assignmentOps.cbegin(); other_op != assignmentOps.cend(); ++other_op) {
+        for (const auto & assignmentOp : assignmentOps) {
             TokensFrontBack tokensFrontBack(list);
             Token tok(tokensFrontBack);
-            tok.str(*other_op);
-            ASSERT_EQUALS_MSG(false, tok.isExtendedOp(), "Failing assignment operator: " + *other_op);
+            tok.str(assignmentOp);
+            ASSERT_EQUALS_MSG(false, tok.isExtendedOp(), "Failing assignment operator: " + assignmentOp);
         }
     }
 
     void isAssignmentOp() const {
-        for (auto test_op = assignmentOps.cbegin(); test_op != assignmentOps.cend(); ++test_op) {
+        for (const auto & assignmentOp : assignmentOps) {
             TokensFrontBack tokensFrontBack(list);
             Token tok(tokensFrontBack);
-            tok.str(*test_op);
+            tok.str(assignmentOp);
             ASSERT_EQUALS(true, tok.isAssignmentOp());
         }
 
@@ -960,37 +960,37 @@ private:
         append_vector(other_ops, logicalOps);
         append_vector(other_ops, extendedOps);
 
-        for (auto other_op = other_ops.cbegin(); other_op != other_ops.cend(); ++other_op) {
+        for (const auto & other_op : other_ops) {
             TokensFrontBack tokensFrontBack(list);
             Token tok(tokensFrontBack);
-            tok.str(*other_op);
-            ASSERT_EQUALS_MSG(false, tok.isAssignmentOp(), "Failing assignment operator: " + *other_op);
+            tok.str(other_op);
+            ASSERT_EQUALS_MSG(false, tok.isAssignmentOp(), "Failing assignment operator: " + other_op);
         }
     }
 
     void operators() const {
-        for (auto test_op = extendedOps.cbegin(); test_op != extendedOps.cend(); ++test_op) {
+        for (const auto & extendedOp : extendedOps) {
             TokensFrontBack tokensFrontBack(list);
             Token tok(tokensFrontBack);
-            tok.str(*test_op);
+            tok.str(extendedOp);
             ASSERT_EQUALS(Token::eExtendedOp, tok.tokType());
         }
-        for (auto test_op = logicalOps.cbegin(); test_op != logicalOps.cend(); ++test_op) {
+        for (const auto & logicalOp : logicalOps) {
             TokensFrontBack tokensFrontBack(list);
             Token tok(tokensFrontBack);
-            tok.str(*test_op);
+            tok.str(logicalOp);
             ASSERT_EQUALS(Token::eLogicalOp, tok.tokType());
         }
-        for (auto test_op = bitOps.cbegin(); test_op != bitOps.cend(); ++test_op) {
+        for (const auto & bitOp : bitOps) {
             TokensFrontBack tokensFrontBack(list);
             Token tok(tokensFrontBack);
-            tok.str(*test_op);
+            tok.str(bitOp);
             ASSERT_EQUALS(Token::eBitOp, tok.tokType());
         }
-        for (auto test_op = comparisonOps.cbegin(); test_op != comparisonOps.cend(); ++test_op) {
+        for (const auto & comparisonOp : comparisonOps) {
             TokensFrontBack tokensFrontBack(list);
             Token tok(tokensFrontBack);
-            tok.str(*test_op);
+            tok.str(comparisonOp);
             ASSERT_EQUALS(Token::eComparisonOp, tok.tokType());
         }
         TokensFrontBack tokensFrontBack(list);
@@ -1032,11 +1032,11 @@ private:
         standard_types.emplace_back("double");
         standard_types.emplace_back("size_t");
 
-        for (auto test_op = standard_types.cbegin(); test_op != standard_types.cend(); ++test_op) {
+        for (const auto & standard_type : standard_types) {
             TokensFrontBack tokensFrontBack(list);
             Token tok(tokensFrontBack);
-            tok.str(*test_op);
-            ASSERT_EQUALS_MSG(true, tok.isStandardType(), "Failing standard type: " + *test_op);
+            tok.str(standard_type);
+            ASSERT_EQUALS_MSG(true, tok.isStandardType(), "Failing standard type: " + standard_type);
         }
 
         // Negative test

@@ -42,7 +42,6 @@ Checks: >
         -modernize-deprecated-ios-base-aliases,
         -misc-include-cleaner,
         -misc-unused-using-decls,
-        -modernize-loop-convert,
         -modernize-macro-to-enum,
         -modernize-raw-string-literal,
         -modernize-replace-auto-ptr,

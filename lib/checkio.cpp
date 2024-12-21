@@ -289,8 +289,8 @@ void CheckIO::checkFileUsage()
                 switch (operation) {
                 case Filepointer::Operation::OPEN:
                     if (fileNameTok) {
-                        for (auto it = filepointers.cbegin(); it != filepointers.cend(); ++it) {
-                            const Filepointer &fptr = it->second;
+                        for (const auto & filepointer : filepointers) {
+                            const Filepointer &fptr = filepointer.second;
                             if (fptr.filename == fileNameTok->str() && (fptr.mode == OpenMode::RW_MODE || fptr.mode == OpenMode::WRITE_MODE))
                                 incompatibleFileOpenError(tok, fileNameTok->str());
                         }

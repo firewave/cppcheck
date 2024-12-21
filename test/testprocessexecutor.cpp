@@ -108,8 +108,8 @@ private:
 
         std::vector<std::unique_ptr<ScopedFile>> scopedfiles;
         scopedfiles.reserve(filelist.size());
-        for (auto i = filelist.cbegin(); i != filelist.cend(); ++i)
-            scopedfiles.emplace_back(new ScopedFile(i->path(), data));
+        for (const auto & file : utils::as_const(filelist))
+            scopedfiles.emplace_back(new ScopedFile(file.path(), data));
 
         // clear files list so only fileSettings are used
         if (useFS)

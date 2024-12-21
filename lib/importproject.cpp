@@ -1033,9 +1033,9 @@ bool ImportProject::importBcb6Prj(const std::string &projectFilename)
             { "-tWV","-WV" }
         };
 
-        for (auto i = synonyms.cbegin(); i != synonyms.cend(); ++i) {
-            if (cflags.erase(i->first) > 0) {
-                cflags.insert(i->second);
+        for (const auto & synonym : utils::as_const(synonyms)) {
+            if (cflags.erase(synonym.first) > 0) {
+                cflags.insert(synonym.second);
             }
         }
     }

@@ -247,9 +247,9 @@ QStringList ThreadHandler::getReCheckFiles(bool all) const
     std::set<QString> unmodified;
 
     QStringList files;
-    for (int i = 0; i < mLastFiles.size(); ++i) {
-        if (needsReCheck(mLastFiles[i], modified, unmodified))
-            files.push_back(mLastFiles[i]);
+    for (const auto & lastFile : mLastFiles) {
+        if (needsReCheck(lastFile, modified, unmodified))
+            files.push_back(lastFile);
     }
     return files;
 }
