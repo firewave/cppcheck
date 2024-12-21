@@ -711,7 +711,7 @@ unsigned int CppCheck::checkClang(const FileWithDetails &file)
 
     try {
         Tokenizer tokenizer(mSettings, mErrorLogger);
-        tokenizer.list.appendFileIfNew(file.spath());
+        tokenizer.list.appendFileIfNew(file.spath(), file.lang());
         std::istringstream ast(output2);
         clangimport::parseClangAstDump(tokenizer, ast);
         ValueFlow::setValues(tokenizer.list,

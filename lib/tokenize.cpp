@@ -122,6 +122,13 @@ Tokenizer::Tokenizer(const Settings &settings, ErrorLogger &errorLogger) :
     mTemplateSimplifier(new TemplateSimplifier(*this))
 {}
 
+Tokenizer::Tokenizer(const Settings &settings, ErrorLogger &errorLogger, TokenList tokenlist) :
+    list(std::move(tokenlist)),
+    mSettings(settings),
+    mErrorLogger(errorLogger),
+    mTemplateSimplifier(new TemplateSimplifier(*this))
+{}
+
 Tokenizer::~Tokenizer()
 {
     delete mSymbolDatabase;
