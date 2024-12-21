@@ -59,6 +59,8 @@ public:
     TokenList(const TokenList &) = delete;
     TokenList &operator=(const TokenList &) = delete;
 
+    TokenList(TokenList&&) = default;
+
     /** @return the source file path. e.g. "file.cpp" */
     const std::string& getSourceFilePath() const;
 
@@ -103,9 +105,8 @@ public:
      * - UTF in the code are not handled.
      * - comments are not handled.
      * @param code input stream for code
-     * @param file0 source file name
+     * @param lang language
      */
-    bool createTokens(std::istream &code, const std::string& file0);
     bool createTokens(std::istream &code, Standards::Language lang);
 
     void createTokens(simplecpp::TokenList&& tokenList);
@@ -114,7 +115,7 @@ public:
     void deallocateTokens();
 
     /** append file name if seen the first time; return its index in any case */
-    int appendFileIfNew(std::string fileName);
+    int appendFileIfNew(std::string fileName, Standards::Language lang);
 
     /** get first token of list */
     const Token *front() const {

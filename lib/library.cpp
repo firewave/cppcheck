@@ -170,8 +170,9 @@ static std::vector<std::string> getnames(const char *names)
     return ret;
 }
 
-static void gettokenlistfromvalid(const std::string& valid, bool cpp, TokenList& tokenList)
+static TokenList gettokenlistfromvalid(const std::string& valid, bool cpp)
 {
+    TokenList tokenList(nullptr);
     std::istringstream istr(valid + ',');
     tokenList.createTokens(istr, cpp ? Standards::Language::CPP : Standards::Language::C); // TODO: check result?
     for (Token *tok = tokenList.front(); tok; tok = tok->next()) {
@@ -180,6 +181,7 @@ static void gettokenlistfromvalid(const std::string& valid, bool cpp, TokenList&
             tok->deleteNext();
         }
     }
+    return tokenList;
 }
 
 Library::Error Library::load(const char exename[], const char path[], bool debug)
@@ -1056,8 +1058,7 @@ bool Library::isIntArgValid(const Token *ftok, int argnr, const MathLib::bigint 
         return true;
     if (ac->valid.find('.') != std::string::npos)
         return isFloatArgValid(ftok, argnr, argvalue);
-    TokenList tokenList(nullptr);
-    gettokenlistfromvalid(ac->valid, ftok->isCpp(), tokenList);
+    TokenList tokenList = gettokenlistfromvalid(ac->valid, ftok->isCpp());
     for (const Token *tok = tokenList.front(); tok; tok = tok->next()) {
         if (tok->isNumber() && argvalue == MathLib::toBigNumber(tok->str()))
             return true;
@@ -1076,8 +1077,7 @@ bool Library::isFloatArgValid(const Token *ftok, int argnr, double argvalue) con
     const ArgumentChecks *ac = getarg(ftok, argnr);
     if (!ac || ac->valid.empty())
         return true;
-    TokenList tokenList(nullptr);
-    gettokenlistfromvalid(ac->valid, ftok->isCpp(), tokenList);
+    const TokenList tokenList = gettokenlistfromvalid(ac->valid, ftok->isCpp());
     for (const Token *tok = tokenList.front(); tok; tok = tok->next()) {
         if (Token::Match(tok, "%num% : %num%") && argvalue >= MathLib::toDoubleNumber(tok->str()) && argvalue <= MathLib::toDoubleNumber(tok->strAt(2)))
             return true;

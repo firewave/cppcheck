@@ -109,7 +109,7 @@ void TokenList::determineCppC()
     }
 }
 
-int TokenList::appendFileIfNew(std::string fileName)
+int TokenList::appendFileIfNew(std::string fileName, Standards::Language lang)
 {
     // Has this file been tokenized already?
     for (int i = 0; i < mFiles.size(); ++i)
@@ -121,7 +121,7 @@ int TokenList::appendFileIfNew(std::string fileName)
 
     // Update mIsC and mIsCpp properties
     if (mFiles.size() == 1) { // Update only useful if first file added to _files
-        determineCppC();
+        mLang = lang;
     }
     return mFiles.size() - 1;
 }
@@ -334,17 +334,6 @@ void TokenList::insertTokens(Token *dest, const Token *src, nonneg int n)
 
 //---------------------------------------------------------------------------
 // Tokenize - tokenizes a given file.
-//---------------------------------------------------------------------------
-
-bool TokenList::createTokens(std::istream &code, const std::string& file0)
-{
-    ASSERT_LANG(!file0.empty());
-
-    appendFileIfNew(file0);
-
-    return createTokensInternal(code, file0);
-}
-
 //---------------------------------------------------------------------------
 
 bool TokenList::createTokens(std::istream &code, Standards::Language lang)
