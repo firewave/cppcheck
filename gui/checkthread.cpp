@@ -181,7 +181,7 @@ void CheckThread::run()
 
 void CheckThread::runAddonsAndTools(const Settings& settings, const FileSettings *fileSettings, const QString &fileName)
 {
-    for (const QString& addon : mAddonsAndTools) {
+    for (const QString& addon : utils::as_const(mAddonsAndTools)) {
         if (addon == CLANG_ANALYZER || addon == CLANG_TIDY) {
             if (!fileSettings)
                 continue;
@@ -298,7 +298,7 @@ void CheckThread::runAddonsAndTools(const Settings& settings, const FileSettings
             {
                 const QString cmd(clangTidyCmd());
                 QString debug(cmd.contains(" ") ? ('\"' + cmd + '\"') : cmd);
-                for (const QString& arg : args) {
+                for (const QString& arg : utils::as_const(args)) {
                     if (arg.contains(" "))
                         debug += " \"" + arg + '\"';
                     else

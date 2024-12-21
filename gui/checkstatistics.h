@@ -37,6 +37,8 @@
  * A class for check statistics.
  */
 class CheckStatistics : public QObject {
+    Q_OBJECT
+
 public:
     explicit CheckStatistics(QObject *parent = nullptr);
 
