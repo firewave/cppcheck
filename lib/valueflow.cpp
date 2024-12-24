@@ -6916,12 +6916,12 @@ static void valueFlowSafeFunctions(const TokenList& tokenlist, const SymbolDatab
                     std::list<ValueFlow::Value> argValues;
                     argValues.emplace_back(0);
                     argValues.back().valueType = ValueFlow::Value::ValueType::FLOAT;
-                    argValues.back().floatValue = isLow ? (double)low : -1E25;
+                    argValues.back().floatValue = isLow ? static_cast<double>(low) : -1E25;
                     argValues.back().errorPath.emplace_back(arg.nameToken(), "Safe checks: Assuming argument has value " + MathLib::toString(argValues.back().floatValue));
                     argValues.back().safe = true;
                     argValues.emplace_back(0);
                     argValues.back().valueType = ValueFlow::Value::ValueType::FLOAT;
-                    argValues.back().floatValue = isHigh ? (double)high : 1E25;
+                    argValues.back().floatValue = isHigh ? static_cast<double>(high) : 1E25;
                     argValues.back().errorPath.emplace_back(arg.nameToken(), "Safe checks: Assuming argument has value " + MathLib::toString(argValues.back().floatValue));
                     argValues.back().safe = true;
                     valueFlowForward(const_cast<Token*>(functionScope->bodyStart->next()),
