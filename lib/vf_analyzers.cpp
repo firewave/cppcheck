@@ -470,7 +470,7 @@ private:
             return T{};
         }
         if (assign == "=")
-            return y;
+            return (T)y;
         return calculate<T, T>(removeAssign(assign), x, y, error);
     }
 
