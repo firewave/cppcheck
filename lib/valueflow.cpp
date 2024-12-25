@@ -1936,10 +1936,8 @@ static void valueFlowForwardLifetime(Token * tok, const TokenList &tokenlist, Er
         if (!expr)
             return;
 
-        if (expr->exprId() == 0)
+        if (expr->exprId() <= 0)
             return;
-
-        const Token* endOfVarScope = ValueFlow::getEndOfExprScope(expr);
 
         // Only forward lifetime values
         std::list<ValueFlow::Value> values = parent->astOperand2()->values();
@@ -1951,35 +1949,41 @@ static void valueFlowForwardLifetime(Token * tok, const TokenList &tokenlist, Er
             });
         });
 
+        if (values.empty())
+            return;
+
         // Skip RHS
         Token* nextExpression = nextAfterAstRightmostLeaf(parent);
+        const Token* endOfVarScope = ValueFlow::getEndOfExprScope(expr);
 
-        if (expr->exprId() > 0) {
-            valueFlowForward(nextExpression, endOfVarScope->next(), expr, values, tokenlist, errorLogger, settings);
+        valueFlowForward(nextExpression, endOfVarScope->next(), expr, values, tokenlist, errorLogger, settings);
 
+        // TODO: handle `[`
+        if (Token::simpleMatch(parent->astOperand1(), ".")) {
             for (ValueFlow::Value& val : values) {
                 if (val.lifetimeKind == ValueFlow::Value::LifetimeKind::Address)
                     val.lifetimeKind = ValueFlow::Value::LifetimeKind::SubObject;
             }
-            // TODO: handle `[`
-            if (Token::simpleMatch(parent->astOperand1(), ".")) {
-                const Token* parentLifetime =
-                    getParentLifetime(parent->astOperand1()->astOperand2(), settings.library);
-                if (parentLifetime && parentLifetime->exprId() > 0) {
-                    valueFlowForward(nextExpression, endOfVarScope, parentLifetime, std::move(values), tokenlist, errorLogger, settings);
-                }
+
+            const Token* parentLifetime =
+                getParentLifetime(parent->astOperand1()->astOperand2(), settings.library);
+            if (parentLifetime && parentLifetime->exprId() > 0) {
+                valueFlowForward(nextExpression, endOfVarScope, parentLifetime, std::move(values), tokenlist, errorLogger, settings);
             }
         }
-        // Constructor
-    } else if (Token::simpleMatch(parent, "{") && !isScopeBracket(parent)) {
+    }
+    // Constructor
+    else if (Token::simpleMatch(parent, "{") && !isScopeBracket(parent)) {
         valueFlowLifetimeConstructor(parent, tokenlist, errorLogger, settings);
         valueFlowForwardLifetime(parent, tokenlist, errorLogger, settings);
-        // Function call
-    } else if (Token::Match(parent->previous(), "%name% (")) {
+    }
+    // Function call
+    else if (Token::Match(parent->previous(), "%name% (")) {
         valueFlowLifetimeFunction(parent->previous(), tokenlist, errorLogger, settings);
         valueFlowForwardLifetime(parent, tokenlist, errorLogger, settings);
-        // Variable
-    } else if (tok->variable() && tok->variable()->scope()) {
+    }
+    // Variable
+    else if (tok->variable() && tok->variable()->scope()) {
         const Variable *var = tok->variable();
         const Token *endOfVarScope = var->scope()->bodyEnd;
 
@@ -1988,8 +1992,9 @@ static void valueFlowForwardLifetime(Token * tok, const TokenList &tokenlist, Er
         // Only forward lifetime values
         values.remove_if(&isNotLifetimeValue);
         valueFlowForward(nextExpression, endOfVarScope, tok, std::move(values), tokenlist, errorLogger, settings);
-        // Cast
-    } else if (parent->isCast()) {
+    }
+    // Cast
+    else if (parent->isCast()) {
         std::list<ValueFlow::Value> values = tok->values();
         // Only forward lifetime values
         values.remove_if(&isNotLifetimeValue);
