@@ -758,11 +758,11 @@ static ValueFlow::Value getLifetimeIteratorValue(const Token* tok, MathLib::bigi
     auto it = findIterVal(values, values.begin());
     if (it != values.end()) {
         auto it2 = findIterVal(values, it + 1);
-        if (it2 == values.cend())
-            return *it;
+        if (it2 == values.end())
+            return std::move(*it);
     }
     if (values.size() == 1)
-        return values.front();
+        return std::move(values.front());
     return ValueFlow::Value{};
 }
 
