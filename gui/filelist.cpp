@@ -19,6 +19,7 @@
 #include "filelist.h"
 
 #include "pathmatch.h"
+#include "utils.h"
 
 #include <algorithm>
 #include <iterator>
@@ -72,7 +73,7 @@ void FileList::addDirectory(const QString &directory, bool recursive)
 
         dir.setNameFilters(origNameFilters);
         dir.setFilter(QDir::Dirs | QDir::NoDotAndDotDot);
-        for (const QFileInfo& item : dir.entryInfoList()) {
+        for (const QFileInfo& item : utils::as_consTdir.entryInfoList()) {
             const QString path = item.canonicalFilePath();
             addDirectory(path, recursive);
         }
