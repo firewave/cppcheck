@@ -1076,7 +1076,7 @@ QPair<bool,Settings> MainWindow::getCppcheckSettings()
 
         result.inlineSuppressions = mProjectFile->getInlineSuppression();
 
-        const QStringList defines = mProjectFile->getDefines();
+        const QStringList& defines = mProjectFile->getDefines();
         for (const QString& define : defines) {
             if (!result.userDefines.empty())
                 result.userDefines += ";";
@@ -1085,12 +1085,10 @@ QPair<bool,Settings> MainWindow::getCppcheckSettings()
 
         result.clang = mProjectFile->clangParser;
 
-        const QStringList undefines = mProjectFile->getUndefines();
-        for (const QString& undefine : undefines)
+        for (const QString& undefine : mProjectFile->getUndefines())
             result.userUndefs.insert(undefine.toStdString());
 
-        const QStringList libraries = mProjectFile->getLibraries();
-        for (const QString& library : libraries) {
+        for (const QString& library : mProjectFile->getLibraries()) {
             result.libraries.emplace_back(library.toStdString());
             const QString filename = library + ".cfg";
             tryLoadLibrary(result.library, filename);
@@ -2183,7 +2181,7 @@ void MainWindow::suppressIds(QStringList ids)
     ids.removeDuplicates();
 
     QList<SuppressionList::Suppression> suppressions = mProjectFile->getSuppressions();
-    for (const QString& id : ids) {
+    for (const QString& id : utils::as_const(ids)) {
         // Remove all matching suppressions
         std::string id2 = id.toStdString();
         for (int i = 0; i < suppressions.size();) {
