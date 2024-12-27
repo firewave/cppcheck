@@ -9,6 +9,10 @@ permissions:
 
 jobs:
   Fuzzing:
+    strategy:
+      matrix:
+        sanitizer: [address, undefined]
+
     runs-on: ubuntu-latest
     if: ${{ github.repository_owner == 'danmar' }}
     steps:
@@ -19,6 +23,7 @@ jobs:
         oss-fuzz-project-name: 'cppcheck'
         dry-run: false
         language: c++
+        sanitizer: ${{ matrix.sanitizer }}
     - name: Run Fuzzers
       uses: google/oss-fuzz/infra/cifuzz/actions/run_fuzzers@master
       with:
@@ -26,6 +31,7 @@ jobs:
         fuzz-seconds: 300
         dry-run: false
         language: c++
+        sanitizer: ${{ matrix.sanitizer }}
     - name: Upload Crash
       uses: actions/upload-artifact@v4
       if: failure() && steps.build.outcome == 'success'
