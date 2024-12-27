@@ -332,7 +332,7 @@ CmdLineParser::Result CmdLineParser::parseFromArgs(int argc, const char* const a
         if (std::strcmp(argv[i], "--doc") == 0) {
             std::ostringstream doc;
             // Get documentation..
-            for (const Check * it : Check::instances()) {
+            for (const Check * it : utils::as_const(Check::instances())) {
                 const std::string& name(it->name());
                 const std::string info(it->classInfo());
                 if (!name.empty() && !info.empty())

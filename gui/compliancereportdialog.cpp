@@ -184,14 +184,14 @@ void ComplianceReportDialog::save()
             p.ignorePaths(toStdStringList(mProjectFile->getExcludedPaths()));
 
             QDir dir(inf.absoluteDir());
-            for (const FileSettings& fs: p.fileSettings)
+            for (const FileSettings& fs: utils::as_const(p.fileSettings))
                 fileList.addFile(dir.relativeFilePath(QString::fromStdString(fs.filename())));
         }
 
         QSet<QString> allFiles;
         for (const QString &sourcefile: fileList.getFileList())
             addHeaders(sourcefile, allFiles);
-        for (const QString& fileName: allFiles) {
+        for (const QString& fileName: utils::as_const(allFiles)) {
             QFile f(fileName);
             if (f.open(QFile::ReadOnly)) {
                 QCryptographicHash hash(QCryptographicHash::Algorithm::Md5);
