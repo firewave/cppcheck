@@ -32,6 +32,7 @@
 #include "resultstree.h"
 #include "settings.h"
 #include "txtreport.h"
+#include "utils.h"
 #include "xmlreport.h"
 #include "xmlreportv2.h"
 

@@ -820,7 +820,7 @@ void ProjectFileDialog::setSuppressions(const QList<SuppressionList::Suppression
     mUI->mListSuppressions->clear();
     QList<SuppressionList::Suppression> new_suppressions = suppressions;
     mSuppressions.clear();
-    for (const SuppressionList::Suppression &suppression : new_suppressions) {
+    for (const SuppressionList::Suppression &suppression : utils::as_const(new_suppressions)) {
         addSingleSuppression(suppression);
     }
     mUI->mListSuppressions->sortItems();

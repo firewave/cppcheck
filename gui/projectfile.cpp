@@ -991,14 +991,14 @@ bool ProjectFile::write(const QString &filename)
     writeStringList(xmlWriter, mTags, CppcheckXml::TagsElementName, CppcheckXml::TagElementName);
     if (!mWarningTags.empty()) {
         QStringList tags;
-        for (const auto& wt: mWarningTags) {
+        for (const auto& wt: utils::as_const(mWarningTags)) {
             if (!tags.contains(wt.second))
                 tags.append(wt.second);
         }
-        for (const QString &tag: tags) {
+        for (const QString &tag: utils::as_const(tags)) {
             xmlWriter.writeStartElement(CppcheckXml::TagWarningsElementName);
             xmlWriter.writeAttribute(CppcheckXml::TagAttributeName, tag);
-            for (const auto& wt: mWarningTags) {
+            for (const auto& wt: utils::as_const(mWarningTags)) {
                 if (wt.second == tag) {
                     xmlWriter.writeStartElement(CppcheckXml::WarningElementName);
                     xmlWriter.writeAttribute(CppcheckXml::HashAttributeName, QString::number(wt.first));
