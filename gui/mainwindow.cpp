@@ -1110,7 +1110,7 @@ bool MainWindow::getCppcheckSettings(Settings& settings, Suppressions& supprs)
 
         settings.inlineSuppressions = mProjectFile->getInlineSuppression();
 
-        const QStringList defines = mProjectFile->getDefines();
+        const QStringList& defines = mProjectFile->getDefines();
         for (const QString& define : defines) {
             if (!settings.userDefines.empty())
                 settings.userDefines += ";";
@@ -2226,7 +2226,7 @@ void MainWindow::suppressIds(QStringList ids)
     ids.removeDuplicates();
 
     QList<SuppressionList::Suppression> suppressions = mProjectFile->getSuppressions();
-    for (const QString& id : ids) {
+    for (const QString& id : utils::as_const(ids)) {
         // Remove all matching suppressions
         std::string id2 = id.toStdString();
         for (int i = 0; i < suppressions.size();) {

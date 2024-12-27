@@ -203,7 +203,7 @@ void CheckClass::constructors()
             initializeVarList(func, callstack, scope, usageList);
 
             // Assign 1 union member => assign all union members
-            for (const Usage &usage : usageList) {
+            for (const Usage &usage : utils::as_const(usageList)) {
                 const Variable& var = *usage.var;
                 if (!usage.assign && !usage.init)
                     continue;
@@ -225,7 +225,7 @@ void CheckClass::constructors()
             }
 
             // Check if any variables are uninitialized
-            for (const Usage &usage : usageList) {
+            for (const Usage &usage : utils::as_const(usageList)) {
                 const Variable& var = *usage.var;
 
                 if (usage.assign || usage.init || var.isStatic())
@@ -2799,7 +2799,7 @@ void CheckClass::initializerListOrder()
 
                     for (std::size_t j = 0; j < vars.size(); j++) {
                         // check for use of uninitialized arguments
-                        for (const auto& arg : vars[j].initArgs)
+                        for (const auto& arg : utils::as_const(vars[j].initArgs))
                             if (vars[j].var->index() < arg->index())
                                 initializerListError(vars[j].tok, vars[j].var->nameToken(), scope->className, vars[j].var->name(), arg->name());
 

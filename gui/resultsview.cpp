@@ -32,6 +32,7 @@
 #include "resultstree.h"
 #include "settings.h"
 #include "txtreport.h"
+#include "utils.h"
 #include "xmlreport.h"
 #include "xmlreportv2.h"
 
@@ -425,7 +426,7 @@ void ResultsView::readErrorsXml(const QString &filename)
         msgBox.exec();
     }
 
-    for (const ErrorItem& item : errors) {
+    for (const ErrorItem& item : utils::as_const(errors)) {
         handleCriticalError(item);
         mUI->mTree->addErrorItem(item);
     }

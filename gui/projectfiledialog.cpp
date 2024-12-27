@@ -137,7 +137,7 @@ ProjectFileDialog::ProjectFileDialog(ProjectFile *projectFile, bool premium, QWi
     QStringList libs;
     // Search the std.cfg first since other libraries could depend on it
     QString stdLibraryFilename;
-    for (const QString &sp : searchPaths) {
+    for (const QString &sp : utils::as_const(searchPaths)) {
         QDir dir(sp);
         dir.setSorting(QDir::Name);
         dir.setNameFilters(QStringList("*.cfg"));
@@ -159,7 +159,7 @@ ProjectFileDialog::ProjectFileDialog(ProjectFile *projectFile, bool premium, QWi
             break;
     }
     // Search other libraries
-    for (const QString &sp : searchPaths) {
+    for (const QString &sp : utils::as_const(searchPaths)) {
         QDir dir(sp);
         dir.setSorting(QDir::Name);
         dir.setNameFilters(QStringList("*.cfg"));
@@ -187,7 +187,7 @@ ProjectFileDialog::ProjectFileDialog(ProjectFile *projectFile, bool premium, QWi
     }
     libs.sort();
     mUI->mLibraries->clear();
-    for (const QString &lib : libs) {
+    for (const QString &lib : utils::as_const(libs)) {
         auto* item = new QListWidgetItem(lib, mUI->mLibraries);
         item->setFlags(item->flags() | Qt::ItemIsUserCheckable); // set checkable flag
         item->setCheckState(Qt::Unchecked); // AND initialize check state
@@ -812,7 +812,7 @@ void ProjectFileDialog::setSuppressions(const QList<SuppressionList::Suppression
     mUI->mListSuppressions->clear();
     QList<SuppressionList::Suppression> new_suppressions = suppressions;
     mSuppressions.clear();
-    for (const SuppressionList::Suppression &suppression : new_suppressions) {
+    for (const SuppressionList::Suppression &suppression : utils::as_const(new_suppressions)) {
         addSingleSuppression(suppression);
     }
     mUI->mListSuppressions->sortItems();
