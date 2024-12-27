@@ -891,7 +891,7 @@ bool ProjectFile::write(const QString &filename)
 
     if (!mIncludeDirs.isEmpty()) {
         xmlWriter.writeStartElement(CppcheckXml::IncludeDirElementName);
-        for (const QString& incdir : mIncludeDirs) {
+        for (const QString& incdir : utils::as_const(mIncludeDirs)) {
             xmlWriter.writeStartElement(CppcheckXml::DirElementName);
             xmlWriter.writeAttribute(CppcheckXml::DirNameAttrib, incdir);
             xmlWriter.writeEndElement();
@@ -901,7 +901,7 @@ bool ProjectFile::write(const QString &filename)
 
     if (!mDefines.isEmpty()) {
         xmlWriter.writeStartElement(CppcheckXml::DefinesElementName);
-        for (const QString& define : mDefines) {
+        for (const QString& define : utils::as_const(mDefines)) {
             xmlWriter.writeStartElement(CppcheckXml::DefineName);
             xmlWriter.writeAttribute(CppcheckXml::DefineNameAttrib, define);
             xmlWriter.writeEndElement();
@@ -923,7 +923,7 @@ bool ProjectFile::write(const QString &filename)
 
     if (!mPaths.isEmpty()) {
         xmlWriter.writeStartElement(CppcheckXml::PathsElementName);
-        for (const QString& path : mPaths) {
+        for (const QString& path : utils::as_const(mPaths)) {
             xmlWriter.writeStartElement(CppcheckXml::PathName);
             xmlWriter.writeAttribute(CppcheckXml::PathNameAttrib, path);
             xmlWriter.writeEndElement();
@@ -933,7 +933,7 @@ bool ProjectFile::write(const QString &filename)
 
     if (!mExcludedPaths.isEmpty()) {
         xmlWriter.writeStartElement(CppcheckXml::ExcludeElementName);
-        for (const QString& path : mExcludedPaths) {
+        for (const QString& path : utils::as_const(mExcludedPaths)) {
             xmlWriter.writeStartElement(CppcheckXml::ExcludePathName);
             xmlWriter.writeAttribute(CppcheckXml::ExcludePathNameAttrib, path);
             xmlWriter.writeEndElement();
@@ -948,7 +948,7 @@ bool ProjectFile::write(const QString &filename)
 
     if (!mSuppressions.isEmpty()) {
         xmlWriter.writeStartElement(CppcheckXml::SuppressionsElementName);
-        for (const SuppressionList::Suppression &suppression : mSuppressions) {
+        for (const SuppressionList::Suppression &suppression : utils::as_const(mSuppressions)) {
             xmlWriter.writeStartElement(CppcheckXml::SuppressionElementName);
             if (!suppression.fileName.empty())
                 xmlWriter.writeAttribute("fileName", QString::fromStdString(suppression.fileName));
@@ -990,14 +990,14 @@ bool ProjectFile::write(const QString &filename)
     writeStringList(xmlWriter, mTags, CppcheckXml::TagsElementName, CppcheckXml::TagElementName);
     if (!mWarningTags.empty()) {
         QStringList tags;
-        for (const auto& wt: mWarningTags) {
+        for (const auto& wt: utils::as_const(mWarningTags)) {
             if (!tags.contains(wt.second))
                 tags.append(wt.second);
         }
-        for (const QString &tag: tags) {
+        for (const QString &tag: utils::as_const(tags)) {
             xmlWriter.writeStartElement(CppcheckXml::TagWarningsElementName);
             xmlWriter.writeAttribute(CppcheckXml::TagAttributeName, tag);
-            for (const auto& wt: mWarningTags) {
+            for (const auto& wt: utils::as_const(mWarningTags)) {
                 if (wt.second == tag) {
                     xmlWriter.writeStartElement(CppcheckXml::WarningElementName);
                     xmlWriter.writeAttribute(CppcheckXml::HashAttributeName, QString::number(wt.first));
@@ -1168,7 +1168,7 @@ QString ProjectFile::getAddonFilePath(QString filesDir, const QString &addon)
 #endif
     ;
 
-    for (const QString& path : searchPaths) {
+    for (const QString& path : utils::as_const(searchPaths)) {
         QString f = path + addon + ".py";
         if (QFile(f).exists())
             return f;
