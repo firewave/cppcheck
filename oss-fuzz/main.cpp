@@ -43,7 +43,7 @@ public:
 };
 
 static DummyErrorLogger s_errorLogger;
-static const FileWithDetails s_file("test.cpp");
+static const FileWithDetails s_file("test.c");
 
 static void doCheck(const std::string& code)
 {
