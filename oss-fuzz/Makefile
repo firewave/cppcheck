@@ -132,7 +132,7 @@ do-fuzz: oss-fuzz-client preprare-samples
 	mkdir -p corpus
 	./oss-fuzz-client -only_ascii=1 -timeout=5 -detect_leaks=0 corpus samples ../test/cli/fuzz-crash ../test/cli/fuzz-crash_c ../test/cli/fuzz-timeout
 
-dedup-corpus: oss-fuzz-client preprare-samples
+dedup-corpus: preprare-samples
 	mv corpus corpus_
 	mkdir -p corpus
 	./oss-fuzz-client -only_ascii=1 -timeout=5 -detect_leaks=0 corpus corpus_ samples ../test/cli/fuzz-crash ../test/cli/fuzz-crash_c ../test/cli/fuzz-timeout -merge=1
