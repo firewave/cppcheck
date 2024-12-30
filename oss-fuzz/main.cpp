@@ -58,7 +58,7 @@ static Settings create_settings()
 }
 static const Settings s_settings = create_settings();
 static DummyErrorLogger s_errorLogger;
-static const FileWithDetails s_file("test.cpp", Standards::Language::CPP, 0);
+static const FileWithDetails s_file("test.cpp", Standards::Language::C, 0);
 
 static void doCheck(const std::string& code)
 {
