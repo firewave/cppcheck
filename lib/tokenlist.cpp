@@ -361,31 +361,26 @@ bool TokenList::createTokens(std::istream &code, Standards::Language lang)
 
 //---------------------------------------------------------------------------
 
-//#define STORE_INPUT
-
-#ifdef STORE_INPUT
 #include <atomic>
 #include <fstream>
 #include <sstream>
 
-static void storeInput(std::istream &code)
+static void storeInput(const std::string& dir, std::istream &code)
 {
     static std::atomic_uint64_t num(0);
     {
         std::ostringstream oss;
         oss << code.rdbuf();
         code.seekg(0);
-        std::ofstream out("/home/user/_test/" + std::to_string(num++)); // TODO: how to configure?
+        std::ofstream out(dir + "/" + std::to_string(num++));
         out << oss.str();
     }
 }
-#endif
 
 bool TokenList::createTokensInternal(std::istream &code, const std::string& file0)
 {
-#ifdef STORE_INPUT
-    storeInput(code);
-#endif
+    if (!mSettings->storeInputDir.empty())
+        storeInput(code);
 
     simplecpp::OutputList outputList;
     simplecpp::TokenList tokens(code, mFiles, file0, &outputList);

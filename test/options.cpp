@@ -22,6 +22,7 @@ options::options(int argc, const char* const argv[])
     ,mHelp(mWhichTests.count("-h") != 0 || mWhichTests.count("--help"))
     ,mSummary(mWhichTests.count("-n") == 0)
     ,mDryRun(mWhichTests.count("-d") != 0)
+    ,mExtract(mWhichTests.count("-x") != 0 ? : "")
     ,mExe(argv[0])
 {
     for (std::set<std::string>::const_iterator it = mWhichTests.cbegin(); it != mWhichTests.cend();) {
@@ -54,6 +55,11 @@ bool options::summary() const
 bool options::dry_run() const
 {
     return mDryRun;
+}
+
+bool options::extract() const
+{
+    return mExtract;
 }
 
 const std::set<std::string>& options::which_test() const
