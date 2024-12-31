@@ -51,8 +51,8 @@ public:
     static void analyseWholeProgram(const Settings &settings, ErrorLogger& errorLogger, const std::string &buildDir);
 
     static void getErrorMessages(ErrorLogger &errorLogger) {
-        unusedFunctionError(errorLogger, "", 0, 0, 0, "funcName");
-        staticFunctionError(errorLogger, "", 0, 0, 0, "funcName");
+        unusedFunctionError(errorLogger, "", 0, 0, "funcName");
+        staticFunctionError(errorLogger, "", 0, 0, "funcName");
     }
 
     // Return true if an error is reported.
@@ -62,11 +62,11 @@ public:
 
 private:
     static void unusedFunctionError(ErrorLogger& errorLogger,
-                                    const std::string &filename, nonneg int fileIndex, nonneg int lineNumber, nonneg int column,
+                                    const std::string &filename, unsigned int lineNumber, nonneg int column,
                                     const std::string &funcname);
 
     static void staticFunctionError(ErrorLogger& errorLogger,
-                                    const std::string &filename, nonneg int fileIndex, nonneg int lineNumber, nonneg int column,
+                                    const std::string &filename, unsigned int lineNumber, nonneg int column,
                                     const std::string &funcname);
 
     struct CPPCHECKLIB FunctionUsage {

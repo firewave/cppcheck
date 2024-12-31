@@ -343,13 +343,12 @@ static bool isOperatorFunction(const std::string & funcName)
 }
 
 void CheckUnusedFunctions::staticFunctionError(ErrorLogger& errorLogger,
-                                               const std::string &filename, nonneg int fileIndex, nonneg int lineNumber, nonneg int column,
+                                               const std::string &filename, unsigned int lineNumber, nonneg int column,
                                                const std::string &funcname)
 {
     std::list<ErrorMessage::FileLocation> locationList;
     if (!filename.empty()) {
         locationList.emplace_back(filename, lineNumber, column);
-        locationList.back().fileIndex = fileIndex;
     }
 
     const ErrorMessage errmsg(std::move(locationList), "", Severity::style, "$symbol:" + funcname + "\nThe function '$symbol' should have static linkage since it is not used outside of its translation unit.", "staticFunction", Certainty::normal);
@@ -367,8 +366,8 @@ bool CheckUnusedFunctions::check(const Settings& settings, ErrorLogger& errorLog
 {
     logChecker("CheckUnusedFunctions::check"); // unusedFunction
 
-    // filename, fileindex, line, column
-    using ErrorParams = std::tuple<std::string, nonneg int, nonneg int, nonneg int, std::string>;
+    // filename, line, column
+    using ErrorParams = std::tuple<std::string, unsigned int, nonneg int, std::string>;
     std::vector<ErrorParams> errors; // ensure well-defined order
     std::vector<ErrorParams> staticFunctionErrors;
 
@@ -384,28 +383,28 @@ bool CheckUnusedFunctions::check(const Settings& settings, ErrorLogger& errorLog
             std::string filename;
             if (func.filename != "+")
                 filename = func.filename;
-            errors.emplace_back(filename, func.fileIndex, func.lineNumber, func.column, it->first);
+            errors.emplace_back(filename, func.lineNumber, func.column, it->first);
         } else if (func.isC && !func.isStatic) {
             std::string filename;
             if (func.filename != "+")
                 filename = func.filename;
-            staticFunctionErrors.emplace_back(filename, func.fileIndex, func.lineNumber, func.column, it->first);
+            staticFunctionErrors.emplace_back(filename, func.lineNumber, func.column, it->first);
         }
     }
 
     std::sort(errors.begin(), errors.end());
     for (const auto& e : errors)
-        unusedFunctionError(errorLogger, std::get<0>(e), std::get<1>(e), std::get<2>(e), std::get<3>(e), std::get<4>(e));
+        unusedFunctionError(errorLogger, std::get<0>(e), std::get<1>(e), std::get<2>(e), std::get<3>(e));
 
     std::sort(staticFunctionErrors.begin(), staticFunctionErrors.end());
     for (const auto& e : staticFunctionErrors)
-        staticFunctionError(errorLogger, std::get<0>(e), std::get<1>(e), std::get<2>(e), std::get<3>(e), std::get<4>(e));
+        staticFunctionError(errorLogger, std::get<0>(e), std::get<1>(e), std::get<2>(e), std::get<3>(e));
 
     return !errors.empty();
 }
 
 void CheckUnusedFunctions::unusedFunctionError(ErrorLogger& errorLogger,
-                                               const std::string &filename, nonneg int fileIndex, nonneg int lineNumber, nonneg int column,
+                                               const std::string &filename, unsigned int lineNumber, nonneg int column,
                                                const std::string &funcname)
 {
     std::list<ErrorMessage::FileLocation> locationList;
@@ -496,7 +495,7 @@ void CheckUnusedFunctions::analyseWholeProgram(const Settings &settings, ErrorLo
 
         if (calls.find(functionName) == calls.end() && !isOperatorFunction(functionName)) {
             const Location &loc = decl->second;
-            unusedFunctionError(errorLogger, loc.fileName, /*fileIndex*/ 0, loc.lineNumber, loc.column, functionName);
+            unusedFunctionError(errorLogger, loc.fileName, loc.lineNumber, loc.column, functionName);
         }
     }
 }
