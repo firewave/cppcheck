@@ -48,6 +48,12 @@ namespace tinyxml2 {
 // TODO: make Tokenizer private
 class SimpleTokenizer : public Tokenizer {
 public:
+    enum class Input : std::uint8_t {
+        Cpp = (1<<0),
+        C = (1<<1),
+        Header = (1<<2)
+    };
+
     template<size_t size>
     SimpleTokenizer(ErrorLogger& errorlogger, const char (&code)[size], bool cpp = true)
         : Tokenizer{s_settings, errorlogger}
