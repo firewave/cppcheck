@@ -73,6 +73,7 @@ private:
         TEST_CASE(structmember26); // #13345
         TEST_CASE(structmember27); // #13367
         TEST_CASE(structmember_macro);
+        TEST_CASE(structmember_header);
         TEST_CASE(classmember);
 
         TEST_CASE(localvar1);
@@ -1987,6 +1988,58 @@ private:
         checkStructMemberUsageP("#define S(n) struct n { int a, b, c; };\n"
                                 "S(unused);\n");
         ASSERT_EQUALS("", errout_str());
+    }
+
+    void structmember_header() {
+        checkStructMemberUsage("struct S {\n"
+                               "int i;\n"
+                               "};\n", true);
+        ASSERT_EQUALS("", errout_str());
+
+        checkStructMemberUsage("struct S {\n"
+                               "protected:"
+                               "int i;\n"
+                               "};\n", true);
+        ASSERT_EQUALS("", errout_str());
+
+        checkStructMemberUsage("struct S {\n"
+                               "struct S1 {"
+                               "int i;\n"
+                               "};"
+                               "};\n", true);
+        ASSERT_EQUALS("", errout_str());
+
+        checkStructMemberUsage("struct S {\n"
+                               "protected:"
+                               "struct S1 {"
+                               "int i;\n"
+                               "};"
+                               "};\n", true);
+        ASSERT_EQUALS("", errout_str());
+
+        checkStructMemberUsage("extern struct S {\n"
+                               "int i;\n"
+                               "};\n", true);
+        ASSERT_EQUALS("error", errout_str());
+
+        checkStructMemberUsage("__declspec(dllexport) struct S {\n"
+                               "int i;\n"
+                               "};\n", true);
+        ASSERT_EQUALS("error", errout_str());
+
+        checkStructMemberUsage("struct S {\n"
+                               "private:"
+                               "int i;\n"
+                               "};\n", true);
+        ASSERT_EQUALS("error", errout_str());
+
+        checkStructMemberUsage("struct S {\n"
+                               "private:"
+                               "struct S1 {"
+                               "int i;\n"
+                               "};"
+                               "};\n", true);
+        ASSERT_EQUALS("error", errout_str());
     }
 
     void classmember() {
