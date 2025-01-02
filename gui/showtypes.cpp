@@ -78,7 +78,6 @@ Severity ShowTypes::ShowTypeToSeverity(ShowTypes::ShowType type)
         return Severity::information;
 
     case ShowTypes::ShowNone:
-    default:
         return Severity::none;
     }
 }

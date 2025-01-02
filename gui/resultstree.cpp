@@ -577,7 +577,6 @@ QString ResultsTree::severityToTranslatedString(Severity severity)
         return tr("internal");
 
     case Severity::none:
-    default:
         return QString();
     }
 }

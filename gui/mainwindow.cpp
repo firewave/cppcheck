@@ -978,9 +978,6 @@ bool MainWindow::tryLoadLibrary(Library &library, const QString& filename)
         case Library::ErrorCode::UNKNOWN_ELEMENT:
             errmsg = tr("Unknown element");
             break;
-        default:
-            errmsg = tr("Unknown issue");
-            break;
         }
         if (!error.reason.empty())
             errmsg += " '" + QString::fromStdString(error.reason) + "'";

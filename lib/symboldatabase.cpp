@@ -3830,8 +3830,6 @@ static const char* functionTypeToString(Function::Type type)
         return "Function";
     case Function::eLambda:
         return "Lambda";
-    default:
-        return "Unknown";
     }
 }
 
