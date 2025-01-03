@@ -149,7 +149,7 @@ public:
     std::set<std::string> checkUnknownFunctionReturn; // TODO: move to Library?
 
     /** Check unused/uninstantiated templates */
-    bool checkUnusedTemplates = true; // TODO: CLI
+    bool checkUnusedTemplates = true;
 
     /** Use Clang */
     bool clang{};
