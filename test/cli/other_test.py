@@ -2734,3 +2734,35 @@ void f() {
     assert stderr.splitlines() == [
         '{}:3:13: error: Internal Error. MathLib::toBigUNumber: out_of_range: 0x10000000000000000 [internalError]'.format(test_file)
     ]
+
+
+def test_check_headers(tmp_path):
+    test_file_h = tmp_path / 'test.h'
+    with open(test_file_h, 'wt') as f:
+        f.write(
+"""
+inline void hdr()
+{
+    (void)(*((int*)0));
+}
+""")
+
+    test_file_c = tmp_path / 'test.c'
+    with open(test_file_c, 'wt') as f:
+        f.write(
+"""
+#include "test.h"
+
+void f() {}
+""")
+
+    args = [
+        '-q',
+        '--template=simple',
+        '--no-check-headers',
+        str(test_file_c)
+    ]
+    exitcode, stdout, stderr = cppcheck(args)
+    assert exitcode == 0, stdout
+    assert stdout.splitlines() == []
+    assert stderr.splitlines() == []  # no error since the header is not checked
