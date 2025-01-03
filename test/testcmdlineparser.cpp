@@ -421,6 +421,9 @@ private:
         TEST_CASE(debugLookupPlatform);
         TEST_CASE(maxTemplateRecursion);
         TEST_CASE(maxTemplateRecursionMissingCount);
+        TEST_CASE(checkHeaders);
+        TEST_CASE(noCheckHeaders);
+        TEST_CASE(noCheckHeaders2);
 
         TEST_CASE(ignorepaths1);
         TEST_CASE(ignorepaths2);
@@ -2897,6 +2900,27 @@ private:
         const char * const argv[] = {"cppcheck", "--max-template-recursion=", "file.cpp"};
         ASSERT_EQUALS_ENUM(CmdLineParser::Result::Fail, parser->parseFromArgs(3, argv));
         ASSERT_EQUALS("cppcheck: error: argument to '--max-template-recursion=' is not valid - not an integer.\n", logger->str());
+    }
+
+    void checkHeaders() {
+        REDIRECT;
+        const char * const argv[] = {"cppcheck", "--check-headers", "file.cpp"};
+        ASSERT_EQUALS_ENUM(CmdLineParser::Result::Success, parser->parseFromArgs(3, argv));
+        ASSERT_EQUALS(true, settings->checkHeaders);
+    }
+
+    void noCheckHeaders() {
+        REDIRECT;
+        const char * const argv[] = {"cppcheck", "--no-check-headers", "file.cpp"};
+        ASSERT_EQUALS_ENUM(CmdLineParser::Result::Success, parser->parseFromArgs(3, argv));
+        ASSERT_EQUALS(false, settings->checkHeaders);
+    }
+
+    void noCheckHeaders2() {
+        REDIRECT;
+        const char * const argv[] = {"cppcheck", "--check-headers", "--no-check-headers", "file.cpp"};
+        ASSERT_EQUALS_ENUM(CmdLineParser::Result::Success, parser->parseFromArgs(4, argv));
+        ASSERT_EQUALS(false, settings->checkHeaders);
     }
 
     void ignorepaths1() {
