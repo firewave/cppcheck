@@ -23,12 +23,41 @@
 
 #include <cstdlib>
 
+#include <cfenv>
+#include <iostream>
+
+#ifdef _MSC_VER
+#include <float.h>
+#endif
+
 int main(int argc, char *argv[])
 {
     // MS Visual C++ memory leak debug tracing
 #if defined(_MSC_VER) && defined(_DEBUG)
     _CrtSetDbgFlag(_CrtSetDbgFlag(_CRTDBG_REPORT_FLAG) | _CRTDBG_LEAK_CHECK_DF);
 #endif
+
+#ifdef __GNUC__
+    if (feenableexcept(FE_ALL_EXCEPT) != 0)
+    {
+        std::cerr << "failed to enable traps for floating-point exceptions - exiting" << std::endl;
+        std::exit(EXIT_FAILURE);
+    }
+#elif defined(_MSC_VER)
+    {
+        const unsigned int cw_flags = _EM_INVALID|_EM_DENORMAL|_EM_ZERODIVIDE|_EM_OVERFLOW|_EM_UNDERFLOW|_EM_INEXACT;
+        if (_controlfp(cw_flags, _MCW_EM) != cw_flags)
+        {
+            std::cerr << "failed to set hardware floating-point exception mask - exiting" << std::endl;
+            std::exit(EXIT_FAILURE);
+        }
+    }
+#endif
+    if (std::feraiseexcept(FE_ALL_EXCEPT) != 0)
+    {
+        std::cerr << "failed to raise floating-point exceptions - exiting" << std::endl;
+        std::exit(EXIT_FAILURE);
+    }
 
     Preprocessor::macroChar = '$';     // While macroChar is char(1) per default outside test suite, we require it to be a human-readable character here.
     gDisableColors = true;
