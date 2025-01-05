@@ -552,9 +552,9 @@ std::list<SuppressionList::Suppression> SuppressionList::getUnmatchedInlineSuppr
             continue;
         if (s.hash > 0)
             continue;
-        if (unusedFunction == UnusedFunction::Only && s.errorId != ID_UNUSEDFUNCTION)
+        if (unusedFunction == UnusedFunction::Only && s.errorId != ID_UNUSEDFUNCTION && !startsWith(s.errorId, "ctu") && !startsWith(s.errorId, "misra"))
             continue;
-        if (unusedFunction == UnusedFunction::Exclude && s.errorId == ID_UNUSEDFUNCTION)
+        if (unusedFunction == UnusedFunction::Exclude && (s.errorId == ID_UNUSEDFUNCTION || startsWith(s.errorId, "ctu") || startsWith(s.errorId, "misra")))
             continue;
         result.push_back(s);
     }
