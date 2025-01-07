@@ -253,9 +253,9 @@ private:
         TEST_CASE(returnByReference);
     }
 
-#define checkCopyCtorAndEqOperator(code) checkCopyCtorAndEqOperator_(code, __FILE__, __LINE__)
+#define checkCopyCtorAndEqOperator(...) checkCopyCtorAndEqOperator_(__FILE__, __LINE__, __VA_ARGS__)
     template<size_t size>
-    void checkCopyCtorAndEqOperator_(const char (&code)[size], const char* file, int line) {
+    void checkCopyCtorAndEqOperator_(const char* file, int line, const char (&code)[size]) {
         const Settings settings = settingsBuilder().severity(Severity::warning).build();
 
         // Tokenize..
@@ -356,9 +356,9 @@ private:
         ASSERT_EQUALS("", errout_str());
     }
 
-#define checkExplicitConstructors(code) checkExplicitConstructors_(code, __FILE__, __LINE__)
+#define checkExplicitConstructors(...) checkExplicitConstructors_(__FILE__, __LINE__, __VA_ARGS__)
     template<size_t size>
-    void checkExplicitConstructors_(const char (&code)[size], const char* file, int line) {
+    void checkExplicitConstructors_(const char* file, int line, const char (&code)[size]) {
         // Tokenize..
         SimpleTokenizer tokenizer(settings0, *this);
         ASSERT_LOC(tokenizer.tokenize(code), file, line);
@@ -505,9 +505,9 @@ private:
                       errout_str());
     }
 
-#define checkDuplInheritedMembers(code) checkDuplInheritedMembers_(code, __FILE__, __LINE__)
+#define checkDuplInheritedMembers(...) checkDuplInheritedMembers_( __FILE__, __LINE__, __VA_ARGS__)
     template<size_t size>
-    void checkDuplInheritedMembers_(const char (&code)[size], const char* file, int line) {
+    void checkDuplInheritedMembers_(const char* file, int line, const char (&code)[size]) {
         // Tokenize..
         SimpleTokenizer tokenizer(settings1, *this);
         ASSERT_LOC(tokenizer.tokenize(code), file, line);
@@ -722,9 +722,9 @@ private:
         ASSERT_EQUALS("", errout_str());
     }
 
-#define checkCopyConstructor(code) checkCopyConstructor_(code, __FILE__, __LINE__)
+#define checkCopyConstructor(...) checkCopyConstructor_( __FILE__, __LINE__, __VA_ARGS__)
     template<size_t size>
-    void checkCopyConstructor_(const char (&code)[size], const char* file, int line) {
+    void checkCopyConstructor_(const char* file, int line, const char (&code)[size]) {
         // Tokenize..
         SimpleTokenizer tokenizer(settings3, *this);
         ASSERT_LOC(tokenizer.tokenize(code), file, line);
@@ -1166,9 +1166,9 @@ private:
     }
 
     // Check that operator Equal returns reference to this
-#define checkOpertorEqRetRefThis(code) checkOpertorEqRetRefThis_(code, __FILE__, __LINE__)
+#define checkOpertorEqRetRefThis(...) checkOpertorEqRetRefThis_( __FILE__, __LINE__, __VA_ARGS__)
     template<size_t size>
-    void checkOpertorEqRetRefThis_(const char (&code)[size], const char* file, int line) {
+    void checkOpertorEqRetRefThis_(const char* file, int line, const char (&code)[size]) {
         // Tokenize..
         SimpleTokenizer tokenizer(settings0, *this);
         ASSERT_LOC(tokenizer.tokenize(code), file, line);
@@ -1637,9 +1637,9 @@ private:
     }
 
     // Check that operator Equal checks for assignment to self
-#define checkOpertorEqToSelf(code) checkOpertorEqToSelf_(code, __FILE__, __LINE__)
+#define checkOpertorEqToSelf(...) checkOpertorEqToSelf_( __FILE__, __LINE__, __VA_ARGS__)
     template<size_t size>
-    void checkOpertorEqToSelf_(const char (&code)[size], const char* file, int line) {
+    void checkOpertorEqToSelf_(const char* file, int line, const char (&code)[size]) {
         // Tokenize..
         SimpleTokenizer tokenizer(settings1, *this);
         ASSERT_LOC(tokenizer.tokenize(code), file, line);
@@ -2592,11 +2592,17 @@ private:
         ASSERT_EQUALS("", errout_str());
     }
 
+    struct CheckVirtualDestructorOptions
+    {
+        CheckVirtualDestructorOptions() = default;
+        bool inconclusive = false;
+    };
+
     // Check that base classes have virtual destructors
 #define checkVirtualDestructor(...) checkVirtualDestructor_(__FILE__, __LINE__, __VA_ARGS__)
     template<size_t size>
-    void checkVirtualDestructor_(const char* file, int line, const char (&code)[size], bool inconclusive = false) {
-        const Settings s = settingsBuilder(settings0).certainty(Certainty::inconclusive, inconclusive).severity(Severity::warning).build();
+    void checkVirtualDestructor_(const char* file, int line, const char (&code)[size], const CheckVirtualDestructorOptions& options = make_default_obj()) {
+        const Settings s = settingsBuilder(settings0).certainty(Certainty::inconclusive, options.inconclusive).severity(Severity::warning).build();
 
         // Tokenize..
         SimpleTokenizer tokenizer(s, *this);
@@ -2891,7 +2897,7 @@ private:
                                "public:\n"
                                "    ~Base(){}\n"
                                "    virtual void foo(){}\n"
-                               "};\n", true);
+                               "};\n", dinit(CheckVirtualDestructorOptions, $.inconclusive = true));
         ASSERT_EQUALS("[test.cpp:3]: (warning, inconclusive) Class 'Base' which has virtual members does not have a virtual destructor.\n", errout_str());
 
         checkVirtualDestructor("class Base {\n"
@@ -2906,7 +2912,7 @@ private:
                                "void foo() {\n"
                                "    Base * base = new Derived();\n"
                                "    delete base;\n"
-                               "}\n", true);
+                               "}\n", dinit(CheckVirtualDestructorOptions, $.inconclusive = true));
         ASSERT_EQUALS("[test.cpp:3]: (error) Class 'Base' which is inherited by class 'Derived' does not have a virtual destructor.\n", errout_str());
 
         // class Base destructor is not virtual but protected -> no error
@@ -2915,14 +2921,14 @@ private:
                                "    virtual void foo(){}\n"
                                "protected:\n"
                                "    ~Base(){}\n"
-                               "};\n", true);
+                               "};\n", dinit(CheckVirtualDestructorOptions, $.inconclusive = true));
         ASSERT_EQUALS("", errout_str());
 
         checkVirtualDestructor("class C {\n"
                                "private:\n"
                                "    C();\n"
                                "    virtual ~C();\n"
-                               "};\n", true);
+                               "};\n", dinit(CheckVirtualDestructorOptions, $.inconclusive = true));
         ASSERT_EQUALS("", errout_str());
     }
 
@@ -3579,9 +3585,9 @@ private:
         ASSERT_EQUALS("", errout_str());
     }
 
-#define checkThisSubtraction(code) checkThisSubtraction_(code, __FILE__, __LINE__)
+#define checkThisSubtraction(...) checkThisSubtraction_(__FILE__, __LINE__, __VA_ARGS__)
     template<size_t size>
-    void checkThisSubtraction_(const char (&code)[size], const char* file, int line) {
+    void checkThisSubtraction_(const char* file, int line, const char (&code)[size]) {
         // Tokenize..
         SimpleTokenizer tokenizer(settings1, *this);
         ASSERT_LOC(tokenizer.tokenize(code), file, line);
@@ -3609,10 +3615,17 @@ private:
                       "[test.cpp:3]: (warning) Suspicious pointer subtraction. Did you intend to write '->'?\n", errout_str());
     }
 
+    struct CheckConstOptions
+    {
+        CheckConstOptions() = default;
+        const Settings *s = nullptr;
+        bool inconclusive = true;
+    };
+
 #define checkConst(...) checkConst_(__FILE__, __LINE__, __VA_ARGS__)
     template<size_t size>
-    void checkConst_(const char* file, int line, const char (&code)[size], const Settings *s = nullptr, bool inconclusive = true) {
-        const Settings settings = settingsBuilder(s ? *s : settings0).certainty(Certainty::inconclusive, inconclusive).build();
+    void checkConst_(const char* file, int line, const char (&code)[size], const CheckConstOptions& options = make_default_obj()) {
+        const Settings settings = settingsBuilder(options.s ? *options.s : settings0).certainty(Certainty::inconclusive, options.inconclusive).build();
 
         // Tokenize..
         SimpleTokenizer tokenizer(settings, *this);
@@ -4830,7 +4843,7 @@ private:
                    "    if( m_d != 0 )\n"
                    "        return m_iRealVal / m_d;\n"
                    "    return dRet;\n"
-                   "};", nullptr, true);
+                   "};");
         ASSERT_EQUALS("[test.cpp:9] -> [test.cpp:4]: (style, inconclusive) Technically the member function 'A::dGetValue' can be const.\n", errout_str());
     }
 
@@ -5828,7 +5841,7 @@ private:
                    "  void set(const Key& key) {\n"
                    "      inherited::set(inherited::Key(key));\n"
                    "  }\n"
-                   "};\n", nullptr, false);
+                   "};\n", dinit(CheckConstOptions, $.inconclusive = false));
         ASSERT_EQUALS("[test.cpp:4] -> [test.cpp:2]: (performance, inconclusive) Either there is a missing 'override', or the member function 'MixerParticipant::GetAudioFrame' can be static.\n",
                       errout_str());
     }
@@ -7484,10 +7497,10 @@ private:
                             "    }\n"
                             "};";
 
-        checkConst(code, &settings0, true);
+        checkConst(code, dinit(CheckConstOptions, $.s = &settings0, $.inconclusive = true));
         ASSERT_EQUALS("[test.cpp:3]: (performance, inconclusive) Technically the member function 'foo::f' can be static (but you may consider moving to unnamed namespace).\n", errout_str());
 
-        checkConst(code, &settings0, false); // TODO: Set inconclusive to true (preprocess it)
+        checkConst(code, dinit(CheckConstOptions, $.s = &settings0, $.inconclusive = false)); // TODO: Set inconclusive to true (preprocess it)
         ASSERT_EQUALS("", errout_str());
     }
 
@@ -7613,13 +7626,13 @@ private:
                    "};\n"
                    "void S::f() {\n"
                    "    std::vector<data>::const_iterator end = std.end();\n"
-                   "}\n", &s);
+                   "}\n", dinit(CheckConstOptions, $.s = &s));
         ASSERT_EQUALS("[test.cpp:6] -> [test.cpp:4]: (style, inconclusive) Technically the member function 'S::f' can be const.\n", errout_str());
     }
 
-#define checkInitializerListOrder(code) checkInitializerListOrder_(code, __FILE__, __LINE__)
+#define checkInitializerListOrder(...) checkInitializerListOrder_(__FILE__, __LINE__, __VA_ARGS__)
     template<size_t size>
-    void checkInitializerListOrder_(const char (&code)[size], const char* file, int line) {
+    void checkInitializerListOrder_(const char* file, int line, const char (&code)[size]) {
         // Tokenize..
         SimpleTokenizer tokenizer(settings2, *this);
         ASSERT_LOC(tokenizer.tokenize(code), file, line);
@@ -7768,9 +7781,9 @@ private:
         ASSERT_EQUALS("", errout_str());
     }
 
-#define checkInitializationListUsage(code) checkInitializationListUsage_(code, __FILE__, __LINE__)
+#define checkInitializationListUsage(...) checkInitializationListUsage_(__FILE__, __LINE__, __VA_ARGS__)
     template<size_t size>
-    void checkInitializationListUsage_(const char (&code)[size], const char* file, int line) {
+    void checkInitializationListUsage_(const char* file, int line, const char (&code)[size]) {
         // Check..
         const Settings settings = settingsBuilder().severity(Severity::performance).build();
 
@@ -7980,9 +7993,9 @@ private:
     }
 
 
-#define checkSelfInitialization(code) checkSelfInitialization_(code, __FILE__, __LINE__)
+#define checkSelfInitialization(...) checkSelfInitialization_(__FILE__, __LINE__, __VA_ARGS__)
     template<size_t size>
-    void checkSelfInitialization_(const char (&code)[size], const char* file, int line) {
+    void checkSelfInitialization_(const char* file, int line, const char (&code)[size]) {
         // Tokenize..
         SimpleTokenizer tokenizer(settings0, *this);
         ASSERT_LOC(tokenizer.tokenize(code), file, line);
@@ -8087,12 +8100,11 @@ private:
         ASSERT_EQUALS("", errout_str());
     }
 
-
 #define checkVirtualFunctionCall(...) checkVirtualFunctionCall_(__FILE__, __LINE__, __VA_ARGS__)
     template<size_t size>
-    void checkVirtualFunctionCall_(const char* file, int line, const char (&code)[size], bool inconclusive = true) {
+    void checkVirtualFunctionCall_(const char* file, int line, const char (&code)[size]) {
         // Check..
-        const Settings settings = settingsBuilder().severity(Severity::warning).severity(Severity::style).certainty(Certainty::inconclusive, inconclusive).build();
+        const Settings settings = settingsBuilder().severity(Severity::warning).severity(Severity::style).certainty(Certainty::inconclusive).build();
 
         // Tokenize..
         SimpleTokenizer tokenizer(settings, *this);
@@ -8433,9 +8445,9 @@ private:
     }
 
 
-#define checkOverride(code) checkOverride_(code, __FILE__, __LINE__)
+#define checkOverride(...) checkOverride_(__FILE__, __LINE__, __VA_ARGS__)
     template<size_t size>
-    void checkOverride_(const char (&code)[size], const char* file, int line) {
+    void checkOverride_(const char* file, int line, const char (&code)[size]) {
         const Settings settings = settingsBuilder().severity(Severity::style).build();
 
         // Tokenize..
@@ -8825,9 +8837,9 @@ private:
         ASSERT_EQUALS("", errout_str());
     }
 
-#define checkUnsafeClassRefMember(code) checkUnsafeClassRefMember_(code, __FILE__, __LINE__)
+#define checkUnsafeClassRefMember(...) checkUnsafeClassRefMember_(__FILE__, __LINE__, __VA_ARGS__)
     template<size_t size>
-    void checkUnsafeClassRefMember_(const char (&code)[size], const char* file, int line) {
+    void checkUnsafeClassRefMember_(const char* file, int line, const char (&code)[size]) {
         /*const*/ Settings settings = settingsBuilder().severity(Severity::warning).build();
         settings.safeChecks.classes = true;
 
@@ -8846,9 +8858,9 @@ private:
     }
 
 
-#define checkThisUseAfterFree(code) checkThisUseAfterFree_(code, __FILE__, __LINE__)
+#define checkThisUseAfterFree(...) checkThisUseAfterFree_(__FILE__, __LINE__, __VA_ARGS__)
     template<size_t size>
-    void checkThisUseAfterFree_(const char (&code)[size], const char* file, int line) {
+    void checkThisUseAfterFree_(const char* file, int line, const char (&code)[size]) {
         // Tokenize..
         SimpleTokenizer tokenizer(settings1, *this);
         ASSERT_LOC(tokenizer.tokenize(code), file, line);
@@ -9062,9 +9074,9 @@ private:
     }
 
 
-#define getFileInfo(code) getFileInfo_(code, __FILE__, __LINE__)
+#define getFileInfo(...) getFileInfo_(__FILE__, __LINE__, __VA_ARGS__)
     template<size_t size>
-    void getFileInfo_(const char (&code)[size], const char* file, int line) {
+    void getFileInfo_(const char* file, int line, const char (&code)[size]) {
         // Tokenize..
         SimpleTokenizer tokenizer(settings1, *this);
         ASSERT_LOC(tokenizer.tokenize(code), file, line);

@@ -462,6 +462,7 @@ private:
         TEST_CASE(testDirectiveRelativePath);
     }
 
+    // TODO
 #define tokenizeAndStringify(...) tokenizeAndStringify_(__FILE__, __LINE__, __VA_ARGS__)
     template<size_t size>
     std::string tokenizeAndStringify_(const char* file, int linenr, const char (&code)[size], bool expand = true, Platform::Type platform = Platform::Type::Native,
