@@ -2604,6 +2604,7 @@ TokenImpl::~TokenImpl()
     delete mOriginalName;
     delete mValueType;
     delete mValues;
+    delete mRefs;
 
     if (mTemplateSimplifierPointers) {
         for (auto *templateSimplifierPointer : *mTemplateSimplifierPointers) {
@@ -2691,4 +2692,11 @@ const Token* findLambdaEndScope(const Token* tok) {
 
 const std::string& Token::fileName() const {
     return mTokensFrontBack.list.getFiles()[mImpl->mFileIndex];
+}
+
+const SmallVector<ReferenceToken>& Token::refs() const
+{
+    if (!mImpl->mRefs)
+        mImpl->mRefs = new SmallVector<ReferenceToken>(followAllReferences(this));
+    return *mImpl->mRefs;
 }
