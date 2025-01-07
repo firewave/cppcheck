@@ -643,7 +643,7 @@ private:
         check("void f(char** old, char* value) {\n"
               "    char *str = strdup(value);\n"
               "    memcpy(old, &str, sizeof(char*));\n"
-              "}\n", &s);
+              "}\n", false, &s);
         ASSERT_EQUALS("", errout_str());
     }
 
@@ -652,7 +652,7 @@ private:
         check("void f(char* old, char* value, size_t len) {\n"
               "    char *str = strdup(value);\n"
               "    memcpy(old, str, len);\n"
-              "}\n", &s);
+              "}\n", false, &s);
         ASSERT_EQUALS("[test.cpp:4]: (error) Memory leak: str\n", errout_str());
     }
 
