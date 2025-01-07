@@ -2647,6 +2647,7 @@ Token::Impl::~Impl()
     delete mOriginalName;
     delete mValueType;
     delete mValues;
+    delete mRefs;
 
     if (mTemplateSimplifierPointers) {
         for (auto *p : *mTemplateSimplifierPointers) {
@@ -2737,4 +2738,11 @@ void Token::templateArgFrom(const Token* fromToken) {
     mImpl->mTemplateArgFileIndex = fromToken ? fromToken->mImpl->mFileIndex : -1;
     mImpl->mTemplateArgLineNumber = fromToken ? fromToken->mImpl->mLineNumber : -1;
     mImpl->mTemplateArgColumn = fromToken ? fromToken->mImpl->mColumn : -1;
+}
+
+const SmallVector<ReferenceToken>& Token::refs() const
+{
+    if (!mImpl->mRefs)
+        mImpl->mRefs = new SmallVector<ReferenceToken>(followAllReferences(this));
+    return *mImpl->mRefs;
 }

@@ -24,6 +24,7 @@
 #include "config.h"
 #include "errortypes.h"
 #include "mathlib.h"
+#include "smallvector.h"
 #include "templatesimplifier.h"
 #include "utils.h"
 #include "vfvalue.h"
@@ -54,6 +55,7 @@ class ConstTokenRange;
 class Token;
 struct TokensFrontBack;
 class TokenList;
+struct ReferenceToken;
 
 struct ScopeInfo2 {
     ScopeInfo2(std::string name_, const Token *bodyEnd_, std::set<std::string> usingNamespaces_ = std::set<std::string>()) : name(std::move(name_)), bodyEnd(bodyEnd_), usingNamespaces(std::move(usingNamespaces_)) {}
@@ -169,6 +171,8 @@ private:
 
         void setCppcheckAttribute(CppcheckAttributesType type, MathLib::bigint value);
         bool getCppcheckAttribute(CppcheckAttributesType type, MathLib::bigint &value) const;
+
+        SmallVector<ReferenceToken>* mRefs{};
 
         Impl() : mFunction(nullptr) {}
 
@@ -1352,6 +1356,9 @@ public:
     const std::list<ValueFlow::Value>& values() const {
         return mImpl->mValues ? *mImpl->mValues : mEmptyValueList;
     }
+
+    // provides and caches result of a followAllReferences() call with default parameters
+    const SmallVector<ReferenceToken>& refs() const;
 
     /**
      * Sets the original name.
