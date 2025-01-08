@@ -1993,6 +1993,7 @@ unsigned int CppCheck::analyseWholeProgram(const std::string &buildDir, const st
     std::list<Check::FileInfo*> fileInfoList;
     CTU::FileInfo ctuFileInfo;
 
+    // TODO: report errors on missing/invalid files?
     // Load all analyzer info data..
     const std::string filesTxt(buildDir + "/files.txt");
     std::ifstream fin(filesTxt);
