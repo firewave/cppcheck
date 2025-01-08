@@ -189,6 +189,7 @@ bool Path::isAbsolute(const std::string& path)
 #endif
 }
 
+// TODO: requires normalized paths
 std::string Path::getRelativePath(const std::string& absolutePath, const std::vector<std::string>& basePaths)
 {
     for (const std::string &bp : basePaths) {
@@ -442,6 +443,7 @@ bool Path::exists(const std::string &path, bool* isdir)
     return type == S_IFREG;
 }
 
+// TODO: requires normalized paths
 std::string Path::join(const std::string& path1, const std::string& path2) {
     if (path1.empty() || path2.empty())
         return path1 + path2;
