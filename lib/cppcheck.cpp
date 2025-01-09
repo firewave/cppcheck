@@ -1800,7 +1800,7 @@ bool CppCheck::analyseWholeProgram()
     bool errors = false;
     // Analyse the tokens
     CTU::FileInfo ctu;
-    if (mSettings.useSingleJob() || !mSettings.buildDir.empty())
+    if (mSettings.useSingleJob() && !mSettings.buildDir.empty())
     {
         for (const Check::FileInfo *fi : mFileInfo) {
             const auto *fi2 = dynamic_cast<const CTU::FileInfo *>(fi);

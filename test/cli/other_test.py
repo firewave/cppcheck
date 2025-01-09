@@ -2642,8 +2642,8 @@ f(p);
     assert stderr_2.splitlines() == stderr_exp
 
 
-@pytest.mark.xfail(strict=True)
-def test_ctu_builddir(tmp_path):  # #11883
+#@pytest.mark.xfail(strict=True)
+def test_ctu_builddir(tmp_path):  # #13543
     build_dir = tmp_path / 'b1'
     os.mkdir(build_dir)
 
