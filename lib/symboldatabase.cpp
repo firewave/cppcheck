@@ -3302,8 +3302,8 @@ void SymbolDatabase::addClassFunction(Scope *&scope, const Token *&tok, const To
     }
 
     // search for match
-    for (auto & it1 : scopeList) {
-        Scope *scope1 = &it1;
+    for (const auto & it1 : utils::as_const(scopeList)) {
+        const Scope *scope1 = &it1;
 
         bool match = false;
 
@@ -3361,7 +3361,7 @@ void SymbolDatabase::addClassFunction(Scope *&scope, const Token *&tok, const To
                         continue;
                 }
 
-                Scope *scope2 = scope1;
+                const Scope *scope2 = scope1;
 
                 while (scope2 && count > 1) {
                     count--;
@@ -4081,7 +4081,7 @@ void SymbolDatabase::printOut(const char *title) const
         std::cout << "    nestedList[" << scope.nestedList.size() << "] = (";
 
         std::size_t count = scope.nestedList.size();
-        for (auto *nsi : scope.nestedList) {
+        for (const auto *nsi : scope.nestedList) {
             std::cout << " " << nsi << " " << nsi->type << " " << nsi->className;
             if (count-- > 1)
                 std::cout << ",";
@@ -5273,7 +5273,7 @@ const Enumerator * SymbolDatabase::findEnumerator(const Token * tok, std::set<st
                 if (enumerator) // enum class
                     return enumerator;
                 // enum
-                for (auto *s : scope->nestedList) {
+                for (const auto *s : scope->nestedList) {
                     enumerator = s->findEnumerator(tokStr);
 
                     if (enumerator && !(enumerator->scope && enumerator->scope->enumClass))
@@ -5312,7 +5312,7 @@ const Enumerator * SymbolDatabase::findEnumerator(const Token * tok, std::set<st
                 scope = varTok->variable()->scope();
         }
 
-        for (auto *s : scope->nestedList) {
+        for (const auto *s : scope->nestedList) {
             enumerator = s->findEnumerator(tokStr);
 
             if (enumerator && !(enumerator->scope && enumerator->scope->enumClass))
@@ -5345,7 +5345,7 @@ const Enumerator * SymbolDatabase::findEnumerator(const Token * tok, std::set<st
             if (enumerator && !(enumerator->scope && enumerator->scope->enumClass))
                 return enumerator;
 
-            for (auto *s : scope->nestedList) {
+            for (const auto *s : scope->nestedList) {
                 enumerator = s->findEnumerator(tokStr);
 
                 if (enumerator && !(enumerator->scope && enumerator->scope->enumClass))
