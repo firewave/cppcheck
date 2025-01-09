@@ -421,7 +421,7 @@ CmdLineParser::Result CmdLineParser::parseFromArgs(int argc, const char* const a
             return Result::Exit;
         }
 
-        if (std::strcmp(argv[i], "--show-filesdir") == 0) {
+        if (std::strcmp(argv[i], "--filesdir") == 0) {
 #ifdef FILESDIR
             std::cout << FILESDIR << std::endl;
 #endif
