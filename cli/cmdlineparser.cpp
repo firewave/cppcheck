@@ -459,12 +459,13 @@ CmdLineParser::Result CmdLineParser::parseFromArgs(int argc, const char* const a
                 }
 
                 // No "=", append a "=1"
-                if (define.find('=') == std::string::npos)
-                    define += "=1";
-
-                if (!mSettings.userDefines.empty())
-                    mSettings.userDefines += ";";
-                mSettings.userDefines += define;
+                if (define.find('=') == std::string::npos) {
+                    mSettings.userDefines.emplace_back(std::move(define), "1");
+                }
+                else {
+                    auto parts = splitString(define, '='/*, 2*/);
+                    mSettings.userDefines.emplace_back(std::move(parts.front()), std::move(parts.back()));
+                }
 
                 def = true;
             }

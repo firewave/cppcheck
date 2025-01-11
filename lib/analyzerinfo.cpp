@@ -45,7 +45,7 @@ static std::string getFilename(const std::string &fullpath)
     return fullpath.substr(pos1,pos2);
 }
 
-void AnalyzerInformation::writeFilesTxt(const std::string &buildDir, const std::list<std::string> &sourcefiles, const std::string &userDefines, const std::list<FileSettings> &fileSettings)
+void AnalyzerInformation::writeFilesTxt(const std::string &buildDir, const std::list<std::string> &sourcefiles, const std::list<std::pair<std::string, std::string>> &userDefines, const std::list<FileSettings> &fileSettings)
 {
     std::map<std::string, unsigned int> fileCount;
 

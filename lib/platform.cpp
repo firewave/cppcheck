@@ -437,12 +437,12 @@ std::string Platform::getLimitsDefines(bool c99) const
     return s;
 }
 
-std::string Platform::getLimitsDefines(Standards::cstd_t cstd) const
+std::list<std::pair<std::string, std::string>> Platform::getLimitsDefines(Standards::cstd_t cstd) const
 {
     return getLimitsDefines(cstd >= Standards::cstd_t::C99);
 }
 
-std::string Platform::getLimitsDefines(Standards::cppstd_t cppstd) const
+std::list<std::pair<std::string, std::string>> Platform::getLimitsDefines(Standards::cppstd_t cppstd) const
 {
     return getLimitsDefines(cppstd >= Standards::cppstd_t::CPP11);
 }

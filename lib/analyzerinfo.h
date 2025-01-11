@@ -51,7 +51,7 @@ class CPPCHECKLIB AnalyzerInformation {
 public:
     ~AnalyzerInformation();
 
-    static void writeFilesTxt(const std::string &buildDir, const std::list<std::string> &sourcefiles, const std::string &userDefines, const std::list<FileSettings> &fileSettings);
+    static void writeFilesTxt(const std::string &buildDir, const std::list<std::string> &sourcefiles, const std::list<std::pair<std::string, std::string>> &userDefines, const std::list<FileSettings> &fileSettings);
 
     /** Close current TU.analyzerinfo file */
     void close();

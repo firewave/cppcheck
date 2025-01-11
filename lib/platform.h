@@ -28,6 +28,7 @@
 #include <climits>
 #include <cstddef>
 #include <cstdint>
+#include <list>
 #include <stdexcept>
 #include <string>
 #include <vector>
@@ -193,9 +194,9 @@ public:
     }
 
     /** provides list of defines specified by the limit.h/climits includes */
-    std::string getLimitsDefines(Standards::cstd_t cstd) const;
+    std::list<std::pair<std::string, std::string>> getLimitsDefines(Standards::cstd_t cstd) const;
     /** provides list of defines specified by the limit.h/climits includes */
-    std::string getLimitsDefines(Standards::cppstd_t cppstd) const;
+    std::list<std::pair<std::string, std::string>> getLimitsDefines(Standards::cppstd_t cppstd) const;
 };
 
 /// @}

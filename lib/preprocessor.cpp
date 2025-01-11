@@ -430,7 +430,7 @@ static std::string readcondition(const simplecpp::Token *iftok, const std::set<s
     return cfgStr;
 }
 
-static bool hasDefine(const std::string &userDefines, const std::string &cfg)
+static bool hasDefine(const std::list<std::pair<std::string, std::string>> &userDefines, const std::string &cfg)
 {
     if (cfg.empty()) {
         return false;
@@ -449,7 +449,7 @@ static bool hasDefine(const std::string &userDefines, const std::string &cfg)
     return false;
 }
 
-static std::string cfg(const std::vector<std::string> &configs, const std::string &userDefines)
+static std::string cfg(const std::vector<std::string> &configs, const std::list<std::pair<std::string, std::string>> &userDefines)
 {
     std::set<std::string> configs2(configs.cbegin(), configs.cend());
     std::string ret;
@@ -484,7 +484,7 @@ static bool isUndefined(const std::string &cfg, const std::set<std::string> &und
     return false;
 }
 
-static bool getConfigsElseIsFalse(const std::vector<std::string> &configs_if, const std::string &userDefines)
+static bool getConfigsElseIsFalse(const std::vector<std::string> &configs_if, const std::list<std::pair<std::string, std::string>> &userDefines)
 {
     return std::any_of(configs_if.cbegin(), configs_if.cend(),
                        [&](const std::string &cfg) {
@@ -509,7 +509,7 @@ static const simplecpp::Token *gotoEndIf(const simplecpp::Token *cmdtok)
     return nullptr;
 }
 
-static void getConfigs(const simplecpp::TokenList &tokens, std::set<std::string> &defined, const std::string &userDefines, const std::set<std::string> &undefined, std::set<std::string> &ret)
+static void getConfigs(const simplecpp::TokenList &tokens, std::set<std::string> &defined, const std::list<std::pair<std::string, std::string>> &userDefines, const std::set<std::string> &undefined, std::set<std::string> &ret)
 {
     std::vector<std::string> configs_if;
     std::vector<std::string> configs_ifndef;
@@ -670,7 +670,7 @@ std::set<std::string> Preprocessor::getConfigs(const simplecpp::TokenList &token
     return ret;
 }
 
-static void splitcfg(const std::string &cfg, std::list<std::string> &defines, const std::string &defaultValue)
+static void splitcfg(const std::list<std::pair<std::string, std::string>> &cfg, std::list<std::string> &defines, const std::string &defaultValue)
 {
     for (std::string::size_type defineStartPos = 0U; defineStartPos < cfg.size();) {
         const std::string::size_type defineEndPos = cfg.find(';', defineStartPos);
@@ -684,7 +684,7 @@ static void splitcfg(const std::string &cfg, std::list<std::string> &defines, co
     }
 }
 
-static simplecpp::DUI createDUI(const Settings &mSettings, const std::string &cfg, const std::string &filename)
+static simplecpp::DUI createDUI(const Settings &mSettings, const std::list<std::pair<std::string, std::string>> &cfg, const std::string &filename)
 {
     // TODO: make it possible to specify platform-dependent sizes
     simplecpp::DUI dui;
