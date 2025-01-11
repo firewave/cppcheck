@@ -297,7 +297,7 @@ bool Platform::loadFromXmlDocument(const tinyxml2::XMLDocument *doc)
     return !error;
 }
 
-std::string Platform::getLimitsDefines(bool c99) const
+std::list<std::pair<std::string, std::string>> Platform::getLimitsDefines(bool c99) const
 {
     std::string s;
 

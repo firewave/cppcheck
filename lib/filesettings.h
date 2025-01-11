@@ -99,12 +99,16 @@ struct CPPCHECKLIB FileSettings {
     {
         return file.spath();
     }
-    std::string defines;
+    std::list<std::pair<std::string, std::string>> defines;
     // TODO: handle differently
-    std::string cppcheckDefines() const {
-        return defines + (msc ? ";_MSC_VER=1900" : "") + (useMfc ? ";__AFXWIN_H__=1" : "");
+    std::list<std::pair<std::string, std::string>> cppcheckDefines() const {
+        auto d = defines;
+        if (msc)
+            d.emplace_back("_MSC_VER", "1900");
+        if (useMfc)
+            d.emplace_back("__AFXWIN_H__", "1");
+        return d;
     }
-    std::set<std::string> undefs;
     std::list<std::string> includePaths;
     // only used by clang mode
     std::list<std::string> systemIncludePaths;

@@ -64,7 +64,7 @@ private:
     }
 
     /** provides list of defines specified by the limit.h/climits includes */
-    std::string getLimitsDefines(bool c99) const;
+    std::list<std::pair<std::string, std::string>> getLimitsDefines(bool c99) const;
 public:
     Platform();
 
