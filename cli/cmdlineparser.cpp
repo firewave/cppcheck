@@ -523,7 +523,7 @@ CmdLineParser::Result CmdLineParser::parseFromArgs(int argc, const char* const a
                     undef = 2 + argv[i];
                 }
 
-                mSettings.userUndefs.insert(std::move(undef));
+                mSettings.userDefines.emplace_back(std::move(undef), "");
             }
 
             else if (std::strncmp(argv[i], "--addon=", 8) == 0)

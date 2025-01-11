@@ -54,8 +54,8 @@ void AnalyzerInformation::writeFilesTxt(const std::string &buildDir, const std::
     for (const std::string &f : sourcefiles) {
         const std::string afile = getFilename(f);
         fout << afile << ".a" << (++fileCount[afile]) << "::" << Path::simplifyPath(f) << '\n';
-        if (!userDefines.empty())
-            fout << afile << ".a" << (++fileCount[afile]) << ":" << userDefines << ":" << Path::simplifyPath(f) << '\n';
+        //if (!userDefines.empty())
+          //  fout << afile << ".a" << (++fileCount[afile]) << ":" << userDefines << ":" << Path::simplifyPath(f) << '\n';
     }
 
     for (const FileSettings &fs : fileSettings) {

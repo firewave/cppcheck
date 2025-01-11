@@ -406,9 +406,6 @@ public:
     /** @brief defines given by the user */
     std::list<std::pair<std::string, std::string>> userDefines;
 
-    /** @brief undefines given by the user */
-    std::set<std::string> userUndefs;
-
     /** @brief forced includes given by the user */
     std::list<std::string> userIncludes;
 
