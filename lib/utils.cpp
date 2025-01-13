@@ -186,12 +186,12 @@ std::string replaceEscapeSequences(const std::string &source) {
 }
 
 
-std::list<std::string> splitString(const std::string& str, char sep)
+std::vector<std::string> splitString(const std::string& str, char sep)
 {
     if (std::strchr(str.c_str(), sep) == nullptr)
         return {str};
 
-    std::list<std::string> l;
+    std::vector<std::string> l;
     std::string p(str);
     for (;;) {
         const std::string::size_type pos = p.find(sep);
