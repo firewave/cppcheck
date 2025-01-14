@@ -1486,8 +1486,8 @@ bool ImportProject::importCppcheckGuiProject(std::istream &istr, Settings &setti
     else if (!temp.premiumArgs.empty())
         settings.premiumArgs = temp.premiumArgs.substr(1);
 
-    for (const std::string &p : paths)
-        guiProject.pathNames.push_back(Path::fromNativeSeparators(p));
+    for (std::string &&p : paths)
+        guiProject.pathNames.push_back(Path::fromNativeSeparators(std::move(p)));
     supprs.nomsg.addSuppressions(std::move(suppressions)); // TODO: check result
     settings.checkHeaders = temp.checkHeaders;
     settings.checkUnusedTemplates = temp.checkUnusedTemplates;
