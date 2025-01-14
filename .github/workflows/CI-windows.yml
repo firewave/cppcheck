@@ -154,7 +154,7 @@ jobs:
           :: cmake --build build --target check --config Debug || exit /b !errorlevel!
           msbuild -m cppcheck.sln /p:Configuration=Debug-PCRE;Platform=x64 -maxcpucount || exit /b !errorlevel!
         env:
-          _CL_: /WX
+          _CL_: "/WX /RTC"
 
       - name: Run Debug test
         if: matrix.config == 'debug'
