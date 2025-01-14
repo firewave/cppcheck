@@ -84,6 +84,7 @@ namespace {
         explicit PipeWriter(int pipe) : mWpipe(pipe) {}
 
         void reportOut(const std::string &outmsg, Color c) override {
+            std::cout << "reportOut - " << outmsg << '\n';
             writeToPipe(REPORT_OUT, static_cast<char>(c) + outmsg);
         }
 
@@ -192,6 +193,7 @@ bool ProcessExecutor::handleRead(int rpipe, unsigned int &result, const std::str
 
     bool res = true;
     if (type == PipeWriter::REPORT_OUT) {
+        std::cout << "handleRead - " << buf.substr(1) << '\n';
         // the first character is the color
         const auto c = static_cast<Color>(buf[0]);
         // TODO: avoid string copy
@@ -336,6 +338,7 @@ unsigned int ProcessExecutor::check()
                         }
                         const bool readRes = handleRead(*rp, result, name);
                         if (!readRes) {
+                            std::cout << (*rp) << " - " << readRes << '\n';
                             std::size_t size = 0;
                             if (p != pipeFile.cend()) {
                                 pipeFile.erase(p);
