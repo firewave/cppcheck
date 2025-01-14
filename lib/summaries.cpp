@@ -173,11 +173,11 @@ void Summaries::loadReturn(const std::string &buildDir, std::set<std::string> &s
             // Get function name
             constexpr std::string::size_type pos1 = 0;
             const std::string::size_type pos2 = line.find(' ', pos1);
-            const std::string functionName = (pos2 == std::string::npos) ? line : line.substr(0, pos2);
+            std::string functionName = (pos2 == std::string::npos) ? line : line.substr(0, pos2);
             std::vector<std::string> call = getSummaryData(line, "call");
             functionCalls[functionName] = call;
             if (call.empty())
-                return1.push_back(functionName);
+                return1.push_back(std::move(functionName));
             else {
                 for (const std::string &c: call) {
                     functionCalledBy[c].push_back(functionName);
