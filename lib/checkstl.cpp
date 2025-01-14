@@ -734,7 +734,7 @@ static std::vector<ValueFlow::Value> pruneLifetimes(std::vector<ValueFlow::Value
         auto root = std::min_element(start, it, [](const ValueFlow::Value& x, const ValueFlow::Value& y) {
             return x.tokvalue != y.tokvalue && astHasToken(x.tokvalue, y.tokvalue);
         });
-        result.push_back(*root);
+        result.push_back(std::move(*root));
         start = it;
     }
     return result;

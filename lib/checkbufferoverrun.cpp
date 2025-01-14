@@ -283,7 +283,7 @@ static std::vector<ValueFlow::Value> getOverrunIndexValues(const Token* tok,
             continue;
         }
         overflow = true;
-        indexValues.push_back(values.front());
+        indexValues.push_back(std::move(values.front()));
     }
     if (overflow)
         return indexValues;
