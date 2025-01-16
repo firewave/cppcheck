@@ -2038,7 +2038,7 @@ void CheckClass::virtualDestructor()
     }
 
     for (const Function *func : inconclusiveErrors)
-        virtualDestructorError(func->tokenDef, func->name(), emptyString, true);
+        virtualDestructorError(func->tokenDef, func->name(), "", true);
 }
 
 void CheckClass::virtualDestructorError(const Token *tok, const std::string &Base, const std::string &Derived, bool inconclusive)
@@ -3064,7 +3064,7 @@ static std::vector<DuplMemberFuncInfo> getDuplInheritedMemberFunctionsRecursive(
                 if (classFuncIt.name() == parentClassFuncIt.name() &&
                     (parentClassFuncIt.access != AccessControl::Private || !skipPrivate) &&
                     !classFuncIt.isConstructor() && !classFuncIt.isDestructor() &&
-                    classFuncIt.argsMatch(parentClassIt.type->classScope, parentClassFuncIt.argDef, classFuncIt.argDef, emptyString, 0) &&
+                    classFuncIt.argsMatch(parentClassIt.type->classScope, parentClassFuncIt.argDef, classFuncIt.argDef, "", 0) &&
                     (classFuncIt.isConst() == parentClassFuncIt.isConst() || Function::returnsConst(&classFuncIt) == Function::returnsConst(&parentClassFuncIt)) &&
                     !(classFuncIt.isDelete() || parentClassFuncIt.isDelete()))
                     results.emplace_back(&classFuncIt, &parentClassFuncIt, &parentClassIt);

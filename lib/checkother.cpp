@@ -3512,7 +3512,7 @@ void CheckOther::unusedLabelError(const Token* tok, bool inSwitch, bool hasIfdef
     if (hasIfdef)
         id += "Configuration";
 
-    std::string msg = "$symbol:" + (tok ? tok->str() : emptyString) + "\nLabel '$symbol' is not used.";
+    std::string msg = "$symbol:" + (tok ? tok->str() : "") + "\nLabel '$symbol' is not used.";
     if (hasIfdef)
         msg += " There is #if in function body so the label might be used in code that is removed by the preprocessor.";
     if (inSwitch)
@@ -4364,7 +4364,7 @@ void CheckOther::overlappingWriteUnion(const Token *tok)
 
 void CheckOther::overlappingWriteFunction(const Token *tok)
 {
-    const std::string &funcname = tok ? tok->str() : emptyString;
+    const std::string &funcname = tok ? tok->str() : "";
     reportError(tok, Severity::error, "overlappingWriteFunction", "Overlapping read/write in " + funcname + "() is undefined behavior");
 }
 

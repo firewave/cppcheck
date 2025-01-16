@@ -612,7 +612,7 @@ static void getConfigs(const simplecpp::TokenList &tokens, std::set<std::string>
         } else if (cmdtok->str() == "error") {
             if (!configs_ifndef.empty() && !configs_ifndef.back().empty()) {
                 if (configs_ifndef.size() == 1U)
-                    ret.erase(emptyString);
+                    ret.erase("");
                 std::vector<std::string> configs(configs_if);
                 configs.push_back(configs_ifndef.back());
                 ret.erase(cfg(configs, userDefines));
@@ -878,7 +878,7 @@ void Preprocessor::reportOutput(const simplecpp::OutputList &outputList, bool sh
         case simplecpp::Output::EXPLICIT_INCLUDE_NOT_FOUND:
         case simplecpp::Output::FILE_NOT_FOUND:
         case simplecpp::Output::DUI_ERROR:
-            error(emptyString, 0, out.msg);
+            error("", 0, out.msg);
             break;
         }
     }

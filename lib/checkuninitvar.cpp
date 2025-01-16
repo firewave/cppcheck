@@ -143,11 +143,11 @@ void CheckUninitVar::checkScope(const Scope* scope, const std::set<std::string> 
             continue;
 
         if (Token::Match(var.nameToken(), "%name% =")) { // Variable is initialized, but Rhs might be not
-            checkRhs(var.nameToken(), var, NO_ALLOC, 0U, emptyString);
+            checkRhs(var.nameToken(), var, NO_ALLOC, 0U, "");
             continue;
         }
         if (Token::Match(var.nameToken(), "%name% ) (") && Token::simpleMatch(var.nameToken()->linkAt(2), ") =")) { // Function pointer is initialized, but Rhs might be not
-            checkRhs(var.nameToken()->linkAt(2)->next(), var, NO_ALLOC, 0U, emptyString);
+            checkRhs(var.nameToken()->linkAt(2)->next(), var, NO_ALLOC, 0U, "");
             continue;
         }
 
@@ -179,7 +179,7 @@ void CheckUninitVar::checkScope(const Scope* scope, const std::set<std::string> 
             continue;
 
         if (tok->astParent() && Token::simpleMatch(tok->astParent()->previous(), "for (") && Token::simpleMatch(tok->astParent()->link()->next(), "{") &&
-            checkLoopBody(tok->astParent()->link()->next(), var, var.isArray() ? ARRAY : NO_ALLOC, emptyString, true))
+            checkLoopBody(tok->astParent()->link()->next(), var, var.isArray() ? ARRAY : NO_ALLOC, "", true))
             continue;
 
         if (var.isArray()) {
@@ -193,14 +193,14 @@ void CheckUninitVar::checkScope(const Scope* scope, const std::set<std::string> 
             if (!init) {
                 Alloc alloc = ARRAY;
                 std::map<nonneg int, VariableValue> variableValue = getVariableValues(var.typeStartToken());
-                checkScopeForVariable(tok, var, nullptr, nullptr, &alloc, emptyString, variableValue);
+                checkScopeForVariable(tok, var, nullptr, nullptr, &alloc, "", variableValue);
             }
             continue;
         }
         if (stdtype || var.isPointer()) {
             Alloc alloc = NO_ALLOC;
             std::map<nonneg int, VariableValue> variableValue = getVariableValues(var.typeStartToken());
-            checkScopeForVariable(tok, var, nullptr, nullptr, &alloc, emptyString, variableValue);
+            checkScopeForVariable(tok, var, nullptr, nullptr, &alloc, "", variableValue);
         }
         if (var.type())
             checkStruct(tok, var);
@@ -225,7 +225,7 @@ void CheckUninitVar::checkScope(const Scope* scope, const std::set<std::string> 
                     else if (arg.typeStartToken()->isStandardType() || arg.typeStartToken()->isEnumType()) {
                         Alloc alloc = NO_ALLOC;
                         std::map<nonneg int, VariableValue> variableValue;
-                        checkScopeForVariable(tok->next(), arg, nullptr, nullptr, &alloc, emptyString, variableValue);
+                        checkScopeForVariable(tok->next(), arg, nullptr, nullptr, &alloc, "", variableValue);
                     }
                 }
             }
@@ -650,7 +650,7 @@ bool CheckUninitVar::checkScopeForVariable(const Token *tok, const Variable& var
                     // Assert that the tokens are '} while ('
                     if (!Token::simpleMatch(tok, "} while (")) {
                         if (printDebug)
-                            reportError(tok,Severity::debug,emptyString,"assertion failed '} while ('");
+                            reportError(tok,Severity::debug,"","assertion failed '} while ('");
                         break;
                     }
 

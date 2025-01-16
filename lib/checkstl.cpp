@@ -202,7 +202,7 @@ void CheckStl::outOfBounds()
     }
 }
 
-static std::string indexValueString(const ValueFlow::Value& indexValue, const std::string& containerName = emptyString)
+static std::string indexValueString(const ValueFlow::Value& indexValue, const std::string& containerName = "")
 {
     if (indexValue.isIteratorStartValue())
         return "at position " + MathLib::toString(indexValue.intvalue) + " from the beginning";
@@ -2514,7 +2514,7 @@ void CheckStl::checkDereferenceInvalidIterator2()
                     outOfBoundsError(emptyAdvance,
                                      lValue.tokvalue->expressionString(),
                                      cValue,
-                                     advanceIndex ? advanceIndex->expressionString() : emptyString,
+                                     advanceIndex ? advanceIndex->expressionString() : "",
                                      nullptr);
                 else
                     outOfBoundsError(tok, lValue.tokvalue->expressionString(), cValue, tok->expressionString(), &value);
@@ -3148,7 +3148,7 @@ void CheckStl::knownEmptyContainer()
                 const Token* contTok = splitTok->astOperand2();
                 if (!isKnownEmptyContainer(contTok))
                     continue;
-                knownEmptyContainerError(contTok, emptyString);
+                knownEmptyContainerError(contTok, "");
             } else {
                 const std::vector<const Token *> args = getArguments(tok);
                 if (args.empty())
