@@ -653,7 +653,7 @@ void SymbolDatabase::createSymbolDatabaseFindAllScopes()
                     tok = funcStart;
 
                     // class function
-                    if (tok->previous() && tok->strAt(-1) == "::")
+                    if (tok->strAt(-1) == "::")
                         addClassFunction(scope, tok, argStart);
 
                     // class destructor

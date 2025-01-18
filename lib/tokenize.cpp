@@ -3624,7 +3624,7 @@ void Tokenizer::concatenateNegativeNumberAndAnyPositive()
         if (!Token::Match(tok, "?|:|,|(|[|{|return|case|sizeof|%op% +|-") || tok->tokType() == Token::eIncDecOp)
             continue;
 
-        while (tok->str() != ">" && tok->next() && tok->strAt(1) == "+" && (!Token::Match(tok->tokAt(2), "%name% (|;") || Token::Match(tok, "%op%")))
+        while (tok->str() != ">" && tok->strAt(1) == "+" && (!Token::Match(tok->tokAt(2), "%name% (|;") || Token::Match(tok, "%op%")))
             tok->deleteNext();
 
         if (Token::Match(tok->next(), "+|- %num%")) {
@@ -4849,12 +4849,12 @@ void Tokenizer::setVarIdPass1()
 
             bool globalNamespace = false;
             if (!isC()) {
-                if (tok->previous() && tok->strAt(-1) == "::") {
+                if (tok->strAt(-1) == "::") {
                     if (Token::Match(tok->tokAt(-2), ")|]|%name%"))
                         continue;
                     globalNamespace = true;
                 }
-                if (tok->next() && tok->strAt(1) == "::")
+                if (tok->strAt(1) == "::")
                     continue;
                 if (Token::simpleMatch(tok->tokAt(-2), ":: template"))
                     continue;
@@ -7885,8 +7885,8 @@ bool Tokenizer::simplifyRedundantParentheses()
 
         // !!operator = ( x ) ;
         if (tok->strAt(-2) != "operator" &&
-            tok->previous() && tok->strAt(-1) == "=" &&
-            tok->next() && tok->strAt(1) != "{" &&
+            tok->strAt(-1) == "=" &&
+            tok->strAt(1) != "{" &&
             Token::simpleMatch(tok->link(), ") ;")) {
             tok->link()->deleteThis();
             tok->deleteThis();
@@ -9781,7 +9781,7 @@ void Tokenizer::simplifyAsm()
 
         //move the new tokens in the same line as ";" if available
         tok = tok->tokAt(2);
-        if (tok->next() && tok->strAt(1) == ";" &&
+        if (tok->strAt(1) == ";" &&
             tok->next()->linenr() != tok->linenr()) {
             const int endposition = tok->next()->linenr();
             tok = tok->tokAt(-3);
@@ -10232,7 +10232,7 @@ bool Tokenizer::operatorEnd(const Token * tok)
                 if (tok && tok->str() == "(") {
                     tok = tok->link()->next();
                 }
-            } else if (tok->str() == "throw" && tok->next() && tok->strAt(1) == "(") {
+            } else if (tok->str() == "throw" && tok->strAt(1) == "(") {
                 tok = tok->linkAt(1)->next();
             }
             // unknown macros ") MACRO {" and ") MACRO(...) {"
