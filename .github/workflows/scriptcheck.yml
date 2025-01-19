@@ -31,17 +31,19 @@ jobs:
         with:
           key: ${{ github.workflow }}-${{ runner.os }}
 
-      - name: Cache Cppcheck
-        uses: actions/cache@v4
-        with:
-          path: cppcheck
-          key: ${{ runner.os }}-scriptcheck-cppcheck-${{ github.sha }}
-
       - name: build cppcheck
         run: |
           export PATH="/usr/lib/ccache:/usr/local/opt/ccache/libexec:$PATH"
           make -j$(nproc) -s CXXFLAGS="-w"
           strip -s ./cppcheck
+
+      - name: Archive Cppcheck
+        uses: actions/upload-artifact@v4
+        with:
+          name: cppcheck-bin
+          path: cppcheck
+          if-no-files-found: error
+          retention-days: 1
 
   scriptcheck:
 
@@ -62,12 +64,10 @@ jobs:
         with:
           persist-credentials: false
 
-      # TODO: bailout on error
       - name: Restore Cppcheck
-        uses: actions/cache@v4
+        uses: actions/download-artifact@v4
         with:
-          path: cppcheck
-          key: ${{ runner.os }}-scriptcheck-cppcheck-${{ github.sha }}
+          name: cppcheck-bin
 
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v5
