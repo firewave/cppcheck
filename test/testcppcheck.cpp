@@ -115,7 +115,8 @@ private:
         const Settings s;
         Suppressions supprs;
         ErrorLogger2 errorLogger;
-        CppCheck cppcheck(s, supprs, errorLogger, false, {});
+        TimerResults timerResults;
+        CppCheck cppcheck(s, supprs, errorLogger, timerResults, false, {});
         ASSERT_EQUALS(1, cppcheck.check(FileWithDetails(file.path())));
         // TODO: how to properly disable these warnings?
         errorLogger.ids.erase(std::remove_if(errorLogger.ids.begin(), errorLogger.ids.end(), [](const std::string& id) {
@@ -137,7 +138,8 @@ private:
         const Settings s;
         Suppressions supprs;
         ErrorLogger2 errorLogger;
-        CppCheck cppcheck(s, supprs, errorLogger, false, {});
+        TimerResults timerResults;
+        CppCheck cppcheck(s, supprs, errorLogger, timerResults, false, {});
         FileSettings fs{file.path()};
         ASSERT_EQUALS(1, cppcheck.check(fs));
         // TODO: how to properly disable these warnings?
@@ -161,7 +163,8 @@ private:
         const Settings s = settingsBuilder().libraryxml(xmldata).build();
         Suppressions supprs;
         ErrorLogger2 errorLogger;
-        CppCheck cppcheck(s, supprs, errorLogger, false, {});
+        TimerResults timerResults;
+        CppCheck cppcheck(s, supprs, errorLogger, timerResults, false, {});
         ASSERT_EQUALS(0, cppcheck.check(FileWithDetails(file.path())));
         // TODO: how to properly disable these warnings?
         errorLogger.ids.erase(std::remove_if(errorLogger.ids.begin(), errorLogger.ids.end(), [](const std::string& id) {
@@ -186,7 +189,8 @@ private:
         const Settings s;
         Suppressions supprs;
         ErrorLogger2 errorLogger;
-        CppCheck cppcheck(s, supprs, errorLogger, false, {});
+        TimerResults timerResults;
+        CppCheck cppcheck(s, supprs, errorLogger, timerResults, false, {});
         ASSERT_EQUALS(1, cppcheck.check(FileWithDetails(test_file_a.path())));
         ASSERT_EQUALS(1, cppcheck.check(FileWithDetails(test_file_b.path())));
         // TODO: how to properly disable these warnings?
@@ -243,7 +247,8 @@ private:
         s.basePaths.emplace_back("/some/path");
         Suppressions supprs;
         ErrorLogger2 errorLogger;
-        CppCheck cppcheck(s, supprs, errorLogger, false, {});
+        TimerResults timerResults;
+        CppCheck cppcheck(s, supprs, errorLogger, timerResults, false, {});
         std::vector<std::string> files{"/some/path/test.cpp"};
         simplecpp::TokenList tokens1(files);
         const std::string expected = "  <rawtokens>\n"
@@ -255,11 +260,12 @@ private:
     void getDumpFileContentsLibrary() const {
         Suppressions supprs;
         ErrorLogger2 errorLogger;
+        TimerResults timerResults;
 
         {
             Settings s;
             s.libraries.emplace_back("std.cfg");
-            CppCheck cppcheck(s, supprs, errorLogger, false, {});
+            CppCheck cppcheck(s, supprs, errorLogger, timerResults, false, {});
             //std::vector<std::string> files{ "/some/path/test.cpp" };
             const std::string expected = "  <library lib=\"std.cfg\"/>\n";
             ASSERT_EQUALS(expected, cppcheck.getLibraryDumpData());
@@ -269,7 +275,7 @@ private:
             Settings s;
             s.libraries.emplace_back("std.cfg");
             s.libraries.emplace_back("posix.cfg");
-            CppCheck cppcheck(s, supprs, errorLogger, false, {});
+            CppCheck cppcheck(s, supprs, errorLogger, timerResults, false, {});
             const std::string expected = "  <library lib=\"std.cfg\"/>\n  <library lib=\"posix.cfg\"/>\n";
             ASSERT_EQUALS(expected, cppcheck.getLibraryDumpData());
         }
@@ -280,7 +286,8 @@ private:
         s.userIncludes.emplace_back("1.h");
         Suppressions supprs;
         ErrorLogger2 errorLogger;
-        CppCheck cppcheck(s, supprs, errorLogger, false, {});
+        TimerResults timerResults;
+        CppCheck cppcheck(s, supprs, errorLogger, timerResults, false, {});
         ASSERT_EQUALS("-x c --include 1.h ", cppcheck.getClangFlags(Standards::Language::C));
     }
 

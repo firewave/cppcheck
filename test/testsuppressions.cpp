@@ -245,6 +245,7 @@ private:
         if (!suppression.empty()) {
             ASSERT_EQUALS("", supprs.nomsg.addSuppressionLine(suppression));
         }
+        TimerResults timerResults;
 
         Settings settings;
         settings.jobs = 1;
@@ -263,7 +264,7 @@ private:
         if (useFS)
             filelist.clear();
 
-        CppCheck cppCheck(settings, supprs, *this, true, nullptr);
+        CppCheck cppCheck(settings, supprs, *this, timerResults, true, nullptr);
         SingleExecutor executor(cppCheck, filelist, fileSettings, settings, supprs, *this);
         const unsigned int exitCode = executor.check();
 
@@ -1202,7 +1203,8 @@ private:
         Suppressions supprs;
         ASSERT_EQUALS("", supprs.nomsg.addSuppressionLine("uninitvar"));
 
-        CppCheck cppCheck(settings, supprs, *this, false, nullptr); // <- do not "use global suppressions". pretend this is a thread that just checks a file.
+        TimerResults timerResults;
+        CppCheck cppCheck(settings, supprs, *this, timerResults, false, nullptr); // <- do not "use global suppressions". pretend this is a thread that just checks a file.
 
         const char code[] = "int f() { int a; return a; }";
         ASSERT_EQUALS(0, cppCheck.check(FileWithDetails("test.c"), code)); // <- no unsuppressed error is seen
@@ -1231,6 +1233,7 @@ private:
 
     void suppressionWithRelativePaths() {
         Suppressions supprs;
+        TimerResults timerResults;
 
         Settings settings;
         settings.quiet = true;
@@ -1246,7 +1249,7 @@ private:
             "    // cppcheck-suppress unusedStructMember\n"
             "    int y;\n"
             "};";
-        CppCheck cppCheck(settings, supprs, *this, true, nullptr);
+        CppCheck cppCheck(settings, supprs, *this, timerResults, true, nullptr);
         ASSERT_EQUALS(0, cppCheck.check(FileWithDetails("/somewhere/test.cpp"), code));
         ASSERT_EQUALS("",errout_str());
     }

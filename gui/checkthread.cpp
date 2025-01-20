@@ -29,6 +29,7 @@
 #include "settings.h"
 #include "standards.h"
 #include "threadresult.h"
+#include "timer.h"
 #include "utils.h"
 
 #include <algorithm>
@@ -131,7 +132,8 @@ void CheckThread::run()
 {
     mState = Running;
 
-    CppCheck cppcheck(mSettings, *mSuppressions, mResult, true, executeCommand);
+    TimerResults timerResults;
+    CppCheck cppcheck(mSettings, *mSuppressions, mResult, timerResults, true, executeCommand);
 
     if (!mFiles.isEmpty() || mAnalyseWholeProgram) {
         mAnalyseWholeProgram = false;

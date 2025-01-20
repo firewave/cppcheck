@@ -49,6 +49,7 @@
 #include "suppressions.h"
 #include "threadhandler.h"
 #include "threadresult.h"
+#include "timer.h"
 #include "translationhandler.h"
 
 #include "ui_mainwindow.h"
@@ -696,7 +697,8 @@ void MainWindow::analyzeCode(const QString& code, const QString& filename)
             mUI->mResults, SLOT(debugError(ErrorItem)));
 
     // Create CppCheck instance
-    CppCheck cppcheck(checkSettings, supprs, result, true, nullptr);
+    TimerResults timerResults;
+    CppCheck cppcheck(checkSettings, supprs, result, timerResults, true, nullptr);
 
     // Check
     checkLockDownUI();

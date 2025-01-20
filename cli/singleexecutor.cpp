@@ -73,7 +73,7 @@ unsigned int SingleExecutor::check()
         result++;
 
     if (mSettings.showtime == SHOWTIME_MODES::SHOWTIME_SUMMARY || mSettings.showtime == SHOWTIME_MODES::SHOWTIME_TOP5_SUMMARY)
-        CppCheck::printTimerResults(mSettings.showtime);
+        mCppcheck.printTimerResults(mSettings.showtime);
 
     return result;
 }
