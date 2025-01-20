@@ -112,8 +112,8 @@ public:
         return false;
     }
 
-    unsigned int check(ErrorLogger &errorLogger, const FileWithDetails *file, const FileSettings *fs) const {
-        CppCheck fileChecker(errorLogger, false, mExecuteCommand);
+    unsigned int check(ErrorLogger &errorLogger, TimerResults& timerResults, const FileWithDetails *file, const FileSettings *fs) const {
+        CppCheck fileChecker(errorLogger, timerResults, false, mExecuteCommand);
         fileChecker.settings() = mSettings; // this is a copy
 
         unsigned int result;
@@ -161,12 +161,13 @@ static unsigned int STDCALL threadProc(ThreadData *data)
 {
     unsigned int result = 0;
 
+    TimerResults timerResults;
     const FileWithDetails *file;
     const FileSettings *fs;
     std::size_t fileSize;
 
     while (data->next(file, fs, fileSize)) {
-        result += data->check(data->logForwarder, file, fs);
+        result += data->check(data->logForwarder, timerResults, file, fs);
 
         data->status(fileSize);
     }
@@ -195,8 +196,8 @@ unsigned int ThreadExecutor::check()
         return v + f.get();
     });
 
-    if (mSettings.showtime == SHOWTIME_MODES::SHOWTIME_SUMMARY || mSettings.showtime == SHOWTIME_MODES::SHOWTIME_TOP5_SUMMARY)
-        CppCheck::printTimerResults(mSettings.showtime);
+    //if (mSettings.showtime == SHOWTIME_MODES::SHOWTIME_SUMMARY || mSettings.showtime == SHOWTIME_MODES::SHOWTIME_TOP5_SUMMARY)
+    //    CppCheck::printTimerResults(mSettings.showtime);
 
     return result;
 }

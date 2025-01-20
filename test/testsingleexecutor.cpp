@@ -100,11 +100,12 @@ private:
             s.plistOutput = opt.plistOutput;
         s.clangTidy = opt.clangTidy;
 
+        TimerResults timerResults;
         bool executeCommandCalled = false;
         std::string exe;
         std::vector<std::string> args;
         // NOLINTNEXTLINE(performance-unnecessary-value-param)
-        CppCheck cppcheck(*this, true, [&executeCommandCalled, &exe, &args](std::string e,std::vector<std::string> a,std::string,std::string&){
+        CppCheck cppcheck(*this, timerResults, true, [&executeCommandCalled, &exe, &args](std::string e,std::vector<std::string> a,std::string,std::string&){
             executeCommandCalled = true;
             exe = std::move(e);
             args = std::move(a);
