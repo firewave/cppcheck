@@ -245,8 +245,9 @@ private:
         if (!suppression.empty()) {
             ASSERT_EQUALS("", supprs.nomsg.addSuppressionLine(suppression));
         }
+        TimerResults timerResults;
 
-        CppCheck cppCheck(supprs, *this, true, nullptr);
+        CppCheck cppCheck(supprs, *this, timerResults, true, nullptr);
         Settings& settings = cppCheck.settings();
         settings.jobs = 1;
         settings.quiet = true;
@@ -1197,8 +1198,9 @@ private:
     void globalSuppressions() { // Testing that Cppcheck::useGlobalSuppressions works (#8515)
         Suppressions supprs;
         ASSERT_EQUALS("", supprs.nomsg.addSuppressionLine("uninitvar"));
+        TimerResults timerResults;
 
-        CppCheck cppCheck(supprs, *this, false, nullptr); // <- do not "use global suppressions". pretend this is a thread that just checks a file.
+        CppCheck cppCheck(supprs, *this, timerResults, false, nullptr); // <- do not "use global suppressions". pretend this is a thread that just checks a file.
         Settings& settings = cppCheck.settings();
         settings.quiet = true;
         settings.exitCode = 1;
@@ -1230,8 +1232,9 @@ private:
 
     void suppressionWithRelativePaths() {
         Suppressions supprs;
+        TimerResults timerResults;
 
-        CppCheck cppCheck(supprs, *this, true, nullptr);
+        CppCheck cppCheck(supprs, *this, timerResults, true, nullptr);
         Settings& settings = cppCheck.settings();
         settings.quiet = true;
         settings.severity.enable(Severity::style);

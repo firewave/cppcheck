@@ -36,6 +36,7 @@
 #include "settings.h"
 #include "singleexecutor.h"
 #include "suppressions.h"
+#include "timer.h"
 #include "utils.h"
 
 #if defined(HAS_THREADING_MODEL_THREAD)
@@ -440,7 +441,8 @@ int CppCheckExecutor::check_internal(const Settings& settings, Suppressions& sup
     if (!settings.checkersReportFilename.empty())
         std::remove(settings.checkersReportFilename.c_str());
 
-    CppCheck cppcheck(supprs, stdLogger, true, executeCommand);
+    TimerResults timerResults;
+    CppCheck cppcheck(supprs, stdLogger, timerResults, true, executeCommand);
     cppcheck.settings() = settings; // this is a copy
 
     unsigned int returnValue = 0;

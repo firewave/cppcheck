@@ -102,12 +102,13 @@ private:
         s.clangTidy = opt.clangTidy;
 
         Suppressions supprs;
+        TimerResults timerResults;
 
         bool executeCommandCalled = false;
         std::string exe;
         std::vector<std::string> args;
         // NOLINTNEXTLINE(performance-unnecessary-value-param)
-        CppCheck cppcheck(supprs, *this, true, [&executeCommandCalled, &exe, &args](std::string e,std::vector<std::string> a,std::string,std::string&){
+        CppCheck cppcheck(supprs, *this, timerResults, true, [&executeCommandCalled, &exe, &args](std::string e,std::vector<std::string> a,std::string,std::string&){
             executeCommandCalled = true;
             exe = std::move(e);
             args = std::move(a);

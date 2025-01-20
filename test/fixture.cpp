@@ -95,7 +95,6 @@ bool TestFixture::prepareTest(const char testname[])
     mVerbose = false;
     mTemplateFormat.clear();
     mTemplateLocation.clear();
-    CppCheck::resetTimerResults();
 
     prepareTestInternal();
 
