@@ -43,6 +43,7 @@ class AnalyzerInformation;
 class ErrorLogger;
 class Settings;
 struct Suppressions;
+class TimerResults;
 
 namespace simplecpp { class TokenList; }
 
@@ -65,6 +66,7 @@ public:
     CppCheck(const Settings& settings,
              Suppressions& supprs,
              ErrorLogger &errorLogger,
+             TimerResults& timerResults,
              bool useGlobalSuppressions,
              ExecuteCmdFn executeCommand);
 
@@ -139,8 +141,7 @@ public:
     /** analyse whole program use .analyzeinfo files or ctuinfo string */
     unsigned int analyseWholeProgram(const std::string &buildDir, const std::list<FileWithDetails> &files, const std::list<FileSettings>& fileSettings, const std::string& ctuInfo);
 
-    static void resetTimerResults();
-    static void printTimerResults(SHOWTIME_MODES mode);
+    void printTimerResults(SHOWTIME_MODES mode);
 
     bool isPremiumCodingStandardId(const std::string& id) const;
 
@@ -214,6 +215,7 @@ private:
     ErrorLogger& mErrorLogger;
     /** the ErrorLogger provided to this instance */
     ErrorLogger& mErrorLoggerDirect;
+    TimerResults& mTimerResults;
 
     /** @brief Current preprocessor configuration */
     std::string mCurrentConfig;

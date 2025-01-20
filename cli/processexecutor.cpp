@@ -331,7 +331,8 @@ unsigned int ProcessExecutor::check()
                 close(pipes[0]);
 
                 PipeWriter pipewriter(pipes[1]);
-                CppCheck fileChecker(mSettings, mSuppressions, pipewriter, false, mExecuteCommand);
+                TimerResults timerResults; // TODO: propagate back
+                CppCheck fileChecker(mSettings, mSuppressions, pipewriter, timerResults, false, mExecuteCommand);
                 unsigned int resultOfCheck = 0;
 
                 if (iFileSettings != mFileSettings.end()) {
@@ -440,8 +441,8 @@ unsigned int ProcessExecutor::check()
     }
 
     // TODO: wee need to get the timing information from the subprocess
-    if (mSettings.showtime == SHOWTIME_MODES::SHOWTIME_SUMMARY || mSettings.showtime == SHOWTIME_MODES::SHOWTIME_TOP5_SUMMARY)
-        CppCheck::printTimerResults(mSettings.showtime);
+    //if (mSettings.showtime == SHOWTIME_MODES::SHOWTIME_SUMMARY || mSettings.showtime == SHOWTIME_MODES::SHOWTIME_TOP5_SUMMARY)
+    //    CppCheck::printTimerResults(mSettings.showtime);
 
     return result;
 }
