@@ -1322,12 +1322,13 @@ const Library::Container* Library::detectContainerInternal(const Token* const ty
 {
     if (!typeStart)
         return nullptr;
-    const Token* firstLinkedTok = nullptr;
+
+    const Token* typeEnd = typeStart;
     for (const Token* tok = typeStart; tok && !tok->varId(); tok = tok->next()) {
         if (!tok->link())
             continue;
 
-        firstLinkedTok = tok;
+        typeEnd = tok->link();
         break;
     }
 
@@ -1336,31 +1337,26 @@ const Library::Container* Library::detectContainerInternal(const Token* const ty
         if (container.startPattern.empty())
             continue;
 
-        const int offset = (withoutStd && startsWith(container.startPattern2, "std :: ")) ? 7 : 0;
+        auto matchStartPattern = utils::memoize([&]
+        {
+            const int offset = (withoutStd && startsWith(container.startPattern2, "std :: ")) ? 7 : 0;
+            return Token::Match(typeStart, container.startPattern2.c_str() + offset);
+        });
 
         // If endPattern is undefined, it will always match, but itEndPattern has to be defined.
-        if (detect != IteratorOnly && container.endPattern.empty()) {
-            if (!Token::Match(typeStart, container.startPattern2.c_str() + offset))
-                continue;
-
+        if (detect != IteratorOnly && container.endPattern.empty() && matchStartPattern()) {
             if (isIterator)
                 *isIterator = false;
             return &container;
         }
 
-        if (!firstLinkedTok)
-            continue;
-
-        const bool matchedStartPattern = Token::Match(typeStart, container.startPattern2.c_str() + offset);
-        if (!matchedStartPattern)
-            continue;
-
-        if (detect != ContainerOnly && Token::Match(firstLinkedTok->link(), container.itEndPattern.c_str())) {
+        if (detect != ContainerOnly && matchStartPattern() && Token::Match(typeEnd, container.itEndPattern.c_str())) {
             if (isIterator)
                 *isIterator = true;
             return &container;
         }
-        if (detect != IteratorOnly && Token::Match(firstLinkedTok->link(), container.endPattern.c_str())) {
+
+        if (detect != IteratorOnly && matchStartPattern() && Token::Match(typeEnd, container.endPattern.c_str())) {
             if (isIterator)
                 *isIterator = false;
             return &container;
