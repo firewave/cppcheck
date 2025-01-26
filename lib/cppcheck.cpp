@@ -1187,8 +1187,14 @@ unsigned int CppCheck::checkFile(const FileWithDetails& file, const std::string 
                     hashes.insert(hash);
                 }
 
-                // Check normal tokens
-                checkNormalTokens(tokenizer, analyzerInformation.get());
+                // TODO: log message when this is active?
+                const char* disableAnalysisEnv = std::getenv("DISABLE_ANALYSIS");
+                const bool doAnalysis = !disableAnalysisEnv || (std::strcmp(disableAnalysisEnv, "1") != 0);
+
+                if (doAnalysis) {
+                    // Check normal tokens
+                    checkNormalTokens(tokenizer, analyzerInformation.get());
+                }
             } catch (const simplecpp::Output &o) {
                 // #error etc during preprocessing
                 configurationError.push_back((mCurrentConfig.empty() ? "\'\'" : mCurrentConfig) + " : [" + o.location.file() + ':' + std::to_string(o.location.line) + "] " + o.msg);
