@@ -1905,6 +1905,46 @@ def test_lib_lookup_duplicate(tmpdir):
     ]
 
 
+def test_lib_lookup_relative_ext(tmpdir):
+    test_file = os.path.join(tmpdir, 'test.c')
+    with open(test_file, 'wt'):
+        pass
+
+    exitcode, stdout, stderr, exe = cppcheck_ex(['--debug-lookup=library', '--library=cfg/custom.xml', test_file])
+    exepath = os.path.dirname(exe)
+    if sys.platform == 'win32':
+        exepath = exepath.replace('\\', '/')
+    assert exitcode == 0, stdout if stdout else stderr
+    lines = __remove_std_lookup_log(stdout.splitlines(), exepath)
+    assert lines == [
+        "looking for library 'gnu'",
+        "looking for library 'gnu.cfg'",
+        "looking for library '{}/gnu.cfg'".format(exepath),
+        "looking for library '{}/cfg/gnu.cfg'".format(exepath),
+        'Checking {} ...'.format(test_file)
+    ]
+
+
+def test_lib_lookup_absolute_ext(tmpdir):
+    test_file = os.path.join(tmpdir, 'test.c')
+    with open(test_file, 'wt'):
+        pass
+
+    exitcode, stdout, stderr, exe = cppcheck_ex(['--debug-lookup=library', '--library=/usr/cfg/custom.xml', test_file])
+    exepath = os.path.dirname(exe)
+    if sys.platform == 'win32':
+        exepath = exepath.replace('\\', '/')
+    assert exitcode == 0, stdout if stdout else stderr
+    lines = __remove_std_lookup_log(stdout.splitlines(), exepath)
+    assert lines == [
+        "looking for library 'gnu'",
+        "looking for library 'gnu.cfg'",
+        "looking for library '{}/gnu.cfg'".format(exepath),
+        "looking for library '{}/cfg/gnu.cfg'".format(exepath),
+        'Checking {} ...'.format(test_file)
+    ]
+
+
 # TODO: test with FILESDIR
 def test_addon_lookup(tmpdir):
     test_file = os.path.join(tmpdir, 'test.c')
