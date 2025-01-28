@@ -83,6 +83,7 @@ private:
         TEST_CASE(matchOr);
         TEST_CASE(matchOp);
         TEST_CASE(matchConstOp);
+        TEST_CASE(matchEmpty);
 
         TEST_CASE(isArithmeticalOp);
         TEST_CASE(isOp);
@@ -838,6 +839,15 @@ private:
 
         for (auto other_op = other_ops.cbegin(); other_op != other_ops.cend(); ++other_op) {
             ASSERT_EQUALS_MSG(false, MatchCheck(*other_op, "%cop%"), "Failing other operator: " + *other_op);
+        }
+    }
+
+    void matchEmpty() const
+    {
+        {
+            const SimpleTokenList tokenlist("int i;");
+            ASSERT_EQUALS(true, Token::Match(tokenlist.front(), ""));
+            ASSERT_EQUALS(true, Token::Match(tokenlist.front(), nullptr));
         }
     }
 
