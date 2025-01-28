@@ -849,6 +849,12 @@ private:
             ASSERT_EQUALS(true, Token::Match(tokenlist.front(), ""));
             ASSERT_EQUALS(true, Token::Match(tokenlist.front(), nullptr));
         }
+        {
+            // the given Token must be non-null after a successfull positive Token::Match() call
+            const SimpleTokenList tokenlist(""); // no tokens meane tokenlist.front() is nullptr
+            ASSERT_EQUALS(false, Token::Match(tokenlist.front(), ""));
+            ASSERT_EQUALS(false, Token::Match(tokenlist.front(), nullptr));
+        }
     }
 
 

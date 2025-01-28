@@ -640,7 +640,7 @@ const char *Token::chrInFirstWord(const char *str, char c)
 bool Token::Match(const Token *tok, const char pattern[], nonneg int varid)
 {
     if (!pattern || !(*pattern))
-        return true;
+        return !!tok;
 
     const char *p = pattern;
     while (true) {
