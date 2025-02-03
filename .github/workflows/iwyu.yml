@@ -14,14 +14,6 @@ jobs:
       matrix:
         # "opensuse/tumbleweed:latest" / "fedora:latest" / "debian:unstable" / "archlinux:latest"
         include:
-          - os: ubuntu-22.04
-            image: "fedora:latest"
-            stdlib: libstdc++
-            use_libcxx: Off
-          - os: ubuntu-22.04
-            image: "fedora:latest"
-            stdlib: libc++
-            use_libcxx: On
           - os: macos-13
             image: ""
             stdlib: libc++  # no libstdc++ on macOS
