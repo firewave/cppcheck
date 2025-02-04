@@ -21,6 +21,7 @@
 #include "errortypes.h"
 #include "filesettings.h"
 #include "settings.h"
+#include "suppressions.h"
 
 #include <string>
 
@@ -47,7 +48,8 @@ static const FileWithDetails s_file("test.c");
 
 static void doCheck(const std::string& code)
 {
-    CppCheck cppcheck(s_errorLogger, false, nullptr);
+    Suppressions supprs;
+    CppCheck cppcheck(supprs, s_errorLogger, false, nullptr);
     // TODO: load std.cfg when settings are no longer owned by CppCheck
     cppcheck.settings().quiet = true;
     cppcheck.settings().addEnabled("all");
