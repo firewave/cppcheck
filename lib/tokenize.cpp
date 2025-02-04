@@ -5930,26 +5930,29 @@ void Tokenizer::printDebugOutput(int simplification, std::ostream &out) const
                        (simplification != 2U && mSettings.debugnormal);
 
     if (debug && list.front()) {
+        // TODO: hack - we need to print everything in the same format - see #9992
+        std::ostream& xml_out = (out.rdbuf() == std::cout.rdbuf()) ? std::cerr : out;
+
         list.front()->printOut(out, nullptr, list.getFiles());
 
         if (mSettings.xml)
-            out << "<debug>" << std::endl;
+            xml_out << "<debug>" << std::endl;
 
         if (mSymbolDatabase) {
             if (mSettings.xml)
-                mSymbolDatabase->printXml(out);
+                mSymbolDatabase->printXml(xml_out);
             else if (mSettings.verbose) {
                 mSymbolDatabase->printOut("Symbol database");
             }
         }
 
         if (mSettings.verbose)
-            list.front()->printAst(mSettings.verbose, mSettings.xml, list.getFiles(), out);
+            list.front()->printAst(mSettings.verbose, mSettings.xml, list.getFiles(), mSettings.xml ? xml_out : out);
 
-        list.front()->printValueFlow(mSettings.xml, out);
+        list.front()->printValueFlow(mSettings.xml, mSettings.xml ? xml_out : out);
 
         if (mSettings.xml)
-            out << "</debug>" << std::endl;
+            xml_out << "</debug>" << std::endl;
     }
 
     if (mSymbolDatabase && simplification == 2U && mSettings.debugwarnings) {

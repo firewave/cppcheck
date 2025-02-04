@@ -2869,3 +2869,124 @@ f(p);
     assert stderr.splitlines() == [
         '{}:2:19: error: Null pointer dereference: p [ctunullpointer]'.format(test_file)
     ]
+
+
+def test_debug(tmp_path):
+    test_file = tmp_path / 'test.c'
+    with open(test_file, "w") as f:
+        f.write(
+"""void f
+{
+    (void)*((int*)0);
+}
+""")
+
+    args = [
+        '-q',
+        '--debug',
+        str(test_file)
+    ]
+
+    exitcode, stdout, stderr = cppcheck(args)
+    assert exitcode == 0, stdout
+    assert stdout.find('##file ') != -1
+    assert stdout.find('##Value flow') != -1
+    assert stdout.find('### Symbol database ###') == -1
+    assert stdout.find('##AST') == -1
+    assert stderr.splitlines() == []
+
+
+def test_debug_xml(tmp_path):
+    test_file = tmp_path / 'test.c'
+    with open(test_file, "w") as f:
+        f.write(
+"""void f
+{
+    (void)*((int*)0);
+}
+""")
+
+    args = [
+        '-q',
+        '--debug',
+        '--xml',
+        str(test_file)
+    ]
+
+    exitcode, stdout, stderr = cppcheck(args)
+    assert exitcode == 0, stdout
+    assert stdout.find('##file ') != -1
+    assert stdout.find('##Value flow') == -1
+    assert stdout.find('### Symbol database ###') == -1
+    assert stdout.find('##AST') == -1
+    assert stderr
+
+    root = ElementTree.fromstring(stderr)
+    print(root)
+    debug = root.findall('debug')
+    assert debug
+    assert len(debug) == 1
+    valueflow = root.findall('debug/valueflow')
+    assert valueflow
+    assert len(valueflow) == 1
+
+
+def test_debug_verbose(tmp_path):
+    test_file = tmp_path / 'test.c'
+    with open(test_file, "w") as f:
+        f.write(
+            """void f
+            {
+                (void)*((int*)0);
+            }
+            """)
+
+    args = [
+        '-q',
+        '--debug',
+        '--verbose',
+        str(test_file)
+    ]
+
+    exitcode, stdout, stderr = cppcheck(args)
+    assert exitcode == 0, stdout
+    assert stdout.find('##file ') != -1
+    assert stdout.find('##Value flow') != -1
+    assert stdout.find('### Symbol database ###') != -1
+    assert stdout.find('##AST') != -1
+    assert stderr.splitlines() == []
+
+
+def test_debug_verbose_xml(tmp_path):
+    test_file = tmp_path / 'test.c'
+    with open(test_file, "w") as f:
+        f.write(
+            """void f
+            {
+                (void)*((int*)0);
+            }
+            """)
+
+    args = [
+        '-q',
+        '--debug',
+        '--verbose',
+        '--xml',
+        str(test_file)
+    ]
+
+    exitcode, stdout, stderr = cppcheck(args)
+    assert exitcode == 0, stdout
+    assert stdout.find('##file ') != -1
+    assert stdout.find('##Value flow') != -1
+    assert stdout.find('### Symbol database ###') != -1
+    assert stdout.find('##AST') != -1
+    assert stderr
+
+    root = ElementTree.fromstring(stderr)
+    debug = root.findall('/results/debug')
+    assert debug
+    assert len(debug) == 1
+    valueflow = root.findall('/results/debug/valueflow')
+    assert valueflow
+    assert len(valueflow) == 1
