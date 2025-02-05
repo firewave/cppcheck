@@ -44,6 +44,21 @@ public:
     void reportMetric(const std::string & /*metric*/) override {}
 };
 
+// this code was taken from TestFixture::SettingsBuilder& TestFixture::SettingsBuilder::library()
+static void loadLibrary(Settings& settings, const char lib[])
+{
+    const Library::ErrorCode lib_error = settings.library.load("", lib).errorcode;
+    if (lib_error != Library::ErrorCode::OK)
+        throw std::runtime_error("loading library '" + std::string(lib) + "' failed - " + std::to_string(static_cast<int>(lib_error)));
+    // strip extension
+    std::string lib_s(lib);
+    const std::string ext(".cfg");
+    const auto pos = lib_s.find(ext);
+    if (pos != std::string::npos)
+        lib_s.erase(pos, ext.size());
+    settings.libraries.emplace_back(lib_s);
+}
+
 static Settings create_settings()
 {
     // TODO: load std.cfg
@@ -56,6 +71,7 @@ static Settings create_settings()
     s.checkLevel = Settings::CheckLevel::exhaustive;
     s.force = true;
     s.inlineSuppressions = true;
+    //loadLibrary(s, "std.cfg");
     return s;
 }
 static const Settings s_settings = create_settings();
