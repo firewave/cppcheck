@@ -131,8 +131,7 @@ void CheckThread::run()
 {
     mState = Running;
 
-    CppCheck cppcheck(*mSuppressions, mResult, true, executeCommand);
-    cppcheck.settings() = std::move(mSettings);
+    CppCheck cppcheck(mSettings, *mSuppressions, mResult, true, executeCommand);
 
     if (!mFiles.isEmpty() || mAnalyseWholeProgram) {
         mAnalyseWholeProgram = false;
@@ -141,9 +140,9 @@ void CheckThread::run()
         qDebug() << "Whole program analysis";
         std::list<FileWithDetails> files2;
         std::transform(mFiles.cbegin(), mFiles.cend(), std::back_inserter(files2), [&](const QString& file) {
-            return FileWithDetails{file.toStdString(), Path::identify(file.toStdString(), cppcheck.settings().cppHeaderProbe), 0};
+            return FileWithDetails{file.toStdString(), Path::identify(file.toStdString(), mSettings.cppHeaderProbe), 0};
         });
-        cppcheck.analyseWholeProgram(cppcheck.settings().buildDir, files2, {}, ctuInfo);
+        cppcheck.analyseWholeProgram(mSettings.buildDir, files2, {}, ctuInfo);
         mFiles.clear();
         emit done();
         return;
@@ -153,7 +152,7 @@ void CheckThread::run()
     while (!file.isEmpty() && mState == Running) {
         qDebug() << "Checking file" << file;
         cppcheck.check(FileWithDetails(file.toStdString()));
-        runAddonsAndTools(cppcheck.settings(), nullptr, file);
+        runAddonsAndTools(mSettings, nullptr, file);
         emit fileChecked(file);
 
         if (mState == Running)
@@ -166,7 +165,7 @@ void CheckThread::run()
         file = QString::fromStdString(fileSettings->filename());
         qDebug() << "Checking file" << file;
         cppcheck.check(*fileSettings);
-        runAddonsAndTools(cppcheck.settings(), fileSettings, QString::fromStdString(fileSettings->filename()));
+        runAddonsAndTools(mSettings, fileSettings, QString::fromStdString(fileSettings->filename()));
         emit fileChecked(file);
 
         if (mState == Running)
