@@ -69,7 +69,9 @@ static Settings create_settings()
     s.addEnabled("all");
     s.certainty.setEnabled(Certainty::inconclusive, true);
     s.checkLevel = Settings::CheckLevel::exhaustive;
-    loadLibrary(s, "std.cfg");
+    s.force = true;
+    s.preprocessOnly = true;
+    //loadLibrary(s, "std.cfg");
     return s;
 }
 static const Settings s_settings = create_settings();
