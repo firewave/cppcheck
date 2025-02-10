@@ -77,8 +77,8 @@ public:
      */
     static void deleteTokens(Token *tok);
 
-    void addtoken(const std::string& str, nonneg int lineno, nonneg int column, nonneg int fileno, bool split = false);
-    void addtoken(const std::string& str, const Token *locationTok);
+    void addtoken(std::string str, nonneg int lineno, nonneg int column, nonneg int fileno, bool split = false);
+    void addtoken(std::string str, const Token *locationTok);
 
     void addtoken(const Token *tok, nonneg int lineno, nonneg int column, nonneg int fileno);
     void addtoken(const Token *tok, const Token *locationTok);

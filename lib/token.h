@@ -930,11 +930,11 @@ public:
      * @param prepend Insert the new token before this token when it's not
      * the first one on the tokens list.
      */
-    RET_NONNULL Token* insertToken(const std::string& tokenStr, const std::string& originalNameStr = emptyString, const std::string& macroNameStr = emptyString, bool prepend = false);
+    RET_NONNULL Token* insertToken(std::string tokenStr, const std::string& originalNameStr = emptyString, const std::string& macroNameStr = emptyString, bool prepend = false);
 
-    RET_NONNULL Token* insertTokenBefore(const std::string& tokenStr, const std::string& originalNameStr = emptyString, const std::string& macroNameStr = emptyString)
+    RET_NONNULL Token* insertTokenBefore(std::string tokenStr, const std::string& originalNameStr = emptyString, const std::string& macroNameStr = emptyString)
     {
-        return insertToken(tokenStr, originalNameStr, macroNameStr, true);
+        return insertToken(std::move(tokenStr), originalNameStr, macroNameStr, true);
     }
 
     Token* previous() {

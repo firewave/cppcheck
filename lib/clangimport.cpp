@@ -357,7 +357,7 @@ namespace clangimport {
         }
     private:
         Token *createTokens(TokenList &tokenList);
-        Token *addtoken(TokenList &tokenList, const std::string &str, bool valueType=true);
+        Token *addtoken(TokenList &tokenList, std::string str, bool valueType=true);
         const ::Type *addTypeTokens(TokenList &tokenList, const std::string &str, const Scope *scope = nullptr);
         void addFullScopeNameTokens(TokenList &tokenList, const Scope *recordScope);
         Scope *createScope(TokenList &tokenList, Scope::ScopeType scopeType, AstNodePtr astNode, const Token *def);
@@ -572,10 +572,10 @@ void clangimport::AstNode::setLocations(TokenList &tokenList, int file, int line
     }
 }
 
-Token *clangimport::AstNode::addtoken(TokenList &tokenList, const std::string &str, bool valueType)
+Token *clangimport::AstNode::addtoken(TokenList &tokenList, std::string str, bool valueType)
 {
     const Scope *scope = getNestedInScope(tokenList);
-    tokenList.addtoken(str, mLine, mCol, mFile);
+    tokenList.addtoken(std::move(str), mLine, mCol, mFile);
     tokenList.back()->scope(scope);
     if (valueType)
         setValueType(tokenList.back());
@@ -1187,7 +1187,7 @@ Token *clangimport::AstNode::createTokens(TokenList &tokenList)
         }
         if (memberName.empty())
             memberName = "<unknown>";
-        Token *member = addtoken(tokenList, memberName);
+        Token *member = addtoken(tokenList, std::move(memberName));
         mData->ref(mExtTokens.back(), member);
         dot->astOperand1(s);
         dot->astOperand2(member);
@@ -1429,10 +1429,10 @@ void clangimport::AstNode::createTokensFunctionDecl(TokenList &tokenList)
             addtoken(tokenList, ",");
         const Type *recordType = addTypeTokens(tokenList, child->mExtTokens.back(), nestedIn);
         const Token *typeEndToken = tokenList.back();
-        const std::string spelling = child->getSpelling();
+        std::string spelling = child->getSpelling();
         Token *vartok = nullptr;
         if (!spelling.empty())
-            vartok = child->addtoken(tokenList, spelling);
+            vartok = child->addtoken(tokenList, std::move(spelling));
         if (!prev) {
             function->argumentList.emplace_back(vartok, child->getType(), nullptr, typeEndToken, i, AccessControl::Argument, recordType, scope);
             if (vartok) {

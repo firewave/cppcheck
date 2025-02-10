@@ -1583,7 +1583,7 @@ void TemplateSimplifier::addNamespace(const TokenAndName &templateDeclaration, c
             if (insert)
                 mTokenList.back()->tokAt(offset)->insertToken(token, emptyString);
             else
-                mTokenList.addtoken(token, tok->linenr(), tok->column(), tok->fileIndex());
+                mTokenList.addtoken(std::move(token), tok->linenr(), tok->column(), tok->fileIndex());
         }
         start = end + 1;
     }
@@ -1828,7 +1828,7 @@ void TemplateSimplifier::expandTemplate(
                                 return Token::simpleMatch(inst.token(), name.c_str(), name.size());
                             })) {
                                 // use the instantiated name
-                                dst->insertTokenBefore(name);
+                                dst->insertTokenBefore(std::move(name));
                                 dst->previous()->linenr(start->linenr());
                                 dst->previous()->column(start->column());
                                 start = closing;
@@ -4037,13 +4037,13 @@ void TemplateSimplifier::simplifyTemplates(const std::time_t maxtime)
             }
 
             const std::string strop = op->str();
-            const std::string strargs = (args && args->isName()) ? args->str() : "";
+            std::string strargs = (args && args->isName()) ? args->str() : "";
 
             Token::eraseTokens(tok, tok->link());
             tok->insertToken(")");
             if (!strargs.empty()) {
                 tok->insertToken("...");
-                tok->insertToken(strargs);
+                tok->insertToken(std::move(strargs));
             }
             tok->insertToken("(");
             Token::createMutualLinks(tok->next(), tok->link()->previous());

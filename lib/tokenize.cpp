@@ -479,7 +479,7 @@ static Token *splitDefinitionFromTypedef(Token *tok, nonneg int *unnamedCount)
     }
     tok1->insertToken(tok->strAt(1)); // struct, union or enum
     tok1 = tok1->next();
-    tok1->insertToken(name);
+    tok1->insertToken(std::move(name));
     tok->deleteThis();
     tok = tok3;
 
@@ -1189,8 +1189,8 @@ static Token* simplifyTypedefCopyTokens(Token* to, const Token* fromStart, const
     return ret;
 }
 
-static Token* simplifyTypedefInsertToken(Token* tok, const std::string& str, const Token* location) {
-    tok = tok->insertToken(str);
+static Token* simplifyTypedefInsertToken(Token* tok, std::string str, const Token* location) {
+    tok = tok->insertToken(std::move(str));
     tok->linenr(location->linenr());
     tok->column(location->column());
     tok->isSimplifiedTypedef(true);
