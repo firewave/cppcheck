@@ -37,6 +37,11 @@ else()
     set(srcs_lib ${srcs})
 endif()
 
+include(CheckFunctionExists)
+check_function_exists(backtrace _backtrace_exists)
+if(_backtrace_exists)
+    endif
+
 if (BUILD_CORE_DLL)
     add_library(cppcheck-core SHARED ${srcs_lib} ${hdrs} $<TARGET_OBJECTS:tinyxml2_objs> $<TARGET_OBJECTS:simplecpp_objs> version.rc)
     target_compile_definitions(cppcheck-core PRIVATE CPPCHECKLIB_EXPORT TINYXML2_EXPORT SIMPLECPP_EXPORT)
