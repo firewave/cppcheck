@@ -1483,6 +1483,7 @@ namespace {
                     r = evaluate(expr->str(), lhs, rhs);
                 if (expr->isComparisonOp() && (r.isUninitValue() || r.isImpossible())) {
                     if (rhs.isIntValue() && !expr->astOperand1()->values().empty()) {
+                        // TODO: the std::list creations are a hot spot
                         std::vector<ValueFlow::Value> result = infer(makeIntegralInferModel(),
                                                                      expr->str(),
                                                                      expr->astOperand1()->values(),
@@ -1491,6 +1492,7 @@ namespace {
                             return std::move(result.front());
                     }
                     if (lhs.isIntValue() && !expr->astOperand2()->values().empty()) {
+                        // TODO: the std::list creations are a hot spot
                         std::vector<ValueFlow::Value> result = infer(makeIntegralInferModel(),
                                                                      expr->str(),
                                                                      {std::move(lhs)},
