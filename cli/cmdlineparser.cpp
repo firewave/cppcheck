@@ -532,6 +532,9 @@ CmdLineParser::Result CmdLineParser::parseFromArgs(int argc, const char* const a
             else if (std::strncmp(argv[i],"--addon-python=", 15) == 0)
                 mSettings.addonPython.assign(argv[i]+15);
 
+            else if (std::strcmp(argv[i],"--analyze-all-vs-configs") == 0)
+                mSettings.analyzeAllVsConfigs = true;
+
             // Check configuration
             else if (std::strcmp(argv[i], "--check-config") == 0)
                 mSettings.checkConfiguration = true;
@@ -996,6 +999,9 @@ CmdLineParser::Result CmdLineParser::parseFromArgs(int argc, const char* const a
                     return Result::Fail;
             }
 
+            else if (std::strcmp(argv[i],"--no-analyze-all-vs-configs") == 0)
+                mSettings.analyzeAllVsConfigs = false;
+
             // undocumented option for usage in Python tests to indicate that no build dir should be injected
             else if (std::strcmp(argv[i], "--no-cppcheck-build-dir") == 0) {
                 mSettings.buildDir.clear();
@@ -1175,8 +1181,6 @@ CmdLineParser::Result CmdLineParser::parseFromArgs(int argc, const char* const a
                     }
                 }
                 if (projType == ImportProject::Type::VS_SLN || projType == ImportProject::Type::VS_VCXPROJ) {
-                    if (project.guiProject.analyzeAllVsConfigs == "false")
-                        project.selectOneVsConfig(mSettings.platform.type);
                     mSettings.libraries.emplace_back("windows");
                 }
                 if (projType == ImportProject::Type::MISSING) {
@@ -1576,6 +1580,12 @@ CmdLineParser::Result CmdLineParser::parseFromArgs(int argc, const char* const a
     if (!mPathNames.empty() && project.projectType != ImportProject::Type::NONE) {
         mLogger.printError("--project cannot be used in conjunction with source files.");
         return Result::Fail;
+    }
+
+    if (!mSettings.analyzeAllVsConfigs) {
+        if (project.projectType == ImportProject::Type::VS_SLN || project.projectType == ImportProject::Type::VS_VCXPROJ)
+            project.selectOneVsConfig(mSettings.platform.type);
+        // TODO: log when this does nothing
     }
 
     if (!mSettings.buildDir.empty() && !Path::isDirectory(mSettings.buildDir)) {

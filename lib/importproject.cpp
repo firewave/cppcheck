@@ -1259,8 +1259,6 @@ bool ImportProject::importCppcheckGuiProject(std::istream &istr, Settings &setti
     // default to --check-level=normal for import for now
     temp.setCheckLevel(Settings::CheckLevel::normal);
 
-    guiProject.analyzeAllVsConfigs.clear();
-
     // TODO: this should support all available command-line options
     for (const tinyxml2::XMLElement *node = rootnode->FirstChildElement(); node; node = node->NextSiblingElement()) {
         const char* name = node->Name();
@@ -1315,7 +1313,7 @@ bool ImportProject::importCppcheckGuiProject(std::istream &istr, Settings &setti
         else if (strcmp(name, CppcheckXml::PlatformElementName) == 0)
             guiProject.platform = empty_if_null(node->GetText());
         else if (strcmp(name, CppcheckXml::AnalyzeAllVsConfigsElementName) == 0)
-            guiProject.analyzeAllVsConfigs = empty_if_null(node->GetText());
+            temp.analyzeAllVsConfigs = (empty_if_null(node->GetText()) != "false");
         else if (strcmp(name, CppcheckXml::Parser) == 0)
             temp.clang = true;
         else if (strcmp(name, CppcheckXml::AddonsElementName) == 0) {
@@ -1396,6 +1394,7 @@ bool ImportProject::importCppcheckGuiProject(std::istream &istr, Settings &setti
     settings.addons = temp.addons;
     settings.clang = temp.clang;
     settings.clangTidy = temp.clangTidy;
+    settings.analyzeAllVsConfigs = temp.analyzeAllVsConfigs;
 
     if (!settings.premiumArgs.empty())
         settings.premiumArgs += temp.premiumArgs;
