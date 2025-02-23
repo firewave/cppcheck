@@ -815,11 +815,8 @@ CmdLineParser::Result CmdLineParser::parseFromArgs(int argc, const char* const a
                 path = 2 + argv[i];
             }
 
-            if (!path.empty()) {
-                mIgnoredPaths.emplace_back(std::move(path));
-            }
+            mIgnoredPaths.emplace_back(std::move(path));
         }
-
         else if (std::strncmp(argv[i], "--include=", 10) == 0) {
             mSettings.userIncludes.emplace_back(Path::fromNativeSeparators(argv[i] + 10));
         }

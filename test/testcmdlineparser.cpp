@@ -164,6 +164,7 @@ private:
         TEST_CASE(enforceLanguage6);
         TEST_CASE(enforceLanguage7);
         TEST_CASE(includesnopath);
+        TEST_CASE(includesnopathX);
         TEST_CASE(includes);
         TEST_CASE(includesslash);
         TEST_CASE(includesbackslash);
@@ -748,6 +749,14 @@ private:
         ASSERT_EQUALS("cppcheck: error: argument to '-D' is missing.\n", logger->str());
     }
 
+    void defines_noarg4() {
+        REDIRECT;
+        const char * const argv[] = {"cppcheck", "-D ", "--quiet", "file.cpp"};
+        // Fails since -D has no param
+        ASSERT_EQUALS_ENUM(CmdLineParser::Result::Fail, parseFromArgs(argv));
+        ASSERT_EQUALS("cppcheck: error: argument to '-D' is missing.\n", logger->str());
+    }
+
     void defines() {
         REDIRECT;
         const char * const argv[] = {"cppcheck", "-D_WIN32", "file.cpp"};
@@ -828,6 +837,30 @@ private:
     void includesnopath() {
         REDIRECT;
         const char * const argv[] = {"cppcheck", "-I"};
+        // Fails since -I has no param
+        ASSERT_EQUALS_ENUM(CmdLineParser::Result::Fail, parseFromArgs(argv));
+        ASSERT_EQUALS("cppcheck: error: argument to '-I' is missing.\n", logger->str());
+    }
+
+    void includesnopath2() {
+        REDIRECT;
+        const char * const argv[] = {"cppcheck", "-I", "-v", "file.cpp"};
+        // Fails since -I has no param
+        ASSERT_EQUALS_ENUM(CmdLineParser::Result::Fail, parseFromArgs(argv));
+        ASSERT_EQUALS("cppcheck: error: argument to '-I' is missing.\n", logger->str());
+    }
+
+    void includesnopath3() {
+        REDIRECT;
+        const char * const argv[] = {"cppcheck", "-I ", "-v", "file.cpp"};
+        // Fails since -I has no param
+        ASSERT_EQUALS_ENUM(CmdLineParser::Result::Fail, parseFromArgs(argv));
+        ASSERT_EQUALS("cppcheck: error: argument to '-I' is missing.\n", logger->str());
+    }
+
+    void includesnopathX() {
+        REDIRECT;
+        const char * const argv[] = {"cppcheck", "-I include", "file.cpp"};
         // Fails since -I has no param
         ASSERT_EQUALS_ENUM(CmdLineParser::Result::Fail, parseFromArgs(argv));
         ASSERT_EQUALS("cppcheck: error: argument to '-I' is missing.\n", logger->str());
@@ -1060,6 +1093,12 @@ private:
         ASSERT_EQUALS("cppcheck: error: --enable parameter is empty\n", logger->str());
     }
 
+    void enabledEmpty2() {
+        REDIRECT;
+        const char * const argv[] = {"cppcheck", "--enable= ", "file.cpp"};
+        ASSERT_EQUALS_ENUM(CmdLineParser::Result::Fail, parseFromArgs(argv));
+        ASSERT_EQUALS("cppcheck: error: --enable parameter is empty\n", logger->str());
+    }
 
     void disableAll() {
         REDIRECT;
@@ -1145,6 +1184,13 @@ private:
         ASSERT_EQUALS("cppcheck: error: --disable parameter is empty\n", logger->str());
     }
 
+    void disableEmpty2() {
+        REDIRECT;
+        const char * const argv[] = {"cppcheck", "--disable= ", "file.cpp"};
+        ASSERT_EQUALS_ENUM(CmdLineParser::Result::Fail, parseFromArgs(argv));
+        ASSERT_EQUALS("cppcheck: error: --disable parameter is empty\n", logger->str());
+    }
+
     void inconclusive() {
         REDIRECT;
         const char * const argv[] = {"cppcheck", "--inconclusive", "file.cpp"};
@@ -1162,6 +1208,14 @@ private:
     void errorExitcodeMissing() {
         REDIRECT;
         const char * const argv[] = {"cppcheck", "--error-exitcode=", "file.cpp"};
+        // Fails since exit code not given
+        ASSERT_EQUALS_ENUM(CmdLineParser::Result::Fail, parseFromArgs(argv));
+        ASSERT_EQUALS("cppcheck: error: argument to '--error-exitcode=' is not valid - not an integer.\n", logger->str());
+    }
+
+    void errorExitcodeMissing2() {
+        REDIRECT;
+        const char * const argv[] = {"cppcheck", "--error-exitcode= ", "file.cpp"};
         // Fails since exit code not given
         ASSERT_EQUALS_ENUM(CmdLineParser::Result::Fail, parseFromArgs(argv));
         ASSERT_EQUALS("cppcheck: error: argument to '--error-exitcode=' is not valid - not an integer.\n", logger->str());
@@ -2195,6 +2249,22 @@ private:
     void ignorepathsnopath() {
         REDIRECT;
         const char * const argv[] = {"cppcheck", "-i"};
+        // Fails since no ignored path given
+        ASSERT_EQUALS_ENUM(CmdLineParser::Result::Fail, parseFromArgs(argv));
+        ASSERT_EQUALS("cppcheck: error: argument to '-i' is missing.\n", logger->str());
+    }
+
+    void ignorepathsnopath2() {
+        REDIRECT;
+        const char * const argv[] = {"cppcheck", "-i", "-v", "file.cpp"};
+        // Fails since no ignored path given
+        ASSERT_EQUALS_ENUM(CmdLineParser::Result::Fail, parseFromArgs(argv));
+        ASSERT_EQUALS("cppcheck: error: argument to '-i' is missing.\n", logger->str());
+    }
+
+    void ignorepathsnopath3() {
+        REDIRECT;
+        const char * const argv[] = {"cppcheck", "-i ", "-v", "file.cpp"};
         // Fails since no ignored path given
         ASSERT_EQUALS_ENUM(CmdLineParser::Result::Fail, parseFromArgs(argv));
         ASSERT_EQUALS("cppcheck: error: argument to '-i' is missing.\n", logger->str());
@@ -3513,6 +3583,14 @@ private:
     void undefs_noarg3() {
         REDIRECT;
         const char * const argv[] = {"cppcheck", "-U", "--quiet", "file.cpp"};
+        // Fails since -U has no param
+        ASSERT_EQUALS_ENUM(CmdLineParser::Result::Fail, parseFromArgs(argv));
+        ASSERT_EQUALS("cppcheck: error: argument to '-U' is missing.\n", logger->str());
+    }
+
+    void undefs_noarg4() {
+        REDIRECT;
+        const char * const argv[] = {"cppcheck", "-U ", "--quiet", "file.cpp"};
         // Fails since -U has no param
         ASSERT_EQUALS_ENUM(CmdLineParser::Result::Fail, parseFromArgs(argv));
         ASSERT_EQUALS("cppcheck: error: argument to '-U' is missing.\n", logger->str());
