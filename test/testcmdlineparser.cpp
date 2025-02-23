@@ -864,6 +864,7 @@ private:
         // Fails since -I has no param
         ASSERT_EQUALS_ENUM(CmdLineParser::Result::Fail, parseFromArgs(argv));
         ASSERT_EQUALS("cppcheck: error: argument to '-I' is missing.\n", logger->str());
+        ASSERT_EQUALS("include/", settings->includePaths.front());
     }
 
     void includes() {
