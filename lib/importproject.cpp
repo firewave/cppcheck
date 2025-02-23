@@ -188,23 +188,20 @@ ImportProject::Type ImportProject::import(const std::string &filename, Settings 
     if (!mPath.empty() && !endsWith(mPath,'/'))
         mPath += '/';
 
-    const std::vector<std::string> fileFilters =
-        settings ? settings->fileFilters : std::vector<std::string>();
-
     if (endsWith(filename, ".json")) {
         if (importCompileCommands(fin)) {
             setRelativePaths(filename);
             return ImportProject::Type::COMPILE_DB;
         }
     } else if (endsWith(filename, ".sln")) {
-        if (importSln(fin, mPath, fileFilters)) {
+        if (importSln(fin, mPath)) {
             setRelativePaths(filename);
             return ImportProject::Type::VS_SLN;
         }
     } else if (endsWith(filename, ".vcxproj")) {
         std::map<std::string, std::string, cppcheck::stricmp> variables;
         std::vector<SharedItemsProject> sharedItemsProjects;
-        if (importVcxproj(filename, variables, "", fileFilters, sharedItemsProjects)) {
+        if (importVcxproj(filename, variables, "", sharedItemsProjects)) {
             setRelativePaths(filename);
             return ImportProject::Type::VS_VCXPROJ;
         }
@@ -426,7 +423,7 @@ bool ImportProject::importCompileCommands(std::istream &istr)
     return true;
 }
 
-bool ImportProject::importSln(std::istream &istr, const std::string &path, const std::vector<std::string> &fileFilters)
+bool ImportProject::importSln(std::istream &istr, const std::string &path)
 {
     std::string line;
 
@@ -462,7 +459,7 @@ bool ImportProject::importSln(std::istream &istr, const std::string &path, const
         if (!Path::isAbsolute(vcxproj))
             vcxproj = path + vcxproj;
         vcxproj = Path::fromNativeSeparators(std::move(vcxproj));
-        if (!importVcxproj(vcxproj, variables, "", fileFilters, sharedItemsProjects)) {
+        if (!importVcxproj(vcxproj, variables, "", sharedItemsProjects)) {
             printError("failed to load '" + vcxproj + "' from Visual Studio solution");
             return false;
         }
@@ -706,7 +703,7 @@ static void loadVisualStudioProperties(const std::string &props, std::map<std::s
     }
 }
 
-bool ImportProject::importVcxproj(const std::string &filename, std::map<std::string, std::string, cppcheck::stricmp> &variables, const std::string &additionalIncludeDirectories, const std::vector<std::string> &fileFilters, std::vector<SharedItemsProject> &cache)
+bool ImportProject::importVcxproj(const std::string &filename, std::map<std::string, std::string, cppcheck::stricmp> &variables, const std::string &additionalIncludeDirectories, std::vector<SharedItemsProject> &cache)
 {
     variables["ProjectDir"] = Path::simplifyPath(Path::getPathFromFilename(filename));
 
@@ -786,7 +783,7 @@ bool ImportProject::importVcxproj(const std::string &filename, std::map<std::str
                                 return false;
                             }
 
-                            SharedItemsProject toAdd = importVcxitems(pathToSharedItemsFile, fileFilters, cache);
+                            SharedItemsProject toAdd = importVcxitems(pathToSharedItemsFile, cache);
                             if (!toAdd.successful) {
                                 printError("Could not load shared items project \"" + pathToSharedItemsFile + "\" from original path \"" + std::string(projectAttribute) + "\".");
                                 return false;
@@ -816,9 +813,6 @@ bool ImportProject::importVcxproj(const std::string &filename, std::map<std::str
 
     // Project files
     for (const std::string &cfilename : compileList) {
-        if (!fileFilters.empty() && !matchglobs(fileFilters, cfilename))
-            continue;
-
         for (const ProjectConfiguration &p : projectConfigurationList) {
 
             if (!guiProject.checkVsConfigs.empty()) {
@@ -871,7 +865,7 @@ bool ImportProject::importVcxproj(const std::string &filename, std::map<std::str
     return true;
 }
 
-ImportProject::SharedItemsProject ImportProject::importVcxitems(const std::string& filename, const std::vector<std::string>& fileFilters, std::vector<SharedItemsProject> &cache)
+ImportProject::SharedItemsProject ImportProject::importVcxitems(const std::string& filename, std::vector<SharedItemsProject> &cache)
 {
     auto isInCacheCheck = [filename](const ImportProject::SharedItemsProject& e) -> bool {
         return filename == e.pathToProjectFile;
@@ -903,10 +897,6 @@ ImportProject::SharedItemsProject ImportProject::importVcxitems(const std::strin
                     if (include && Path::acceptFile(include)) {
                         std::string file(include);
                         findAndReplace(file, "$(MSBuildThisFileDirectory)", "./");
-
-                        // Don't include file if it matches the filter
-                        if (!fileFilters.empty() && !matchglobs(fileFilters, file))
-                            continue;
 
                         result.sourceFiles.emplace_back(file);
                     } else {
