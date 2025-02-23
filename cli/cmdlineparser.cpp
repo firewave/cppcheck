@@ -820,18 +820,16 @@ CmdLineParser::Result CmdLineParser::parseFromArgs(int argc, const char* const a
                     path = 2 + argv[i];
                 }
 
-                if (!path.empty()) {
-                    path = Path::removeQuotationMarks(std::move(path));
-                    path = Path::simplifyPath(std::move(path));
+                path = Path::removeQuotationMarks(std::move(path));
+                path = Path::simplifyPath(std::move(path));
 
-                    // TODO: this only works when it exists
-                    if (Path::isDirectory(path)) {
-                        // If directory name doesn't end with / or \, add it
-                        if (!endsWith(path, '/'))
-                            path += '/';
-                    }
-                    mIgnoredPaths.emplace_back(std::move(path));
+                // TODO: this only works when it exists
+                if (Path::isDirectory(path)) {
+                    // If directory name doesn't end with / or \, add it
+                    if (!endsWith(path, '/'))
+                        path += '/';
                 }
+                mIgnoredPaths.emplace_back(std::move(path));
             }
 
             else if (std::strncmp(argv[i], "--include=", 10) == 0) {
