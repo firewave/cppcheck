@@ -247,19 +247,19 @@ public:
      * @brief Returns list of unmatched local (per-file) suppressions.
      * @return list of unmatched suppressions
      */
-    std::list<Suppression> getUnmatchedLocalSuppressions(const FileWithDetails &file, bool includeUnusedFunction) const;
+    std::list<Suppression> getUnmatchedLocalSuppressions(const FileWithDetails &file) const;
 
     /**
      * @brief Returns list of unmatched global (glob pattern) suppressions.
      * @return list of unmatched suppressions
      */
-    std::list<Suppression> getUnmatchedGlobalSuppressions(bool includeUnusedFunction) const;
+    std::list<Suppression> getUnmatchedGlobalSuppressions() const;
 
     /**
      * @brief Returns list of unmatched inline suppressions.
      * @return list of unmatched suppressions
      */
-    std::list<Suppression> getUnmatchedInlineSuppressions(bool includeUnusedFunction) const;
+    std::list<Suppression> getUnmatchedInlineSuppressions() const;
 
     /**
      * @brief Returns list of all suppressions.
@@ -277,7 +277,7 @@ public:
      * @param unmatched list of unmatched suppressions (from Settings::Suppressions::getUnmatched(Local|Global)Suppressions)
      * @return true is returned if errors are reported
      */
-    static bool reportUnmatchedSuppressions(const std::list<SuppressionList::Suppression> &unmatched, ErrorLogger &errorLogger);
+    static bool reportUnmatchedSuppressions(const std::list<SuppressionList::Suppression> &unmatched, ErrorLogger &errorLogger, bool includeUnusedFunction);
 
 private:
     mutable std::mutex mSuppressionsSync;
