@@ -442,9 +442,42 @@ int CppCheckExecutor::check_wrapper(const Settings& settings, Suppressions& supp
     return check_internal(settings, supprs);
 }
 
-bool CppCheckExecutor::reportSuppressions(const Settings &settings, const SuppressionList& suppressions, bool unusedFunctionCheckEnabled, const std::list<FileWithDetails> &files, const std::list<FileSettings>& fileSettings, ErrorLogger& errorLogger) {
-    const auto& suppr = suppressions.getSuppressions();
-    if (std::any_of(suppr.begin(), suppr.end(), [](const SuppressionList::Suppression& s) {
+/**
+ * Report unmatched suppressions
+ * @param unmatched list of unmatched suppressions (from Settings::Suppressions::getUnmatched(Local|Global)Suppressions)
+ * @return true is returned if errors are reported
+ */
+static bool reportUnmatchedSuppressions(const std::list<SuppressionList::Suppression> &unmatched, ErrorLogger &errorLogger, const std::vector<std::string>& filters)
+{
+    bool err = false;
+    // Report unmatched suppressions
+    for (const SuppressionList::Suppression &s : unmatched) {
+        bool skip = false;
+        for (const auto& filter : filters)
+        {
+            if (matchglob(filter, s.errorId))
+            {
+                skip = true;
+                break;
+            }
+        }
+        if (skip)
+            continue;
+
+        std::list<::ErrorMessage::FileLocation> callStack;
+        if (!s.fileName.empty()) {
+            callStack.emplace_back(s.fileName, s.lineNumber, 0);
+        }
+        errorLogger.reportErr(::ErrorMessage(std::move(callStack), "", Severity::information, "Unmatched suppression: " + s.errorId, "unmatchedSuppression", Certainty::normal));
+        err = true;
+    }
+    return err;
+}
+
+bool CppCheckExecutor::reportUnmatchedSuppressions(const Settings &settings, const SuppressionList& suppressions, const std::list<FileWithDetails> &files, const std::list<FileSettings>& fileSettings, ErrorLogger& errorLogger) {
+    // TODO: explain this
+    const auto suppr = suppressions.getSuppressions();
+    if (std::any_of(suppr.cbegin(), suppr.cend(), [](const SuppressionList::Suppression& s) {
         return s.errorId == "unmatchedSuppression" && s.fileName.empty() && s.lineNumber == SuppressionList::Suppression::NO_LINE;
     }))
         return false;
@@ -455,22 +488,19 @@ bool CppCheckExecutor::reportSuppressions(const Settings &settings, const Suppre
         assert(!(!files.empty() && !fileSettings.empty()));
 
         for (auto i = files.cbegin(); i != files.cend(); ++i) {
-            err |= SuppressionList::reportUnmatchedSuppressions(
-                suppressions.getUnmatchedLocalSuppressions(*i, unusedFunctionCheckEnabled), errorLogger);
+            err |= ::reportUnmatchedSuppressions(suppressions.getUnmatchedLocalSuppressions(*i), errorLogger, settings.unmatchedSuppressionFilters);
         }
 
         for (auto i = fileSettings.cbegin(); i != fileSettings.cend(); ++i) {
-            err |= SuppressionList::reportUnmatchedSuppressions(
-                suppressions.getUnmatchedLocalSuppressions(i->file, unusedFunctionCheckEnabled), errorLogger);
+            err |= ::reportUnmatchedSuppressions(suppressions.getUnmatchedLocalSuppressions(i->file), errorLogger, settings.unmatchedSuppressionFilters);
         }
     }
     if (settings.inlineSuppressions) {
         // report unmatched unusedFunction suppressions
-        err |= SuppressionList::reportUnmatchedSuppressions(
-            suppressions.getUnmatchedInlineSuppressions(unusedFunctionCheckEnabled), errorLogger);
+        err |= ::reportUnmatchedSuppressions(suppressions.getUnmatchedInlineSuppressions(), errorLogger, settings.unmatchedSuppressionFilters);
     }
 
-    err |= SuppressionList::reportUnmatchedSuppressions(suppressions.getUnmatchedGlobalSuppressions(unusedFunctionCheckEnabled), errorLogger);
+    err |= ::reportUnmatchedSuppressions(suppressions.getUnmatchedGlobalSuppressions(), errorLogger, settings.unmatchedSuppressionFilters);
     return err;
 }
 
@@ -525,7 +555,7 @@ int CppCheckExecutor::check_internal(const Settings& settings, Suppressions& sup
     returnValue |= cppcheck.analyseWholeProgram(settings.buildDir, mFiles, mFileSettings, stdLogger.getCtuInfo());
 
     if (settings.severity.isEnabled(Severity::information) || settings.checkConfiguration) {
-        const bool err = reportSuppressions(settings, supprs.nomsg, settings.checks.isEnabled(Checks::unusedFunction), mFiles, mFileSettings, stdLogger);
+        const bool err = reportUnmatchedSuppressions(settings, supprs.nomsg, mFiles, mFileSettings, stdLogger);
         if (err && returnValue == 0)
             returnValue = settings.exitCode;
     }
