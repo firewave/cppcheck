@@ -1042,6 +1042,8 @@ bool MainWindow::getCppcheckSettings(Settings& settings, Suppressions& supprs)
     // default to --check-level=normal for GUI for now
     settings.setCheckLevel(Settings::CheckLevel::normal);
 
+    // TODO: settings.premium
+
     const bool std = tryLoadLibrary(settings.library, "std.cfg");
     if (!std) {
         QMessageBox::critical(this, tr("Error"), tr("Failed to load %1. Your Cppcheck installation is broken. You can use --data-dir=<directory> at the command line to specify where this file is located. Please note that --data-dir is supposed to be used by installation scripts and therefore the GUI does not start when it is used, all that happens is that the setting is configured.\n\nAnalysis is aborted.").arg("std.cfg"));
@@ -1713,6 +1715,7 @@ void MainWindow::formatAndSetTitle(const QString &text)
         nameWithVersion += " (" + extraVersion + ")";
     }
 
+    // TODO: should not contain the version - it should set extraVersion
     if (!mCppcheckCfgProductName.isEmpty())
         nameWithVersion = mCppcheckCfgProductName;
 
@@ -2240,7 +2243,9 @@ void MainWindow::replyFinished(QNetworkReply *reply) {
     const QString str = reply->readAll();
     qDebug() << "Response: " << str;
     if (reply->url().fileName() == "version.txt") {
+        // TODO: lacks extra version
         QString nameWithVersion = QString("Cppcheck %1").arg(CppCheck::version());
+        // TODO: this should not contain the version - it should set extraVersion
         if (!mCppcheckCfgProductName.isEmpty())
             nameWithVersion = mCppcheckCfgProductName;
         const int appVersion = getVersion(nameWithVersion);
