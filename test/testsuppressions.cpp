@@ -103,6 +103,8 @@ private:
         TEST_CASE(suppressionsParseXmlFile);
 
         TEST_CASE(toString);
+
+        TEST_CASE(suppressionWildcard);
     }
 
     void suppressionsBadId1() const {
@@ -1659,6 +1661,38 @@ private:
             s.errorId = "unitvar";
             s.symbolName = "sym";
             ASSERT_EQUALS("unitvar:sym", s.toString());
+        }
+    }
+
+    void suppressionWildcard() const {
+        SuppressionList suppressions;
+        ASSERT_EQUALS("", suppressions.addSuppressionLine("id:test*.cpp"));
+        {
+            const auto supprs = suppressions.getSuppressions();
+            const auto suppr = supprs.cbegin();
+            ASSERT(!suppr->checked);
+            ASSERT(!suppr->matched);
+        }
+        ASSERT_EQUALS(false, suppressions.isSuppressed(errorMessage("abc", "xyz.cpp", 1)));
+        {
+            const auto supprs = suppressions.getSuppressions();
+            const auto suppr = supprs.cbegin();
+            ASSERT(!suppr->checked);
+            ASSERT(!suppr->matched);
+        }
+        ASSERT_EQUALS(false, suppressions.isSuppressed(errorMessage("abc", "test.cpp", 1)));
+        {
+            const auto supprs = suppressions.getSuppressions();
+            const auto suppr = supprs.cbegin();
+            ASSERT(!suppr->checked);
+            ASSERT(!suppr->matched);
+        }
+        ASSERT_EQUALS(true, suppressions.isSuppressed(errorMessage("id", "test.cpp", 1)));
+        {
+            const auto supprs = suppressions.getSuppressions();
+            const auto suppr = supprs.cbegin();
+            ASSERT(suppr->checked);
+            ASSERT(suppr->matched);
         }
     }
 };
