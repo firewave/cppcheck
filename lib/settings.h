@@ -298,6 +298,9 @@ public:
     /** @brief plist output (--plist-output=&lt;dir&gt;) */
     std::string plistOutput;
 
+    /** @brief Are we Cppcheck Premium */
+    bool premium{};
+
     /** @brief Extra arguments for Cppcheck Premium addon */
     std::string premiumArgs;
 
