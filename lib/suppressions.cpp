@@ -610,7 +610,7 @@ void SuppressionList::markUnmatchedInlineSuppressionsAsChecked(const Tokenizer &
     }
 }
 
-bool SuppressionList::reportUnmatchedSuppressions(const std::list<SuppressionList::Suppression> &unmatched, ErrorLogger &errorLogger, bool includeUnusedFunction)
+bool SuppressionList::reportUnmatchedSuppressions(const std::list<SuppressionList::Suppression> &unmatched, ErrorLogger &errorLogger, bool includeUnusedFunction, bool includePremium)
 {
     bool err = false;
     // Report unmatched suppressions
@@ -620,6 +620,9 @@ bool SuppressionList::reportUnmatchedSuppressions(const std::list<SuppressionLis
             continue;
 
         if (!includeUnusedFunction && s.errorId == ID_UNUSEDFUNCTION)
+            continue;
+
+        if (!includePremium && matchglob("premium-*", s.errorId))
             continue;
 
         // check if this unmatched suppression is suppressed

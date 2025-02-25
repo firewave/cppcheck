@@ -277,7 +277,7 @@ public:
      * @param unmatched list of unmatched suppressions (from Settings::Suppressions::getUnmatched(Local|Global)Suppressions)
      * @return true is returned if errors are reported
      */
-    static bool reportUnmatchedSuppressions(const std::list<SuppressionList::Suppression> &unmatched, ErrorLogger &errorLogger, bool includeUnusedFunction);
+    static bool reportUnmatchedSuppressions(const std::list<SuppressionList::Suppression> &unmatched, ErrorLogger &errorLogger, bool includeUnusedFunction, bool includePremium);
 
 private:
     mutable std::mutex mSuppressionsSync;

@@ -404,21 +404,21 @@ bool CppCheckExecutor::reportSuppressions(const Settings &settings, const Suppre
 
         for (auto i = files.cbegin(); i != files.cend(); ++i) {
             err |= SuppressionList::reportUnmatchedSuppressions(
-                suppressions.getUnmatchedLocalSuppressions(*i), errorLogger, unusedFunctionCheckEnabled);
+                suppressions.getUnmatchedLocalSuppressions(*i), errorLogger, unusedFunctionCheckEnabled, settings.premium);
         }
 
         for (auto i = fileSettings.cbegin(); i != fileSettings.cend(); ++i) {
             err |= SuppressionList::reportUnmatchedSuppressions(
-                suppressions.getUnmatchedLocalSuppressions(i->file), errorLogger, unusedFunctionCheckEnabled);
+                suppressions.getUnmatchedLocalSuppressions(i->file), errorLogger, unusedFunctionCheckEnabled, settings.premium);
         }
     }
     if (settings.inlineSuppressions) {
         // report unmatched unusedFunction suppressions
         err |= SuppressionList::reportUnmatchedSuppressions(
-            suppressions.getUnmatchedInlineSuppressions(), errorLogger, unusedFunctionCheckEnabled);
+            suppressions.getUnmatchedInlineSuppressions(), errorLogger, unusedFunctionCheckEnabled, settings.premium);
     }
 
-    err |= SuppressionList::reportUnmatchedSuppressions(suppressions.getUnmatchedGlobalSuppressions(), errorLogger, unusedFunctionCheckEnabled);
+    err |= SuppressionList::reportUnmatchedSuppressions(suppressions.getUnmatchedGlobalSuppressions(), errorLogger, unusedFunctionCheckEnabled, settings.premium);
     return err;
 }
 
