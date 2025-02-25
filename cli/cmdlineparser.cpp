@@ -1568,10 +1568,23 @@ CmdLineParser::Result CmdLineParser::parseFromArgs(int argc, const char* const a
     if (mSettings.jobs > 1 && mSettings.buildDir.empty()) {
         // TODO: bail out instead?
         if (mSettings.checks.isEnabled(Checks::unusedFunction))
+        {
             mLogger.printMessage("unusedFunction check requires --cppcheck-build-dir to be active with -j.");
+            mSettings.checks.disable(Checks::unusedFunction);
+            // TODO: is there some later logic to remove?
+        }
         // TODO: enable
         //mLogger.printMessage("whole program analysis requires --cppcheck-build-dir to be active with -j.");
     }
+
+    mSettings.unmatchedSuppressionFilters.emplace_back("unmatchedSuppression");
+    if (!mSettings.checks.isEnabled(Checks::unusedFunction))
+        mSettings.unmatchedSuppressionFilters.emplace_back("unusedFunction");
+    if (mSettings.addons.count("misra"))
+        mSettings.unmatchedSuppressionFilters.emplace_back("misra-*");
+    // TODO: handle all premium features
+    //if (!mSettings.isPremiumEnabled())
+        mSettings.unmatchedSuppressionFilters.emplace_back("premium-*");
 
     if (!mPathNames.empty() && project.projectType != ImportProject::Type::NONE) {
         mLogger.printError("--project cannot be used in conjunction with source files.");

@@ -1266,7 +1266,7 @@ unsigned int CppCheck::checkFile(const FileWithDetails& file, const std::string 
         // collected after all files are processed
         if (!mSettings.useSingleJob()) {
             // TODO: check result?
-            SuppressionList::reportUnmatchedSuppressions(mSuppressions.nomsg.getUnmatchedLocalSuppressions(file, (bool)mUnusedFunctionsCheck), mErrorLogger);
+            //SuppressionList::reportUnmatchedSuppressions(mSuppressions.nomsg.getUnmatchedLocalSuppressions(file), mErrorLogger);
         }
     }
 
