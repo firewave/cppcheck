@@ -25,11 +25,13 @@
 #include <string>
 #include <utility>
 
-class TestRegEx : public TestFixture {
+class TestRegExBase : public TestFixture {
 public:
-    TestRegEx() : TestFixture("TestRegEx") {}
+    TestRegExBase(const char * const name, Regex::Type type) : TestFixture(name), mType(type) {}
 
 private:
+    Regex::Type mType{};
+
     void run() override {
         TEST_CASE(match);
         TEST_CASE(nomatch);
@@ -43,7 +45,7 @@ private:
 #define assertRegex(...) assertRegex_(__FILE__, __LINE__, __VA_ARGS__)
     std::shared_ptr<Regex> assertRegex_(const char* file, int line, std::string pattern, const std::string& exp_err = "") const {
         std::string regex_err;
-        auto r = Regex::create(std::move(pattern), regex_err);
+        auto r = Regex::create(std::move(pattern), mType, regex_err);
         if (exp_err.empty())
             ASSERT_LOC(!!r.get(), file, line);
         else
@@ -79,7 +81,13 @@ private:
     }
 
     void compileError() const {
-        (void)assertRegex("[", "pcre_compile failed: missing terminating ] for character class");
+        std::string exp;
+        if (mType == Regex::Type::Pcre)
+            exp = "missing terminating ] for character class";
+        else if (mType == Regex::Type::Std)
+            exp = "Unexpected character within '[...]' in regular expression";
+
+        (void)assertRegex("[", exp);
     }
 
     void copy() const {
@@ -189,6 +197,17 @@ private:
 #undef assertRegex
 };
 
-REGISTER_TEST(TestRegEx)
+class TestRegExPcre : public TestRegExBase {
+public:
+    TestRegExPcre() : TestRegExBase("TestRegExPcre", Regex::Type::Pcre) {}
+};
+
+class TestRegExStd : public TestRegExBase {
+public:
+    TestRegExStd() : TestRegExBase("TestRegExStd", Regex::Type::Std) {}
+};
+
+REGISTER_TEST(TestRegExPcre)
+REGISTER_TEST(TestRegExStd)
 
 #endif // HAVE_RULES
