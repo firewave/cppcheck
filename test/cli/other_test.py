@@ -3173,6 +3173,7 @@ def test_suppress_unmatched_wildcard(tmp_path):
         '--template=simple',
         '--enable=information',
         '--suppress=id:test*.cpp',
+        '--suppress=id2:test?.cpp',
         str(test_file)
     ]
     exitcode, stdout, stderr = cppcheck(args)
