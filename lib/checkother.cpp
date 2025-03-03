@@ -620,7 +620,7 @@ void CheckOther::checkRedundantAssignment()
 
 void CheckOther::redundantCopyError(const Token *tok1, const Token* tok2, const std::string& var)
 {
-    const std::list<const Token *> callstack = { tok1, tok2 };
+    const std::list<const Token *> callstack{ tok1, tok2 };
     reportError(callstack, Severity::performance, "redundantCopy",
                 "$symbol:" + var + "\n"
                 "Buffer '$symbol' is being written before its old content has been used.", CWE563, Certainty::normal);
@@ -628,7 +628,7 @@ void CheckOther::redundantCopyError(const Token *tok1, const Token* tok2, const 
 
 void CheckOther::redundantAssignmentError(const Token *tok1, const Token* tok2, const std::string& var, bool inconclusive)
 {
-    const ErrorPath errorPath = { ErrorPathItem(tok1, var + " is assigned"), ErrorPathItem(tok2, var + " is overwritten") };
+    const ErrorPath errorPath{ ErrorPathItem(tok1, var + " is assigned"), ErrorPathItem(tok2, var + " is overwritten") };
     if (inconclusive)
         reportError(errorPath, Severity::style, "redundantAssignment",
                     "$symbol:" + var + "\n"
@@ -642,7 +642,7 @@ void CheckOther::redundantAssignmentError(const Token *tok1, const Token* tok2, 
 
 void CheckOther::redundantInitializationError(const Token *tok1, const Token* tok2, const std::string& var, bool inconclusive)
 {
-    const ErrorPath errorPath = { ErrorPathItem(tok1, var + " is initialized"), ErrorPathItem(tok2, var + " is overwritten") };
+    const ErrorPath errorPath{ ErrorPathItem(tok1, var + " is initialized"), ErrorPathItem(tok2, var + " is overwritten") };
     reportError(errorPath, Severity::style, "redundantInitialization",
                 "$symbol:" + var + "\nRedundant initialization for '$symbol'. The initialized value is overwritten before it is read.",
                 CWE563,
@@ -651,7 +651,7 @@ void CheckOther::redundantInitializationError(const Token *tok1, const Token* to
 
 void CheckOther::redundantAssignmentInSwitchError(const Token *tok1, const Token* tok2, const std::string &var)
 {
-    const ErrorPath errorPath = { ErrorPathItem(tok1, "$symbol is assigned"), ErrorPathItem(tok2, "$symbol is overwritten") };
+    const ErrorPath errorPath{ ErrorPathItem(tok1, "$symbol is assigned"), ErrorPathItem(tok2, "$symbol is overwritten") };
     reportError(errorPath, Severity::style, "redundantAssignInSwitch",
                 "$symbol:" + var + "\n"
                 "Variable '$symbol' is reassigned a value before the old one has been used. 'break;' missing?", CWE563, Certainty::normal);
@@ -2877,7 +2877,7 @@ void CheckOther::duplicateExpressionError(const Token *tok1, const Token *tok2, 
 
 void CheckOther::duplicateAssignExpressionError(const Token *tok1, const Token *tok2, bool inconclusive)
 {
-    const std::list<const Token *> toks = { tok2, tok1 };
+    const std::list<const Token *> toks{ tok2, tok1 };
 
     const std::string& var1 = tok1 ? tok1->str() : "x";
     const std::string& var2 = tok2 ? tok2->str() : "x";
@@ -3826,7 +3826,7 @@ void CheckOther::checkFuncArgNamesDifferent()
 void CheckOther::funcArgNamesDifferent(const std::string & functionName, nonneg int index,
                                        const Token* declaration, const Token* definition)
 {
-    std::list<const Token *> tokens = { declaration,definition };
+    std::list<const Token *> tokens{ declaration,definition };
     reportError(tokens, Severity::style, "funcArgNamesDifferent",
                 "$symbol:" + functionName + "\n"
                 "Function '$symbol' argument " + std::to_string(index + 1) + " names different: declaration '" +
@@ -3839,7 +3839,7 @@ void CheckOther::funcArgOrderDifferent(const std::string & functionName,
                                        const std::vector<const Token *> & declarations,
                                        const std::vector<const Token *> & definitions)
 {
-    std::list<const Token *> tokens = {
+    std::list<const Token *> tokens{
         !declarations.empty() ? declarations[0] ? declarations[0] : declaration : nullptr,
         !definitions.empty() ? definitions[0] ? definitions[0] : definition : nullptr
     };

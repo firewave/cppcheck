@@ -3268,7 +3268,7 @@ static ValueFlow::Value makeConditionValue(long long val,
 
 static std::vector<const Token*> getConditions(const Token* tok, const char* op)
 {
-    std::vector<const Token*> conds = {tok};
+    std::vector<const Token*> conds{tok};
     if (tok->str() == op) {
         std::vector<const Token*> args = astFlatten(tok, op);
         std::copy_if(args.cbegin(), args.cend(), std::back_inserter(conds), [&](const Token* tok2) {
@@ -3624,8 +3624,8 @@ static void valueFlowSymbolicOperators(const SymbolDatabase& symboldatabase, con
                     continue;
                 if (Token::Match(tok, "*|/") && constant->intvalue != 1)
                     continue;
-                std::vector<ValueFlow::Value> values = {makeSymbolic(vartok)};
-                std::unordered_set<nonneg int> ids = {vartok->exprId()};
+                std::vector<ValueFlow::Value> values{makeSymbolic(vartok)};
+                std::unordered_set<nonneg int> ids{vartok->exprId()};
                 std::copy_if(vartok->values().cbegin(),
                              vartok->values().cend(),
                              std::back_inserter(values),
@@ -4561,7 +4561,7 @@ struct ConditionHandler {
                     parent = nullptr;
                 }
                 if (parent) {
-                    std::vector<Token*> nextExprs = {parent->astOperand2()};
+                    std::vector<Token*> nextExprs{parent->astOperand2()};
                     if (astIsLHS(parent) && parent->astParent() && parent->astParent()->str() == parent->str()) {
                         nextExprs.push_back(parent->astParent()->astOperand2());
                     }
@@ -4712,9 +4712,9 @@ struct ConditionHandler {
                 }
             }
 
-            bool deadBranch[] = {false, false};
+            bool deadBranch[]{false, false};
             // start token of conditional code
-            Token* startTokens[] = {nullptr, nullptr};
+            Token* startTokens[]{nullptr, nullptr};
             // determine startToken(s)
             if (Token::simpleMatch(top->link(), ") {"))
                 startTokens[0] = top->link()->next();
@@ -4980,8 +4980,8 @@ static void valueFlowInferCondition(TokenList& tokenlist, const Settings& settin
             continue;
         if (Token::Match(tok, "%comp%|-") && tok->astOperand1() && tok->astOperand2()) {
             if (astIsIterator(tok->astOperand1()) || astIsIterator(tok->astOperand2())) {
-                static const std::array<ValuePtr<InferModel>, 2> iteratorModels = {EndIteratorInferModel{},
-                                                                                   StartIteratorInferModel{}};
+                static const std::array<ValuePtr<InferModel>, 2> iteratorModels{EndIteratorInferModel{},
+                                                                                StartIteratorInferModel{}};
                 for (const ValuePtr<InferModel>& model : iteratorModels) {
                     std::vector<ValueFlow::Value> result =
                         infer(model, tok->str(), tok->astOperand1()->values(), tok->astOperand2()->values());

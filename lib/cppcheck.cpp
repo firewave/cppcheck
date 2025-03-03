@@ -406,9 +406,9 @@ static void createDumpFile(const Settings& settings,
 static std::string detectPython(const CppCheck::ExecuteCmdFn &executeCommand)
 {
 #ifdef _WIN32
-    const char *py_exes[] = { "python3.exe", "python.exe" };
+    const char *py_exes[]{ "python3.exe", "python.exe" };
 #else
-    const char *py_exes[] = { "python3", "python" };
+    const char *py_exes[]{ "python3", "python" };
 #endif
     for (const char* py_exe : py_exes) {
         std::string out;
@@ -1595,7 +1595,7 @@ void CppCheck::executeRules(const std::string &tokenlist, const TokenList &list)
 #endif
 
         int pos = 0;
-        int ovector[30]= {0};
+        int ovector[30]{};
         while (pos < (int)str.size()) {
             const int pcreExecRet = pcre_exec(re, pcreExtra, str.c_str(), (int)str.size(), pos, 0, ovector, 30);
             if (pcreExecRet < 0) {

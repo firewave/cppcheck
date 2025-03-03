@@ -4512,8 +4512,8 @@ void Tokenizer::setVarId()
 
 // Variable declarations can't start with "return" etc.
 #define NOTSTART_C "NOT", "case", "default", "goto", "not", "return", "sizeof", "typedef"
-static const std::unordered_set<std::string> notstart_c = { NOTSTART_C };
-static const std::unordered_set<std::string> notstart_cpp = { NOTSTART_C,
+static const std::unordered_set<std::string> notstart_c{ NOTSTART_C };
+static const std::unordered_set<std::string> notstart_cpp{ NOTSTART_C,
                                                               "delete", "friend", "new", "throw", "using", "virtual", "explicit", "const_cast", "dynamic_cast", "reinterpret_cast", "static_cast", "template"
 };
 
@@ -7447,7 +7447,7 @@ void Tokenizer::simplifyStaticConst()
 {
     // This function will simplify the token list so that the qualifiers "extern", "static"
     // and "const" appear in the same order as in the array below.
-    static const std::array<std::string, 3> qualifiers = {"extern", "static", "const"};
+    static const std::array<std::string, 3> qualifiers{"extern", "static", "const"};
 
     // Move 'const' before all other qualifiers and types and then
     // move 'static' before all other qualifiers and types, ...
@@ -7543,7 +7543,7 @@ void Tokenizer::simplifyVariableMultipleAssign()
 }
 
 // Binary operators simplification map
-static const std::unordered_map<std::string, std::string> cAlternativeTokens = {
+static const std::unordered_map<std::string, std::string> cAlternativeTokens{
     std::make_pair("and", "&&")
     , std::make_pair("and_eq", "&=")
     , std::make_pair("bitand", "&")
@@ -7993,7 +7993,7 @@ bool Tokenizer::simplifyRedundantParentheses()
 
 void Tokenizer::simplifyTypeIntrinsics()
 {
-    static const std::unordered_map<std::string, std::string> intrinsics = {
+    static const std::unordered_map<std::string, std::string> intrinsics{
         { "__has_nothrow_assign", "has_nothrow_assign" },
         { "__has_nothrow_constructor", "has_nothrow_constructor" },
         { "__has_nothrow_copy", "has_nothrow_copy" },
@@ -9512,7 +9512,7 @@ void Tokenizer::simplifySpaceshipOperator()
     }
 }
 
-static const std::unordered_set<std::string> keywords = {
+static const std::unordered_set<std::string> keywords{
     "inline"
     , "_inline"
     , "__inline"
@@ -10094,7 +10094,7 @@ namespace {
         std::string mbcs, unicode;
     };
 
-    const std::map<std::string, triplet> apis = {
+    const std::map<std::string, triplet> apis{
         std::make_pair("_topen", triplet("open", "_wopen")),
         std::make_pair("_tsopen_s", triplet("_sopen_s", "_wsopen_s")),
         std::make_pair("_tfopen", triplet("fopen", "_wfopen")),

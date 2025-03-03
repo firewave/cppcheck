@@ -554,7 +554,7 @@ static void replaceSpecialChars(std::string& source)
 {
     // Support a few special characters to allow to specific formatting, see http://sourceforge.net/apps/phpbb/cppcheck/viewtopic.php?f=4&t=494&sid=21715d362c0dbafd3791da4d9522f814
     // Substitution should be done first so messages from cppcheck never get translated.
-    static const std::unordered_map<char, std::string> substitutionMap = {
+    static const std::unordered_map<char, std::string> substitutionMap{
         {'b', "\b"},
         {'n', "\n"},
         {'r', "\r"},

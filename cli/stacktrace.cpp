@@ -32,7 +32,7 @@ void print_stacktrace(FILE* output, int start_idx, bool demangling, int maxdepth
 {
     // 32 vs. 64bit
 #define ADDRESSDISPLAYLENGTH ((sizeof(long)==8)?12:8)
-    void *callstackArray[32]= {nullptr}; // the less resources the better...
+    void *callstackArray[32]{}; // the less resources the better...
     const int currentdepth = backtrace(callstackArray, (int)getArrayLength(callstackArray));
     // set offset to 1 to omit the printing function itself
     int offset=start_idx+1; // some entries on top are within our own exception handling code or libc
@@ -49,7 +49,7 @@ void print_stacktrace(FILE* output, int start_idx, bool demangling, int maxdepth
 
     fputs("Callstack:\n", output);
     bool own_code = false;
-    char demangle_buffer[2048]= {0};
+    char demangle_buffer[2048]{};
     for (int i = offset; i < maxdepth; ++i) {
         const char * const symbolString = symbolStringList[i];
         // skip all leading libc symbols so the first symbol is our code
@@ -69,7 +69,7 @@ void print_stacktrace(FILE* output, int start_idx, bool demangling, int maxdepth
         if (demangling && firstBracketName) {
             const char * const plus = strchr(firstBracketName, '+');
             if (plus && (plus>(firstBracketName+1))) {
-                char input_buffer[1024]= {0};
+                char input_buffer[1024]{};
                 strncpy(input_buffer, firstBracketName+1, plus-firstBracketName-1);
                 size_t length = getArrayLength(demangle_buffer);
                 int status=0;

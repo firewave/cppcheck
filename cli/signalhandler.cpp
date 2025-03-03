@@ -60,7 +60,7 @@ static constexpr size_t MYSTACKSIZE = (16*1024)+32768; // wild guess about a rea
 #else
 static constexpr size_t MYSTACKSIZE = 16*1024+SIGSTKSZ; // wild guess about a reasonable buffer
 #endif
-static char mytstack[MYSTACKSIZE]= {0}; // alternative stack for signal handler
+static char mytstack[MYSTACKSIZE]{}; // alternative stack for signal handler
 static bool bStackBelowHeap=false; // lame attempt to locate heap vs. stack address space. See CppCheckExecutor::check_wrapper()
 static FILE* signalOutput = stdout; // TODO: get rid of this
 
@@ -87,7 +87,7 @@ static bool IsAddressOnStack(const void* ptr)
 
 #define DECLARE_SIGNAL(x) std::make_pair(x, #x)
 using Signalmap_t = std::map<int, std::string>;
-static const Signalmap_t listofsignals = {
+static const Signalmap_t listofsignals{
     DECLARE_SIGNAL(SIGABRT),
     DECLARE_SIGNAL(SIGBUS),
     DECLARE_SIGNAL(SIGFPE),

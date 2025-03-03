@@ -1048,7 +1048,7 @@ CmdLineParser::Result CmdLineParser::parseFromArgs(int argc, const char* const a
                 const std::string platform(11+argv[i]);
 
                 std::string errstr;
-                const std::vector<std::string> paths = {argv[0]};
+                const std::vector<std::string> paths{argv[0]};
                 if (!mSettings.platform.set(platform, errstr, paths, mSettings.debuglookup || mSettings.debuglookupPlatform)) {
                     mLogger.printError(errstr);
                     return Result::Fail;
@@ -1156,7 +1156,7 @@ CmdLineParser::Result CmdLineParser::parseFromArgs(int argc, const char* const a
                     // keep existing platform from command-line intact
                     if (!platform.empty()) {
                         std::string errstr;
-                        const std::vector<std::string> paths = {projectFile, argv[0]};
+                        const std::vector<std::string> paths{projectFile, argv[0]};
                         if (!mSettings.platform.set(platform, errstr, paths, mSettings.debuglookup || mSettings.debuglookupPlatform)) {
                             mLogger.printError(errstr);
                             return Result::Fail;

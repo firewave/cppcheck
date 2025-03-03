@@ -96,7 +96,7 @@ int main()
     std::cout << "Content-type: text/html\r\n\r\n"
               << "<!DOCTYPE html>\n";
 
-    char data[4096] = {0};
+    char data[4096]{};
 
     const char *query_string = std::getenv("QUERY_STRING");
     if (query_string)
@@ -117,7 +117,7 @@ int main()
     if (std::strncmp(pdata, "code=", 5)==0)
         pdata += 5;
 
-    char code[4096] = {0};
+    char code[4096]{};
     unencode(pdata, code);
 
     logfile = std::fopen("democlient.log", "at");

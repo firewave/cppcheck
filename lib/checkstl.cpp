@@ -371,7 +371,7 @@ void CheckStl::iteratorsError(const Token* tok, const std::string& containerName
 
 void CheckStl::iteratorsError(const Token* tok, const Token* containerTok, const std::string& containerName1, const std::string& containerName2)
 {
-    std::list<const Token*> callstack = { tok, containerTok };
+    std::list<const Token*> callstack{ tok, containerTok };
     reportError(callstack, Severity::error, "iterators2",
                 "$symbol:" + containerName1 + "\n"
                 "$symbol:" + containerName2 + "\n"
@@ -380,7 +380,7 @@ void CheckStl::iteratorsError(const Token* tok, const Token* containerTok, const
 
 void CheckStl::iteratorsError(const Token* tok, const Token* containerTok, const std::string& containerName)
 {
-    std::list<const Token*> callstack = { tok, containerTok };
+    std::list<const Token*> callstack{ tok, containerTok };
     reportError(callstack,
                 Severity::error,
                 "iterators3",
@@ -395,7 +395,7 @@ void CheckStl::iteratorsError(const Token* tok, const Token* containerTok, const
 void CheckStl::dereferenceErasedError(const Token *erased, const Token* deref, const std::string &itername, bool inconclusive)
 {
     if (erased) {
-        std::list<const Token*> callstack = { deref, erased };
+        std::list<const Token*> callstack{ deref, erased };
         reportError(callstack, Severity::error, "eraseDereference",
                     "$symbol:" + itername + "\n"
                     "Iterator '$symbol' used after element has been erased.\n"
@@ -1939,7 +1939,7 @@ void CheckStl::missingComparison()
 
 void CheckStl::missingComparisonError(const Token *incrementToken1, const Token *incrementToken2)
 {
-    std::list<const Token*> callstack = { incrementToken1,incrementToken2 };
+    std::list<const Token*> callstack{ incrementToken1,incrementToken2 };
 
     std::ostringstream errmsg;
     errmsg << "Missing bounds check for extra iterator increment in loop.\n"
@@ -1964,7 +1964,7 @@ static bool isLocal(const Token *tok)
 }
 
 namespace {
-    const std::set<std::string> stl_string_stream = {
+    const std::set<std::string> stl_string_stream{
         "istringstream", "ostringstream", "stringstream", "wstringstream"
     };
 }
@@ -2230,7 +2230,7 @@ void CheckStl::string_c_strStream(const Token* tok)
 //---------------------------------------------------------------------------
 
 namespace {
-    const std::set<std::string> stl_containers_with_empty_and_clear = {
+    const std::set<std::string> stl_containers_with_empty_and_clear{
         "deque",  "forward_list",  "list",
         "map",  "multimap",  "multiset",  "set",  "string",
         "unordered_map",  "unordered_multimap",  "unordered_multiset",

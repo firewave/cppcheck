@@ -331,7 +331,7 @@ static bool isOperatorFunction(const std::string & funcName)
         return true;
     }
 
-    const std::vector<std::string> additionalOperators = {
+    const std::vector<std::string> additionalOperators{
         "new", "new[]", "delete", "delete[]"
     };
 

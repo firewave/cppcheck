@@ -123,7 +123,7 @@ void CheckLeakAutoVar::leakError(const Token *tok, const std::string &varname, i
 void CheckLeakAutoVar::mismatchError(const Token *deallocTok, const Token *allocTok, const std::string &varname) const
 {
     const CheckMemoryLeak c(mTokenizer, mErrorLogger, mSettings);
-    const std::list<const Token *> callstack = { allocTok, deallocTok };
+    const std::list<const Token *> callstack{ allocTok, deallocTok };
     c.mismatchAllocDealloc(callstack, varname);
 }
 
@@ -135,7 +135,7 @@ void CheckLeakAutoVar::deallocUseError(const Token *tok, const std::string &varn
 
 void CheckLeakAutoVar::deallocReturnError(const Token *tok, const Token *deallocTok, const std::string &varname)
 {
-    const std::list<const Token *> locations = { deallocTok, tok };
+    const std::list<const Token *> locations{ deallocTok, tok };
     reportError(locations, Severity::error, "deallocret", "$symbol:" + varname + "\nReturning/dereferencing '$symbol' after it is deallocated / released", CWE672, Certainty::normal);
 }
 
@@ -155,7 +155,7 @@ void CheckLeakAutoVar::configurationInfo(const Token* tok, const std::pair<const
 
 void CheckLeakAutoVar::doubleFreeError(const Token *tok, const Token *prevFreeTok, const std::string &varname, int type)
 {
-    const std::list<const Token *> locations = { prevFreeTok, tok };
+    const std::list<const Token *> locations{ prevFreeTok, tok };
 
     if (Library::isresource(type))
         reportError(locations, Severity::error, "doubleFree", "$symbol:" + varname + "\nResource handle '$symbol' freed twice.", CWE415, Certainty::normal);

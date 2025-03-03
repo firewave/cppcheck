@@ -154,25 +154,25 @@ private:
     }
 
     void twomasklongerpath1() const {
-        std::vector<std::string> masks = { "src/", "module/" };
+        std::vector<std::string> masks{ "src/", "module/" };
         PathMatch match(std::move(masks));
         ASSERT(!match.match("project/"));
     }
 
     void twomasklongerpath2() const {
-        std::vector<std::string> masks = { "src/", "module/" };
+        std::vector<std::string> masks{ "src/", "module/" };
         PathMatch match(std::move(masks));
         ASSERT(match.match("project/src/"));
     }
 
     void twomasklongerpath3() const {
-        std::vector<std::string> masks = { "src/", "module/" };
+        std::vector<std::string> masks{ "src/", "module/" };
         PathMatch match(std::move(masks));
         ASSERT(match.match("project/module/"));
     }
 
     void twomasklongerpath4() const {
-        std::vector<std::string> masks = { "src/", "module/" };
+        std::vector<std::string> masks{ "src/", "module/" };
         PathMatch match(std::move(masks));
         ASSERT(match.match("project/src/module/"));
     }
@@ -219,7 +219,7 @@ private:
 
     void mixedallmatch() const { // #13570
         // when trying to match a directory against a directory entry it erroneously modified a local variable also used for file matching
-        std::vector<std::string> masks = { "tests/", "file.c" };
+        std::vector<std::string> masks{ "tests/", "file.c" };
         PathMatch match(std::move(masks));
         ASSERT(match.match("tests/"));
         ASSERT(match.match("lib/file.c"));

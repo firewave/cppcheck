@@ -301,7 +301,7 @@ public:
             DIR_UNKNOWN ///< direction not known / specified
         };
         // argument directions up to ** indirect level (only one can be configured explicitly at the moment)
-        std::array<Direction, 3> direction = { { Direction::DIR_UNKNOWN, Direction::DIR_UNKNOWN, Direction::DIR_UNKNOWN } };
+        std::array<Direction, 3> direction{ { Direction::DIR_UNKNOWN, Direction::DIR_UNKNOWN, Direction::DIR_UNKNOWN } };
     };
 
     struct Function {

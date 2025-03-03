@@ -91,7 +91,7 @@ ConstTokenRange Token::until(const Token* t) const
     return ConstTokenRange(this, t);
 }
 
-static const std::unordered_set<std::string> controlFlowKeywords = {
+static const std::unordered_set<std::string> controlFlowKeywords{
     "goto",
     "do",
     "if",
@@ -174,7 +174,7 @@ void Token::update_property_info()
     }
 }
 
-static const std::unordered_set<std::string> stdTypes = { "bool"
+static const std::unordered_set<std::string> stdTypes{ "bool"
                                                           , "_Bool"
                                                           , "char"
                                                           , "double"

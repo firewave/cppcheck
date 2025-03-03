@@ -138,7 +138,7 @@ private:
     }
 
     void ErrorMessageConstructLocations() const {
-        std::list<ErrorMessage::FileLocation> locs = { fooCpp5, barCpp8 };
+        std::list<ErrorMessage::FileLocation> locs{ fooCpp5, barCpp8 };
         ErrorMessage msg(std::move(locs), "", Severity::error, "Programming error.", "errorId", Certainty::normal);
         ASSERT_EQUALS(2, msg.callStack.size());
         ASSERT_EQUALS("Programming error.", msg.shortMessage());
@@ -158,7 +158,7 @@ private:
     }
 
     void ErrorMessageVerboseLocations() const {
-        std::list<ErrorMessage::FileLocation> locs = { fooCpp5, barCpp8 };
+        std::list<ErrorMessage::FileLocation> locs{ fooCpp5, barCpp8 };
         ErrorMessage msg(std::move(locs), "", Severity::error, "Programming error.\nVerbose error", "errorId", Certainty::normal);
         ASSERT_EQUALS(2, msg.callStack.size());
         ASSERT_EQUALS("Programming error.", msg.shortMessage());
@@ -198,7 +198,7 @@ private:
     }
 
     void ErrorMessageReportTypeMisraC() const {
-        std::list<ErrorMessage::FileLocation> locs = { fooCpp5 };
+        std::list<ErrorMessage::FileLocation> locs{ fooCpp5 };
         const auto reportType = ReportType::misraC;
         const auto mapping = createGuidelineMapping(reportType);
         const std::string format = "{severity} {id}";
@@ -211,7 +211,7 @@ private:
     }
 
     void ErrorMessageReportTypeCertC() const {
-        std::list<ErrorMessage::FileLocation> locs = { fooCpp5 };
+        std::list<ErrorMessage::FileLocation> locs{ fooCpp5 };
         const auto reportType = ReportType::certC;
         const auto mapping = createGuidelineMapping(reportType);
         const std::string format = "{severity} {id}";
@@ -245,7 +245,7 @@ private:
 
     void CustomFormatLocations() const {
         // Check that first location from location stack is used in template
-        std::list<ErrorMessage::FileLocation> locs = { fooCpp5, barCpp8 };
+        std::list<ErrorMessage::FileLocation> locs{ fooCpp5, barCpp8 };
         ErrorMessage msg(std::move(locs), "", Severity::error, "Programming error.\nVerbose error", "errorId", Certainty::normal);
         ASSERT_EQUALS(2, msg.callStack.size());
         ASSERT_EQUALS("Programming error.", msg.shortMessage());
@@ -276,7 +276,7 @@ private:
     }
 
     void ToXmlV2Locations() const {
-        std::list<ErrorMessage::FileLocation> locs = { fooCpp5, barCpp8_i };
+        std::list<ErrorMessage::FileLocation> locs{ fooCpp5, barCpp8_i };
         ErrorMessage msg(std::move(locs), "", Severity::error, "Programming error.\nVerbose error", "errorId", Certainty::normal);
         std::string header("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<results version=\"2\">\n");
         header += "    <cppcheck version=\"";

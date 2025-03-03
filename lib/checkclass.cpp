@@ -1516,7 +1516,7 @@ void CheckClass::checkMemsetType(const Scope *start, const Token *tok, const Sco
 
 void CheckClass::mallocOnClassWarning(const Token* tok, const std::string &memfunc, const Token* classTok)
 {
-    std::list<const Token *> toks = { tok, classTok };
+    std::list<const Token *> toks{ tok, classTok };
     reportError(toks, Severity::warning, "mallocOnClassWarning",
                 "$symbol:" + memfunc +"\n"
                 "Memory for class instance allocated with $symbol(), but class provides constructors.\n"
@@ -1526,7 +1526,7 @@ void CheckClass::mallocOnClassWarning(const Token* tok, const std::string &memfu
 
 void CheckClass::mallocOnClassError(const Token* tok, const std::string &memfunc, const Token* classTok, const std::string &classname)
 {
-    std::list<const Token *> toks = { tok, classTok };
+    std::list<const Token *> toks{ tok, classTok };
     reportError(toks, Severity::error, "mallocOnClassError",
                 "$symbol:" + memfunc +"\n"
                 "$symbol:" + classname +"\n"
@@ -2363,7 +2363,7 @@ bool CheckClass::isConstMemberFunc(const Scope *scope, const Token *tok)
     return false;
 }
 
-const std::set<std::string> CheckClass::stl_containers_not_const = { "map", "unordered_map", "std :: map|unordered_map <" }; // start pattern
+const std::set<std::string> CheckClass::stl_containers_not_const{ "map", "unordered_map", "std :: map|unordered_map <" }; // start pattern
 
 bool CheckClass::checkConstFunc(const Scope *scope, const Function *func, MemberAccess& memberAccessed) const
 {
@@ -2764,7 +2764,7 @@ void CheckClass::initializerListOrder()
 
 void CheckClass::initializerListError(const Token *tok1, const Token *tok2, const std::string &classname, const std::string &varname, const std::string& argname)
 {
-    std::list<const Token *> toks = { tok1, tok2 };
+    std::list<const Token *> toks{ tok1, tok2 };
     const std::string msg = argname.empty() ?
                             "Member variable '$symbol' is in the wrong place in the initializer list." :
                             "Member variable '$symbol' uses an uninitialized argument '" + argname + "' due to the order of declarations.";
@@ -3514,7 +3514,7 @@ bool CheckClass::checkThisUseAfterFreeRecursive(const Scope *classScope, const F
 void CheckClass::thisUseAfterFree(const Token *self, const Token *free, const Token *use)
 {
     std::string selfPointer = self ? self->str() : "ptr";
-    const ErrorPath errorPath = { ErrorPathItem(self, "Assuming '" + selfPointer + "' is used as 'this'"), ErrorPathItem(free, "Delete '" + selfPointer + "', invalidating 'this'"), ErrorPathItem(use, "Call method when 'this' is invalid") };
+    const ErrorPath errorPath{ ErrorPathItem(self, "Assuming '" + selfPointer + "' is used as 'this'"), ErrorPathItem(free, "Delete '" + selfPointer + "', invalidating 'this'"), ErrorPathItem(use, "Call method when 'this' is invalid") };
     const std::string usestr = use ? use->str() : "x";
     const std::string usemsg = use && use->function() ? ("Calling method '" + usestr + "()'") : ("Using member '" + usestr + "'");
     reportError(errorPath, Severity::warning, "thisUseAfterFree",

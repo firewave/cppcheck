@@ -2239,7 +2239,7 @@ bool TokenList::isKeyword(const std::string &str) const
     if (isCPP()) {
         // TODO: integrate into keywords?
         // types and literals are not handled as keywords
-        static const std::unordered_set<std::string> cpp_types = {"bool", "false", "true"};
+        static const std::unordered_set<std::string> cpp_types{"bool", "false", "true"};
         if (cpp_types.find(str) != cpp_types.end())
             return false;
 
@@ -2254,7 +2254,7 @@ bool TokenList::isKeyword(const std::string &str) const
 
     // TODO: integrate into Keywords?
     // types are not handled as keywords
-    static const std::unordered_set<std::string> c_types = {"char", "double", "float", "int", "long", "short"};
+    static const std::unordered_set<std::string> c_types{"char", "double", "float", "int", "long", "short"};
     if (c_types.find(str) != c_types.end())
         return false;
 

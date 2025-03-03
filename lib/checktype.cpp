@@ -262,7 +262,7 @@ void CheckType::checkSignConversion()
             continue;
 
         // Check if an operand can be negative..
-        const Token * astOperands[] = { tok->astOperand1(), tok->astOperand2() };
+        const Token * astOperands[]{ tok->astOperand1(), tok->astOperand2() };
         for (const Token * tok1 : astOperands) {
             if (!tok1)
                 continue;
@@ -309,7 +309,7 @@ void CheckType::signConversionError(const Token *tok, const ValueFlow::Value *ne
 //---------------------------------------------------------------------------
 static bool checkTypeCombination(ValueType src, ValueType tgt, const Settings& settings)
 {
-    static const std::pair<ValueType::Type, ValueType::Type> typeCombinations[] = {
+    static const std::pair<ValueType::Type, ValueType::Type> typeCombinations[]{
         { ValueType::Type::INT, ValueType::Type::LONG },
         { ValueType::Type::INT, ValueType::Type::LONGLONG },
         { ValueType::Type::LONG, ValueType::Type::LONGLONG },

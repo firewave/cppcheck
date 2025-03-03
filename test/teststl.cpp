@@ -3438,7 +3438,7 @@ private:
     }
 
     void stlBoundaries1() {
-        const std::string stlCont[] = {
+        const std::string stlCont[]{
             "list", "set", "multiset", "map", "multimap"
         };
 

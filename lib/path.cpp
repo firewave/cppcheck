@@ -152,7 +152,7 @@ std::string Path::getCurrentPath()
 
 std::string Path::getCurrentExecutablePath(const char* fallback)
 {
-    char buf[4096] = {};
+    char buf[4096]{};
     bool success{};
 #ifdef _WIN32
     success = (GetModuleFileNameA(nullptr, buf, sizeof(buf)) < sizeof(buf));
@@ -206,15 +206,15 @@ std::string Path::getRelativePath(const std::string& absolutePath, const std::ve
     return absolutePath;
 }
 
-static const std::unordered_set<std::string> cpp_src_exts = {
+static const std::unordered_set<std::string> cpp_src_exts{
     ".cpp", ".cxx", ".cc", ".c++", ".tpp", ".txx", ".ipp", ".ixx"
 };
 
-static const std::unordered_set<std::string> c_src_exts = {
+static const std::unordered_set<std::string> c_src_exts{
     ".c", ".cl"
 };
 
-static const std::unordered_set<std::string> header_exts = {
+static const std::unordered_set<std::string> header_exts{
     ".h", ".hpp", ".h++", ".hxx", ".hh"
 };
 

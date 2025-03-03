@@ -121,7 +121,7 @@ namespace {
             : mode(mode_) {}
     };
 
-    const std::unordered_set<std::string> whitelist = { "clearerr", "feof", "ferror", "fgetpos", "ftell", "setbuf", "setvbuf", "ungetc", "ungetwc" };
+    const std::unordered_set<std::string> whitelist{ "clearerr", "feof", "ferror", "fgetpos", "ftell", "setbuf", "setvbuf", "ungetc", "ungetwc" };
 }
 
 void CheckIO::checkFileUsage()
@@ -1567,8 +1567,8 @@ CheckIO::ArgumentInfo::~ArgumentInfo()
 }
 
 namespace {
-    const std::set<std::string> stl_vector = { "array", "vector" };
-    const std::set<std::string> stl_string = { "string", "u16string", "u32string", "wstring" };
+    const std::set<std::string> stl_vector{ "array", "vector" };
+    const std::set<std::string> stl_string{ "string", "u16string", "u32string", "wstring" };
 }
 
 bool CheckIO::ArgumentInfo::isStdVectorOrString()
@@ -1625,7 +1625,7 @@ bool CheckIO::ArgumentInfo::isStdVectorOrString()
     return false;
 }
 
-static const std::set<std::string> stl_container = {
+static const std::set<std::string> stl_container{
     "array", "bitset", "deque", "forward_list",
     "hash_map", "hash_multimap", "hash_set",
     "list", "map", "multimap", "multiset",

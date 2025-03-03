@@ -1612,8 +1612,8 @@ private:
             const bool result = db->scopeList.front().isVariableDeclaration(tokenizer.tokens(), vartok, typetok);
             ASSERT_EQUALS(true, result);
             Variable v(vartok, tokenizer.tokens(), tokenizer.list.back(), 0, AccessControl::Public, nullptr, nullptr, settings1);
-            static const std::set<std::string> types = { "string", "wstring" };
-            static const std::set<std::string> no_types = { "set" };
+            static const std::set<std::string> types{ "string", "wstring" };
+            static const std::set<std::string> no_types{ "set" };
             ASSERT_EQUALS(true, v.isStlType());
             ASSERT_EQUALS(true, v.isStlType(types));
             ASSERT_EQUALS(false, v.isStlType(no_types));
@@ -1625,8 +1625,8 @@ private:
             const bool result = db->scopeList.front().isVariableDeclaration(tokenizer.tokens(), vartok, typetok);
             ASSERT_EQUALS(true, result);
             Variable v(vartok, tokenizer.tokens(), tokenizer.list.back(), 0, AccessControl::Public, nullptr, nullptr, settings1);
-            static const std::set<std::string> types = { "bitset", "set", "vector", "wstring" };
-            static const std::set<std::string> no_types = { "bitset", "map", "set" };
+            static const std::set<std::string> types{ "bitset", "set", "vector", "wstring" };
+            static const std::set<std::string> no_types{ "bitset", "map", "set" };
             ASSERT_EQUALS(true, v.isStlType());
             ASSERT_EQUALS(true, v.isStlType(types));
             ASSERT_EQUALS(false, v.isStlType(no_types));
@@ -1638,7 +1638,7 @@ private:
             const bool result = db->scopeList.front().isVariableDeclaration(tokenizer.tokens(), vartok, typetok);
             ASSERT_EQUALS(true, result);
             Variable v(vartok, tokenizer.tokens(), tokenizer.list.back(), 0, AccessControl::Public, nullptr, nullptr, settings1);
-            static const std::set<std::string> types = { "bitset", "set", "vector" };
+            static const std::set<std::string> types{ "bitset", "set", "vector" };
             ASSERT_EQUALS(false, v.isStlType());
             ASSERT_EQUALS(false, v.isStlType(types));
             ASSERT_EQUALS(false, v.isStlStringType());
@@ -6943,7 +6943,7 @@ private:
         ASSERT(db);
         const Scope * bar = db->findScopeByName("bar");
         ASSERT(bar != nullptr);
-        constexpr unsigned int linenrs[2] = { 2, 1 };
+        constexpr unsigned int linenrs[2]{ 2, 1 };
         unsigned int index = 0;
         for (const Token * tok = bar->bodyStart->next(); tok != bar->bodyEnd; tok = tok->next()) {
             if (Token::Match(tok, "%name% (") && !tok->varId() && Token::simpleMatch(tok->linkAt(1), ") ;")) {

@@ -106,7 +106,7 @@ private:
         // unsigned types getting promoted to int sizeof(int) = 4 bytes
         // and unsigned types having already a size of 4 bytes
         {
-            const std::string types[] = {"unsigned char", /*[unsigned]*/ "char", "bool", "unsigned short", "unsigned int", "unsigned long"};
+            const std::string types[]{"unsigned char", /*[unsigned]*/ "char", "bool", "unsigned short", "unsigned int", "unsigned long"};
             for (const std::string& type : types) {
                 check(type + " f(" + type +" x) { return x << 31; }", settings);
                 ASSERT_EQUALS("", errout_str());
@@ -121,7 +121,7 @@ private:
         // signed types getting promoted to int sizeof(int) = 4 bytes
         // and signed types having already a size of 4 bytes
         {
-            const std::string types[] = {"signed char", "signed short", /*[signed]*/ "short", "wchar_t", /*[signed]*/ "int", "signed int", /*[signed]*/ "long", "signed long"};
+            const std::string types[]{"signed char", "signed short", /*[signed]*/ "short", "wchar_t", /*[signed]*/ "int", "signed int", /*[signed]*/ "long", "signed long"};
             for (const std::string& type : types) {
                 // c++11
                 check(type + " f(" + type +" x) { return x << 33; }", settings);

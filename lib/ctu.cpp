@@ -567,7 +567,7 @@ std::list<ErrorMessage::FileLocation> CTU::FileInfo::getErrorPath(InvalidValueTy
                                                                   int maxCtuDepth,
                                                                   ValueFlow::Value::UnknownFunctionReturn *unknownFunctionReturn)
 {
-    const CTU::FileInfo::CallBase *path[10] = {nullptr};
+    const CTU::FileInfo::CallBase *path[10]{};
 
     if (!findPath(unsafeUsage.myId, unsafeUsage.myArgNr, unsafeUsage.value, invalidValue, callsMap, path, 0, warning, maxCtuDepth))
         return {};

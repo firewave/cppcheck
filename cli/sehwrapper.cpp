@@ -129,7 +129,7 @@ namespace {
             if (!result)  // official end...
                 break;
             pSymGetSymFromAddr64(hProcess, (ULONG64)stack.AddrPC.Offset, &displacement, &symbol);
-            TCHAR undname[maxnamelength]= {0};
+            TCHAR undname[maxnamelength]{};
             pUnDecorateSymbolName((const TCHAR*)symbol.Name, (PTSTR)undname, (DWORD)getArrayLength(undname), UNDNAME_COMPLETE);
             if (beyond_main>=0)
                 ++beyond_main;

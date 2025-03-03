@@ -1015,7 +1015,7 @@ bool ImportProject::importBcb6Prj(const std::string &projectFilename)
         // cleanup: -t is "An alternate name for the -Wxxx switches; there is no difference"
         // -> Remove every known -txxx argument and replace it with its -Wxxx counterpart.
         //    This way, we know what we have to check for later on.
-        static const std::map<std::string, std::string> synonyms = {
+        static const std::map<std::string, std::string> synonyms{
             { "-tC","-WC" },
             { "-tCDR","-WCDR" },
             { "-tCDV","-WCDV" },

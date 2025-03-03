@@ -37,21 +37,14 @@ public:
 private:
     /*const*/ TokenList list{&settingsDefault};
 
-    std::vector<std::string> arithmeticalOps;
-    std::vector<std::string> logicalOps;
-    std::vector<std::string> bitOps;
-    std::vector<std::string> comparisonOps;
-    std::vector<std::string> extendedOps;
-    std::vector<std::string> assignmentOps;
+    const std::vector<std::string> arithmeticalOps{ "+", "-", "*", "/", "%", "<<", ">>" };
+    const std::vector<std::string> logicalOps{ "&&", "||", "!" };
+    const std::vector<std::string> bitOps{ "&", "|", "^", "~" };
+    const std::vector<std::string> comparisonOps{ "==", "!=", "<", "<=", ">", ">=" };
+    const std::vector<std::string> extendedOps{ ",", "[", "]", "(", ")", "?", ":" };
+    const std::vector<std::string> assignmentOps{ "=", "+=", "-=", "*=", "/=", "%=", "&=", "^=", "|=", "<<=", ">>=" };
 
     void run() override {
-        arithmeticalOps = { "+", "-", "*", "/", "%", "<<", ">>" };
-        logicalOps = { "&&", "||", "!" };
-        comparisonOps = { "==", "!=", "<", "<=", ">", ">=" };
-        bitOps = { "&", "|", "^", "~" };
-        extendedOps = { ",", "[", "]", "(", ")", "?", ":" };
-        assignmentOps = { "=", "+=", "-=", "*=", "/=", "%=", "&=", "^=", "|=", "<<=", ">>=" };
-
         TEST_CASE(nextprevious);
         TEST_CASE(multiCompare);
         TEST_CASE(multiCompare2);                   // #3294 - false negative multi compare between "=" and "=="

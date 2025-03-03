@@ -80,7 +80,7 @@ static QStringList getPaths(const QListWidget *list)
 }
 
 /** Platforms shown in the platform combobox */
-static const std::array<Platform::Type, 6> builtinPlatforms = {
+static const std::array<Platform::Type, 6> builtinPlatforms{
     Platform::Type::Native,
     Platform::Type::Win32A,
     Platform::Type::Win32W,

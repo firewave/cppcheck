@@ -95,7 +95,7 @@ private:
         ASSERT_EQUALS(false, Path::acceptFile("index.h"));
         ASSERT_EQUALS(false, Path::acceptFile("index.hpp"));
 
-        const std::set<std::string> extra = { ".extra", ".header" };
+        const std::set<std::string> extra{ ".extra", ".header" };
         ASSERT(Path::acceptFile("index.c", extra));
         ASSERT(Path::acceptFile("index.cpp", extra));
         ASSERT(Path::acceptFile("index.extra", extra));
@@ -148,7 +148,7 @@ private:
     }
 
     void getRelative() const {
-        const std::vector<std::string> basePaths = {
+        const std::vector<std::string> basePaths{
             "", // Don't crash with empty paths
             "C:/foo",
             "C:/bar/",
@@ -332,7 +332,7 @@ private:
 
     void identifyWithCppProbe() const
     {
-        const std::list<std::string> markers_cpp = {
+        const std::list<std::string> markers_cpp{
             "// -*- C++ -*-",
             "// -*-C++-*-",
             "// -*- Mode: C++; -*-",
@@ -377,7 +377,7 @@ private:
             }
         }
 
-        const std::list<std::string> markers_c = {
+        const std::list<std::string> markers_c{
             "-*- C++ -*-", // needs to be in comment
             "// -*- C++", // no end marker
             "// -*- C++ --*-", // incorrect end marker

@@ -2532,7 +2532,7 @@ private:
     }
 
     void standard() {
-        std::vector<std::string> files = {"test.cpp"};
+        std::vector<std::string> files{"test.cpp"};
 
         const char code[] = "int a;";
         // TODO: this bypasses the standard determined from the settings - the parameter should not be exposed

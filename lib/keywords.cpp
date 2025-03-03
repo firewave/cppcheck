@@ -38,42 +38,42 @@
     "alignas", "alignof", "bool", "constexpr", "false", "nullptr", "static_assert", "thread_local", "true", "typeof", "typeof_unqual", \
     "_BitInt", "_Decimal128", "_Decimal32", "_Decimal64"
 
-static const std::unordered_set<std::string> c89_keywords_all = {
+static const std::unordered_set<std::string> c89_keywords_all{
     C90_KEYWORDS
 };
 
-static const std::unordered_set<std::string> c89_keywords = {
+static const std::unordered_set<std::string> c89_keywords{
     C90_KEYWORDS
 };
 
-static const std::unordered_set<std::string> c99_keywords_all = {
+static const std::unordered_set<std::string> c99_keywords_all{
     C90_KEYWORDS, C99_KEYWORDS
 };
 
-static const std::unordered_set<std::string> c99_keywords = {
+static const std::unordered_set<std::string> c99_keywords{
     C99_KEYWORDS
 };
 
-static const std::unordered_set<std::string> c11_keywords_all = {
+static const std::unordered_set<std::string> c11_keywords_all{
     C90_KEYWORDS, C99_KEYWORDS, C11_KEYWORDS
 };
 
-static const std::unordered_set<std::string> c11_keywords = {
+static const std::unordered_set<std::string> c11_keywords{
     C11_KEYWORDS
 };
 
-static const std::unordered_set<std::string> c17_keywords_all = {
+static const std::unordered_set<std::string> c17_keywords_all{
     C90_KEYWORDS, C99_KEYWORDS, C11_KEYWORDS
 };
 
-static const std::unordered_set<std::string> c17_keywords = {
+static const std::unordered_set<std::string> c17_keywords{
 };
 
-static const std::unordered_set<std::string> c23_keywords_all = {
+static const std::unordered_set<std::string> c23_keywords_all{
     C90_KEYWORDS, C99_KEYWORDS, C11_KEYWORDS, C23_KEYWORDS
 };
 
-static const std::unordered_set<std::string> c23_keywords = {
+static const std::unordered_set<std::string> c23_keywords{
     C23_KEYWORDS
 };
 
@@ -114,55 +114,55 @@ static const std::unordered_set<std::string> c23_keywords = {
 #pragma clang diagnostic pop
 #endif
 
-static const std::unordered_set<std::string> cpp03_keywords_all = {
+static const std::unordered_set<std::string> cpp03_keywords_all{
     CPP03_KEYWORDS
 };
 
-static const std::unordered_set<std::string> cpp03_keywords = {
+static const std::unordered_set<std::string> cpp03_keywords{
     CPP03_KEYWORDS
 };
 
-static const std::unordered_set<std::string> cpp11_keywords_all = {
+static const std::unordered_set<std::string> cpp11_keywords_all{
     CPP03_KEYWORDS, CPP11_KEYWORDS
 };
 
-static const std::unordered_set<std::string> cpp11_keywords = {
+static const std::unordered_set<std::string> cpp11_keywords{
     CPP11_KEYWORDS
 };
 
-static const std::unordered_set<std::string> cpp14_keywords_all = {
+static const std::unordered_set<std::string> cpp14_keywords_all{
     CPP03_KEYWORDS, CPP11_KEYWORDS
 };
 
-static const std::unordered_set<std::string> cpp14_keywords = {
+static const std::unordered_set<std::string> cpp14_keywords{
 };
 
-static const std::unordered_set<std::string> cpp17_keywords_all = {
+static const std::unordered_set<std::string> cpp17_keywords_all{
     CPP03_KEYWORDS, CPP11_KEYWORDS
 };
 
-static const std::unordered_set<std::string> cpp17_keywords = {
+static const std::unordered_set<std::string> cpp17_keywords{
 };
 
-static const std::unordered_set<std::string> cpp20_keywords_all = {
+static const std::unordered_set<std::string> cpp20_keywords_all{
     CPP03_KEYWORDS, CPP11_KEYWORDS, CPP20_KEYWORDS
 };
 
-static const std::unordered_set<std::string> cpp20_keywords = {
+static const std::unordered_set<std::string> cpp20_keywords{
     CPP20_KEYWORDS
 };
 
-static const std::unordered_set<std::string> cpp23_keywords = {
+static const std::unordered_set<std::string> cpp23_keywords{
 };
 
-static const std::unordered_set<std::string> cpp23_keywords_all = {
+static const std::unordered_set<std::string> cpp23_keywords_all{
     CPP03_KEYWORDS, CPP11_KEYWORDS, CPP20_KEYWORDS
 };
 
-static const std::unordered_set<std::string> cpp26_keywords = {
+static const std::unordered_set<std::string> cpp26_keywords{
 };
 
-static const std::unordered_set<std::string> cpp26_keywords_all = {
+static const std::unordered_set<std::string> cpp26_keywords_all{
     CPP03_KEYWORDS, CPP11_KEYWORDS, CPP20_KEYWORDS
 };
 

@@ -194,7 +194,7 @@ void CheckInternal::checkTokenSimpleMatchPatterns()
 }
 
 namespace {
-    const std::set<std::string> knownPatterns = {
+    const std::set<std::string> knownPatterns{
         "%any%"
         , "%assign%"
         , "%bool%"
