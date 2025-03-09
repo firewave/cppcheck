@@ -1079,6 +1079,8 @@ void Preprocessor::addRemarkComments(const simplecpp::TokenList &tokens, std::ve
                 remarkedToken = prev;
             break;
         }
+        if (!remarkedToken)
+            continue;
 
         // Relative filename
         const std::string relativeFilename = getRelativeFilename(remarkedToken, mSettings);
