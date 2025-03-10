@@ -70,7 +70,7 @@ static Settings create_settings()
     s.certainty.setEnabled(Certainty::inconclusive, true);
     s.checkLevel = Settings::CheckLevel::exhaustive;
     s.force = true;
-    s.preprocessOnly = true;
+    //s.preprocessOnly = true;
     //loadLibrary(s, "std.cfg");
     return s;
 }
