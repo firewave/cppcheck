@@ -27,7 +27,7 @@ from enum import Enum
 # Version scheme (MAJOR.MINOR.PATCH) should orientate on "Semantic Versioning" https://semver.org/
 # Every change in this script should result in increasing the version number accordingly (exceptions may be cosmetic
 # changes)
-SERVER_VERSION = "1.3.64"
+SERVER_VERSION = "1.3.65"
 
 # TODO: fetch from GitHub tags
 OLD_VERSION = '2.17.0'
