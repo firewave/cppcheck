@@ -1417,7 +1417,7 @@ def server(server_address_port: int, packages: list, packageIndex: int, resultPa
             continue
         if cmd.startswith('write\nftp://') or cmd.startswith('write\nhttp://'):
             t_start = time.perf_counter()
-            data, read_res = read_data(connection, cmd, pos_nl, max_data_size=1024 * 1024, check_done=True, cmd_name='write')
+            data, read_res = read_data(connection, cmd, pos_nl, max_data_size=2.5 * 1024 * 1024, check_done=True, cmd_name='write')
             if data is None:
                 continue
 
