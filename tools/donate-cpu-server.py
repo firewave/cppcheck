@@ -22,6 +22,7 @@ import logging.handlers
 import operator
 import html as html_lib
 from urllib.parse import urlparse
+from enum import Enum
 
 # Version scheme (MAJOR.MINOR.PATCH) should orientate on "Semantic Versioning" https://semver.org/
 # Every change in this script should result in increasing the version number accordingly (exceptions may be cosmetic
@@ -1292,9 +1293,16 @@ class HttpClientThread(Thread):
             time.sleep(1)
             self.connection.close()
 
+class ReadResult(Enum):
+    SUCCESS = 0
+    ERROR = 1
+    TIMEOUT = 2
+    TRUNCATED = 3
 
 def read_data(connection, cmd, pos_nl, max_data_size, check_done, cmd_name, timeout=10):
     data = cmd[pos_nl+1:]
+    result = ReadResult.SUCCESS
+
     t = 0.0
     try:
         while (len(data) < max_data_size) and (not check_done or not data.endswith('\nDONE')) and (timeout > 0 and t < timeout):
@@ -1305,6 +1313,7 @@ def read_data(connection, cmd, pos_nl, max_data_size, check_done, cmd_name, time
                 except UnicodeDecodeError as e:
                     print_ts('Error: Decoding failed ({}): {}'.format(cmd_name, e))
                     data = None
+                    result = ReadResult.ERROR
                     break
                 t = 0.0
                 data += text_received
@@ -1316,21 +1325,25 @@ def read_data(connection, cmd, pos_nl, max_data_size, check_done, cmd_name, time
     except socket.error as e:
         print_ts('Socket error occurred ({}): {}'.format(cmd_name, e))
         data = None
+        result = ReadResult.ERROR
 
     connection.close()
 
     if (timeout > 0) and (t >= timeout):
         print_ts('Timeout occurred ({}).'.format(cmd_name))
         data = None
+        result = ReadResult.TIMEOUT
 
     if data and (len(data) >= max_data_size):
         print_ts('Maximum allowed data ({} bytes) exceeded ({}).'.format(max_data_size, cmd_name))
+        result = ReadResult.TRUNCATED
 
     elif data and check_done and not data.endswith('\nDONE'):
         print_ts('Incomplete data received ({}).'.format(cmd_name))
         data = None
+        result = ReadResult.ERROR
 
-    return data
+    return data, result
 
 def server(server_address_port: int, packages: list, packageIndex: int, resultPath: str) -> None:
     socket.setdefaulttimeout(30)
@@ -1404,10 +1417,9 @@ def server(server_address_port: int, packages: list, packageIndex: int, resultPa
             continue
         if cmd.startswith('write\nftp://') or cmd.startswith('write\nhttp://'):
             t_start = time.perf_counter()
-            data = read_data(connection, cmd, pos_nl, max_data_size=1024 * 1024, check_done=True, cmd_name='write')
+            data, read_res = read_data(connection, cmd, pos_nl, max_data_size=1024 * 1024, check_done=True, cmd_name='write')
             if data is None:
                 continue
-            truncated_data = len(data) >= 1024 * 1024
 
             pos = data.find('\n')
             if pos == -1:
@@ -1447,7 +1459,7 @@ def server(server_address_port: int, packages: list, packageIndex: int, resultPa
                 print_ts('Unexpected old version. Ignoring result data.')
                 continue
             filename = os.path.join(resultPath, res.group(1))
-            if truncated_data:
+            if read_res == ReadResult.TRUNCATED:
                 print_ts('Data is too large. Removing result.')
                 os.remove(filename)
                 continue
@@ -1465,10 +1477,9 @@ def server(server_address_port: int, packages: list, packageIndex: int, resultPa
             continue
         if cmd.startswith('write_info\nftp://') or cmd.startswith('write_info\nhttp://'):
             t_start = time.perf_counter()
-            data = read_data(connection, cmd, pos_nl, max_data_size=7 * 1024 * 1024, check_done=True, cmd_name='write_info')
+            data, read_result = read_data(connection, cmd, pos_nl, max_data_size=7 * 1024 * 1024, check_done=True, cmd_name='write_info')
             if data is None:
                 continue
-            truncated_data = len(data) >= 7 * 1024 * 1024
 
             pos = data.find('\n')
             if pos == -1:
@@ -1494,7 +1505,7 @@ def server(server_address_port: int, packages: list, packageIndex: int, resultPa
             if not os.path.exists(info_path):
                 os.mkdir(info_path)
             filename = info_path + '/' + res.group(1)
-            if truncated_data:
+            if read_result == ReadResult.TRUNCATED:
                 print_ts('Data is too large. Removing result.')
                 os.remove(filename)
                 continue
