@@ -2085,7 +2085,7 @@ def test_def_undef(tmp_path):
 void f()
 {
 #ifndef DEF_1
-    {int i = *((int*)0);}
+    (void)(*((int*)0));
 #endif
 }
 """)
@@ -2115,10 +2115,10 @@ def test_def_def(tmp_path):  # #13334
 void f()
 {
 #if DEF_1 == 3
-    {int i = *((int*)0);}
+    (void)(*((int*)0));
 #endif
 #if DEF_1 == 7
-    {int i = *((int*)0);}
+    (void)(*((int*)0));
 #endif
 }
 """)
@@ -2148,7 +2148,7 @@ def test_def_undef_def(tmp_path):  # #13334
 void f()
 {
 #ifdef DEF_1
-    {int i = *((int*)0);}
+    (void)(*((int*)0));
 #endif
 }
 """)
@@ -2178,7 +2178,7 @@ def test_undef(tmp_path):
 void f()
 {
 #ifndef DEF_1
-    {int i = *((int*)0);}
+    (void)(*((int*)0));
 #endif
 }
 """)
@@ -2208,7 +2208,7 @@ def test_undef_src(tmp_path):  # #13340
 void f()
 {
 #ifdef DEF_1
-    {int i = *((int*)0);}
+    (void)(*((int*)0));
 #endif
 }
 """)
