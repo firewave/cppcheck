@@ -156,10 +156,9 @@ private:
     void many_files() {
         const int num_files = 100;
         check(num_files, num_files,
-              "int main()\n"
+              "void f()\n"
               "{\n"
-              "  int i = *((int*)0);\n"
-              "  return 0;\n"
+              "  (void)(*((int*)0));\n"
               "}", dinit(CheckOptions,
                          $.quiet = false));
         {
@@ -182,10 +181,9 @@ private:
     void many_files_showtime() {
         SUPPRESS;
         check(100, 100,
-              "int main()\n"
+              "void f()\n"
               "{\n"
-              "  int i = *((int*)0);\n"
-              "  return 0;\n"
+              "  (void)(*((int*)0));\n"
               "}", dinit(CheckOptions, $.showtime = SHOWTIME_MODES::SHOWTIME_SUMMARY));
         // we are not interested in the results - so just consume them
         ignore_errout();
@@ -196,10 +194,9 @@ private:
         ScopedFile plistFile("dummy", "", plistOutput);
 
         check(100, 100,
-              "int main()\n"
+              "void f()\n"
               "{\n"
-              "  int i = *((int*)0);\n"
-              "  return 0;\n"
+              "  (void)(*((int*)0));\n"
               "}", dinit(CheckOptions, $.plistOutput = plistOutput.c_str()));
         // we are not interested in the results - so just consume them
         ignore_errout();
@@ -231,10 +228,9 @@ private:
 
     void one_error_less_files() {
         check(1, 1,
-              "int main()\n"
+              "void f()\n"
               "{\n"
-              "  {int i = *((int*)0);}\n"
-              "  return 0;\n"
+              "  (void)(*((int*)0));\n"
               "}");
         ASSERT_EQUALS("[" + fprefix() + "_" + zpad3(1) + ".cpp:3]: (error) Null pointer dereference: (int*)0\n", errout_str());
     }
@@ -242,10 +238,9 @@ private:
     void one_error_several_files() {
         const int num_files = 20;
         check(num_files, num_files,
-              "int main()\n"
+              "void f()\n"
               "{\n"
-              "  {int i = *((int*)0);}\n"
-              "  return 0;\n"
+              "  (void)(*((int*)0));\n"
               "}");
         {
             std::string expected;
@@ -348,10 +343,9 @@ private:
         const char xmldata[] = R"(<def format="2"><markup ext=".cpp" reporterrors="false"/></def>)";
         settings = settingsBuilder().libraryxml(xmldata).build();
         check(1, 0,
-              "int main()\n"
+              "void f()\n"
               "{\n"
-              "  int i = *((int*)0);\n"
-              "  return 0;\n"
+              "  (void)(*((int*)0));\n"
               "}");
         ASSERT_EQUALS("", errout_str());
         settings = settingsOld;

@@ -106,10 +106,9 @@ private:
     void checkWithFile() const
     {
         ScopedFile file("test.cpp",
-                        "int main()\n"
+                        "void f()\n"
                         "{\n"
-                        "  int i = *((int*)0);\n"
-                        "  return 0;\n"
+                        "  (void)(*((int*)0));\n"
                         "}");
 
         const Settings s;
@@ -128,10 +127,9 @@ private:
     void checkWithFS() const
     {
         ScopedFile file("test.cpp",
-                        "int main()\n"
+                        "void f()\n"
                         "{\n"
-                        "  int i = *((int*)0);\n"
-                        "  return 0;\n"
+                        "  (void)(*((int*)0));\n"
                         "}");
 
         const Settings s;
@@ -151,10 +149,9 @@ private:
     void suppress_error_library() const
     {
         ScopedFile file("test.cpp",
-                        "int main()\n"
+                        "void f()\n"
                         "{\n"
-                        "  int i = *((int*)0);\n"
-                        "  return 0;\n"
+                        "  (void)(*((int*)0));\n"
                         "}");
 
         const char xmldata[] = R"(<def format="2"><markup ext=".cpp" reporterrors="false"/></def>)";
