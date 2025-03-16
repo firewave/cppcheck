@@ -105,7 +105,7 @@ private:
 
     void checkWithFile() const
     {
-        ScopedFile file("test.cpp",
+        ScopedFile file("test.c",
                         "void f()\n"
                         "{\n"
                         "  (void)(*((int*)0));\n"
@@ -126,7 +126,7 @@ private:
 
     void checkWithFS() const
     {
-        ScopedFile file("test.cpp",
+        ScopedFile file("test.c",
                         "void f()\n"
                         "{\n"
                         "  (void)(*((int*)0));\n"
@@ -148,13 +148,13 @@ private:
 
     void suppress_error_library() const
     {
-        ScopedFile file("test.cpp",
+        ScopedFile file("test.c",
                         "void f()\n"
                         "{\n"
                         "  (void)(*((int*)0));\n"
                         "}");
 
-        const char xmldata[] = R"(<def format="2"><markup ext=".cpp" reporterrors="false"/></def>)";
+        const char xmldata[] = R"(<def format="2"><markup ext=".c" reporterrors="false"/></def>)";
         const Settings s = settingsBuilder().libraryxml(xmldata).build();
         Suppressions supprs;
         ErrorLogger2 errorLogger;
@@ -175,9 +175,9 @@ private:
                         "{\n"
                         "  (void)*((int*)0);\n"
                         "}");
-        ScopedFile test_file_a("a.cpp",
+        ScopedFile test_file_a("a.c",
                                "#include \"inc.h\"");
-        ScopedFile test_file_b("b.cpp",
+        ScopedFile test_file_b("b.c",
                                "#include \"inc.h\"");
 
         const Settings s;
@@ -241,10 +241,10 @@ private:
         Suppressions supprs;
         ErrorLogger2 errorLogger;
         CppCheck cppcheck(s, supprs, errorLogger, false, {});
-        std::vector<std::string> files{"/some/path/test.cpp"};
+        std::vector<std::string> files{"/some/path/test.c"};
         simplecpp::TokenList tokens1(files);
         const std::string expected = "  <rawtokens>\n"
-                                     "    <file index=\"0\" name=\"test.cpp\"/>\n"
+                                     "    <file index=\"0\" name=\"test.c\"/>\n"
                                      "  </rawtokens>\n";
         ASSERT_EQUALS(expected, cppcheck.getDumpFileContentsRawTokens(files, tokens1));
     }
@@ -257,7 +257,7 @@ private:
             Settings s;
             s.libraries.emplace_back("std.cfg");
             CppCheck cppcheck(s, supprs, errorLogger, false, {});
-            //std::vector<std::string> files{ "/some/path/test.cpp" };
+            //std::vector<std::string> files{ "/some/path/test.c" };
             const std::string expected = "  <library lib=\"std.cfg\"/>\n";
             ASSERT_EQUALS(expected, cppcheck.getLibraryDumpData());
         }
