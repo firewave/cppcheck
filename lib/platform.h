@@ -91,7 +91,7 @@ public:
     }
 
     bool isIntValue(MathLib::biguint value) const {
-        const unsigned long long intMax = max_value(int_bit);
+        const MathLib::biguint intMax = max_value(int_bit);
         return value <= intMax;
     }
 
