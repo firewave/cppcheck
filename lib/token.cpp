@@ -1663,9 +1663,9 @@ static void astStringXml(const Token *tok, nonneg int indent, std::ostream &out)
     else {
         out << '>' << std::endl;
         if (tok->astOperand1())
-            astStringXml(tok->astOperand1(), indent+2U, out);
+            astStringXml(tok->astOperand1(), indent+2, out);
         if (tok->astOperand2())
-            astStringXml(tok->astOperand2(), indent+2U, out);
+            astStringXml(tok->astOperand2(), indent+2, out);
         out << strindent << "</token>" << std::endl;
     }
 }
