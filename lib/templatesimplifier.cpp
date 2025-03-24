@@ -2545,7 +2545,7 @@ void TemplateSimplifier::simplifyTemplateArgs(Token *start, const Token *end, st
                     tok->deleteNext(3);
                     again = true;
                 } else if (Token::Match(tok->next(), "( %type% )")) {
-                    const unsigned int size = mTokenizer.sizeOfType(tok->tokAt(2));
+                    const nonneg int size = mTokenizer.sizeOfType(tok->tokAt(2));
                     if (size > 0) {
                         tok->str(std::to_string(size));
                         tok->deleteNext(3);
