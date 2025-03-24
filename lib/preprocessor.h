@@ -53,7 +53,7 @@ struct CPPCHECKLIB Directive {
     std::string file;
 
     /** line number in (possibly included) file where directive is defined */
-    unsigned int linenr;
+    nonneg int linenr;
 
     /** the actual directive text */
     std::string str;

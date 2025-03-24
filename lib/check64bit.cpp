@@ -79,10 +79,10 @@ void Check64BitPortability::pointerassignment()
             if (!returnType)
                 continue;
 
-            if (retPointer && !returnType->typeScope && returnType->pointer == 0U)
+            if (retPointer && !returnType->typeScope && returnType->pointer == 0)
                 returnIntegerError(tok);
 
-            if (!retPointer && returnType->pointer >= 1U)
+            if (!retPointer && returnType->pointer >= 1)
                 returnPointerError(tok);
         }
     }
@@ -99,16 +99,16 @@ void Check64BitPortability::pointerassignment()
                 continue;
 
             // Assign integer to pointer..
-            if (lhstype->pointer >= 1U &&
+            if (lhstype->pointer >= 1 &&
                 !tok->astOperand2()->isNumber() &&
-                rhstype->pointer == 0U &&
+                rhstype->pointer == 0 &&
                 rhstype->originalTypeName.empty() &&
                 rhstype->type == ValueType::Type::INT)
                 assignmentIntegerToAddressError(tok);
 
             // Assign pointer to integer..
-            if (rhstype->pointer >= 1U &&
-                lhstype->pointer == 0U &&
+            if (rhstype->pointer >= 1 &&
+                lhstype->pointer == 0 &&
                 lhstype->originalTypeName.empty() &&
                 lhstype->isIntegral() &&
                 lhstype->type >= ValueType::Type::CHAR &&

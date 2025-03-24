@@ -1330,10 +1330,10 @@ std::string Token::stringifyList(const stringifyOptions& options, const std::vec
 
     std::string ret;
 
-    unsigned int lineNumber = mImpl->mLineNumber - (options.linenumbers ? 1U : 0U);
+    nonneg int lineNumber = mImpl->mLineNumber - (options.linenumbers ? 1U : 0U);
     // cppcheck-suppress shadowFunction - TODO: fix this
-    unsigned int fileIndex = options.files ? ~0U : mImpl->mFileIndex;
-    std::map<int, unsigned int> lineNumbers;
+    nonneg int fileIndex = options.files ? ~0U : mImpl->mFileIndex;
+    std::map<int, nonneg int> lineNumbers;
     for (const Token *tok = this; tok != end; tok = tok->next()) {
         assert(tok && "end precedes token");
         if (!tok)
