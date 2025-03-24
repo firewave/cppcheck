@@ -550,7 +550,7 @@ public:
      * Get array dimension length.
      * @return length of dimension
      */
-    MathLib::bigint dimension(nonneg int index_) const {
+    MathLib::bigint dimension(std::size_t index_) const {
         return mDimensions.at(index_).num;
     }
 
@@ -558,7 +558,7 @@ public:
      * Get array dimension known.
      * @return length of dimension known
      */
-    bool dimensionKnown(nonneg int index_) const {
+    bool dimensionKnown(std::size_t index_) const {
         return mDimensions.at(index_).known;
     }
 
