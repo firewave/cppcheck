@@ -307,7 +307,7 @@ void CheckString::checkIncorrectStringCompare()
                 begin = begin->previous();
                 const Token* end = tok->linkAt(2)->next();
                 if (Token::Match(begin->previous(), "%str% ==|!=") && begin->strAt(-2) != "+") {
-                    const std::size_t slen = Token::getStrLength(begin->previous());
+                    const nonneg int slen = Token::getStrLength(begin->previous());
                     if (clen != slen) {
                         incorrectStringCompareError(tok->next(), "substr", begin->strAt(-1));
                     }
@@ -437,7 +437,7 @@ void CheckString::sprintfOverlappingData()
 
             const std::vector<const Token *> args = getArguments(tok);
 
-            const int formatString = Token::simpleMatch(tok, "sprintf") ? 1 : 2;
+            const unsigned int formatString = Token::simpleMatch(tok, "sprintf") ? 1 : 2;
             for (unsigned int argnr = formatString + 1; argnr < args.size(); ++argnr) {
                 const Token *dest = args[0];
                 while (dest->isCast())
