@@ -8260,7 +8260,7 @@ std::string ValueType::str() const
     } else if (type == ValueType::Type::SMART_POINTER && smartPointer) {
         ret += " smart-pointer(" + smartPointer->name + ")";
     }
-    for (unsigned int p = 0; p < pointer; p++) {
+    for (int p = 0; p < pointer; p++) {
         ret += " *";
         if (constness & (2 << p))
             ret += " const";

@@ -2216,7 +2216,7 @@ void TemplateSimplifier::expandTemplate(
                 Token::Match(tok3->next()->findClosingBracket(), ">|>>")) {
                 const Token *closingBracket = tok3->next()->findClosingBracket();
                 if (Token::simpleMatch(closingBracket->next(), "&")) {
-                    int num = 0;
+                    size_t num = 0;
                     const Token *par = tok3->next();
                     while (num < typeParametersInDeclaration.size() && par != closingBracket) {
                         const std::string pattern("[<,] " + typeParametersInDeclaration[num]->str() + " [,>]");
