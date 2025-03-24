@@ -125,7 +125,7 @@ void CheckExceptionSafety::deallocThrow()
             if (!var || !(var->isGlobal() || var->isStatic()))
                 continue;
 
-            const unsigned int varid(tok->varId());
+            const nonneg int varid(tok->varId());
 
             // Token where throw occurs
             const Token *throwToken = nullptr;
