@@ -181,7 +181,7 @@ void CheckExceptionSafety::checkRethrowCopy()
         if (scope.type != ScopeType::eCatch)
             continue;
 
-        const unsigned int varid = scope.bodyStart->tokAt(-2)->varId();
+        const nonneg int varid = scope.bodyStart->tokAt(-2)->varId();
         if (varid) {
             for (const Token* tok = scope.bodyStart->next(); tok && tok != scope.bodyEnd; tok = tok->next()) {
                 if (Token::simpleMatch(tok, "catch (") && tok->linkAt(1) && tok->linkAt(1)->next()) { // Don't check inner catch - it is handled in another iteration of outer loop.
