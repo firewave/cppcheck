@@ -186,7 +186,7 @@ void CheckType::checkIntegerOverflow()
         if (!vt || !vt->isIntegral() || vt->sign != ValueType::Sign::SIGNED)
             continue;
 
-        unsigned int bits;
+        int bits;
         if (vt->type == ValueType::Type::INT)
             bits = mSettings->platform.int_bit;
         else if (vt->type == ValueType::Type::LONG)
@@ -213,7 +213,7 @@ void CheckType::checkIntegerOverflow()
             continue;
 
         // For left shift, it's common practice to shift into the sign bit
-        if (tok->str() == "<<" && value->intvalue > 0 && value->intvalue < (static_cast<MathLib::biguint>(1) << bits))
+        if (tok->str() == "<<" && value->intvalue > 0 && value->intvalue < (1ULL << bits))
             continue;
 
         integerOverflowError(tok, *value, isOverflow);
