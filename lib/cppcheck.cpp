@@ -889,10 +889,8 @@ unsigned int CppCheck::checkFile(const FileWithDetails& file, const std::string 
 
             if (mUnusedFunctionsCheck && (mSettings.useSingleJob() || analyzerInformation)) {
                 std::size_t hash = 0;
-                // this is not a real source file - we just want to tokenize it. treat it as C anyways as the language needs to be determined.
+                // this is not a real source file - we just want to tokenize it.
                 Tokenizer tokenizer(mSettings, mErrorLogger);
-                // enforce the language since markup files are special and do not adhere to the enforced language
-                tokenizer.list.setLang(Standards::Language::C, true);
                 if (fileStream) {
                     std::vector<std::string> files{file.spath()};
                     simplecpp::TokenList tokens(*fileStream, files);
@@ -900,7 +898,8 @@ unsigned int CppCheck::checkFile(const FileWithDetails& file, const std::string 
                         const Preprocessor preprocessor(mSettings, mErrorLogger);
                         hash = calculateHash(preprocessor, tokens, mSettings, mSuppressions);
                     }
-                    tokenizer.list.createTokens(std::move(tokens));
+                    // treat it as C since markup files are special and do not adhere to the actual language
+                    tokenizer.list.createTokens(std::move(tokens), Standards::Language::C);
                 }
                 else {
                     std::vector<std::string> files{file.spath()};
@@ -909,7 +908,8 @@ unsigned int CppCheck::checkFile(const FileWithDetails& file, const std::string 
                         const Preprocessor preprocessor(mSettings, mErrorLogger);
                         hash = calculateHash(preprocessor, tokens, mSettings, mSuppressions);
                     }
-                    tokenizer.list.createTokens(std::move(tokens));
+                    // treat it as C since markup files are special and do not adhere to the actual language
+                    tokenizer.list.createTokens(std::move(tokens), Standards::Language::C);
                 }
                 mUnusedFunctionsCheck->parseTokens(tokenizer, mSettings);
 
@@ -1119,7 +1119,7 @@ unsigned int CppCheck::checkFile(const FileWithDetails& file, const std::string 
                 // Create tokens, skip rest of iteration if failed
                 Timer::run("Tokenizer::createTokens", mSettings.showtime, &s_timerResults, [&]() {
                     simplecpp::TokenList tokensP = preprocessor.preprocess(tokens1, mCurrentConfig, files, true);
-                    tokenizer.list.createTokens(std::move(tokensP));
+                    tokenizer.list.createTokens(std::move(tokensP), file.lang());
                 });
                 hasValidConfig = true;
 

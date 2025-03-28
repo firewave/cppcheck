@@ -678,7 +678,6 @@ void clangimport::AstNode::setValueType(Token *tok)
             continue;
 
         TokenList decl(nullptr);
-        decl.setLang(tok->isCpp() ? Standards::Language::CPP : Standards::Language::C);
         addTypeTokens(decl, type, tok->scope());
         if (!decl.front())
             break;

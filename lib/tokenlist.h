@@ -70,9 +70,6 @@ public:
     /** @return true if the code is C++ */
     bool isCPP() const;
 
-    // TODO: get rid of this
-    void setLang(Standards::Language lang, bool force = false);
-
     /**
      * Delete all tokens in given token list
      * @param tok token list to delete
@@ -109,7 +106,7 @@ public:
      */
     bool createTokens(std::istream &code, Standards::Language lang);
 
-    void createTokens(simplecpp::TokenList&& tokenList);
+    void createTokens(simplecpp::TokenList&& tokenList, Standards::Language lang);
 
     /** Deallocate list */
     void deallocateTokens();
@@ -211,9 +208,7 @@ public:
     static const Token * isFunctionHead(const Token *tok, const std::string &endsWith);
 
 private:
-    void determineCppC();
-
-    bool createTokensInternal(std::istream &code, const std::string& file0);
+    bool createTokensInternal(std::istream &code, const std::string& file0, Standards::Language lang);
 
     /** Token list */
     TokensFrontBack mTokensFrontBack;

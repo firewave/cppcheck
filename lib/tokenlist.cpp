@@ -63,11 +63,7 @@ static constexpr int AST_MAX_DEPTH = 150;
 TokenList::TokenList(const Settings* settings)
     : mTokensFrontBack(*this)
     , mSettings(settings)
-{
-    if (mSettings && (mSettings->enforcedLang != Standards::Language::None)) {
-        mLang = mSettings->enforcedLang;
-    }
-}
+{}
 
 TokenList::~TokenList()
 {
@@ -96,22 +92,6 @@ void TokenList::deallocateTokens()
     mFiles.clear();
 }
 
-void TokenList::determineCppC()
-{
-    // only try to determine if it wasn't enforced
-    if (mLang == Standards::Language::None) {
-        ASSERT_LANG(!getSourceFilePath().empty());
-        mLang = Path::identify(getSourceFilePath(), mSettings ? mSettings->cppHeaderProbe : false);
-        // TODO: cannot enable assert as this might occur for unknown extensions
-        //ASSERT_LANG(mLang != Standards::Language::None);
-        if (mLang == Standards::Language::None) {
-            // TODO: should default to C instead like we do for headers
-            // default to C++
-            mLang = Standards::Language::CPP;
-        }
-    }
-}
-
 int TokenList::appendFileIfNew(std::string fileName, Standards::Language lang)
 {
     // Has this file been tokenized already?
@@ -124,8 +104,8 @@ int TokenList::appendFileIfNew(std::string fileName, Standards::Language lang)
     // The "mFiles" vector remembers what files have been tokenized..
     mFiles.push_back(std::move(fileName));
 
-    // Update mIsC and mIsCpp properties
-    if (mFiles.size() == 1) { // Update only useful if first file added to _files
+    // The language is determined by the initial file
+    if (mFiles.size() == 1) {
         mLang = lang;
     }
     return mFiles.size() - 1;
@@ -346,24 +326,17 @@ void TokenList::insertTokens(Token *dest, const Token *src, nonneg int n)
 
 bool TokenList::createTokens(std::istream &code, Standards::Language lang)
 {
-    ASSERT_LANG(lang != Standards::Language::None);
-    if (mLang == Standards::Language::None) {
-        mLang = lang;
-    } else {
-        ASSERT_LANG(lang == mLang);
-    }
-
-    return createTokensInternal(code, "");
+    return createTokensInternal(code, "", lang);
 }
 
 //---------------------------------------------------------------------------
 
-bool TokenList::createTokensInternal(std::istream &code, const std::string& file0)
+bool TokenList::createTokensInternal(std::istream &code, const std::string& file0, Standards::Language lang)
 {
     simplecpp::OutputList outputList;
     simplecpp::TokenList tokens(code, mFiles, file0, &outputList);
 
-    createTokens(std::move(tokens));
+    createTokens(std::move(tokens), lang);
 
     return outputList.empty();
 }
@@ -371,7 +344,7 @@ bool TokenList::createTokensInternal(std::istream &code, const std::string& file
 //---------------------------------------------------------------------------
 
 // NOLINTNEXTLINE(cppcoreguidelines-rvalue-reference-param-not-moved)
-void TokenList::createTokens(simplecpp::TokenList&& tokenList)
+void TokenList::createTokens(simplecpp::TokenList&& tokenList, Standards::Language lang)
 {
     // TODO: what to do if the list has been filled already? clear mTokensFrontBack?
 
@@ -384,7 +357,9 @@ void TokenList::createTokens(simplecpp::TokenList&& tokenList)
     else
         mFiles.clear();
 
-    determineCppC();
+    assert(lang != Standards::Language::None);
+
+    mLang = lang;
 
     for (const simplecpp::Token *tok = tokenList.cfront(); tok;) {
 
@@ -2284,17 +2259,6 @@ bool TokenList::isCPP() const
         return true; // treat as C++ by default
 
     return mLang == Standards::Language::CPP;
-}
-
-void TokenList::setLang(Standards::Language lang, bool force)
-{
-    ASSERT_LANG(lang != Standards::Language::None);
-    if (!force)
-    {
-        ASSERT_LANG(mLang == Standards::Language::None);
-    }
-
-    mLang = lang;
 }
 
 const Token * TokenList::isFunctionHead(const Token *tok, const std::string &endsWith)
