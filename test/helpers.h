@@ -45,14 +45,14 @@ class SimpleTokenizer : public Tokenizer {
 public:
     template<size_t size>
     SimpleTokenizer(ErrorLogger& errorlogger, const char (&code)[size], bool cpp = true)
-        : Tokenizer{s_settings, errorlogger}
+        : Tokenizer{TokenList{&s_settings}, s_settings, errorlogger}
     {
         if (!tokenize(code, cpp))
             throw std::runtime_error("creating tokens failed");
     }
 
     SimpleTokenizer(const Settings& settings, ErrorLogger& errorlogger)
-        : Tokenizer{settings, errorlogger}
+        : Tokenizer{TokenList{&settings}, settings, errorlogger}
     {}
 
     /*
@@ -260,14 +260,14 @@ class SimpleTokenizer2 : public Tokenizer {
 public:
     template<size_t size>
     SimpleTokenizer2(const Settings &settings, ErrorLogger &errorlogger, const char (&code)[size], std::vector<std::string> &files)
-        : Tokenizer{settings, errorlogger}
+        : Tokenizer{TokenList{&settings}, settings, errorlogger}
     {
         preprocess(code, files, *this, errorlogger);
     }
 
     // TODO: get rid of this
     SimpleTokenizer2(const Settings &settings, ErrorLogger &errorlogger, const char code[], std::vector<std::string> &files)
-        : Tokenizer{settings, errorlogger}
+        : Tokenizer{TokenList{&settings}, settings, errorlogger}
     {
         preprocess(code, files, *this, errorlogger);
     }

@@ -555,7 +555,8 @@ private:
         const simplecpp::TokenList tokens1(istr, files, filename, &outputList);
         std::list<Directive> directives = preprocessor.createDirectives(tokens1);
 
-        Tokenizer tokenizer(settings, *this);
+        TokenList tokenlist{&settings};
+        Tokenizer tokenizer(std::move(tokenlist), settings, *this);
         tokenizer.setDirectives(std::move(directives));
 
         tokenizer.dump(ostr);
@@ -862,10 +863,11 @@ private:
         ASSERT_THROW_INTERNAL(tokenizeAndStringify(";template<class T> class X { };",false,Platform::Type::Native,false), SYNTAX);
         ASSERT_THROW_INTERNAL(tokenizeAndStringify("int X<Y>() {};",false,Platform::Type::Native,false), SYNTAX);
         {
-            Tokenizer tokenizer(settings1, *this);
+            TokenList tokenlist{&settings1};
             const char code[] = "void foo(int i) { reinterpret_cast<char>(i) };";
             std::istringstream istr(code);
-            ASSERT(tokenizer.list.createTokens(istr, "test.h"));
+            ASSERT(tokenlist.createTokens(istr, "test.h"));
+            Tokenizer tokenizer(std::move(tokenlist), settings1, *this);
             ASSERT_THROW_INTERNAL(tokenizer.simplifyTokens1(""), SYNTAX);
         }
     }
@@ -3683,7 +3685,8 @@ private:
     }
 
     void simplifyString() {
-        Tokenizer tokenizer(settings0, *this);
+        TokenList tokenlist{&settings0};
+        Tokenizer tokenizer(std::move(tokenlist), settings0, *this);
         ASSERT_EQUALS("\"abc\"", tokenizer.simplifyString("\"abc\""));
         ASSERT_EQUALS("\"\n\"", tokenizer.simplifyString("\"\\xa\""));
         ASSERT_EQUALS("\"3\"", tokenizer.simplifyString("\"\\x33\""));
@@ -6131,11 +6134,12 @@ private:
 
     std::string testAst(const char code[], AstStyle style = AstStyle::Simple) {
         // tokenize given code..
-        Tokenizer tokenizer(settings0, *this);
+        TokenList tokenlist{&settings0};
         std::istringstream istr(code);
-        if (!tokenizer.list.createTokens(istr,"test.cpp"))
+        if (!tokenlist.createTokens(istr,"test.cpp"))
             return "ERROR";
 
+        Tokenizer tokenizer(std::move(tokenlist), settings0, *this);
         tokenizer.combineStringAndCharLiterals();
         tokenizer.combineOperators();
         tokenizer.simplifySpaceshipOperator();
