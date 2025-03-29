@@ -324,9 +324,9 @@ void TokenList::insertTokens(Token *dest, const Token *src, nonneg int n)
 // Tokenize - tokenizes a given file.
 //---------------------------------------------------------------------------
 
-bool TokenList::createTokens(std::istream &code, Standards::Language lang)
+bool TokenList::createTokens(std::istream &code, const std::string& file0, Standards::Language lang)
 {
-    return createTokensInternal(code, "", lang);
+    return createTokensInternal(code, file0, lang);
 }
 
 //---------------------------------------------------------------------------

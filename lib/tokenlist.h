@@ -104,7 +104,7 @@ public:
      * @param code input stream for code
      * @param lang language
      */
-    bool createTokens(std::istream &code, Standards::Language lang);
+    bool createTokens(std::istream &code, const std::string& file0, Standards::Language lang);
 
     void createTokens(simplecpp::TokenList&& tokenList, Standards::Language lang);
 

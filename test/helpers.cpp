@@ -174,7 +174,7 @@ void PreprocessorHelper::preprocess(const char code[], std::vector<std::string> 
     simplecpp::TokenList tokens2 = preprocessor.preprocess(tokens1, "", files, true);
 
     // Tokenizer..
-    tokenizer.list.createTokens(std::move(tokens2));
+    tokenizer.list.createTokens(std::move(tokens2), Standards::Language::None);
 
     std::list<Directive> directives = preprocessor.createDirectives(tokens1);
     tokenizer.setDirectives(std::move(directives));
@@ -195,7 +195,7 @@ void PreprocessorHelper::preprocess(const char code[], std::vector<std::string> 
     simplecpp::preprocess(tokens2, tokens1, files, filedata, dui);
 
     // Tokenizer..
-    tokenizer.list.createTokens(std::move(tokens2));
+    tokenizer.list.createTokens(std::move(tokens2), Standards::Language::None);
 
     const Preprocessor preprocessor(tokenizer.getSettings(), errorlogger);
     std::list<Directive> directives = preprocessor.createDirectives(tokens1);

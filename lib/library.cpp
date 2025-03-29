@@ -179,7 +179,7 @@ static TokenList gettokenlistfromvalid(const std::string& valid, bool cpp)
 {
     TokenList tokenList(nullptr);
     std::istringstream istr(valid + ',');
-    tokenList.createTokens(istr, cpp ? Standards::Language::CPP : Standards::Language::C); // TODO: check result?
+    tokenList.createTokens(istr, "", cpp ? Standards::Language::CPP : Standards::Language::C); // TODO: check result?
     for (Token *tok = tokenList.front(); tok; tok = tok->next()) {
         if (Token::Match(tok,"- %num%")) {
             tok->str("-" + tok->strAt(1));

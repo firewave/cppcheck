@@ -129,7 +129,7 @@ private:
             const Settings s = settingsBuilder().c(Standards::C89).build();
             TokenList tokenlist(&s);
             std::istringstream istr(code2);
-            ASSERT(tokenlist.createTokens(istr, "a.c"));
+            ASSERT(tokenlist.createTokens(istr, "a.c", Standards::Language::C));
             ASSERT_EQUALS(false, tokenlist.front()->isKeyword());
         }
 
@@ -150,7 +150,7 @@ private:
             const Settings s = settingsBuilder().cpp(Standards::CPP03).build();
             TokenList tokenlist(&s);
             std::istringstream istr(code2);
-            ASSERT(tokenlist.createTokens(istr, "a.cpp"));
+            ASSERT(tokenlist.createTokens(istr, "a.cpp", Standards::Language::CPP));
             ASSERT_EQUALS(false, tokenlist.front()->isKeyword());
         }
     }
@@ -165,7 +165,7 @@ private:
         Preprocessor preprocessor(settingsDefault, *this);
         simplecpp::TokenList tokensP = preprocessor.preprocess(tokens1, "", files, true);
         TokenList tokenlist(&settingsDefault);
-        tokenlist.createTokens(std::move(tokensP)); // do not assert
+        tokenlist.createTokens(std::move(tokensP), Standards::Language::C); // do not assert
     }
 
     void ast1() const {
@@ -173,7 +173,7 @@ private:
 
         TokenList tokenlist(&settings);
         std::istringstream istr(s);
-        ASSERT(tokenlist.createTokens(istr, Standards::Language::C));
+        ASSERT(tokenlist.createTokens(istr, "", Standards::Language::C));
         // TODO: put this logic in TokenList
         // generate links
         {

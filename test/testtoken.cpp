@@ -30,9 +30,7 @@
 
 class TestToken : public TestFixture {
 public:
-    TestToken() : TestFixture("TestToken") {
-        list.setLang(Standards::Language::C);
-    }
+    TestToken() : TestFixture("TestToken") {}
 
 private:
     /*const*/ TokenList list{&settingsDefault};
@@ -1355,7 +1353,6 @@ private:
         {
             const Settings s = settingsBuilder().c(Standards::cstd_t::C89).build();
             TokenList list_c{&s};
-            list_c.setLang(Standards::Language::C);
             TokensFrontBack tokensFrontBack(list_c);
             Token tok(tokensFrontBack);
             tok.str("alignas"); // not a C89 keyword
@@ -1363,7 +1360,6 @@ private:
         }
         {
             TokenList list_c{&settingsDefault};
-            list_c.setLang(Standards::Language::C);
             TokensFrontBack tokensFrontBack(list_c);
             Token tok(tokensFrontBack);
             tok.str("alignas"); // a C23 keyword
@@ -1371,7 +1367,6 @@ private:
         }
         {
             TokenList list_c{&settingsDefault};
-            list_c.setLang(Standards::Language::C);
             TokensFrontBack tokensFrontBack(list_c);
             Token tok(tokensFrontBack);
             tok.str("and_eq"); // a C++ keyword
@@ -1384,7 +1379,6 @@ private:
         {
             const Settings s = settingsBuilder().cpp(Standards::cppstd_t::CPP03).build();
             TokenList list_cpp{&s};
-            list_cpp.setLang(Standards::Language::CPP);
             TokensFrontBack tokensFrontBack(list_cpp);
             Token tok(tokensFrontBack);
             tok.str("consteval"); // not a C++03 keyword
@@ -1392,7 +1386,6 @@ private:
         }
         {
             TokenList list_cpp{&settingsDefault};
-            list_cpp.setLang(Standards::Language::CPP);
             TokensFrontBack tokensFrontBack(list_cpp);
             Token tok(tokensFrontBack);
             tok.str("consteval"); // a C++20 keyword
@@ -1400,7 +1393,6 @@ private:
         }
         {
             TokenList list_cpp{&settingsDefault};
-            list_cpp.setLang(Standards::Language::CPP);
             TokensFrontBack tokensFrontBack(list_cpp);
             Token tok(tokensFrontBack);
             tok.str("typeof_unqual"); // a C keyword
@@ -1460,7 +1452,6 @@ private:
     {
         {
             TokenList list_c{&settingsDefault};
-            list_c.setLang(Standards::Language::C);
             TokensFrontBack tokensFrontBack(list_c);
             Token tok(tokensFrontBack);
             tok.str("char"); // not treated as keyword in TokenList::isKeyword()
@@ -1468,7 +1459,6 @@ private:
         }
         {
             TokenList list_c{&settingsDefault};
-            list_c.setLang(Standards::Language::C);
             TokensFrontBack tokensFrontBack(list_c);
             Token tok(tokensFrontBack);
             tok.str("size_t"); // not treated as keyword in TokenList::isKeyword()
@@ -1480,7 +1470,6 @@ private:
     {
         {
             TokenList list_cpp{&settingsDefault};
-            list_cpp.setLang(Standards::Language::CPP);
             TokensFrontBack tokensFrontBack(list_cpp);
             Token tok(tokensFrontBack);
             tok.str("bool"); // not treated as keyword in TokenList::isKeyword()
@@ -1488,7 +1477,6 @@ private:
         }
         {
             TokenList list_cpp{&settingsDefault};
-            list_cpp.setLang(Standards::Language::CPP);
             TokensFrontBack tokensFrontBack(list_cpp);
             Token tok(tokensFrontBack);
             tok.str("size_t");
@@ -1499,7 +1487,6 @@ private:
     void varid_reset() const
     {
         TokenList list_c{&settingsDefault};
-        list_c.setLang(Standards::Language::C);
         TokensFrontBack tokensFrontBack(list_c);
         Token tok(tokensFrontBack);
         tok.str("int"); // not treated as keyword in TokenList::isKeyword()

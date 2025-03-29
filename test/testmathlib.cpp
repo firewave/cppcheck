@@ -409,7 +409,7 @@ private:
 
         {
             TokenList list{&settingsDefault};
-            list.appendFileIfNew("test.c");
+            list.appendFileIfNew("test.c", Standards::Language::C);
             TokensFrontBack tokensFrontBack(list);
             auto *tok = new Token(tokensFrontBack);
             tok->str("invalid");
@@ -585,7 +585,7 @@ private:
 
         {
             TokenList list{&settingsDefault};
-            list.appendFileIfNew("test.c");
+            list.appendFileIfNew("test.c", Standards::Language::C);
             TokensFrontBack tokensFrontBack(list);
             auto *tok = new Token(tokensFrontBack);
             tok->str("invalid");
@@ -715,7 +715,7 @@ private:
 
         {
             TokenList list{&settingsDefault};
-            list.appendFileIfNew("test.c");
+            list.appendFileIfNew("test.c", Standards::Language::None);
             TokensFrontBack tokensFrontBack(list);
             auto *tok = new Token(tokensFrontBack);
             tok->str("invalid");

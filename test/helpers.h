@@ -83,7 +83,7 @@ public:
     {
         std::istringstream istr(code);
         (void)list.appendFileIfNew(cpp ? "test.cpp" : "test.c", cpp ? Standards::Language::CPP : Standards::Language::C);
-        if (!list.createTokens(istr, cpp ? Standards::Language::CPP : Standards::Language::C))
+        if (!list.createTokens(istr, cpp ? "test.cpp" : "test.c", cpp ? Standards::Language::CPP : Standards::Language::C))
             return false;
 
         return simplifyTokens1(configuration);
@@ -96,7 +96,7 @@ public:
     {
         std::istringstream istr(code);
         (void)list.appendFileIfNew(cpp ? "test.cpp" : "test.c", cpp ? Standards::Language::CPP : Standards::Language::C);
-        if (!list.createTokens(istr, cpp ? Standards::Language::CPP : Standards::Language::C))
+        if (!list.createTokens(istr, cpp ? "test.cpp" : "test.c", cpp ? Standards::Language::CPP : Standards::Language::C))
             return false;
 
         return simplifyTokens1(configuration);
@@ -114,7 +114,7 @@ public:
     explicit SimpleTokenList(const char (&code)[size], Standards::Language lang = Standards::Language::CPP)
     {
         std::istringstream iss(code);
-        if (!list.createTokens(iss, lang))
+        if (!list.createTokens(iss, "", lang))
             throw std::runtime_error("creating tokens failed");
     }
 

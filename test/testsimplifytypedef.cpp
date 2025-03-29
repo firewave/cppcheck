@@ -276,7 +276,7 @@ private:
         Tokenizer tokenizer(settings1, *this);
 
         std::istringstream istr(code);
-        if (!tokenizer.list.createTokens(istr, Standards::Language::CPP))
+        if (!tokenizer.list.createTokens(istr, "", Standards::Language::CPP))
             return "";
         tokenizer.createLinks();
         tokenizer.simplifyTypedef();
@@ -312,7 +312,7 @@ private:
         Tokenizer tokenizer(settings1, *this);
 
         std::istringstream istr(code);
-        if (!tokenizer.list.createTokens(istr, "file.c"))
+        if (!tokenizer.list.createTokens(istr, "file.c", Standards::Language::C))
             return "";
         tokenizer.createLinks();
         tokenizer.simplifyTypedef();
@@ -328,7 +328,7 @@ private:
         Tokenizer tokenizer(settings1, *this);
 
         std::istringstream istr(code);
-        if (!tokenizer.list.createTokens(istr, "file.c"))
+        if (!tokenizer.list.createTokens(istr, "file.c", Standards::Language::C))
             return {};
         tokenizer.createLinks();
         tokenizer.simplifyTypedef();
@@ -4456,7 +4456,7 @@ private:
 
         Tokenizer tokenizer(settings1, *this);
         std::istringstream istr(code);
-        ASSERT(tokenizer.list.createTokens(istr, "file.c"));
+        ASSERT(tokenizer.list.createTokens(istr, "file.c", Standards::Language::C));
         tokenizer.createLinks();
         tokenizer.simplifyTypedef();
 
@@ -4498,7 +4498,7 @@ private:
 
         Tokenizer tokenizer(settings1, *this);
         std::istringstream istr(code);
-        ASSERT(tokenizer.list.createTokens(istr, "file.c"));
+        ASSERT(tokenizer.list.createTokens(istr, "file.c", Standards::Language::C));
         tokenizer.createLinks();
         tokenizer.simplifyTypedef();
 
@@ -4516,7 +4516,7 @@ private:
 
         Tokenizer tokenizer(settings1, *this);
         std::istringstream istr(code);
-        ASSERT(tokenizer.list.createTokens(istr, "file.c"));
+        ASSERT(tokenizer.list.createTokens(istr, "file.c", Standards::Language::C));
         tokenizer.createLinks();
         tokenizer.simplifyTypedef();
 
