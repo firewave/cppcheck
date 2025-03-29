@@ -25,6 +25,7 @@
 #include "tokenize.h"
 
 #include <string>
+#include <utility>
 #include <vector>
 
 class TestString : public TestFixture {
@@ -69,8 +70,9 @@ private:
 
 #define check(...) check_(__FILE__, __LINE__, __VA_ARGS__)
     void check_(const char* file, int line, const char code[], const CheckOptions& options = make_default_obj()) {
+        TokenList tokenlist{&settings};
+        Tokenizer tokenizer(std::move(tokenlist), settings, *this);
         std::vector<std::string> files(1, options.filename);
-        Tokenizer tokenizer(settings, *this);
         PreprocessorHelper::preprocess(code, files, tokenizer, *this);
 
         // Tokenize..

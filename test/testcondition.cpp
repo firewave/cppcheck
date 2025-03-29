@@ -27,6 +27,7 @@
 #include <cstddef>
 #include <limits>
 #include <string>
+#include <utility>
 #include <vector>
 
 class TestCondition : public TestFixture {
@@ -139,7 +140,8 @@ private:
 #define check(...) check_(__FILE__, __LINE__, __VA_ARGS__)
     void check_(const char* file, int line, const char code[], const CheckOptions& options = make_default_obj()) {
         const Settings settings = settingsBuilder(options.s ? *options.s : settings0).certainty(Certainty::inconclusive, options.inconclusive).build();
-        Tokenizer tokenizer(settings, *this);
+        TokenList tokenlist{&settings};
+        Tokenizer tokenizer(std::move(tokenlist), settings, *this);
         std::vector<std::string> files(1, options.filename);
         PreprocessorHelper::preprocess(code, files, tokenizer, *this);
 
@@ -155,8 +157,9 @@ private:
     {
         const Settings settings = settingsBuilder(settings0).severity(Severity::performance).certainty(Certainty::inconclusive).build();
 
+        TokenList tokenlist{&settings};
+        Tokenizer tokenizer(std::move(tokenlist), settings, *this);
         std::vector<std::string> files(1, "test.cpp");
-        Tokenizer tokenizer(settings, *this);
         PreprocessorHelper::preprocess(code, files, tokenizer, *this);
 
         // Tokenizer..

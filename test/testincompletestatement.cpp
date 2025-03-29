@@ -24,6 +24,7 @@
 #include "tokenize.h"
 
 #include <string>
+#include <utility>
 #include <vector>
 
 class TestIncompleteStatement : public TestFixture {
@@ -44,8 +45,9 @@ private:
     void check_(const char* file, int line, const char code[], const CheckOptions& options = make_default_obj()) {
         const Settings settings1 = settingsBuilder(settings).certainty(Certainty::inconclusive, options.inconclusive).build();
 
+        TokenList tokenlist{&settings1};
+        Tokenizer tokenizer(std::move(tokenlist), settings1, *this);
         std::vector<std::string> files(1, options.cpp ? "test.cpp" : "test.c");
-        Tokenizer tokenizer(settings1, *this);
         PreprocessorHelper::preprocess(code, files, tokenizer, *this);
 
         // Tokenize..

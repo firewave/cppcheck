@@ -30,6 +30,7 @@
 #include <cstddef>
 #include <list>
 #include <string>
+#include <utility>
 #include <vector>
 
 class TestBufferOverrun : public TestFixture {
@@ -76,8 +77,9 @@ private:
     {
         const Settings settings = settingsBuilder(settings0).severity(Severity::performance).certainty(Certainty::inconclusive).build();
 
+        TokenList tokenlist{&settings};
+        Tokenizer tokenizer(std::move(tokenlist), settings, *this);
         std::vector<std::string> files(1, filename);
-        Tokenizer tokenizer(settings, *this);
         PreprocessorHelper::preprocess(code, files, tokenizer, *this);
 
         // Tokenizer..

@@ -37,6 +37,7 @@
 #include <set>
 #include <sstream>
 #include <string>
+#include <utility>
 #include <vector>
 
 class TestValueFlow : public TestFixture {
@@ -484,8 +485,9 @@ private:
     void bailout_(const char* file, int line, const char (&code)[size]) {
         const Settings s = settingsBuilder().debugwarnings().build();
 
+        TokenList tokenlist{&s};
+        Tokenizer tokenizer(std::move(tokenlist), s, *this);
         std::vector<std::string> files(1, "test.cpp");
-        Tokenizer tokenizer(s, *this);
         PreprocessorHelper::preprocess(code, files, tokenizer, *this);
 
         // Tokenize..

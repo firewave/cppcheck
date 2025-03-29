@@ -49,14 +49,14 @@ class SimpleTokenizer : public Tokenizer {
 public:
     template<size_t size>
     SimpleTokenizer(ErrorLogger& errorlogger, const char (&code)[size], bool cpp = true)
-        : Tokenizer{s_settings, errorlogger}
+        : Tokenizer{TokenList{&s_settings}, s_settings, errorlogger}
     {
         if (!tokenize(code, cpp))
             throw std::runtime_error("creating tokens failed");
     }
 
     SimpleTokenizer(const Settings& settings, ErrorLogger& errorlogger)
-        : Tokenizer{settings, errorlogger}
+        : Tokenizer{TokenList{&settings}, settings, errorlogger}
     {}
 
     /*
@@ -171,8 +171,9 @@ public:
     static std::string getcode(const Settings& settings, ErrorLogger& errorlogger, const std::string &filedata, const std::string &cfg, const std::string &filename, SuppressionList *inlineSuppression = nullptr);
     static std::map<std::string, std::string> getcode(const Settings& settings, ErrorLogger& errorlogger, const char code[], const std::string &filename = "file.c", SuppressionList *inlineSuppression = nullptr);
 
+    static simplecpp::TokenList preprocess(const char code[], std::vector<std::string> &files, TokenList& tokenlist, const simplecpp::DUI& dui);
+
     static void preprocess(const char code[], std::vector<std::string> &files, Tokenizer& tokenizer, ErrorLogger& errorlogger);
-    static void preprocess(const char code[], std::vector<std::string> &files, Tokenizer& tokenizer, ErrorLogger& errorlogger, const simplecpp::DUI& dui);
 
     /** get remark comments */
     static std::vector<RemarkComment> getRemarkComments(const char code[], ErrorLogger& errorLogger);
