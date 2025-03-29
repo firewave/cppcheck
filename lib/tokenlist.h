@@ -59,6 +59,8 @@ public:
     TokenList(const TokenList &) = delete;
     TokenList &operator=(const TokenList &) = delete;
 
+    TokenList(TokenList&&) = default;
+
     /** @return the source file path. e.g. "file.cpp" */
     const std::string& getSourceFilePath() const;
 

@@ -115,8 +115,8 @@ static bool isClassStructUnionEnumStart(const Token * tok)
 
 //---------------------------------------------------------------------------
 
-Tokenizer::Tokenizer(const Settings &settings, ErrorLogger &errorLogger) :
-    list(&settings),
+Tokenizer::Tokenizer(TokenList tokenList, const Settings &settings, ErrorLogger &errorLogger) :
+    list(std::move(tokenList)),
     mSettings(settings),
     mErrorLogger(errorLogger),
     mTemplateSimplifier(new TemplateSimplifier(*this))
@@ -10950,7 +10950,8 @@ bool Tokenizer::isPacked(const Token * bodyStart) const
 
 void Tokenizer::getErrorMessages(ErrorLogger& errorLogger, const Settings& settings)
 {
-    Tokenizer tokenizer(settings, errorLogger);
+    TokenList tokenlist{&settings};
+    Tokenizer tokenizer(std::move(tokenlist), settings, errorLogger);
     tokenizer.invalidConstFunctionTypeError(nullptr);
     // checkLibraryNoReturn
     tokenizer.unhandled_macro_class_x_y(nullptr, "", "", "", "");
