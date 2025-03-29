@@ -25,6 +25,7 @@
 
 #include <cstddef>
 #include <string>
+#include <utility>
 #include <vector>
 
 class TestSizeof : public TestFixture {
@@ -62,8 +63,9 @@ private:
 #define checkP(...) checkP_(__FILE__, __LINE__, __VA_ARGS__)
     template<size_t size>
     void checkP_(const char* file, int line, const char (&code)[size]) {
+        TokenList tokenlist{&settings};
+        Tokenizer tokenizer(std::move(tokenlist), settings, *this);
         std::vector<std::string> files(1, "test.cpp");
-        Tokenizer tokenizer(settings, *this);
         PreprocessorHelper::preprocess(code, files, tokenizer, *this);
 
         // Tokenize..

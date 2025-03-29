@@ -2546,38 +2546,38 @@ private:
         simplecpp::DUI dui;
 
         {
-            Tokenizer tokenizer(settingsDefault, *this);
+            TokenList tokenlist{&settingsDefault};
             dui.std = "c89";
-            PreprocessorHelper::preprocess(code, files, tokenizer, *this, dui);
-            ASSERT(tokenizer.list.front());
+            (void)PreprocessorHelper::preprocess(code, files, tokenlist, dui);
+            ASSERT(tokenlist.front());
         }
 
         {
-            Tokenizer tokenizer(settingsDefault, *this);
+            TokenList tokenlist{&settingsDefault};
             dui.std = "gnu23";
-            PreprocessorHelper::preprocess(code, files, tokenizer, *this, dui);
-            ASSERT(tokenizer.list.front());
+            (void)PreprocessorHelper::preprocess(code, files, tokenlist, dui);
+            ASSERT(tokenlist.front());
         }
 
         {
-            Tokenizer tokenizer(settingsDefault, *this);
+            TokenList tokenlist{&settingsDefault};
             dui.std = "c++98";
-            PreprocessorHelper::preprocess(code, files, tokenizer, *this, dui);
-            ASSERT(tokenizer.list.front());
+            (void)PreprocessorHelper::preprocess(code, files, tokenlist, dui);
+            ASSERT(tokenlist.front());
         }
 
         {
-            Tokenizer tokenizer(settingsDefault, *this);
+            TokenList tokenlist{&settingsDefault};
             dui.std = "gnu++26";
-            PreprocessorHelper::preprocess(code, files, tokenizer, *this, dui);
-            ASSERT(tokenizer.list.front());
+            (void)PreprocessorHelper::preprocess(code, files, tokenlist, dui);
+            ASSERT(tokenlist.front());
         }
 
         {
-            Tokenizer tokenizer(settingsDefault, *this);
+            TokenList tokenlist{&settingsDefault};
             dui.std = "gnu77";
-            PreprocessorHelper::preprocess(code, files, tokenizer, *this, dui);
-            ASSERT(!tokenizer.list.front()); // nothing is tokenized when an unknown standard is provided
+            (void)PreprocessorHelper::preprocess(code, files, tokenlist, dui);
+            ASSERT(!tokenlist.front()); // nothing is tokenized when an unknown standard is provided
         }
     }
 };

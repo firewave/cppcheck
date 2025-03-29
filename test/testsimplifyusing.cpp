@@ -29,6 +29,7 @@
 #include <cstddef>
 #include <sstream>
 #include <string>
+#include <utility>
 #include <vector>
 
 class TestSimplifyUsing : public TestFixture {
@@ -114,7 +115,8 @@ private:
         const Settings settings = settingsBuilder(settings0).certainty(Certainty::inconclusive).debugwarnings(options.debugwarnings).platform(options.type).build();
 
         if (options.preprocess) {
-            Tokenizer tokenizer(settings, *this);
+            TokenList tokenlist{&settings};
+            Tokenizer tokenizer(std::move(tokenlist), settings, *this);
             std::vector<std::string> files(1, "test.cpp");
             PreprocessorHelper::preprocess(code, files, tokenizer, *this);
             std::istringstream istr(code);

@@ -30,6 +30,7 @@
 #include <cstddef>
 #include <list>
 #include <string>
+#include <utility>
 #include <vector>
 
 class TestNullPointer : public TestFixture {
@@ -201,8 +202,9 @@ private:
     void checkP_(const char* file, int line, const char (&code)[size]) {
         const Settings settings1 = settingsBuilder(settings).certainty(Certainty::inconclusive, false).build();
 
+        TokenList tokenlist{&settings1};
+        Tokenizer tokenizer(std::move(tokenlist), settings1, *this);
         std::vector<std::string> files(1, "test.cpp");
-        Tokenizer tokenizer(settings1, *this);
         PreprocessorHelper::preprocess(code, files, tokenizer, *this);
 
         // Tokenizer..

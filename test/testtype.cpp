@@ -27,6 +27,7 @@
 
 #include <cstddef>
 #include <string>
+#include <utility>
 #include <vector>
 
 class TestType : public TestFixture {
@@ -89,8 +90,9 @@ private:
     void checkP_(const char* file, int line, const char (&code)[size], const Settings& settings, const CheckPOptions& options = make_default_obj()) {
         const Settings settings1 = settingsBuilder(settings).severity(Severity::warning).severity(Severity::portability).build();
 
+        TokenList tokenlist{&settings1};
+        Tokenizer tokenizer(std::move(tokenlist), settings1, *this);
         std::vector<std::string> files(1, options.filename);
-        Tokenizer tokenizer(settings1, *this);
         PreprocessorHelper::preprocess(code, files, tokenizer, *this);
 
         // Tokenizer..

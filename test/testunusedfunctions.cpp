@@ -27,6 +27,7 @@
 
 #include <cstddef>
 #include <sstream>
+#include <utility>
 #include <string>
 
 class TestUnusedFunctions : public TestFixture {
@@ -598,9 +599,10 @@ private:
         for (int i = 1; i <= 2; ++i) {
             const std::string fname = "test" + std::to_string(i) + ".cpp";
 
-            Tokenizer tokenizer(settings, *this);
+            TokenList tokenlist{&settings};
             std::istringstream istr(code);
-            ASSERT(tokenizer.list.createTokens(istr, fname));
+            ASSERT(tokenlist.createTokens(istr, fname));
+            Tokenizer tokenizer(std::move(tokenlist), settings, *this);
             ASSERT(tokenizer.simplifyTokens1(""));
 
             c.parseTokens(tokenizer, settings);

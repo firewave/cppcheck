@@ -25,6 +25,7 @@
 #include "tokenize.h"
 
 #include <string>
+#include <utility>
 #include <vector>
 
 class TestUnusedPrivateFunction : public TestFixture {
@@ -96,8 +97,9 @@ private:
     void check_(const char* file, int line, const char code[], const CheckOptions& options = make_default_obj()) {
         const Settings settings1 = settingsBuilder(settings).platform(options.platform).build();
 
+        TokenList tokenlist{&settings1};
         std::vector<std::string> files(1, "test.cpp");
-        Tokenizer tokenizer(settings1, *this);
+        Tokenizer tokenizer(std::move(tokenlist), settings1, *this);
         PreprocessorHelper::preprocess(code, files, tokenizer, *this);
 
         // Tokenize..

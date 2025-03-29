@@ -30,6 +30,7 @@
 #include <list>
 #include <sstream>
 #include <string>
+#include <utility>
 #include <vector>
 
 class TestClass : public TestFixture {
@@ -8703,8 +8704,9 @@ private:
     void checkUselessOverride_(const char* file, int line, const char code[]) {
         const Settings settings = settingsBuilder().severity(Severity::style).build();
 
+        TokenList tokenlist{&settings};
+        Tokenizer tokenizer(std::move(tokenlist), settings, *this);
         std::vector<std::string> files(1, "test.cpp");
-        Tokenizer tokenizer(settings, *this);
         PreprocessorHelper::preprocess(code, files, tokenizer, *this);
 
         ASSERT_LOC(tokenizer.simplifyTokens1(""), file, line);
@@ -9085,10 +9087,11 @@ private:
         // getFileInfo
         std::list<Check::FileInfo*> fileInfo;
         for (const std::string& c: code) {
-            Tokenizer tokenizer(settingsDefault, *this);
+            TokenList tokenlist{&settingsDefault};
             std::istringstream istr(c);
             const std::string filename = std::to_string(fileInfo.size()) + ".cpp";
-            ASSERT(tokenizer.list.createTokens(istr, filename));
+            ASSERT(tokenlist.createTokens(istr, filename));
+            Tokenizer tokenizer(std::move(tokenlist), settingsDefault, *this);
             ASSERT(tokenizer.simplifyTokens1(""));
             fileInfo.push_back(check.getFileInfo(tokenizer, settingsDefault));
         }
@@ -9151,8 +9154,9 @@ private:
     void checkReturnByReference_(const char* file, int line, const char (&code)[size]) {
         const Settings settings = settingsBuilder().severity(Severity::performance).library("std.cfg").build();
 
+        TokenList tokenlist{&settings};
+        Tokenizer tokenizer(std::move(tokenlist), settings, *this);
         std::vector<std::string> files(1, "test.cpp");
-        Tokenizer tokenizer(settings, *this);
         PreprocessorHelper::preprocess(code, files, tokenizer, *this);
 
         ASSERT_LOC(tokenizer.simplifyTokens1(""), file, line);

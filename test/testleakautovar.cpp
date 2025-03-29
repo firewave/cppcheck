@@ -24,6 +24,7 @@
 
 #include <cstddef>
 #include <string>
+#include <utility>
 #include <vector>
 
 class TestLeakAutoVar : public TestFixture {
@@ -3195,8 +3196,9 @@ private:
 
 #define checkP(...) checkP_(__FILE__, __LINE__, __VA_ARGS__)
     void checkP_(const char* file, int line, const char code[], bool cpp = false) {
+        TokenList tokenlist{&settings};
+        Tokenizer tokenizer(std::move(tokenlist), settings, *this);
         std::vector<std::string> files(1, cpp?"test.cpp":"test.c");
-        Tokenizer tokenizer(settings, *this);
         PreprocessorHelper::preprocess(code, files, tokenizer, *this);
 
         // Tokenizer..

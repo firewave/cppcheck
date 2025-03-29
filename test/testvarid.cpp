@@ -28,6 +28,7 @@
 #include <cstddef>
 #include <sstream>
 #include <string>
+#include <utility>
 #include <vector>
 
 class TestVarID : public TestFixture {
@@ -284,9 +285,10 @@ private:
 #define tokenizeHeader(...) tokenizeHeader_(__FILE__, __LINE__, __VA_ARGS__)
     template<size_t size>
     std::string tokenizeHeader_(const char* file, int line, const char (&code)[size], const char filename[]) {
-        Tokenizer tokenizer(settings, *this);
+        TokenList tokenlist{&settings};
         std::istringstream istr(code);
-        ASSERT_LOC(tokenizer.list.createTokens(istr, filename), file, line);
+        ASSERT_LOC(tokenlist.createTokens(istr, filename), file, line);
+        Tokenizer tokenizer(std::move(tokenlist), settings, *this);
         ASSERT_EQUALS(true, tokenizer.simplifyTokens1(""));
 
         // result..
@@ -298,8 +300,9 @@ private:
 #define tokenizeExpr(...) tokenizeExpr_(__FILE__, __LINE__, __VA_ARGS__)
     template<size_t size>
     std::string tokenizeExpr_(const char* file, int line, const char (&code)[size], const char filename[] = "test.cpp") {
+        TokenList tokenlist{&settings};
+        Tokenizer tokenizer(std::move(tokenlist), settings, *this);
         std::vector<std::string> files(1, filename);
-        Tokenizer tokenizer(settings, *this);
         PreprocessorHelper::preprocess(code, files, tokenizer, *this);
 
         ASSERT_LOC(tokenizer.simplifyTokens1(""), file, line);

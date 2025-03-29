@@ -27,6 +27,7 @@
 
 #include <cstddef>
 #include <string>
+#include <utility>
 #include <vector>
 
 class TestOther : public TestFixture {
@@ -348,8 +349,9 @@ private:
         settings->standards.cpp = Standards::CPPLatest;
         settings->certainty.enable(Certainty::inconclusive);
 
+        TokenList tokenlist{settings};
+        Tokenizer tokenizer(std::move(tokenlist), *settings, *this);
         std::vector<std::string> files(1, filename);
-        Tokenizer tokenizer(*settings, *this);
         PreprocessorHelper::preprocess(code, files, tokenizer, *this);
 
         // Tokenizer..
