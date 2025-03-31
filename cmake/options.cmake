@@ -96,6 +96,10 @@ if (NOT USE_BOOST AND USE_BOOST_INT128)
 endif()
 option(USE_LIBCXX           "Use libc++ instead of libstdc++"                               OFF)
 
+if(USE_LIBCXX AND NOT CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+    message(FATAL_ERROR "libc++ can only be used with a Clang-based compiler")
+endif()
+
 option(DISABLE_CRTDBG_MAP_ALLOC "Disable usage of Visual Studio C++ memory leak detection in Debug build" OFF)
 option(NO_UNIX_SIGNAL_HANDLING "Disable usage of Unix Signal Handling"                      OFF)
 option(NO_UNIX_BACKTRACE_SUPPORT "Disable usage of Unix Backtrace support"                  OFF)
