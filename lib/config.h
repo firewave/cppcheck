@@ -102,6 +102,7 @@
 #  define UNUSED
 #endif
 
+// TODO: AppleClang versions do not align with Clang versions - add check for proper version
 // warn_unused
 #if __has_cpp_attribute (gnu::warn_unused) || \
     (defined(__clang__) && (__clang_major__ >= 15))
@@ -121,6 +122,7 @@
 #  define DEPRECATED
 #endif
 
+// TODO: AppleClang versions do not align with Clang versions - add check for proper version
 // returns_nonnull
 #if __has_cpp_attribute (gnu::returns_nonnull)
 #  define RET_NONNULL [[gnu::returns_nonnull]]
