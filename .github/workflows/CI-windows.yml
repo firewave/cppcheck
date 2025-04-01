@@ -104,6 +104,7 @@ jobs:
           arch: x64
 
       - name: Cache PCRE
+        if: false
         id: cache-pcre
         uses: actions/cache@v4
         with:
@@ -114,12 +115,12 @@ jobs:
           key: pcre-${{ env.PCRE_VERSION }}-x64-bin-win
 
       - name: Download PCRE
-        if: steps.cache-pcre.outputs.cache-hit != 'true'
+        if: true #steps.cache-pcre.outputs.cache-hit != 'true'
         run: |
           curl -fsSL https://github.com/pfultz2/pcre/archive/refs/tags/%PCRE_VERSION%.zip -o pcre.zip || exit /b !errorlevel!
 
       - name: Install PCRE
-        if: steps.cache-pcre.outputs.cache-hit != 'true'
+        if: true #steps.cache-pcre.outputs.cache-hit != 'true'
         run: |
           @echo on
           7z x pcre.zip || exit /b !errorlevel!
