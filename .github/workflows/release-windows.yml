@@ -39,18 +39,22 @@ jobs:
 
       - name: Download PCRE
         run: |
-          curl -fsSL https://github.com/pfultz2/pcre/archive/refs/tags/%PCRE_VERSION%.zip -o pcre-%PCRE_VERSION%.zip || exit /b !errorlevel!
+          curl -fsSL https://github.com/pfultz2/pcre/archive/refs/tags/%PCRE_VERSION%.zip -o pcre.zip || exit /b !errorlevel!
 
       - name: Install PCRE
         run: |
           @echo on
-          7z x pcre-%PCRE_VERSION%.zip || exit /b !errorlevel!
-          cd pcre-%PCRE_VERSION% || exit /b !errorlevel!
+          7z x pcre.zip || exit /b !errorlevel!
+          del pcre.zip || exit /b !errorlevel!
+          rename pcre-%PCRE_VERSION% pcre || exit /b !errorlevel!
+          cd pcre || exit /b !errorlevel!
           git apply --ignore-space-change ..\externals\pcre.patch || exit /b !errorlevel!
-          cmake . -G "Visual Studio 17 2022" -A x64 -DPCRE_BUILD_PCRECPP=OFF -DPCRE_BUILD_PCREGREP=OFF -DPCRE_BUILD_TESTS=OFF -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -DCMAKE_COMPILE_WARNING_AS_ERROR=On || exit /b !errorlevel!
+          cmake . -G "Visual Studio 17 2022" -A x64 -DPCRE_BUILD_PCRECPP=OFF -DPCRE_BUILD_PCREGREP=OFF -DPCRE_BUILD_TESTS=OFF -Wno-dev -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -DCMAKE_COMPILE_WARNING_AS_ERROR=On || exit /b !errorlevel!
           msbuild -m PCRE.sln -p:Configuration=Release -p:Platform=x64 || exit /b !errorlevel!
           copy pcre.h ..\externals || exit /b !errorlevel!
           copy Release\pcre.lib ..\externals\pcre64.lib || exit /b !errorlevel!
+          cd .. || exit /b !errorlevel!
+          rd /s /q pcre || exit /b !errorlevel!
 
       # available modules: https://github.com/miurahr/aqtinstall/blob/master/docs/getting_started.rst#installing-modules
       # available tools:   https://github.com/miurahr/aqtinstall/blob/master/docs/getting_started.rst#installing-tools
