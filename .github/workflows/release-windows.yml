@@ -2,13 +2,7 @@
 # Environment reference https://help.github.com/en/actions/reference/virtual-environments-for-github-hosted-runners
 name: release-windows
 
-on:
-  push:
-    tags:
-      - '2.*'
-  schedule:
-    - cron:  '0 0 * * *'
-  workflow_dispatch:
+on: [push,pull_request]
 
 permissions:
   contents: read
@@ -38,6 +32,7 @@ jobs:
         uses: ilammy/msvc-dev-cmd@v1
 
       - name: Cache PCRE
+        if: false
         id: cache-pcre
         uses: actions/cache@v4
         with:
@@ -47,12 +42,12 @@ jobs:
           key: pcre-${{ env.PCRE_VERSION }}-bin-x64-win-release-job
 
       - name: Download PCRE
-        if: steps.cache-pcre.outputs.cache-hit != 'true'
+        if: true # steps.cache-pcre.outputs.cache-hit != 'true'
         run: |
           curl -fsSL https://github.com/pfultz2/pcre/archive/refs/tags/%PCRE_VERSION%.zip -o pcre.zip || exit /b !errorlevel!
 
       - name: Install PCRE
-        if: steps.cache-pcre.outputs.cache-hit != 'true'
+        if: true #steps.cache-pcre.outputs.cache-hit != 'true'
         run: |
           @echo on
           7z x pcre.zip || exit /b !errorlevel!
