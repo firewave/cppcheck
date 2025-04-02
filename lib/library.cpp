@@ -1062,7 +1062,7 @@ bool Library::isIntArgValid(const Token *ftok, int argnr, const MathLib::bigint 
         return true;
     if (ac->valid.find('.') != std::string::npos)
         return isFloatArgValid(ftok, argnr, static_cast<double>(argvalue));
-    TokenList tokenList(nullptr);
+    TokenList tokenList(nullptr, ftok->isCpp() ? Standards::Language::CPP : Standards::Language::C);
     gettokenlistfromvalid(ac->valid, ftok->isCpp(), tokenList);
     for (const Token *tok = tokenList.front(); tok; tok = tok->next()) {
         if (tok->isNumber() && argvalue == MathLib::toBigNumber(tok))
@@ -1082,7 +1082,7 @@ bool Library::isFloatArgValid(const Token *ftok, int argnr, double argvalue) con
     const ArgumentChecks *ac = getarg(ftok, argnr);
     if (!ac || ac->valid.empty())
         return true;
-    TokenList tokenList(nullptr);
+    TokenList tokenList(nullptr, ftok->isCpp() ? Standards::Language::CPP : Standards::Language::C);
     gettokenlistfromvalid(ac->valid, ftok->isCpp(), tokenList);
     for (const Token *tok = tokenList.front(); tok; tok = tok->next()) {
         if (Token::Match(tok, "%num% : %num%") && argvalue >= MathLib::toDoubleNumber(tok) && argvalue <= MathLib::toDoubleNumber(tok->tokAt(2)))
