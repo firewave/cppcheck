@@ -599,7 +599,7 @@ private:
         for (int i = 1; i <= 2; ++i) {
             const std::string fname = "test" + std::to_string(i) + ".cpp";
 
-            TokenList tokenlist{&settings};
+            TokenList tokenlist{&settings, Standards::Language::CPP};
             std::istringstream istr(code);
             ASSERT(tokenlist.createTokens(istr, fname));
             Tokenizer tokenizer(std::move(tokenlist), settings, *this);

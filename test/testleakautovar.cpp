@@ -3196,7 +3196,7 @@ private:
 
 #define checkP(...) checkP_(__FILE__, __LINE__, __VA_ARGS__)
     void checkP_(const char* file, int line, const char code[], bool cpp = false) {
-        TokenList tokenlist{&settings};
+        TokenList tokenlist{&settings, cpp ? Standards::Language::CPP : Standards::Language::C};
         Tokenizer tokenizer(std::move(tokenlist), settings, *this);
         std::vector<std::string> files(1, cpp?"test.cpp":"test.c");
         PreprocessorHelper::preprocess(code, files, tokenizer, *this);

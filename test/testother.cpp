@@ -339,7 +339,7 @@ private:
 
 #define checkP(...) checkP_(__FILE__, __LINE__, __VA_ARGS__)
     template<size_t size>
-    void checkP_(const char* file, int line, const char (&code)[size], const char *filename = "test.cpp") {
+    void checkP_(const char* file, int line, const char (&code)[size], bool cpp = true) {
         Settings* settings = &_settings;
         settings->severity.enable(Severity::style);
         settings->severity.enable(Severity::warning);
@@ -349,9 +349,9 @@ private:
         settings->standards.cpp = Standards::CPPLatest;
         settings->certainty.enable(Certainty::inconclusive);
 
-        TokenList tokenlist{settings};
+        TokenList tokenlist{settings, cpp ? Standards::Language::CPP : Standards::Language::C};
         Tokenizer tokenizer(std::move(tokenlist), *settings, *this);
-        std::vector<std::string> files(1, filename);
+        std::vector<std::string> files(1, cpp ? "test.cpp" : "test.c");
         PreprocessorHelper::preprocess(code, files, tokenizer, *this);
 
         // Tokenizer..
@@ -5603,7 +5603,7 @@ private:
                "    }\n"
                "    OUTB(index, port_0);\n"
                "    return INB(port_1);\n"
-               "}\n", "test.c");
+               "}\n", false);
         ASSERT_EQUALS("", errout_str());
 
         check("[[noreturn]] void n();\n"
@@ -11674,7 +11674,7 @@ private:
         checkP("#define X x\n"
                "void f(int x) {\n"
                "  return x + X++;\n"
-               "}", "test.c");
+               "}", false);
         ASSERT_EQUALS("[test.c:3]: (error) Expression 'x+x++' depends on order of evaluation of side effects\n", errout_str());
     }
 

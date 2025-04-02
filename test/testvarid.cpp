@@ -286,7 +286,7 @@ private:
 #define tokenizeHeader(...) tokenizeHeader_(__FILE__, __LINE__, __VA_ARGS__)
     template<size_t size>
     std::string tokenizeHeader_(const char* file, int line, const char (&code)[size], const char filename[]) {
-        TokenList tokenlist{&settings};
+        TokenList tokenlist{&settings, Path::identify(filename, false)};
         std::istringstream istr(code);
         ASSERT_LOC(tokenlist.createTokens(istr, filename), file, line);
         Tokenizer tokenizer(std::move(tokenlist), settings, *this);
@@ -300,10 +300,10 @@ private:
 
 #define tokenizeExpr(...) tokenizeExpr_(__FILE__, __LINE__, __VA_ARGS__)
     template<size_t size>
-    std::string tokenizeExpr_(const char* file, int line, const char (&code)[size], const char filename[] = "test.cpp") {
-        TokenList tokenlist{&settings};
+    std::string tokenizeExpr_(const char* file, int line, const char (&code)[size]) {
+        TokenList tokenlist{&settings, Standards::Language::CPP};
         Tokenizer tokenizer(std::move(tokenlist), settings, *this);
-        std::vector<std::string> files(1, filename);
+        std::vector<std::string> files(1, "test.cpp");
         PreprocessorHelper::preprocess(code, files, tokenizer, *this);
 
         ASSERT_LOC(tokenizer.simplifyTokens1(""), file, line);

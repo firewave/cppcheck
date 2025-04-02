@@ -485,7 +485,7 @@ private:
     void bailout_(const char* file, int line, const char (&code)[size]) {
         const Settings s = settingsBuilder().debugwarnings().build();
 
-        TokenList tokenlist{&s};
+        TokenList tokenlist{&s, Standards::Language::CPP};
         Tokenizer tokenizer(std::move(tokenlist), s, *this);
         std::vector<std::string> files(1, "test.cpp");
         PreprocessorHelper::preprocess(code, files, tokenizer, *this);

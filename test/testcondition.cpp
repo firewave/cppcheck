@@ -133,16 +133,16 @@ private:
     {
         CheckOptions() = default;
         const Settings* s = nullptr;
-        const char* filename = "test.cpp";
+        bool cpp = true;
         bool inconclusive = false;
     };
 
 #define check(...) check_(__FILE__, __LINE__, __VA_ARGS__)
     void check_(const char* file, int line, const char code[], const CheckOptions& options = make_default_obj()) {
         const Settings settings = settingsBuilder(options.s ? *options.s : settings0).certainty(Certainty::inconclusive, options.inconclusive).build();
-        TokenList tokenlist{&settings};
+        TokenList tokenlist{&settings, options.cpp ? Standards::Language::CPP : Standards::Language::C};
         Tokenizer tokenizer(std::move(tokenlist), settings, *this);
-        std::vector<std::string> files(1, options.filename);
+        std::vector<std::string> files(1, options.cpp ? "test.cpp" : "test.c");
         PreprocessorHelper::preprocess(code, files, tokenizer, *this);
 
         // Tokenizer..
@@ -157,7 +157,7 @@ private:
     {
         const Settings settings = settingsBuilder(settings0).severity(Severity::performance).certainty(Certainty::inconclusive).build();
 
-        TokenList tokenlist{&settings};
+        TokenList tokenlist{&settings, Standards::Language::CPP};
         Tokenizer tokenizer(std::move(tokenlist), settings, *this);
         std::vector<std::string> files(1, "test.cpp");
         PreprocessorHelper::preprocess(code, files, tokenizer, *this);
@@ -3165,7 +3165,7 @@ private:
         check("void f() { A<x &> a; }");
         ASSERT_EQUALS("", errout_str());
 
-        check("void f() { a(x<y|z,0); }", dinit(CheckOptions, $.filename = "test.c"));  // filename is c => there are never templates
+        check("void f() { a(x<y|z,0); }", dinit(CheckOptions, $.cpp = false));  // language is c => there are never templates
         ASSERT_EQUALS("[test.c:1]: (style) Boolean result is used in bitwise operation. Clarify expression with parentheses.\n", errout_str());
 
         check("class A<B&,C>;");

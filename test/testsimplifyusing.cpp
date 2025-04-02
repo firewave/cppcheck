@@ -115,7 +115,7 @@ private:
         const Settings settings = settingsBuilder(settings0).certainty(Certainty::inconclusive).debugwarnings(options.debugwarnings).platform(options.type).build();
 
         if (options.preprocess) {
-            TokenList tokenlist{&settings};
+            TokenList tokenlist{&settings, Standards::Language::CPP};
             Tokenizer tokenizer(std::move(tokenlist), settings, *this);
             std::vector<std::string> files(1, "test.cpp");
             PreprocessorHelper::preprocess(code, files, tokenizer, *this);

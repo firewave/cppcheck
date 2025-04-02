@@ -274,7 +274,7 @@ private:
     }
 
     std::string simplifyTypedef(const char code[]) {
-        TokenList tokenlist{&settings1};
+        TokenList tokenlist{&settings1, Standards::Language::CPP};
         std::istringstream istr(code);
         if (!tokenlist.createTokens(istr, Standards::Language::CPP))
             return "";
@@ -287,7 +287,7 @@ private:
 
 
     std::string simplifyTypedefP(const char code[]) {
-        TokenList tokenlist{&settings0};
+        TokenList tokenlist{&settings0, Standards::Language::CPP};
         Tokenizer tokenizer(std::move(tokenlist), settings0, *this);
         std::vector<std::string> files(1, "test.cpp");
         PreprocessorHelper::preprocess(code, files, tokenizer, *this);
@@ -311,7 +311,7 @@ private:
 
 
     std::string simplifyTypedefC(const char code[]) {
-        TokenList tokenlist{&settings1};
+        TokenList tokenlist{&settings1, Standards::Language::C};
 
         std::istringstream istr(code);
         if (!tokenlist.createTokens(istr, "file.c"))
@@ -328,7 +328,7 @@ private:
     }
 
     std::string dumpTypedefInfo(const char code[]) {
-        TokenList tokenlist{&settings1};
+        TokenList tokenlist{&settings1, Standards::Language::C};
         std::istringstream istr(code);
         if (!tokenlist.createTokens(istr, "file.c"))
             return {};
@@ -4457,7 +4457,7 @@ private:
                             "uint8_t t;"
                             "void test(rFunctionPointer_fp functionPointer);";
 
-        TokenList tokenlist{&settings1};
+        TokenList tokenlist{&settings1, Standards::Language::C};
         std::istringstream istr(code);
         ASSERT(tokenlist.createTokens(istr, "file.c"));
         Tokenizer tokenizer(std::move(tokenlist), settings1, *this);
@@ -4500,7 +4500,7 @@ private:
                             "    MY_INT x = 0;\n"
                             "}";
 
-        TokenList tokenlist{&settings1};
+        TokenList tokenlist{&settings1, Standards::Language::C};
         std::istringstream istr(code);
         ASSERT(tokenlist.createTokens(istr, "file.c"));
         Tokenizer tokenizer(std::move(tokenlist), settings1, *this);
@@ -4519,7 +4519,7 @@ private:
                             "    F x = 0;\n"
                             "}";
 
-        TokenList tokenlist{&settings1};
+        TokenList tokenlist{&settings1, Standards::Language::C};
         std::istringstream istr(code);
         ASSERT(tokenlist.createTokens(istr, "file.c"));
         Tokenizer tokenizer(std::move(tokenlist), settings1, *this);

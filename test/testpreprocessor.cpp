@@ -2546,35 +2546,35 @@ private:
         simplecpp::DUI dui;
 
         {
-            TokenList tokenlist{&settingsDefault};
+            TokenList tokenlist{&settingsDefault, Standards::Language::CPP};
             dui.std = "c89";
             (void)PreprocessorHelper::preprocess(code, files, tokenlist, dui);
             ASSERT(tokenlist.front());
         }
 
         {
-            TokenList tokenlist{&settingsDefault};
+            TokenList tokenlist{&settingsDefault, Standards::Language::CPP};
             dui.std = "gnu23";
             (void)PreprocessorHelper::preprocess(code, files, tokenlist, dui);
             ASSERT(tokenlist.front());
         }
 
         {
-            TokenList tokenlist{&settingsDefault};
+            TokenList tokenlist{&settingsDefault, Standards::Language::CPP};
             dui.std = "c++98";
             (void)PreprocessorHelper::preprocess(code, files, tokenlist, dui);
             ASSERT(tokenlist.front());
         }
 
         {
-            TokenList tokenlist{&settingsDefault};
+            TokenList tokenlist{&settingsDefault, Standards::Language::CPP};
             dui.std = "gnu++26";
             (void)PreprocessorHelper::preprocess(code, files, tokenlist, dui);
             ASSERT(tokenlist.front());
         }
 
         {
-            TokenList tokenlist{&settingsDefault};
+            TokenList tokenlist{&settingsDefault, Standards::Language::CPP};
             dui.std = "gnu77";
             (void)PreprocessorHelper::preprocess(code, files, tokenlist, dui);
             ASSERT(!tokenlist.front()); // nothing is tokenized when an unknown standard is provided

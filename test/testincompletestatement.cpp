@@ -45,7 +45,7 @@ private:
     void check_(const char* file, int line, const char code[], const CheckOptions& options = make_default_obj()) {
         const Settings settings1 = settingsBuilder(settings).certainty(Certainty::inconclusive, options.inconclusive).build();
 
-        TokenList tokenlist{&settings1};
+        TokenList tokenlist{&settings1, options.cpp ? Standards::Language::CPP : Standards::Language::C};
         Tokenizer tokenizer(std::move(tokenlist), settings1, *this);
         std::vector<std::string> files(1, options.cpp ? "test.cpp" : "test.c");
         PreprocessorHelper::preprocess(code, files, tokenizer, *this);

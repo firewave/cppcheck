@@ -49,14 +49,14 @@ class SimpleTokenizer : public Tokenizer {
 public:
     template<size_t size>
     SimpleTokenizer(ErrorLogger& errorlogger, const char (&code)[size], bool cpp = true)
-        : Tokenizer{TokenList{&s_settings}, s_settings, errorlogger}
+        : Tokenizer{TokenList{&s_settings, cpp ? Standards::Language::CPP : Standards::Language::C}, s_settings, errorlogger}
     {
         if (!tokenize(code, cpp))
             throw std::runtime_error("creating tokens failed");
     }
 
-    SimpleTokenizer(const Settings& settings, ErrorLogger& errorlogger)
-        : Tokenizer{TokenList{&settings}, settings, errorlogger}
+    SimpleTokenizer(const Settings& settings, ErrorLogger& errorlogger, bool cpp = true)
+        : Tokenizer{TokenList{&settings, cpp ? Standards::Language::CPP : Standards::Language::C}, settings, errorlogger}
     {}
 
     /*
@@ -110,6 +110,7 @@ class SimpleTokenList
 public:
     template<size_t size>
     explicit SimpleTokenList(const char (&code)[size], Standards::Language lang = Standards::Language::CPP)
+    : list{&settings, lang}
     {
         std::istringstream iss(code);
         if (!list.createTokens(iss, lang))
@@ -126,7 +127,7 @@ public:
 
 private:
     const Settings settings;
-    TokenList list{&settings};
+    TokenList list;
 };
 
 
