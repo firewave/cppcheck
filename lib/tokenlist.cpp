@@ -60,12 +60,16 @@
 static constexpr int AST_MAX_DEPTH = 150;
 
 
-TokenList::TokenList(const Settings* settings)
+TokenList::TokenList(const Settings* settings, Standards::Language lang)
     : mTokensFrontBack(*this)
     , mSettings(settings)
 {
     if (mSettings && (mSettings->enforcedLang != Standards::Language::None)) {
         mLang = mSettings->enforcedLang;
+    }
+    else {
+        assert(lang != Standards::Language::None);
+        mLang = lang;
     }
 }
 
@@ -344,6 +348,7 @@ void TokenList::insertTokens(Token *dest, const Token *src, nonneg int n)
 
 //---------------------------------------------------------------------------
 
+// TODO: remove lang
 bool TokenList::createTokens(std::istream &code, Standards::Language lang)
 {
     ASSERT_LANG(lang != Standards::Language::None);
