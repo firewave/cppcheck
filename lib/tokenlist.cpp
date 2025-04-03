@@ -68,7 +68,7 @@ TokenList::TokenList(const Settings* settings, Standards::Language lang)
         mLang = mSettings->enforcedLang;
     }
     else {
-        assert(mLang != Standards::Language::None);
+        assert(lang != Standards::Language::None);
         mLang = lang;
     }
 }
