@@ -79,6 +79,13 @@ public:
                   bool cpp = true,
                   const std::string &configuration = "")
     {
+        return tokenize(code, std::string(cpp ? "test.cpp" : "test.c"), configuration);
+    }
+
+    bool tokenize(const std::string& code,
+                  const std::string& filename,
+                  const std::string &configuration = "")
+    {
         std::istringstream istr(code);
         return tokenize(istr, std::string(cpp ? "test.cpp" : "test.c"), configuration);
     }
