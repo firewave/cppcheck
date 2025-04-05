@@ -169,6 +169,7 @@ void TestFixture::assert_(const char * const filename, const unsigned int linenr
         errmsg << getLocationStr(filename, linenr) << ": Assertion failed." << std::endl << "_____" << std::endl;
         if (!msg.empty())
             errmsg << "Hint:" << std::endl << msg << std::endl;
+        throw AssertFailedError();
     }
 }
 
@@ -183,6 +184,7 @@ void TestFixture::assertFailure(const char* const filename, const unsigned int l
     if (!msg.empty())
         errmsg << "Hint:" << std::endl << msg << std::endl;
     errmsg << "_____" << std::endl;
+    throw AssertFailedError();
 }
 
 void TestFixture::assertEquals(const char * const filename, const unsigned int linenr, const std::string &expected, const std::string &actual, const std::string &msg) const
@@ -289,6 +291,7 @@ void TestFixture::assertThrow(const char * const filename, const unsigned int li
     ++fails_counter;
     errmsg << getLocationStr(filename, linenr) << ": Assertion succeeded. "
            << "The expected exception was thrown" << std::endl << "_____" << std::endl;
+    throw AssertFailedError();
 }
 
 void TestFixture::assertThrowFail(const char * const filename, const unsigned int linenr) const
@@ -296,6 +299,7 @@ void TestFixture::assertThrowFail(const char * const filename, const unsigned in
     ++fails_counter;
     errmsg << getLocationStr(filename, linenr) << ": Assertion failed. "
            << "The expected exception was not thrown"  << std::endl << "_____" << std::endl;
+    throw AssertFailedError();
 }
 
 void TestFixture::assertNoThrowFail(const char * const filename, const unsigned int linenr) const
@@ -320,6 +324,7 @@ void TestFixture::assertNoThrowFail(const char * const filename, const unsigned 
 
     errmsg << getLocationStr(filename, linenr) << ": Assertion failed. "
            << "Unexpected exception was thrown: " << ex_msg << std::endl << "_____" << std::endl;
+    throw AssertFailedError();
 }
 
 void TestFixture::printHelp()
