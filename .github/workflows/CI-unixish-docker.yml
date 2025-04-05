@@ -20,7 +20,7 @@ jobs:
 
     strategy:
       matrix:
-        image: ["ubuntu:24.04", "ubuntu:24.10"]
+        image: ["ubuntu:24.04", "ubuntu:25.04"]
         include:
           - build_gui: false
           - image: "ubuntu:24.04"
@@ -84,7 +84,7 @@ jobs:
 
     strategy:
       matrix:
-        image: ["ubuntu:24.04", "ubuntu:24.10"]
+        image: ["ubuntu:24.04", "ubuntu:25.04"]
       fail-fast: false # Prefer quick result
 
     runs-on: ubuntu-22.04
