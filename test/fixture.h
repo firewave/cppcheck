@@ -118,7 +118,7 @@ protected:
                           long long current, long long actual) const;
     NORETURN void assertThrow(const char * filename, unsigned int linenr) const;
     NORETURN void assertThrowFail(const char * filename, unsigned int linenr) const;
-    NORETURN void assertNoThrowFail(const char * filename, unsigned int linenr) const;
+    void assertNoThrowFail(const char * filename, unsigned int linenr, bool bailout) const;
     static std::string deleteLineNumber(const std::string &message);
 
     void setVerbose(bool v) {
@@ -312,14 +312,13 @@ protected:
     std::unique_ptr<TestFixture> impl;
 };
 
-#define TEST_CASE( NAME ) do { if (prepareTest(#NAME)) { setVerbose(false); try { NAME(); teardownTest(); } catch(const AssertFailedError&) {} catch (...) { assertNoThrowFail(__FILE__, __LINE__); } } } while (false)
+#define TEST_CASE( NAME ) do { if (prepareTest(#NAME)) { setVerbose(false); try { NAME(); teardownTest(); } catch(const AssertFailedError&) {} catch (...) { assertNoThrowFail(__FILE__, __LINE__, false); } } } while (false)
 
-// TODO: the asserts do not actually assert i.e. do stop executing the test
 #define ASSERT( CONDITION ) assert_(__FILE__, __LINE__, (CONDITION))
 #define ASSERT_LOC( CONDITION, FILE_, LINE_ ) assert_(FILE_, LINE_, (CONDITION))
 #define ASSERT_LOC_MSG( CONDITION, MSG, FILE_, LINE_ ) assert_(FILE_, LINE_, (CONDITION), MSG)
 // *INDENT-OFF*
-#define ASSERT_EQUALS( EXPECTED, ACTUAL ) do { try { assertEquals(__FILE__, __LINE__, (EXPECTED), (ACTUAL)); } catch(const AssertFailedError&) { throw; } catch (...) { assertNoThrowFail(__FILE__, __LINE__); } } while (false)
+#define ASSERT_EQUALS( EXPECTED, ACTUAL ) do { try { assertEquals(__FILE__, __LINE__, (EXPECTED), (ACTUAL)); } catch(const AssertFailedError&) { throw; } catch (...) { assertNoThrowFail(__FILE__, __LINE__, true); } } while (false)
 // *INDENT-ON*
 #define ASSERT_EQUALS_WITHOUT_LINENUMBERS( EXPECTED, ACTUAL ) assertEqualsWithoutLineNumbers(__FILE__, __LINE__, EXPECTED, ACTUAL)
 #define ASSERT_EQUALS_DOUBLE( EXPECTED, ACTUAL, TOLERANCE ) assertEqualsDouble(__FILE__, __LINE__, EXPECTED, ACTUAL, TOLERANCE)
@@ -334,7 +333,7 @@ protected:
 #define ASSERT_THROW_EQUALS_2( CMD, EXCEPTION, EXPECTED ) do { try { (void)(CMD); assertThrowFail(__FILE__, __LINE__); } catch(const AssertFailedError&) { throw; } catch (const EXCEPTION&e) { assertEquals(__FILE__, __LINE__, EXPECTED, e.what()); } catch (...) { assertThrowFail(__FILE__, __LINE__); } } while (false)
 #define ASSERT_THROW_INTERNAL( CMD, TYPE ) do { try { (void)(CMD); assertThrowFail(__FILE__, __LINE__); } catch(const AssertFailedError&) { throw; } catch (const InternalError& e) { assertEqualsEnum(__FILE__, __LINE__, InternalError::TYPE, e.type); } catch (...) { assertThrowFail(__FILE__, __LINE__); } } while (false)
 #define ASSERT_THROW_INTERNAL_EQUALS( CMD, TYPE, EXPECTED ) do { try { (void)(CMD); assertThrowFail(__FILE__, __LINE__); } catch(const AssertFailedError&) { throw; } catch (const InternalError& e) { assertEqualsEnum(__FILE__, __LINE__, InternalError::TYPE, e.type); assertEquals(__FILE__, __LINE__, EXPECTED, e.errorMessage); } catch (...) { assertThrowFail(__FILE__, __LINE__); } } while (false)
-#define ASSERT_NO_THROW( CMD ) do { try { (void)(CMD); } catch(const AssertFailedError&) { throw; } catch (...) { assertNoThrowFail(__FILE__, __LINE__); } } while (false)
+#define ASSERT_NO_THROW( CMD ) do { try { (void)(CMD); } catch(const AssertFailedError&) { throw; } catch (...) { assertNoThrowFail(__FILE__, __LINE__, true); } } while (false)
 #define TODO_ASSERT_THROW( CMD, EXCEPTION ) do { try { (void)(CMD); } catch(const AssertFailedError&) { throw; } catch (const EXCEPTION&) {} catch (...) { assertThrow(__FILE__, __LINE__); } } while (false)
 #define TODO_ASSERT( CONDITION ) do { const bool condition=(CONDITION); todoAssertEquals(__FILE__, __LINE__, true, false, condition); } while (false)
 #define TODO_ASSERT_EQUALS( WANTED, CURRENT, ACTUAL ) todoAssertEquals(__FILE__, __LINE__, WANTED, CURRENT, ACTUAL)
