@@ -1224,6 +1224,7 @@ unsigned int CppCheck::checkFile(const FileWithDetails& file, const std::string 
                     mLogger->setAnalyzerInfo(nullptr);
                 return mLogger->exitcode();
             } catch (const InternalError &e) {
+                // TODO: tokenlist might be invalid at this point
                 ErrorMessage errmsg = ErrorMessage::fromInternalError(e, &tokenlist, file.spath());
                 mErrorLogger.reportErr(errmsg);
             }
