@@ -117,7 +117,7 @@ private:
         Suppressions supprs;
         ErrorLogger2 errorLogger;
         CppCheck cppcheck(s, supprs, errorLogger, false, {});
-        ASSERT_EQUALS(1, cppcheck.check(FileWithDetails(file.path())));
+        ASSERT_EQUALS(1, cppcheck.check(createFileWithDetails(file.path())));
         // TODO: how to properly disable these warnings?
         errorLogger.ids.erase(std::remove_if(errorLogger.ids.begin(), errorLogger.ids.end(), [](const std::string& id) {
             return id == "logChecker";
@@ -191,8 +191,8 @@ private:
         Suppressions supprs;
         ErrorLogger2 errorLogger;
         CppCheck cppcheck(s, supprs, errorLogger, false, {});
-        ASSERT_EQUALS(1, cppcheck.check(FileWithDetails(test_file_a.path())));
-        ASSERT_EQUALS(1, cppcheck.check(FileWithDetails(test_file_b.path())));
+        ASSERT_EQUALS(1, cppcheck.check(createFileWithDetails(test_file_a.path())));
+        ASSERT_EQUALS(1, cppcheck.check(createFileWithDetails(test_file_b.path())));
         // TODO: how to properly disable these warnings?
         errorLogger.errmsgs.erase(std::remove_if(errorLogger.errmsgs.begin(), errorLogger.errmsgs.end(), [](const ErrorMessage& msg) {
             return msg.id == "logChecker";

@@ -279,4 +279,9 @@ private:
     std::vector<std::string> mFiles;
 };
 
+static inline FileWithDetails createFileWithDetails(const std::string& file)
+{
+    return FileWithDetails(file, Path::identify(file, false), 0);
+}
+
 #endif // helpersH
