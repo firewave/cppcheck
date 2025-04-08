@@ -5566,15 +5566,21 @@ private:
                           "template<> unsigned A<int, v<char> >::foo() { return 0; }", 2));
     }
 
-    // Helper function to unit test TemplateSimplifier::findTemplateDeclarationEnd
-    bool findTemplateDeclarationEndHelper(const char code[], const char pattern[], unsigned offset = 0) {
-        Tokenizer tokenizer(settings, *this);
-
+    static bool tokenize(Tokenizer& tokenizer, const char code[])
+    {
         std::istringstream istr(code);
         if (!TokenListHelper::createTokens(tokenizer.list, istr, "test.cpp"))
             return false;
         tokenizer.createLinks();
         tokenizer.splitTemplateRightAngleBrackets(false);
+        return true;
+    }
+
+    // Helper function to unit test TemplateSimplifier::findTemplateDeclarationEnd
+    bool findTemplateDeclarationEndHelper(const char code[], const char pattern[], unsigned offset = 0) {
+        Tokenizer tokenizer(settings, *this);
+        if (!tokenize(tokenizer, code))
+            return false;
 
         const Token *_tok = tokenizer.tokens();
         for (unsigned i = 0; i < offset; ++i)
@@ -5599,12 +5605,8 @@ private:
     // Helper function to unit test TemplateSimplifier::getTemplateParametersInDeclaration
     bool getTemplateParametersInDeclarationHelper(const char code[], const std::vector<std::string> & params) {
         Tokenizer tokenizer(settings, *this);
-
-        std::istringstream istr(code);
-        if (!TokenListHelper::createTokens(tokenizer.list, istr, "test.cpp"))
+        if (!tokenize(tokenizer, code))
             return false;
-        tokenizer.createLinks();
-        tokenizer.splitTemplateRightAngleBrackets(false);
 
         std::vector<const Token *> typeParametersInDeclaration;
         TemplateSimplifier::getTemplateParametersInDeclaration(tokenizer.tokens()->tokAt(2), typeParametersInDeclaration);

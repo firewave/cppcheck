@@ -304,36 +304,32 @@ private:
         ASSERT_LOC(tokenizer.tokenize(code), file, line);
     }
 
-
-    std::string simplifyTypedefC(const char code[]) {
-        Tokenizer tokenizer(settings1, *this);
-
+    static bool tokenize(Tokenizer& tokenizer, const char code[])
+    {
         std::istringstream istr(code);
         if (!TokenListHelper::createTokens(tokenizer.list, istr, "file.c"))
-            return "";
+            return false;
         tokenizer.createLinks();
         tokenizer.simplifyTypedef();
         try {
             tokenizer.validate();
         } catch (const InternalError&) {
-            return "";
+            return false;
         }
+        return true;
+    }
+
+    std::string simplifyTypedefC(const char code[]) {
+        Tokenizer tokenizer(settings1, *this);
+        if (!tokenize(tokenizer, code))
+            return "";
         return tokenizer.tokens()->stringifyList(nullptr, false);
     }
 
     std::string dumpTypedefInfo(const char code[]) {
         Tokenizer tokenizer(settings1, *this);
-
-        std::istringstream istr(code);
-        if (!TokenListHelper::createTokens(tokenizer.list, istr, "file.c"))
-            return {};
-        tokenizer.createLinks();
-        tokenizer.simplifyTypedef();
-        try {
-            tokenizer.validate();
-        } catch (const InternalError&) {
-            return {};
-        }
+        if (!tokenize(tokenizer, code))
+            return "";
         return tokenizer.dumpTypedefInfo();
     }
 
@@ -4452,15 +4448,7 @@ private:
                             "void test(rFunctionPointer_fp functionPointer);";
 
         Tokenizer tokenizer(settings1, *this);
-        std::istringstream istr(code);
-        ASSERT(TokenListHelper::createTokens(tokenizer.list, istr, "file.c"));
-        tokenizer.createLinks();
-        tokenizer.simplifyTypedef();
-
-        try {
-            tokenizer.validate();
-        }
-        catch (const InternalError&) {
+        if (!tokenize(tokenizer, code)) {
             ASSERT_EQUALS_MSG(false, true, "Validation of Tokenizer failed");
         }
 
