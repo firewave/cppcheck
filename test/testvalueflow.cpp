@@ -2177,9 +2177,9 @@ private:
                 "    M;\n"
                 "}");
         ASSERT_EQUALS_WITHOUT_LINENUMBERS(
-            "[test.cpp:3]: (debug) valueFlowConditionExpressions bailout: Skipping function due to incomplete variable a\n"
-            "[test.cpp:4]: (debug) valueflow.cpp:1260:(valueFlow) bailout: variable 'x', condition is defined in macro\n"
-            "[test.cpp:4]: (debug) valueflow.cpp:1260:(valueFlow) bailout: variable 'x', condition is defined in macro\n", // duplicate
+            "[test.cpp:3:5]: (debug) valueFlowConditionExpressions bailout: Skipping function due to incomplete variable a [valueFlowBailoutIncompleteVar]\n"
+            "[test.cpp:4:5]: (debug) valueflow.cpp:1260:(valueFlow) bailout: variable 'x', condition is defined in macro [valueFlowBailout]\n"
+            "[test.cpp:4:5]: (debug) valueflow.cpp:1260:(valueFlow) bailout: variable 'x', condition is defined in macro [valueFlowBailout]\n", // duplicate
             errout_str());
 
         bailout("#define FREE(obj) ((obj) ? (free((char *) (obj)), (obj) = 0) : 0)\n" // #8349
@@ -2189,8 +2189,8 @@ private:
                 "}");
         ASSERT_EQUALS_WITHOUT_LINENUMBERS(
             "[test.cpp:3]: (debug) valueFlowConditionExpressions bailout: Skipping function due to incomplete variable a\n"
-            "[test.cpp:4]: (debug) valueflow.cpp:1260:(valueFlow) bailout: variable 'x', condition is defined in macro\n"
-            "[test.cpp:4]: (debug) valueflow.cpp:1260:(valueFlow) bailout: variable 'x', condition is defined in macro\n", // duplicate
+            "[test.cpp:4]: (debug) valueflow.cpp:1260:(valueFlow) bailout: variable 'x', condition is defined in macro [valueFlowBailout]\n"
+            "[test.cpp:4]: (debug) valueflow.cpp:1260:(valueFlow) bailout: variable 'x', condition is defined in macro [valueFlowBailout]\n", // duplicate
             errout_str());
     }
 
@@ -2203,9 +2203,9 @@ private:
                 "    if (x==123){}\n"
                 "}");
         ASSERT_EQUALS_WITHOUT_LINENUMBERS(
-            "[test.cpp:3]: (debug) valueFlowConditionExpressions bailout: Skipping function due to incomplete variable a\n"
-            "[test.cpp:2]: (debug) valueflow.cpp::(valueFlow) bailout: valueFlowAfterCondition: bailing in conditional block\n"
-            "[test.cpp:2]: (debug) valueflow.cpp::(valueFlow) bailout: valueFlowAfterCondition: bailing in conditional block\n", // duplicate
+            "[test.cpp:3:5]: (debug) valueFlowConditionExpressions bailout: Skipping function due to incomplete variable a [valueFlowBailoutIncompleteVar]\n"
+            "[test.cpp:2:31]: (debug) valueflow.cpp::(valueFlow) bailout: valueFlowAfterCondition: bailing in conditional block [valueFlowBailout]\n"
+            "[test.cpp:2:31]: (debug) valueflow.cpp::(valueFlow) bailout: valueFlowAfterCondition: bailing in conditional block [valueFlowBailout]\n", // duplicate
             errout_str());
 
         // #5721 - FP
@@ -2220,8 +2220,8 @@ private:
                 "    if (abc) {}\n"
                 "}");
         ASSERT_EQUALS_WITHOUT_LINENUMBERS(
-            "[test.cpp:3]: (debug) valueflow.cpp:6730:(valueFlow) bailout: valueFlowAfterCondition: bailing in conditional block\n"
-            "[test.cpp:3]: (debug) valueflow.cpp:6730:(valueFlow) bailout: valueFlowAfterCondition: bailing in conditional block\n", // duplicate
+            "[test.cpp:3]: (debug) valueflow.cpp:6730:(valueFlow) bailout: valueFlowAfterCondition: bailing in conditional block [valueFlowBailout]\n"
+            "[test.cpp:3]: (debug) valueflow.cpp:6730:(valueFlow) bailout: valueFlowAfterCondition: bailing in conditional block [valueFlowBailout]\n", // duplicate
             errout_str());
     }
 
@@ -9011,8 +9011,8 @@ private:
             "}\n"
             );
         ASSERT_EQUALS_WITHOUT_LINENUMBERS(
-            "[test.cpp:2]: (debug) valueFlowConditionExpressions bailout: Skipping function due to incomplete variable VALUE_1\n"
-            "[test.cpp:6]: (debug) valueFlowConditionExpressions bailout: Skipping function due to incomplete variable VALUE_2\n",
+            "[test.cpp:2:12]: (debug) valueFlowConditionExpressions bailout: Skipping function due to incomplete variable VALUE_1 [valueFlowBailoutIncompleteVar]\n"
+            "[test.cpp:6:12]: (debug) valueFlowConditionExpressions bailout: Skipping function due to incomplete variable VALUE_2 [valueFlowBailoutIncompleteVar]\n",
             errout_str());
     }
 
