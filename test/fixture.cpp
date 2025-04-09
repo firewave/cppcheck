@@ -105,10 +105,10 @@ bool TestFixture::prepareTest(const char testname[])
         mTestname = testname;
         ++countTests;
         if (quiet_tests) {
-            std::putchar('.'); // Use putchar to write through redirection of std::cout/cerr
+            //std::putchar('.'); // Use putchar to write through redirection of std::cout/cerr
             std::fflush(stdout);
         } else {
-            std::cout << classname << "::" << mTestname << std::endl;
+            //std::cout << classname << "::" << mTestname << std::endl;
         }
         return !dry_run;
     }
@@ -155,10 +155,10 @@ static std::string writestr(const std::string &str, bool gccStyle = false)
         else
             ostr << "\\x" << std::hex << short{*i};
     }
-    if (!str.empty() && !gccStyle)
-        ostr << std::endl;
-    else if (gccStyle)
-        ostr << '\"';
+    //if (!str.empty() && !gccStyle)
+    //    ostr << std::endl;
+    //else if (gccStyle)
+    //    ostr << '\"';
     return ostr.str();
 }
 
@@ -176,6 +176,10 @@ void TestFixture::assert_(const char * const filename, const unsigned int linenr
 void TestFixture::assertFailure(const char* const filename, const unsigned int linenr, const std::string& expected, const std::string& actual, const std::string& msg) const
 {
     ++fails_counter;
+    errmsg << writestr(expected);
+    errmsg << "0SEP0";
+    errmsg << writestr(actual) << std::endl;
+    /*
     errmsg << getLocationStr(filename, linenr) << ": Assertion failed. " << std::endl
            << "Expected: " << std::endl
            << writestr(expected) << std::endl
@@ -184,7 +188,8 @@ void TestFixture::assertFailure(const char* const filename, const unsigned int l
     if (!msg.empty())
         errmsg << "Hint:" << std::endl << msg << std::endl;
     errmsg << "_____" << std::endl;
-    throw AssertFailedError();
+     */
+    //throw AssertFailedError();
 }
 
 void TestFixture::assertEquals(const char * const filename, const unsigned int linenr, const std::string &expected, const std::string &actual, const std::string &msg) const
@@ -408,17 +413,17 @@ std::size_t TestFixture::runTests(const options& args)
     }
 
     if (args.summary() && !args.dry_run()) {
-        std::cout << "\n\nTesting Complete\nNumber of tests: " << countTests << std::endl;
-        std::cout << "Number of todos: " << todos_counter;
-        if (succeeded_todos_counter > 0)
-            std::cout << " (" << succeeded_todos_counter << " succeeded)";
-        std::cout << std::endl;
+        //std::cout << "\n\nTesting Complete\nNumber of tests: " << countTests << std::endl;
+        //std::cout << "Number of todos: " << todos_counter;
+        //if (succeeded_todos_counter > 0)
+        //    std::cout << " (" << succeeded_todos_counter << " succeeded)";
+        //std::cout << std::endl;
     }
     // calling flush here, to do all output before the error messages (in case the output is buffered)
     std::cout.flush();
 
     if (args.summary() && !args.dry_run()) {
-        std::cerr << "Tests failed: " << fails_counter << std::endl << std::endl;
+        //std::cerr << "Tests failed: " << fails_counter << std::endl << std::endl;
     }
     std::cerr << errmsg.str();
 
