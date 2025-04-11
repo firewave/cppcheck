@@ -33,6 +33,7 @@
 class FileWithDetails
 {
 public:
+    // TODO: remove this
     explicit FileWithDetails(std::string path)
         : FileWithDetails(std::move(path), Standards::Language::None, 0)
     {}
@@ -45,6 +46,9 @@ public:
     {
         if (mPath.empty())
             throw std::runtime_error("empty path specified");
+        // TODO: remove this
+        if (mLang == Standards::Language::None)
+            mLang = Path::identify(mPath, false);
     }
 
     const std::string& path() const
@@ -80,6 +84,7 @@ private:
 
 /** File settings. Multiple configurations for a file is allowed. */
 struct CPPCHECKLIB FileSettings {
+    // TODO: remove this
     explicit FileSettings(std::string path)
         : file(std::move(path))
     {}
