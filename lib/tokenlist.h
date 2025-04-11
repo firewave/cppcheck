@@ -57,7 +57,16 @@ public:
     TokenList(const TokenList &) = delete;
     TokenList &operator=(const TokenList &) = delete;
 
-    TokenList(TokenList&&) = default;
+    TokenList(TokenList&& other)
+    {
+        mTokensFrontBack = other.mTokensFrontBack;
+        other.mTokensFrontBack.front = nullptr;
+        other.mTokensFrontBack.back = nullptr;
+        mFiles = std::move(other.mFiles);
+        mOrigFiles = std::move(other.mOrigFiles);
+        mSettings = other.mSettings;
+        mLang = other.mLang;
+    }
 
     /** @return the source file path. e.g. "file.cpp" */
     const std::string& getSourceFilePath() const;
@@ -219,7 +228,7 @@ private:
     std::vector<std::string> mOrigFiles;
 
     /** settings */
-    const Settings* const mSettings{};
+    const Settings* mSettings{};
 
     /** File is known to be C/C++ code */
     Standards::Language mLang{Standards::Language::None};
