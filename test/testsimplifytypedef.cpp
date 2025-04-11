@@ -275,7 +275,7 @@ private:
     std::string simplifyTypedef(const char code[]) {
         TokenList tokenlist{&settings1, Standards::Language::CPP};
         std::istringstream istr(code);
-        if (!tokenlist.createTokens(istr, Standards::Language::CPP))
+        if (!tokenlist.createTokens(istr))
             return "";
         Tokenizer tokenizer(std::move(tokenlist), settings1, *this);
         tokenizer.createLinks();

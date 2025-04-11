@@ -578,7 +578,7 @@ namespace {
             const Settings s;
             TokenList tokenlist(&s, Standards::Language::C);
             std::istringstream istr(c);
-            tokenlist.createTokens(istr, Standards::Language::C); // TODO: check result
+            tokenlist.createTokens(istr); // TODO: check result
             // TODO: put in a helper
             // generate links
             {

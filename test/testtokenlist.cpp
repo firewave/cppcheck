@@ -131,7 +131,7 @@ private:
             TokenList tokenlist(&s, Standards::Language::C);
             std::istringstream istr(code2);
             tokenlist.appendFileIfNew("a.c");
-            ASSERT(tokenlist.createTokens(istr, Path::identify("a.c", false)));
+            ASSERT(tokenlist.createTokens(istr));
             ASSERT_EQUALS(false, tokenlist.front()->isKeyword());
         }
 
@@ -153,7 +153,7 @@ private:
             TokenList tokenlist(&s, Standards::Language::CPP);
             std::istringstream istr(code2);
             tokenlist.appendFileIfNew("a.cpp");
-            ASSERT(tokenlist.createTokens(istr, Path::identify("a.cpp", false)));
+            ASSERT(tokenlist.createTokens(istr));
             ASSERT_EQUALS(false, tokenlist.front()->isKeyword());
         }
     }
@@ -176,7 +176,7 @@ private:
 
         TokenList tokenlist(&settings, Standards::Language::C);
         std::istringstream istr(s);
-        ASSERT(tokenlist.createTokens(istr, Standards::Language::C));
+        ASSERT(tokenlist.createTokens(istr));
         // TODO: put this logic in TokenList
         // generate links
         {

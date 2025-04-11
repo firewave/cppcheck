@@ -63,13 +63,8 @@ static constexpr int AST_MAX_DEPTH = 150;
 TokenList::TokenList(const Settings* settings, Standards::Language lang)
     : mSettings(settings)
 {
-    if (mSettings && (mSettings->enforcedLang != Standards::Language::None)) {
-        mLang = mSettings->enforcedLang;
-    }
-    else {
-        assert(lang != Standards::Language::None);
-        mLang = lang;
-    }
+    assert(lang != Standards::Language::None);
+    mLang = lang;
 }
 
 TokenList::~TokenList()
@@ -347,16 +342,8 @@ void TokenList::insertTokens(Token *dest, const Token *src, nonneg int n)
 
 //---------------------------------------------------------------------------
 
-// TODO: remove lang
-bool TokenList::createTokens(std::istream &code, Standards::Language lang)
+bool TokenList::createTokens(std::istream &code)
 {
-    ASSERT_LANG(lang != Standards::Language::None);
-    if (mLang == Standards::Language::None) {
-        mLang = lang;
-    } else {
-        ASSERT_LANG(lang == mLang);
-    }
-
     return createTokensInternal(code, mFiles.empty() ? "" : *mFiles.cbegin());
 }
 
@@ -2288,17 +2275,6 @@ bool TokenList::isCPP() const
         return true; // treat as C++ by default
 
     return mLang == Standards::Language::CPP;
-}
-
-void TokenList::setLang(Standards::Language lang, bool force)
-{
-    ASSERT_LANG(lang != Standards::Language::None);
-    if (!force)
-    {
-        ASSERT_LANG(mLang == Standards::Language::None);
-    }
-
-    mLang = lang;
 }
 
 const Token * TokenList::isFunctionHead(const Token *tok, const std::string &endsWith)

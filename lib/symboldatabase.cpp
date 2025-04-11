@@ -1809,7 +1809,6 @@ void SymbolDatabase::setArrayDimensionsUsingValueFlow()
                 // In template arguments, there might not be AST
                 // Determine size by using the "raw tokens"
                 TokenList tokenList(&mSettings, dimension.tok->isCpp() ? Standards::Language::CPP : Standards::Language::C);
-                tokenList.setLang(dimension.tok->isCpp() ? Standards::Language::CPP : Standards::Language::C);
                 tokenList.addtoken(";", 0, 0, 0, false);
                 bool fail = false;
                 for (const Token *tok = dimension.tok; tok && !Token::Match(tok, "[,>]"); tok = tok->next()) {
@@ -7714,7 +7713,7 @@ void SymbolDatabase::setValueTypeInTokenList(bool reportDebugWarnings, Token *to
                     ValueType valuetype;
                     TokenList tokenList(&mSettings, tok->isCpp() ? Standards::Language::CPP : Standards::Language::C);
                     std::istringstream istr(typestr+";");
-                    tokenList.createTokens(istr, tok->isCpp() ? Standards::Language::CPP : Standards::Language::C); // TODO: check result?
+                    tokenList.createTokens(istr); // TODO: check result?
                     tokenList.simplifyStdType();
                     if (parsedecl(tokenList.front(), &valuetype, mDefaultSignedness, mSettings)) {
                         valuetype.originalTypeName = typestr;
@@ -7804,7 +7803,7 @@ void SymbolDatabase::setValueTypeInTokenList(bool reportDebugWarnings, Token *to
                 }
                 TokenList tokenList(&mSettings, tok->isCpp() ? Standards::Language::CPP : Standards::Language::C);
                 std::istringstream istr(typestr+";");
-                if (tokenList.createTokens(istr, tok->isCpp() ? Standards::Language::CPP : Standards::Language::C)) {
+                if (tokenList.createTokens(istr)) {
                     ValueType vt;
                     tokenList.simplifyPlatformTypes();
                     tokenList.simplifyStdType();
