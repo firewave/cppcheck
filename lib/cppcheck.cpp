@@ -903,9 +903,8 @@ unsigned int CppCheck::checkFile(const FileWithDetails& file, const std::string 
 
             if (mUnusedFunctionsCheck && (mSettings.useSingleJob() || analyzerInformation)) {
                 std::size_t hash = 0;
+                // markup files are special and do not adhere to the enforced language
                 TokenList tokenlist{&mSettings, Standards::Language::C};
-                // enforce the language since markup files are special and do not adhere to the enforced language
-                tokenlist.setLang(Standards::Language::C, true); // TODO: remove when enforceLang handling has been removed
                 if (fileStream) {
                     std::vector<std::string> files;
                     simplecpp::TokenList tokens(*fileStream, files, file.spath());
@@ -1051,7 +1050,7 @@ unsigned int CppCheck::checkFile(const FileWithDetails& file, const std::string 
             }
             TokenList tokenlist(&mSettings, file.lang());
             std::istringstream istr2(code);
-            tokenlist.createTokens(istr2, file.lang()); // TODO: check result?
+            tokenlist.createTokens(istr2); // TODO: check result?
             executeRules("define", tokenlist);
         }
 #endif

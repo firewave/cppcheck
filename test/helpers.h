@@ -115,7 +115,7 @@ private:
         if (list.front())
             throw std::runtime_error("token list is not empty");
         list.appendFileIfNew(filename);
-        if (!list.createTokens(istr, Path::identify(filename, false)))
+        if (!list.createTokens(istr))
             return false;
 
         return simplifyTokens1(configuration);
@@ -133,7 +133,7 @@ public:
     : list{&settings, lang}
     {
         std::istringstream iss(code);
-        if (!list.createTokens(iss, lang))
+        if (!list.createTokens(iss))
             throw std::runtime_error("creating tokens failed");
     }
 
@@ -290,7 +290,7 @@ struct TokenListHelper
         if (tokenlist.front())
             throw std::runtime_error("token list is not empty");
         tokenlist.appendFileIfNew(file);
-        return tokenlist.createTokens(istr, Path::identify(file, false));
+        return tokenlist.createTokens(istr);
     }
 };
 

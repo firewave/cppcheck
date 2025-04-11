@@ -5431,7 +5431,7 @@ private:
         TokenList tokenlist{&settings, Standards::Language::CPP};
         std::istringstream istr(code);
         tokenlist.appendFileIfNew("test.cpp");
-        if (!tokenlist.createTokens(istr, Path::identify("test.cpp", false)))
+        if (!tokenlist.createTokens(istr))
             return false;
         Tokenizer tokenizer(std::move(tokenlist), settings, *this);
         tokenizer.createLinks();
@@ -5501,7 +5501,7 @@ private:
 
         std::istringstream istr(code);
         tokenlist.appendFileIfNew("test.cpp");
-        if (!tokenlist.createTokens(istr, Path::identify("test.cpp", false)))
+        if (!tokenlist.createTokens(istr))
             return false;
         Tokenizer tokenizer(std::move(tokenlist), settings, *this);
         tokenizer.createLinks();

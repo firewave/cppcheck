@@ -868,7 +868,7 @@ private:
             const char code[] = "void foo(int i) { reinterpret_cast<char>(i) };";
             std::istringstream istr(code);
             tokenlist.appendFileIfNew("test.h");
-            ASSERT(tokenlist.createTokens(istr, Path::identify("test.h", false)));
+            ASSERT(tokenlist.createTokens(istr));
             Tokenizer tokenizer(std::move(tokenlist), settings1, *this);
             ASSERT_THROW_INTERNAL(tokenizer.simplifyTokens1(""), SYNTAX);
         }
@@ -6139,7 +6139,7 @@ private:
         TokenList tokenlist{&settings0, Standards::Language::CPP};
         std::istringstream istr(code);
         tokenlist.appendFileIfNew("test.cpp");
-        if (!tokenlist.createTokens(istr,Path::identify("test.cpp", false)))
+        if (!tokenlist.createTokens(istr))
             return "ERROR";
 
         Tokenizer tokenizer(std::move(tokenlist), settings0, *this);
