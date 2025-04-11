@@ -128,8 +128,8 @@ private:
     }
 
     void nextprevious() const {
-        TokensFrontBack tokensFrontBack(list);
-        auto *token = new Token(tokensFrontBack);
+        TokensFrontBack tokensFrontBack;
+        auto *token = new Token(list, tokensFrontBack);
         token->str("1");
         (void)token->insertToken("2");
         (void)token->next()->insertToken("3");
@@ -162,15 +162,15 @@ private:
     void multiCompare() const {
         // Test for found
         {
-            TokensFrontBack tokensFrontBack(list);
-            Token one(tokensFrontBack);
+            TokensFrontBack tokensFrontBack;
+            Token one(list, tokensFrontBack);
             one.str("one");
             ASSERT_EQUALS(1, Token::multiCompare(&one, "one|two", 0));
         }
 
         {
-            TokensFrontBack tokensFrontBack(list);
-            Token two(tokensFrontBack);
+            TokensFrontBack tokensFrontBack;
+            Token two(list, tokensFrontBack);
             two.str("two");
             ASSERT_EQUALS(1, Token::multiCompare(&two, "one|two", 0));
             ASSERT_EQUALS(1, Token::multiCompare(&two, "verybig|two|", 0));
@@ -178,8 +178,8 @@ private:
 
         // Test for empty string found
         {
-            TokensFrontBack tokensFrontBack(list);
-            Token notfound(tokensFrontBack);
+            TokensFrontBack tokensFrontBack;
+            Token notfound(list, tokensFrontBack);
             notfound.str("notfound");
             ASSERT_EQUALS(0, Token::multiCompare(&notfound, "one|two|", 0));
 
@@ -188,51 +188,51 @@ private:
         }
 
         {
-            TokensFrontBack tokensFrontBack(list);
-            Token s(tokensFrontBack);
+            TokensFrontBack tokensFrontBack;
+            Token s(list, tokensFrontBack);
             s.str("s");
             ASSERT_EQUALS(-1, Token::multiCompare(&s, "verybig|two", 0));
         }
 
         {
-            TokensFrontBack tokensFrontBack(list);
-            Token ne(tokensFrontBack);
+            TokensFrontBack tokensFrontBack;
+            Token ne(list, tokensFrontBack);
             ne.str("ne");
             ASSERT_EQUALS(-1, Token::multiCompare(&ne, "one|two", 0));
         }
 
         {
-            TokensFrontBack tokensFrontBack(list);
-            Token a(tokensFrontBack);
+            TokensFrontBack tokensFrontBack;
+            Token a(list, tokensFrontBack);
             a.str("a");
             ASSERT_EQUALS(-1, Token::multiCompare(&a, "abc|def", 0));
         }
 
         {
-            TokensFrontBack tokensFrontBack(list);
-            Token abcd(tokensFrontBack);
+            TokensFrontBack tokensFrontBack;
+            Token abcd(list, tokensFrontBack);
             abcd.str("abcd");
             ASSERT_EQUALS(-1, Token::multiCompare(&abcd, "abc|def", 0));
         }
 
         {
-            TokensFrontBack tokensFrontBack(list);
-            Token def(tokensFrontBack);
+            TokensFrontBack tokensFrontBack;
+            Token def(list, tokensFrontBack);
             def.str("default");
             ASSERT_EQUALS(-1, Token::multiCompare(&def, "abc|def", 0));
         }
 
         // %op%
         {
-            TokensFrontBack tokensFrontBack(list);
-            Token plus(tokensFrontBack);
+            TokensFrontBack tokensFrontBack;
+            Token plus(list, tokensFrontBack);
             plus.str("+");
             ASSERT_EQUALS(1, Token::multiCompare(&plus, "one|%op%", 0));
             ASSERT_EQUALS(1, Token::multiCompare(&plus, "%op%|two", 0));
         }
         {
-            TokensFrontBack tokensFrontBack(list);
-            Token x(tokensFrontBack);
+            TokensFrontBack tokensFrontBack;
+            Token x(list, tokensFrontBack);
             x.str("x");
             ASSERT_EQUALS(-1, Token::multiCompare(&x, "one|%op%", 0));
             ASSERT_EQUALS(-1, Token::multiCompare(&x, "%op%|two", 0));
@@ -310,15 +310,15 @@ private:
     }
 
     void multiCompare5() const {
-        TokensFrontBack tokensFrontBack(list);
-        Token tok(tokensFrontBack);
+        TokensFrontBack tokensFrontBack;
+        Token tok(list, tokensFrontBack);
         tok.str("||");
         ASSERT_EQUALS(true, Token::multiCompare(&tok, "+|%or%|%oror%", 0) >= 0);
     }
 
     void charTypes() const {
-        TokensFrontBack tokensFrontBack(list);
-        Token tok(tokensFrontBack);
+        TokensFrontBack tokensFrontBack;
+        Token tok(list, tokensFrontBack);
 
         tok.str("'a'");
         ASSERT_EQUALS(true, tok.isCChar());
@@ -394,8 +394,8 @@ private:
     }
 
     void stringTypes() const {
-        TokensFrontBack tokensFrontBack(list);
-        Token tok(tokensFrontBack);
+        TokensFrontBack tokensFrontBack;
+        Token tok(list, tokensFrontBack);
 
         tok.str("\"a\"");
         ASSERT_EQUALS(true, tok.isCChar());
@@ -439,8 +439,8 @@ private:
     }
 
     void getStrLength() const {
-        TokensFrontBack tokensFrontBack(list);
-        Token tok(tokensFrontBack);
+        TokensFrontBack tokensFrontBack;
+        Token tok(list, tokensFrontBack);
 
         tok.str("\"\"");
         ASSERT_EQUALS(0, Token::getStrLength(&tok));
@@ -468,8 +468,8 @@ private:
     }
 
     void getStrSize() const {
-        TokensFrontBack tokensFrontBack(list);
-        Token tok(tokensFrontBack);
+        TokensFrontBack tokensFrontBack;
+        Token tok(list, tokensFrontBack);
 
         tok.str("\"\"");
         ASSERT_EQUALS(sizeof(""), Token::getStrSize(&tok, settingsDefault));
@@ -485,8 +485,8 @@ private:
     }
 
     void strValue() const {
-        TokensFrontBack tokensFrontBack(list);
-        Token tok(tokensFrontBack);
+        TokensFrontBack tokensFrontBack;
+        Token tok(list, tokensFrontBack);
 
         tok.str("\"\"");
         ASSERT_EQUALS("", tok.strValue());
@@ -517,8 +517,8 @@ private:
     }
 
     void concatStr() const {
-        TokensFrontBack tokensFrontBack(list);
-        Token tok(tokensFrontBack);
+        TokensFrontBack tokensFrontBack;
+        Token tok(list, tokensFrontBack);
 
         tok.str("\"\"");
         tok.concatStr("\"\"");
@@ -557,9 +557,9 @@ private:
     }
 
     void deleteLast() const {
-        TokensFrontBack listEnds(list);
+        TokensFrontBack listEnds;
         Token ** const tokensBack = &(listEnds.back);
-        Token tok(listEnds);
+        Token tok(list, listEnds);
         (void)tok.insertToken("aba");
         ASSERT_EQUALS(true, *tokensBack == tok.next());
         tok.deleteNext();
@@ -567,9 +567,9 @@ private:
     }
 
     void deleteFirst() const {
-        TokensFrontBack listEnds(list);
+        TokensFrontBack listEnds;
         Token ** const tokensFront = &(listEnds.front);
-        Token tok(listEnds);
+        Token tok(list, listEnds);
 
         (void)tok.insertToken("aba");
 
@@ -613,8 +613,8 @@ private:
         ASSERT_EQUALS(true, Token::Match(singleChar.front(), "[a|bc]"));
         ASSERT_EQUALS(false, Token::Match(singleChar.front(), "[d|ef]"));
 
-        TokensFrontBack tokensFrontBack(list);
-        Token multiChar(tokensFrontBack);
+        TokensFrontBack tokensFrontBack;
+        Token multiChar(list, tokensFrontBack);
         multiChar.str("[ab");
         ASSERT_EQUALS(false, Token::Match(&multiChar, "[ab|def]"));
     }
@@ -855,8 +855,8 @@ private:
 
     void isArithmeticalOp() const {
         for (auto test_op = arithmeticalOps.cbegin(); test_op != arithmeticalOps.cend(); ++test_op) {
-            TokensFrontBack tokensFrontBack(list);
-            Token tok(tokensFrontBack);
+            TokensFrontBack tokensFrontBack;
+            Token tok(list, tokensFrontBack);
             tok.str(*test_op);
             ASSERT_EQUALS(true, tok.isArithmeticalOp());
         }
@@ -870,8 +870,8 @@ private:
         append_vector(other_ops, assignmentOps);
 
         for (auto other_op = other_ops.cbegin(); other_op != other_ops.cend(); ++other_op) {
-            TokensFrontBack tokensFrontBack(list);
-            Token tok(tokensFrontBack);
+            TokensFrontBack tokensFrontBack;
+            Token tok(list, tokensFrontBack);
             tok.str(*other_op);
             ASSERT_EQUALS_MSG(false, tok.isArithmeticalOp(), "Failing arithmetical operator: " + *other_op);
         }
@@ -886,8 +886,8 @@ private:
         append_vector(test_ops, assignmentOps);
 
         for (auto test_op = test_ops.cbegin(); test_op != test_ops.cend(); ++test_op) {
-            TokensFrontBack tokensFrontBack(list);
-            Token tok(tokensFrontBack);
+            TokensFrontBack tokensFrontBack;
+            Token tok(list, tokensFrontBack);
             tok.str(*test_op);
             ASSERT_EQUALS(true, tok.isOp());
         }
@@ -897,8 +897,8 @@ private:
         append_vector(other_ops, extendedOps);
 
         for (auto other_op = other_ops.cbegin(); other_op != other_ops.cend(); ++other_op) {
-            TokensFrontBack tokensFrontBack(list);
-            Token tok(tokensFrontBack);
+            TokensFrontBack tokensFrontBack;
+            Token tok(list, tokensFrontBack);
             tok.str(*other_op);
             ASSERT_EQUALS_MSG(false, tok.isOp(), "Failing normal operator: " + *other_op);
         }
@@ -912,8 +912,8 @@ private:
         append_vector(test_ops, logicalOps);
 
         for (auto test_op = test_ops.cbegin(); test_op != test_ops.cend(); ++test_op) {
-            TokensFrontBack tokensFrontBack(list);
-            Token tok(tokensFrontBack);
+            TokensFrontBack tokensFrontBack;
+            Token tok(list, tokensFrontBack);
             tok.str(*test_op);
             ASSERT_EQUALS(true, tok.isConstOp());
         }
@@ -924,8 +924,8 @@ private:
         append_vector(other_ops, assignmentOps);
 
         for (auto other_op = other_ops.cbegin(); other_op != other_ops.cend(); ++other_op) {
-            TokensFrontBack tokensFrontBack(list);
-            Token tok(tokensFrontBack);
+            TokensFrontBack tokensFrontBack;
+            Token tok(list, tokensFrontBack);
             tok.str(*other_op);
             ASSERT_EQUALS_MSG(false, tok.isConstOp(), "Failing normal operator: " + *other_op);
         }
@@ -940,16 +940,16 @@ private:
         append_vector(test_ops, extendedOps);
 
         for (auto test_op = test_ops.cbegin(); test_op != test_ops.cend(); ++test_op) {
-            TokensFrontBack tokensFrontBack(list);
-            Token tok(tokensFrontBack);
+            TokensFrontBack tokensFrontBack;
+            Token tok(list, tokensFrontBack);
             tok.str(*test_op);
             ASSERT_EQUALS(true, tok.isExtendedOp());
         }
 
         // Negative test against assignment operators
         for (auto other_op = assignmentOps.cbegin(); other_op != assignmentOps.cend(); ++other_op) {
-            TokensFrontBack tokensFrontBack(list);
-            Token tok(tokensFrontBack);
+            TokensFrontBack tokensFrontBack;
+            Token tok(list, tokensFrontBack);
             tok.str(*other_op);
             ASSERT_EQUALS_MSG(false, tok.isExtendedOp(), "Failing assignment operator: " + *other_op);
         }
@@ -957,8 +957,8 @@ private:
 
     void isAssignmentOp() const {
         for (auto test_op = assignmentOps.cbegin(); test_op != assignmentOps.cend(); ++test_op) {
-            TokensFrontBack tokensFrontBack(list);
-            Token tok(tokensFrontBack);
+            TokensFrontBack tokensFrontBack;
+            Token tok(list, tokensFrontBack);
             tok.str(*test_op);
             ASSERT_EQUALS(true, tok.isAssignmentOp());
         }
@@ -972,8 +972,8 @@ private:
         append_vector(other_ops, extendedOps);
 
         for (auto other_op = other_ops.cbegin(); other_op != other_ops.cend(); ++other_op) {
-            TokensFrontBack tokensFrontBack(list);
-            Token tok(tokensFrontBack);
+            TokensFrontBack tokensFrontBack;
+            Token tok(list, tokensFrontBack);
             tok.str(*other_op);
             ASSERT_EQUALS_MSG(false, tok.isAssignmentOp(), "Failing assignment operator: " + *other_op);
         }
@@ -981,31 +981,31 @@ private:
 
     void operators() const {
         for (auto test_op = extendedOps.cbegin(); test_op != extendedOps.cend(); ++test_op) {
-            TokensFrontBack tokensFrontBack(list);
-            Token tok(tokensFrontBack);
+            TokensFrontBack tokensFrontBack;
+            Token tok(list, tokensFrontBack);
             tok.str(*test_op);
             ASSERT_EQUALS(Token::eExtendedOp, tok.tokType());
         }
         for (auto test_op = logicalOps.cbegin(); test_op != logicalOps.cend(); ++test_op) {
-            TokensFrontBack tokensFrontBack(list);
-            Token tok(tokensFrontBack);
+            TokensFrontBack tokensFrontBack;
+            Token tok(list, tokensFrontBack);
             tok.str(*test_op);
             ASSERT_EQUALS(Token::eLogicalOp, tok.tokType());
         }
         for (auto test_op = bitOps.cbegin(); test_op != bitOps.cend(); ++test_op) {
-            TokensFrontBack tokensFrontBack(list);
-            Token tok(tokensFrontBack);
+            TokensFrontBack tokensFrontBack;
+            Token tok(list, tokensFrontBack);
             tok.str(*test_op);
             ASSERT_EQUALS(Token::eBitOp, tok.tokType());
         }
         for (auto test_op = comparisonOps.cbegin(); test_op != comparisonOps.cend(); ++test_op) {
-            TokensFrontBack tokensFrontBack(list);
-            Token tok(tokensFrontBack);
+            TokensFrontBack tokensFrontBack;
+            Token tok(list, tokensFrontBack);
             tok.str(*test_op);
             ASSERT_EQUALS(Token::eComparisonOp, tok.tokType());
         }
-        TokensFrontBack tokensFrontBack(list);
-        Token tok(tokensFrontBack);
+        TokensFrontBack tokensFrontBack;
+        Token tok(list, tokensFrontBack);
         tok.str("++");
         ASSERT_EQUALS(Token::eIncDecOp, tok.tokType());
         tok.str("--");
@@ -1013,8 +1013,8 @@ private:
     }
 
     void literals() const {
-        TokensFrontBack tokensFrontBack(list);
-        Token tok(tokensFrontBack);
+        TokensFrontBack tokensFrontBack;
+        Token tok(list, tokensFrontBack);
 
         tok.str("\"foo\"");
         ASSERT(tok.tokType() == Token::eString);
@@ -1044,15 +1044,15 @@ private:
         standard_types.emplace_back("size_t");
 
         for (auto test_op = standard_types.cbegin(); test_op != standard_types.cend(); ++test_op) {
-            TokensFrontBack tokensFrontBack(list);
-            Token tok(tokensFrontBack);
+            TokensFrontBack tokensFrontBack;
+            Token tok(list, tokensFrontBack);
             tok.str(*test_op);
             ASSERT_EQUALS_MSG(true, tok.isStandardType(), "Failing standard type: " + *test_op);
         }
 
         // Negative test
-        TokensFrontBack tokensFrontBack(list);
-        Token tok(tokensFrontBack);
+        TokensFrontBack tokensFrontBack;
+        Token tok(list, tokensFrontBack);
         tok.str("string");
         ASSERT_EQUALS(false, tok.isStandardType());
 
@@ -1068,8 +1068,8 @@ private:
     }
 
     void updateProperties() const {
-        TokensFrontBack tokensFrontBack(list);
-        Token tok(tokensFrontBack);
+        TokensFrontBack tokensFrontBack;
+        Token tok(list, tokensFrontBack);
         tok.str("foobar");
 
         ASSERT_EQUALS(true, tok.isName());
@@ -1082,45 +1082,45 @@ private:
     }
 
     void isNameGuarantees1() const {
-        TokensFrontBack tokensFrontBack(list);
-        Token tok(tokensFrontBack);
+        TokensFrontBack tokensFrontBack;
+        Token tok(list, tokensFrontBack);
         tok.str("Name");
         ASSERT_EQUALS(true, tok.isName());
     }
 
     void isNameGuarantees2() const {
-        TokensFrontBack tokensFrontBack(list);
-        Token tok(tokensFrontBack);
+        TokensFrontBack tokensFrontBack;
+        Token tok(list, tokensFrontBack);
         tok.str("_name");
         ASSERT_EQUALS(true, tok.isName());
     }
 
     void isNameGuarantees3() const {
-        TokensFrontBack tokensFrontBack(list);
-        Token tok(tokensFrontBack);
+        TokensFrontBack tokensFrontBack;
+        Token tok(list, tokensFrontBack);
         tok.str("_123");
         ASSERT_EQUALS(true, tok.isName());
     }
 
     void isNameGuarantees4() const {
-        TokensFrontBack tokensFrontBack(list);
-        Token tok(tokensFrontBack);
+        TokensFrontBack tokensFrontBack;
+        Token tok(list, tokensFrontBack);
         tok.str("123456");
         ASSERT_EQUALS(false, tok.isName());
         ASSERT_EQUALS(true, tok.isNumber());
     }
 
     void isNameGuarantees5() const {
-        TokensFrontBack tokensFrontBack(list);
-        Token tok(tokensFrontBack);
+        TokensFrontBack tokensFrontBack;
+        Token tok(list, tokensFrontBack);
         tok.str("a123456");
         ASSERT_EQUALS(true, tok.isName());
         ASSERT_EQUALS(false, tok.isNumber());
     }
 
     void isNameGuarantees6() const {
-        TokensFrontBack tokensFrontBack(list);
-        Token tok(tokensFrontBack);
+        TokensFrontBack tokensFrontBack;
+        Token tok(list, tokensFrontBack);
         tok.str("$f");
         ASSERT_EQUALS(true, tok.isName());
     }
@@ -1229,8 +1229,8 @@ private:
         v2.valueType = ValueFlow::Value::ValueType::BUFFER_SIZE;
         v2.setKnown();
 
-        TokensFrontBack tokensFrontBack(list);
-        Token token(tokensFrontBack);
+        TokensFrontBack tokensFrontBack;
+        Token token(list, tokensFrontBack);
         ASSERT_EQUALS(true, token.addValue(v1));
         ASSERT_EQUALS(true, token.addValue(v2));
         ASSERT_EQUALS(false, token.hasKnownIntValue());
@@ -1248,8 +1248,8 @@ private:
 
     void _assert_tok(const char* file, int line, const std::string& s, Token::Type t, bool l = false, bool std = false, bool ctrl = false) const
     {
-        TokensFrontBack tokensFrontBack(list);
-        Token tok(tokensFrontBack);
+        TokensFrontBack tokensFrontBack;
+        Token tok(list, tokensFrontBack);
         tok.str(s);
         _assert_tok(file, line, &tok, t, l, std, ctrl);
     }
@@ -1336,8 +1336,8 @@ private:
     void update_property_info_evariable() const
     {
         {
-            TokensFrontBack tokensFrontBack(list);
-            Token tok(tokensFrontBack);
+            TokensFrontBack tokensFrontBack;
+            Token tok(list, tokensFrontBack);
             tok.str("var1");
             tok.varId(17);
             assert_tok(&tok, Token::Type::eVariable);
@@ -1349,22 +1349,22 @@ private:
         {
             const Settings s = settingsBuilder().c(Standards::cstd_t::C89).build();
             TokenList list_c{&s, Standards::Language::C};
-            TokensFrontBack tokensFrontBack(list_c);
-            Token tok(tokensFrontBack);
+            TokensFrontBack tokensFrontBack;
+            Token tok(list_c, tokensFrontBack);
             tok.str("alignas"); // not a C89 keyword
             assert_tok(&tok, Token::Type::eName);
         }
         {
             TokenList list_c{&settingsDefault, Standards::Language::C};
-            TokensFrontBack tokensFrontBack(list_c);
-            Token tok(tokensFrontBack);
+            TokensFrontBack tokensFrontBack;
+            Token tok(list_c, tokensFrontBack);
             tok.str("alignas"); // a C23 keyword
             assert_tok(&tok, Token::Type::eKeyword);
         }
         {
             TokenList list_c{&settingsDefault, Standards::Language::C};
-            TokensFrontBack tokensFrontBack(list_c);
-            Token tok(tokensFrontBack);
+            TokensFrontBack tokensFrontBack;
+            Token tok(list_c, tokensFrontBack);
             tok.str("and_eq"); // a C++ keyword
             assert_tok(&tok, Token::Type::eName);
         }
@@ -1375,22 +1375,22 @@ private:
         {
             const Settings s = settingsBuilder().cpp(Standards::cppstd_t::CPP03).build();
             TokenList list_cpp{&s, Standards::Language::CPP};
-            TokensFrontBack tokensFrontBack(list_cpp);
-            Token tok(tokensFrontBack);
+            TokensFrontBack tokensFrontBack;
+            Token tok(list_cpp, tokensFrontBack);
             tok.str("consteval"); // not a C++03 keyword
             assert_tok(&tok, Token::Type::eName);
         }
         {
             TokenList list_cpp{&settingsDefault, Standards::Language::CPP};
-            TokensFrontBack tokensFrontBack(list_cpp);
-            Token tok(tokensFrontBack);
+            TokensFrontBack tokensFrontBack;
+            Token tok(list_cpp, tokensFrontBack);
             tok.str("consteval"); // a C++20 keyword
             assert_tok(&tok, Token::Type::eKeyword);
         }
         {
             TokenList list_cpp{&settingsDefault, Standards::Language::CPP};
-            TokensFrontBack tokensFrontBack(list_cpp);
-            Token tok(tokensFrontBack);
+            TokensFrontBack tokensFrontBack;
+            Token tok(list_cpp, tokensFrontBack);
             tok.str("typeof_unqual"); // a C keyword
             assert_tok(&tok, Token::Type::eName);
         }
@@ -1399,20 +1399,20 @@ private:
     void update_property_info_ebracket_link() const
     {
         {
-            TokensFrontBack tokensFrontBack(list);
-            Token tok(tokensFrontBack);
+            TokensFrontBack tokensFrontBack;
+            Token tok(list, tokensFrontBack);
             tok.str("<");
 
-            Token tok2(tokensFrontBack);
+            Token tok2(list, tokensFrontBack);
             tok.link(&tok2);
             assert_tok(&tok, Token::Type::eBracket);
         }
 
         {
-            TokensFrontBack tokensFrontBack(list);
-            Token tok(tokensFrontBack);
+            TokensFrontBack tokensFrontBack;
+            Token tok(list, tokensFrontBack);
 
-            Token tok2(tokensFrontBack);
+            Token tok2(list, tokensFrontBack);
             tok.link(&tok2);
 
             tok.str("<");
@@ -1423,20 +1423,20 @@ private:
     void update_property_info_ecomparisonop_link() const
     {
         {
-            TokensFrontBack tokensFrontBack(list);
-            Token tok(tokensFrontBack);
+            TokensFrontBack tokensFrontBack;
+            Token tok(list, tokensFrontBack);
             tok.str("==");
 
-            Token tok2(tokensFrontBack);
+            Token tok2(list, tokensFrontBack);
             tok.link(&tok2); // TODO: does not (and probably should not) update
             assert_tok(&tok, Token::Type::eComparisonOp);
         }
 
         {
-            TokensFrontBack tokensFrontBack(list);
-            Token tok(tokensFrontBack);
+            TokensFrontBack tokensFrontBack;
+            Token tok(list, tokensFrontBack);
 
-            Token tok2(tokensFrontBack);
+            Token tok2(list, tokensFrontBack);
             tok.link(&tok2);
 
             tok.str("==");
@@ -1448,15 +1448,15 @@ private:
     {
         {
             TokenList list_c{&settingsDefault, Standards::Language::C};
-            TokensFrontBack tokensFrontBack(list_c);
-            Token tok(tokensFrontBack);
+            TokensFrontBack tokensFrontBack;
+            Token tok(list_c, tokensFrontBack);
             tok.str("char"); // not treated as keyword in TokenList::isKeyword()
             assert_tok(&tok, Token::Type::eType, /*l=*/ false, /*std=*/ true);
         }
         {
             TokenList list_c{&settingsDefault, Standards::Language::C};
-            TokensFrontBack tokensFrontBack(list_c);
-            Token tok(tokensFrontBack);
+            TokensFrontBack tokensFrontBack;
+            Token tok(list_c, tokensFrontBack);
             tok.str("size_t"); // not treated as keyword in TokenList::isKeyword()
             assert_tok(&tok, Token::Type::eType, /*l=*/ false, /*std=*/ true);
         }
@@ -1466,15 +1466,15 @@ private:
     {
         {
             TokenList list_cpp{&settingsDefault, Standards::Language::CPP};
-            TokensFrontBack tokensFrontBack(list_cpp);
-            Token tok(tokensFrontBack);
+            TokensFrontBack tokensFrontBack;
+            Token tok(list_cpp, tokensFrontBack);
             tok.str("bool"); // not treated as keyword in TokenList::isKeyword()
             assert_tok(&tok, Token::Type::eType, /*l=*/ false, /*std=*/ true);
         }
         {
             TokenList list_cpp{&settingsDefault, Standards::Language::CPP};
-            TokensFrontBack tokensFrontBack(list_cpp);
-            Token tok(tokensFrontBack);
+            TokensFrontBack tokensFrontBack;
+            Token tok(list_cpp, tokensFrontBack);
             tok.str("size_t");
             assert_tok(&tok, Token::Type::eType, /*l=*/ false, /*std=*/ true);
         }
@@ -1482,8 +1482,8 @@ private:
 
     void update_property_info_replace() const // #13743
     {
-        TokensFrontBack tokensFrontBack(list);
-        Token tok(tokensFrontBack);
+        TokensFrontBack tokensFrontBack;
+        Token tok(list, tokensFrontBack);
         tok.str("size_t");
         assert_tok(&tok, Token::Type::eType, false, true);
         tok.str("long");
@@ -1493,8 +1493,8 @@ private:
     void varid_reset() const
     {
         TokenList list_c{&settingsDefault, Standards::Language::C};
-        TokensFrontBack tokensFrontBack(list_c);
-        Token tok(tokensFrontBack);
+        TokensFrontBack tokensFrontBack;
+        Token tok(list_c, tokensFrontBack);
         tok.str("int"); // not treated as keyword in TokenList::isKeyword()
         assert_tok(&tok, Token::Type::eType, /*l=*/ false, /*std=*/ true);
         tok.varId(0);

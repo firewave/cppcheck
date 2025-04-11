@@ -60,16 +60,17 @@ namespace {
 const std::list<ValueFlow::Value> TokenImpl::mEmptyValueList;
 const std::string Token::mEmptyString;
 
-Token::Token(TokensFrontBack &tokensFrontBack)
-    : mTokensFrontBack(tokensFrontBack)
-    , mIsC(mTokensFrontBack.list.isC())
-    , mIsCpp(mTokensFrontBack.list.isCPP())
+Token::Token(const TokenList& tokenlist, TokensFrontBack &tokensFrontBack)
+    : mList(tokenlist)
+    , mTokensFrontBack(tokensFrontBack)
+    , mIsC(mList.isC())
+    , mIsCpp(mList.isCPP())
 {
     mImpl = new TokenImpl();
 }
 
 Token::Token(const Token* tok)
-    : Token(const_cast<Token*>(tok)->mTokensFrontBack)
+    : Token(tok->mList, const_cast<Token*>(tok)->mTokensFrontBack)
 {
     fileIndex(tok->fileIndex());
     linenr(tok->linenr());
@@ -127,7 +128,7 @@ void Token::update_property_info()
         else if (std::isalpha(static_cast<unsigned char>(mStr[0])) || mStr[0] == '_' || mStr[0] == '$') { // Name
             if (mImpl->mVarId)
                 tokType(eVariable);
-            else if (mTokensFrontBack.list.isKeyword(mStr)) {
+            else if (mList.isKeyword(mStr)) {
                 tokType(eKeyword);
                 update_property_isStandardType();
                 if (mTokType != eType) // cannot be a control-flow keyword when it is a type
@@ -1058,7 +1059,7 @@ Token* Token::insertToken(const std::string& tokenStr, const std::string& origin
     if (mStr.empty())
         newToken = this;
     else
-        newToken = new Token(mTokensFrontBack);
+        newToken = new Token(mList, mTokensFrontBack);
     newToken->str(tokenStr);
     if (!originalNameStr.empty())
         newToken->originalName(originalNameStr);
