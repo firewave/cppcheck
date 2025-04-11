@@ -1731,7 +1731,7 @@ std::string Token::astStringZ3() const
     return "(" + str() + " " + astOperand1()->astStringZ3() + " " + astOperand2()->astStringZ3() + ")";
 }
 
-void Token::printValueFlow(bool xml, std::ostream &out) const
+void Token::printValueFlow(const std::vector<std::string>& files, bool xml, std::ostream &out) const
 {
     std::string outs;
 
@@ -1758,7 +1758,7 @@ void Token::printValueFlow(bool xml, std::ostream &out) const
         else {
             if (fileIndex != tok->fileIndex()) {
                 outs += "File ";
-                outs += tok->mTokensFrontBack.list.getFiles()[tok->fileIndex()];
+                outs += files[tok->fileIndex()];
                 outs += '\n';
                 line = 0;
             }
@@ -2712,8 +2712,4 @@ Token* findLambdaEndScope(Token* tok)
 }
 const Token* findLambdaEndScope(const Token* tok) {
     return findLambdaEndScope(const_cast<Token*>(tok));
-}
-
-const std::string& Token::fileName() const {
-    return mTokensFrontBack.list.getFiles()[mImpl->mFileIndex];
 }

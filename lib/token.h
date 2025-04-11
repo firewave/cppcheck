@@ -885,8 +885,6 @@ private:
     static int multiCompare(const Token *tok, const char *haystack, nonneg int varid);
 
 public:
-    const std::string& fileName() const;
-
     nonneg int fileIndex() const {
         return mImpl->mFileIndex;
     }
@@ -1554,7 +1552,7 @@ public:
 
     void printAst(bool verbose, bool xml, const std::vector<std::string> &fileNames, std::ostream &out) const;
 
-    void printValueFlow(bool xml, std::ostream &out) const;
+    void printValueFlow(const std::vector<std::string>& files, bool xml, std::ostream &out) const;
 
     void scopeInfo(std::shared_ptr<ScopeInfo2> newScopeInfo);
     std::shared_ptr<ScopeInfo2> scopeInfo() const;

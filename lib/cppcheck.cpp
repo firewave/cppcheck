@@ -932,7 +932,7 @@ unsigned int CppCheck::checkFile(const FileWithDetails& file, const std::string 
 
                     std::list<ErrorMessage> errors;
                     analyzerInformation->analyzeFile(mSettings.buildDir, file.spath(), cfgname, hash, errors);
-                    analyzerInformation->setFileInfo("CheckUnusedFunctions", mUnusedFunctionsCheck->analyzerInfo());
+                    analyzerInformation->setFileInfo("CheckUnusedFunctions", mUnusedFunctionsCheck->analyzerInfo(tokenizer));
                     analyzerInformation->close();
                 }
             }
@@ -1391,7 +1391,7 @@ void CppCheck::checkNormalTokens(const Tokenizer &tokenizer, AnalyzerInformation
     }
 
     if (mSettings.checks.isEnabled(Checks::unusedFunction) && analyzerInformation) {
-        analyzerInformation->setFileInfo("CheckUnusedFunctions", unusedFunctionsChecker.analyzerInfo());
+        analyzerInformation->setFileInfo("CheckUnusedFunctions", unusedFunctionsChecker.analyzerInfo(tokenizer));
     }
 
 #ifdef HAVE_RULES
