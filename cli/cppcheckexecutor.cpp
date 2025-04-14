@@ -33,6 +33,7 @@
 #include "errortypes.h"
 #include "filesettings.h"
 #include "json.h"
+#include "safeptr.h"
 #include "settings.h"
 #include "singleexecutor.h"
 #include "suppressions.h"
@@ -250,18 +251,15 @@ namespace {
     public:
         explicit StdLogger(const Settings& settings)
             : mSettings(settings)
+            , mErrorOutput(mSettings.outputFile.empty() ? nullptr : new std::ofstream(mSettings.outputFile))
             , mGuidelineMapping(createGuidelineMapping(settings.reportType))
-        {
-            if (!mSettings.outputFile.empty()) {
-                mErrorOutput = new std::ofstream(settings.outputFile);
-            }
-        }
+        {}
 
         ~StdLogger() override {
             if (mSettings.outputFormat == Settings::OutputFormat::sarif) {
                 reportErr(mSarifReport.serialize(mSettings.cppcheckCfgProductName));
             }
-            delete mErrorOutput;
+            delete mErrorOutput.get();
         }
 
         StdLogger(const StdLogger&) = delete;
@@ -323,7 +321,7 @@ namespace {
         /**
          * Error output
          */
-        std::ofstream* mErrorOutput{};
+        safe_ptr<std::ofstream> mErrorOutput;
 
         /**
          * Checkers that has been executed
