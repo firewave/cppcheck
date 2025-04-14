@@ -3689,7 +3689,7 @@ private:
     }
 
     void simplifyString() {
-        TokenList tokenlist{&settings0, Standards::Language::None};
+        TokenList tokenlist{&settings0, Standards::Language::CPP};
         Tokenizer tokenizer(std::move(tokenlist), settings0, *this);
         ASSERT_EQUALS("\"abc\"", tokenizer.simplifyString("\"abc\""));
         ASSERT_EQUALS("\"\n\"", tokenizer.simplifyString("\"\\xa\""));
