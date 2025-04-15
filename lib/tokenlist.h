@@ -26,6 +26,7 @@
 
 #include <cstddef>
 #include <iosfwd>
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -57,11 +58,9 @@ public:
     TokenList(const TokenList &) = delete;
     TokenList &operator=(const TokenList &) = delete;
 
-    TokenList(TokenList&& other)
+    TokenList(TokenList&& other) NOEXCEPT
     {
-        mTokensFrontBack = other.mTokensFrontBack;
-        other.mTokensFrontBack.front = nullptr;
-        other.mTokensFrontBack.back = nullptr;
+        mTokensFrontBack = std::move(other.mTokensFrontBack);
         mFiles = std::move(other.mFiles);
         mOrigFiles = std::move(other.mOrigFiles);
         mSettings = other.mSettings;
@@ -126,20 +125,20 @@ public:
 
     /** get first token of list */
     const Token *front() const {
-        return mTokensFrontBack.front;
+        return mTokensFrontBack->front;
     }
     // NOLINTNEXTLINE(readability-make-member-function-const) - do not allow usage of mutable pointer from const object
     Token *front() {
-        return mTokensFrontBack.front;
+        return mTokensFrontBack->front;
     }
 
     /** get last token of list */
     const Token *back() const {
-        return mTokensFrontBack.back;
+        return mTokensFrontBack->back;
     }
     // NOLINTNEXTLINE(readability-make-member-function-const) - do not allow usage of mutable pointer from const object
     Token *back() {
-        return mTokensFrontBack.back;
+        return mTokensFrontBack->back;
     }
 
     /**
@@ -223,7 +222,7 @@ private:
     bool createTokensInternal(std::istream &code, const std::string& file0);
 
     /** Token list */
-    TokensFrontBack mTokensFrontBack;
+    std::shared_ptr<TokensFrontBack> mTokensFrontBack;
 
     /** filenames for the tokenized source code (source + included) */
     std::vector<std::string> mFiles;
