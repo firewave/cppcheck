@@ -193,7 +193,7 @@ private:
         auto it = files.cbegin();
         ASSERT_EQUALS(dirprefix + "cli/main.cpp", it->path());
         ASSERT_EQUALS(Path::simplifyPath(dirprefix + "cli/main.cpp"), it->spath());
-        ASSERT_EQUALS_ENUM(Standards::Language::None, it->lang());
+        ASSERT_EQUALS_ENUM(Standards::Language::CPP, it->lang());
         it++;
         ASSERT_EQUALS(dirprefix + "lib/token.cpp", it->path());
         ASSERT_EQUALS(Path::simplifyPath(dirprefix + "lib/token.cpp"), it->spath());
