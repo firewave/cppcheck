@@ -48,7 +48,7 @@ public:
     SimpleTokenizer(ErrorLogger& errorlogger, const char (&code)[size], bool cpp = true)
         : Tokenizer{TokenList{&s_settings, cpp ? Standards::Language::CPP : Standards::Language::C}, s_settings, errorlogger}
     {
-        if (!tokenize(code, cpp))
+        if (!tokenize(code))
             throw std::runtime_error("creating tokens failed");
     }
 
@@ -56,16 +56,6 @@ public:
         : Tokenizer{TokenList{&settings, cpp ? Standards::Language::CPP : Standards::Language::C}, settings, errorlogger}
     {}
 
-    /*
-        Token* tokens() {
-        return Tokenizer::tokens();
-        }
-
-        const Token* tokens() const {
-        return Tokenizer::tokens();
-        }
-     */
-
     template<size_t size>
     bool tokenize(const char (&code)[size],
                   const std::string& filename,
@@ -76,12 +66,10 @@ public:
     }
 
     template<size_t size>
-    bool tokenize(const char (&code)[size],
-                  bool cpp = true,
-                  const std::string &configuration = "")
+    bool tokenize(const char (&code)[size])
     {
         std::istringstream istr(code);
-        return tokenize(istr, std::string(cpp ? "test.cpp" : "test.c"), configuration);
+        return tokenize(istr, std::string(list.isCPP() ? "test.cpp" : "test.c"), "");
     }
 
     bool tokenize(const std::string& code,
@@ -92,12 +80,10 @@ public:
         return tokenize(istr, filename, configuration);
     }
 
-    bool tokenize(const std::string& code,
-                  bool cpp = true,
-                  const std::string &configuration = "")
+    bool tokenize(const std::string& code)
     {
         std::istringstream istr(code);
-        return tokenize(istr, std::string(cpp ? "test.cpp" : "test.c"), configuration);
+        return tokenize(istr, std::string(list.isCPP() ? "test.cpp" : "test.c"), "");
     }
 
 private:
