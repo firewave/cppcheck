@@ -60,6 +60,7 @@ public:
     bool tokenize(const char (&code)[size],
                   const std::string& filename)
     {
+        list.setLang(Path::identify(filename, false), true);
         std::istringstream istr(code);
         return tokenize(istr, filename);
     }
@@ -74,6 +75,7 @@ public:
     bool tokenize(const std::string& code,
                   const std::string& filename)
     {
+        list.setLang(Path::identify(filename, false), true);
         std::istringstream istr(code);
         return tokenize(istr, filename);
     }
