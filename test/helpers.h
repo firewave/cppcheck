@@ -52,13 +52,11 @@ public:
         : Tokenizer{TokenList{&settings, cpp ? Standards::Language::CPP : Standards::Language::C}, settings, errorlogger}
     {}
 
-    template<size_t size>
-    bool tokenize(const char (&code)[size],
-                  const std::string& filename)
+    SimpleTokenizer(const Settings& settings, ErrorLogger& errorlogger, const std::string& filename)
+        : Tokenizer{settings, errorlogger}
     {
-        list.setLang(Path::identify(filename, false), true);
-        std::istringstream istr(code);
-        return tokenize(istr, filename);
+        list.setLang(Path::identify(filename, false));
+        list.appendFileIfNew(filename);
     }
 
     template<size_t size>
@@ -66,14 +64,6 @@ public:
     {
         std::istringstream istr(code);
         return tokenize(istr, std::string(list.isCPP() ? "test.cpp" : "test.c"));
-    }
-
-    bool tokenize(const std::string& code,
-                  const std::string& filename)
-    {
-        list.setLang(Path::identify(filename, false), true);
-        std::istringstream istr(code);
-        return tokenize(istr, filename);
     }
 
     bool tokenize(const std::string& code)
