@@ -44,13 +44,9 @@ namespace tinyxml2 {
 // TODO: make Tokenizer private
 class SimpleTokenizer : public Tokenizer {
 public:
-    template<size_t size>
-    SimpleTokenizer(ErrorLogger& errorlogger, const char (&code)[size], bool cpp = true)
+    explicit SimpleTokenizer(ErrorLogger& errorlogger, bool cpp = true)
         : Tokenizer{TokenList{&s_settings, cpp ? Standards::Language::CPP : Standards::Language::C}, s_settings, errorlogger}
-    {
-        if (!tokenize(code))
-            throw std::runtime_error("creating tokens failed");
-    }
+    {}
 
     SimpleTokenizer(const Settings& settings, ErrorLogger& errorlogger, bool cpp = true)
         : Tokenizer{TokenList{&settings, cpp ? Standards::Language::CPP : Standards::Language::C}, settings, errorlogger}
