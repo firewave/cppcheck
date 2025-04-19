@@ -99,15 +99,15 @@ void ThreadResult::setProject(const ImportProject &prj)
 {
     std::lock_guard<std::mutex> locker(mutex);
     mFiles.clear();
-    mFileSettings = prj.fileSettings;
+    mFileSettings = prj.getFileSettings();
     mItNextFileSettings = mFileSettings.cbegin();
     mProgress = 0;
     mFilesChecked = 0;
-    mTotalFiles = prj.fileSettings.size();
+    mTotalFiles = prj.getFileSettings().size();
 
     // Determine the total size of all of the files to check, so that we can
     // show an accurate progress estimate
-    mMaxProgress = std::accumulate(prj.fileSettings.begin(), prj.fileSettings.end(), quint64{ 0 }, [](quint64 v, const FileSettings& fs) {
+    mMaxProgress = std::accumulate(prj.getFileSettings().begin(), prj.getFileSettings().end(), quint64{ 0 }, [](quint64 v, const FileSettings& fs) {
         return v + QFile(QString::fromStdString(fs.filename())).size();
     });
 }

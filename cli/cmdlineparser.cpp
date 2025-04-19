@@ -1615,7 +1615,7 @@ CmdLineParser::Result CmdLineParser::parseFromArgs(int argc, const char* const a
     }
 
     // Print error only if we have "real" command and expect files
-    if (mPathNames.empty() && project.guiProject.pathNames.empty() && project.fileSettings.empty()) {
+    if (mPathNames.empty() && project.guiProject.pathNames.empty() && project.getFileSettings().empty()) {
         // TODO: this message differs from the one reported in fillSettingsFromArgs()
         mLogger.printError("no C or C++ source files found.");
         return Result::Fail;
@@ -1640,14 +1640,14 @@ CmdLineParser::Result CmdLineParser::parseFromArgs(int argc, const char* const a
     if (!project.guiProject.pathNames.empty())
         mPathNames = project.guiProject.pathNames;
 
-    if (!project.fileSettings.empty()) {
+    if (!project.getFileSettings().empty()) {
         project.ignorePaths(mIgnoredPaths, mSettings.debugignore);
-        if (project.fileSettings.empty()) {
+        if (project.getFileSettings().empty()) {
             mLogger.printError("no C or C++ source files found.");
             mLogger.printMessage("all paths were ignored"); // TODO: log this differently?
             return Result::Fail;
         }
-        mFileSettings = project.fileSettings;
+        mFileSettings = project.getFileSettings();
     }
 
     if (mSettings.debugnormal && mSettings.outputFormat == Settings::OutputFormat::xml && (mPathNames.size() > 1 || mFileSettings.size() > 1))

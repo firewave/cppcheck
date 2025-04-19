@@ -44,7 +44,7 @@
 // TODO: align the exclusion logic with PathMatch
 void ImportProject::ignorePaths(const std::vector<std::string> &ipaths, bool debug)
 {
-    for (auto it = fileSettings.cbegin(); it != fileSettings.cend();) {
+    for (auto it = mFileSettings.cbegin(); it != mFileSettings.cend();) {
         bool ignore = false;
         for (std::string i : ipaths) {
             if (it->filename().size() > i.size() && it->filename().compare(0,i.size(),i)==0) {
@@ -66,7 +66,7 @@ void ImportProject::ignorePaths(const std::vector<std::string> &ipaths, bool deb
         if (ignore) {
             if (debug)
                 std::cout << "ignored path: " << it->filename() << std::endl;
-            it = fileSettings.erase(it);
+            it = mFileSettings.erase(it);
         }
         else
             ++it;
@@ -75,9 +75,9 @@ void ImportProject::ignorePaths(const std::vector<std::string> &ipaths, bool deb
 
 void ImportProject::ignoreOtherConfigs(const std::string &cfg)
 {
-    for (auto it = fileSettings.cbegin(); it != fileSettings.cend();) {
+    for (auto it = mFileSettings.cbegin(); it != mFileSettings.cend();) {
         if (it->cfg != cfg)
-            it = fileSettings.erase(it);
+            it = mFileSettings.erase(it);
         else
             ++it;
     }
@@ -423,7 +423,7 @@ bool ImportProject::importCompileCommands(std::istream &istr)
         fsParseCommand(fs, command); // read settings; -D, -I, -U, -std, -m*, -f*
         std::map<std::string, std::string, cppcheck::stricmp> variables;
         fsSetIncludePaths(fs, directory, fs.includePaths, variables);
-        fileSettings.push_back(std::move(fs));
+        mFileSettings.push_back(std::move(fs));
     }
 
     return true;
@@ -867,7 +867,7 @@ bool ImportProject::importVcxproj(const std::string &filename, std::map<std::str
             for (const auto &path : sharedItemsIncludePaths) {
                 fs.includePaths.emplace_back(path);
             }
-            fileSettings.push_back(std::move(fs));
+            mFileSettings.push_back(std::move(fs));
         }
     }
 
@@ -1197,7 +1197,7 @@ bool ImportProject::importBcb6Prj(const std::string &projectFilename)
         FileSettings fs{Path::simplifyPath(Path::isAbsolute(c) ? c : projectDir + c)};
         fsSetIncludePaths(fs, projectDir, toStringList(includePath), variables);
         fsSetDefines(fs, cppMode ? cppDefines : defines);
-        fileSettings.push_back(std::move(fs));
+        mFileSettings.push_back(std::move(fs));
     }
 
     return true;
@@ -1422,7 +1422,7 @@ bool ImportProject::importCppcheckGuiProject(std::istream &istr, Settings &setti
 void ImportProject::selectOneVsConfig(Platform::Type platform)
 {
     std::set<std::string> filenames;
-    for (auto it = fileSettings.cbegin(); it != fileSettings.cend();) {
+    for (auto it = mFileSettings.cbegin(); it != mFileSettings.cend();) {
         if (it->cfg.empty()) {
             ++it;
             continue;
@@ -1438,7 +1438,7 @@ void ImportProject::selectOneVsConfig(Platform::Type platform)
         else if (filenames.find(fs.filename()) != filenames.end())
             remove = true;
         if (remove) {
-            it = fileSettings.erase(it);
+            it = mFileSettings.erase(it);
         } else {
             filenames.insert(fs.filename());
             ++it;
@@ -1449,7 +1449,7 @@ void ImportProject::selectOneVsConfig(Platform::Type platform)
 // cppcheck-suppress unusedFunction - used by GUI only
 void ImportProject::selectVsConfigurations(Platform::Type platform, const std::vector<std::string> &configurations)
 {
-    for (auto it = fileSettings.cbegin(); it != fileSettings.cend();) {
+    for (auto it = mFileSettings.cbegin(); it != mFileSettings.cend();) {
         if (it->cfg.empty()) {
             ++it;
             continue;
@@ -1464,7 +1464,7 @@ void ImportProject::selectVsConfigurations(Platform::Type platform, const std::v
         else if ((platform == Platform::Type::Win32A || platform == Platform::Type::Win32W) && fs.platformType == Platform::Type::Win64)
             remove = true;
         if (remove) {
-            it = fileSettings.erase(it);
+            it = mFileSettings.erase(it);
         } else {
             ++it;
         }
@@ -1482,7 +1482,7 @@ void ImportProject::setRelativePaths(const std::string &filename)
     if (Path::isAbsolute(filename))
         return;
     const std::vector<std::string> basePaths{Path::fromNativeSeparators(Path::getCurrentPath())};
-    for (auto &fs: fileSettings) {
+    for (auto &fs: mFileSettings) {
         fs.file = FileWithDetails{Path::getRelativePath(fs.filename(), basePaths)};
         for (auto &includePath: fs.includePaths)
             includePath = Path::getRelativePath(includePath, basePaths);

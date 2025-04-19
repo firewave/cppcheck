@@ -69,7 +69,9 @@ public:
     static void fsSetDefines(FileSettings& fs, std::string defs);
     static void fsSetIncludePaths(FileSettings& fs, const std::string &basepath, const std::list<std::string> &in, std::map<std::string, std::string, cppcheck::stricmp> &variables);
 
-    std::list<FileSettings> fileSettings;
+    const std::list<FileSettings>& getFileSettings() const {
+        return mFileSettings;
+    }
 
     ImportProject() = default;
     virtual ~ImportProject() = default;
@@ -117,6 +119,8 @@ private:
     static void printError(const std::string &message);
 
     void setRelativePaths(const std::string &filename);
+
+    std::list<FileSettings> mFileSettings;
 
     std::string mPath;
     std::set<std::string> mAllVSConfigs;
