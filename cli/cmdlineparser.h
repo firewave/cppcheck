@@ -46,6 +46,7 @@ class Library;
  * class internal options.
  */
 class CmdLineParser {
+    friend class TestCmdlineParser;
 public:
     /**
      * The constructor.
@@ -67,12 +68,6 @@ public:
      * @return false when errors are found in the input
      */
     bool fillSettingsFromArgs(int argc, const char* const argv[]);
-
-    /**
-     * Parse given command line.
-     * @return true if command line was ok, false if there was an error.
-     */
-    Result parseFromArgs(int argc, const char* const argv[]);
 
     /**
      * Return the path names user gave to command line.
@@ -115,6 +110,12 @@ protected:
     void printHelp() const;
 
 private:
+    /**
+     * Parse given command line.
+     * @return true if command line was ok, false if there was an error.
+     */
+    Result parseFromArgs(int argc, const char* const argv[]);
+
     bool isCppcheckPremium() const;
 
     template<typename T>
