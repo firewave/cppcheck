@@ -1,12 +1,12 @@
 import subprocess
 import pathlib
 
-cmd = './testrunner TestUnusedVar'
+cmd = './testrunner TestMemleakInClass TestMemleakInFunction TestMemleakStructMember TestMemleakNoVar'
 
 with subprocess.Popen(cmd.split(), stderr=subprocess.PIPE, universal_newlines=True) as p:
     out = p.stderr.read().strip()
 
-file = '/home/user/CLionProjects/cppcheck/test/testunusedvar.cpp'
+file = '/home/user/CLionProjects/cppcheck/test/testmemleak.cpp'
 
 text = pathlib.Path(file).read_text()
 
