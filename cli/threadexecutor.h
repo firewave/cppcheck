@@ -19,7 +19,6 @@
 #ifndef THREADEXECUTOR_H
 #define THREADEXECUTOR_H
 
-#include "cppcheck.h"
 #include "executor.h"
 
 #include <list>
@@ -29,6 +28,7 @@ class ErrorLogger;
 struct Suppressions;
 struct FileSettings;
 class FileWithDetails;
+class CppCheck;
 
 /// @addtogroup CLI
 /// @{
@@ -41,13 +41,11 @@ class ThreadExecutor : public Executor {
     friend class SyncLogForwarder;
 
 public:
-    ThreadExecutor(CppCheck &cppcheck, const std::list<FileWithDetails> &files, const std::list<FileSettings>& fileSettings, const Settings &settings, Suppressions &suppressions, ErrorLogger &errorLogger, CppCheck::ExecuteCmdFn executeCommand);
+    ThreadExecutor(CppCheck &cppcheck, const std::list<FileWithDetails> &files, const std::list<FileSettings>& fileSettings, const Settings &settings, Suppressions &suppressions, ErrorLogger &errorLogger);
     ThreadExecutor(const ThreadExecutor &) = delete;
     ThreadExecutor& operator=(const ThreadExecutor &) = delete;
 
     unsigned int check() override;
-
-    CppCheck::ExecuteCmdFn mExecuteCommand;
 };
 
 /// @}

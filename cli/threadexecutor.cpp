@@ -38,9 +38,8 @@
 #include <utility>
 #include <vector>
 
-ThreadExecutor::ThreadExecutor(CppCheck &cppcheck, const std::list<FileWithDetails> &files, const std::list<FileSettings>& fileSettings, const Settings &settings, Suppressions &suppressions, ErrorLogger &errorLogger, CppCheck::ExecuteCmdFn executeCommand)
+ThreadExecutor::ThreadExecutor(CppCheck &cppcheck, const std::list<FileWithDetails> &files, const std::list<FileSettings>& fileSettings, const Settings &settings, Suppressions &suppressions, ErrorLogger &errorLogger)
     : Executor(cppcheck, files, fileSettings, settings, suppressions, errorLogger)
-    , mExecuteCommand(std::move(executeCommand))
 {
     assert(mSettings.jobs > 1);
 }
@@ -196,7 +195,7 @@ unsigned int ThreadExecutor::check()
     std::vector<std::future<unsigned int>> threadFutures;
     threadFutures.reserve(mSettings.jobs);
 
-    ThreadData data(*this, mErrorLogger, mSettings, mSuppressions, mFiles, mFileSettings, mExecuteCommand);
+    ThreadData data(*this, mErrorLogger, mSettings, mSuppressions, mFiles, mFileSettings, {}/*mExecuteCommand*/);
 
     for (unsigned int i = 0; i < mSettings.jobs; ++i) {
         try {

@@ -16,6 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "cppcheck.h"
 #include "filesettings.h"
 #include "fixture.h"
 #include "helpers.h"
@@ -121,7 +122,7 @@ private:
             filelist.clear();
 
         CppCheck cppcheck(settings, supprs, *this, false, executeFn);
-        ThreadExecutor executor(cppcheck, filelist, fileSettings, s, supprs, *this, executeFn);
+        ThreadExecutor executor(cppcheck, filelist, fileSettings, s, supprs, *this);
         ASSERT_EQUALS(result, executor.check());
         ASSERT_EQUALS(opt.executeCommandCalled, executeCommandCalled);
         ASSERT_EQUALS(opt.exe, exe);

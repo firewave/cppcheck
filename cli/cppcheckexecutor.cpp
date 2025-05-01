@@ -456,13 +456,13 @@ int CppCheckExecutor::check_internal(const Settings& settings, Suppressions& sup
     } else {
 #if defined(HAS_THREADING_MODEL_THREAD)
         if (settings.executor == Settings::ExecutorType::Thread) {
-            ThreadExecutor executor(cppcheck, mFiles, mFileSettings, settings, supprs, stdLogger, CppCheckExecutor::executeCommand);
+            ThreadExecutor executor(cppcheck, mFiles, mFileSettings, settings, supprs, stdLogger);
             returnValue = executor.check();
         }
 #endif
 #if defined(HAS_THREADING_MODEL_FORK)
         if (settings.executor == Settings::ExecutorType::Process) {
-            ProcessExecutor executor(cppcheck, mFiles, mFileSettings, settings, supprs, stdLogger, CppCheckExecutor::executeCommand);
+            ProcessExecutor executor(cppcheck, mFiles, mFileSettings, settings, supprs, stdLogger);
             returnValue = executor.check();
         }
 #endif

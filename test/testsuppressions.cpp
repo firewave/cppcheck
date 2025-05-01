@@ -320,7 +320,7 @@ private:
             filelist.clear();
 
         CppCheck cppcheck(settings, supprs, *this, false, {});
-        ThreadExecutor executor(cppcheck, filelist, fileSettings, settings, supprs, *this, {});
+        ThreadExecutor executor(cppcheck, filelist, fileSettings, settings, supprs, *this);
         const unsigned int exitCode = executor.check();
 
         CppCheckExecutor::reportSuppressions(settings, supprs.nomsg, false, filelist, fileSettings, *this); // TODO: check result
@@ -368,7 +368,7 @@ private:
             filelist.clear();
 
         CppCheck cppcheck(settings, supprs, *this, false, {});
-        ProcessExecutor executor(cppcheck, filelist, fileSettings, settings, supprs, *this, {});
+        ProcessExecutor executor(cppcheck, filelist, fileSettings, settings, supprs, *this);
         const unsigned int exitCode = executor.check();
 
         CppCheckExecutor::reportSuppressions(settings, supprs.nomsg, false, filelist, fileSettings, *this); // TODO: check result

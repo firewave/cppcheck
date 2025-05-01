@@ -19,7 +19,6 @@
 #ifndef PROCESSEXECUTOR_H
 #define PROCESSEXECUTOR_H
 
-#include "cppcheck.h"
 #include "executor.h"
 
 #include <cstddef>
@@ -31,6 +30,7 @@ class ErrorLogger;
 struct Suppressions;
 struct FileSettings;
 class FileWithDetails;
+class CppCheck;
 
 /// @addtogroup CLI
 /// @{
@@ -41,7 +41,7 @@ class FileWithDetails;
  */
 class ProcessExecutor : public Executor {
 public:
-    ProcessExecutor(CppCheck &cppcheck, const std::list<FileWithDetails> &files, const std::list<FileSettings>& fileSettings, const Settings &settings, Suppressions &suppressions, ErrorLogger &errorLogger, CppCheck::ExecuteCmdFn executeCommand);
+    ProcessExecutor(CppCheck &cppcheck, const std::list<FileWithDetails> &files, const std::list<FileSettings>& fileSettings, const Settings &settings, Suppressions &suppressions, ErrorLogger &errorLogger);
     ProcessExecutor(const ProcessExecutor &) = delete;
     ProcessExecutor& operator=(const ProcessExecutor &) = delete;
 
@@ -66,8 +66,6 @@ private:
      * @param msg The error message
      */
     void reportInternalChildErr(const std::string &childname, const std::string &msg);
-
-    CppCheck::ExecuteCmdFn mExecuteCommand;
 };
 
 /// @}

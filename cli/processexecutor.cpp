@@ -68,9 +68,8 @@ enum class Color : std::uint8_t;
 using std::memset;
 
 
-ProcessExecutor::ProcessExecutor(CppCheck &cppcheck, const std::list<FileWithDetails> &files, const std::list<FileSettings>& fileSettings, const Settings &settings, Suppressions &suppressions, ErrorLogger &errorLogger, CppCheck::ExecuteCmdFn executeCommand)
+ProcessExecutor::ProcessExecutor(CppCheck &cppcheck, const std::list<FileWithDetails> &files, const std::list<FileSettings>& fileSettings, const Settings &settings, Suppressions &suppressions, ErrorLogger &errorLogger)
     : Executor(cppcheck, files, fileSettings, settings, suppressions, errorLogger)
-    , mExecuteCommand(std::move(executeCommand))
 {
     assert(mSettings.jobs > 1);
 }
@@ -331,7 +330,7 @@ unsigned int ProcessExecutor::check()
                 close(pipes[0]);
 
                 PipeWriter pipewriter(pipes[1]);
-                CppCheck fileChecker(mSettings, mSuppressions, pipewriter, false, mExecuteCommand);
+                CppCheck fileChecker(mSettings, mSuppressions, pipewriter, false, {}/*mExecuteCommand*/);
                 unsigned int resultOfCheck = 0;
 
                 if (iFileSettings != mFileSettings.end()) {
