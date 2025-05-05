@@ -496,6 +496,7 @@ private:
         ASSERT_LOC(tokenizer.simplifyTokens1(""), file, line);
     }
 
+    // TODO: use options
 #define tokenValues(...) tokenValues_(__FILE__, __LINE__, __VA_ARGS__)
     std::list<ValueFlow::Value> tokenValues_(const char* file, int line, const char code[], const char tokstr[], const Settings *s = nullptr, bool cpp = true) {
         SimpleTokenizer tokenizer(s ? *s : settings, *this, cpp);
@@ -531,12 +532,14 @@ private:
         return result;
     }
 
+    // TODO: use options
 #define valueOfTok(...) valueOfTok_(__FILE__, __LINE__, __VA_ARGS__)
     ValueFlow::Value valueOfTok_(const char* file, int line, const char code[], const char tokstr[], const Settings *s = nullptr, bool cpp = true) {
         std::list<ValueFlow::Value> values = removeImpossible(tokenValues_(file, line, code, tokstr, s, cpp));
         return values.size() == 1U && !values.front().isTokValue() ? values.front() : ValueFlow::Value();
     }
 
+    // TODO: use options
 #define testKnownValueOfTok(...) testKnownValueOfTok_(__FILE__, __LINE__, __VA_ARGS__)
     bool testKnownValueOfTok_(const char* file,
                               int line,

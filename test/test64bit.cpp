@@ -42,11 +42,17 @@ private:
         TEST_CASE(assignment);
     }
 
+    struct CheckOptions
+    {
+          CheckOptions() = default;
+          bool cpp = true;
+    };
+
 #define check(...) check_(__FILE__, __LINE__, __VA_ARGS__)
     template<size_t size>
-    void check_(const char* file, int line, const char (&code)[size], bool cpp = true) {
+    void check_(const char* file, int line, const char (&code)[size], const CheckOptions& options = make_default_obj()) {
         // Tokenize..
-        SimpleTokenizer tokenizer(settings, *this, cpp);
+        SimpleTokenizer tokenizer(settings, *this, options.cpp);
         ASSERT_LOC(tokenizer.tokenize(code), file, line);
 
         // Check char variable usage..
@@ -161,7 +167,7 @@ private:
         check("int f(int* p) {\n"
               "    int n = (int)(size_t)*p;\n"
               "    return n;\n"
-              "}\n", false);
+              "}\n", dinit(CheckOptions, $.cpp = false));
         ASSERT_EQUALS("", errout_str());
     }
 
