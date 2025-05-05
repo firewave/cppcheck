@@ -234,17 +234,6 @@ private:
         runChecks<CheckLeakAutoVar>(tokenizer, this);
     }
 
-    // TODO: get rid of this
-    template<size_t size>
-    void check_(const char* file, int line, const char (&code)[size], const Settings & s) {
-        // Tokenize..
-        SimpleTokenizer tokenizer(s, *this);
-        ASSERT_LOC(tokenizer.tokenize(code), file, line);
-
-        // Check for leaks..
-        runChecks<CheckLeakAutoVar>(tokenizer, this);
-    }
-
     void assign1() {
         check("void f() {\n"
               "    char *p = malloc(10);\n"
@@ -2318,7 +2307,7 @@ private:
         check("FILE* f() {\n"
               "    char* temp = strdup(\"temp.txt\");\n"
               "    return fopen(temp, \"rt\");\n"
-              "}\n", s);
+              "}\n", dinit(CheckOptions, $.cpp = true, $.s = &s));
         TODO_ASSERT_EQUALS("[test.cpp:3]: (error) Memory leak: temp\n", "", errout_str());
     }
 
