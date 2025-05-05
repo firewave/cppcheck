@@ -232,19 +232,6 @@ private:
         runChecks<CheckLeakAutoVar>(tokenizer, this);
     }
 
-    // TODO: get rid of this
-    template<size_t size>
-    void check_(const char* file, int line, const char (&code)[size], const Settings & s) {
-        const Settings settings0 = settingsBuilder(s).checkLibrary().build();
-
-        // Tokenize..
-        SimpleTokenizer tokenizer(settings0, *this);
-        ASSERT_LOC(tokenizer.tokenize(code), file, line);
-
-        // Check for leaks..
-        runChecks<CheckLeakAutoVar>(tokenizer, this);
-    }
-
     void assign1() {
         check("void f() {\n"
               "    char *p = malloc(10);\n"
@@ -2263,7 +2250,7 @@ private:
               "    FILE* fp;\n"
               "    if (NULL == x || NULL == (fp = fopen(temp, \"rt\")))\n"
               "        return;\n"
-              "}\n", s);
+              "}\n", dinit(CheckOptions, $.cpp = true, $.s = &s));
         ASSERT_EQUALS("[test.cpp:5]: (error) Memory leak: temp\n"
                       "[test.cpp:6]: (error) Memory leak: temp\n"
                       "[test.cpp:6]: (error) Resource leak: fp\n",
@@ -2273,7 +2260,7 @@ private:
               "    char* temp = strdup(\"temp.txt\");\n"
               "    FILE* fp = fopen(temp, \"rt\");\n"
               "    return fp;\n"
-              "}\n", s);
+              "}\n", dinit(CheckOptions, $.cpp = true, $.s = &s));
         ASSERT_EQUALS("[test.cpp:4]: (error) Memory leak: temp\n", errout_str());
 
         check("FILE* f() {\n"
@@ -2281,7 +2268,7 @@ private:
               "    FILE* fp = NULL;\n"
               "    fopen_s(&fp, temp, \"rt\");\n"
               "    return fp;\n"
-              "}\n", s);
+              "}\n", dinit(CheckOptions, $.cpp = true, $.s = &s));
         ASSERT_EQUALS("[test.cpp:5]: (error) Memory leak: temp\n", errout_str());
 
         check("void f() {\n"
@@ -2289,7 +2276,7 @@ private:
               "    FILE* fp = fopen(\"a.txt\", \"rb\");\n"
               "    if (fp)\n"
               "        freopen(temp, \"rt\", fp);\n"
-              "}\n", s);
+              "}\n", dinit(CheckOptions, $.cpp = true, $.s = &s));
         ASSERT_EQUALS("[test.cpp:6]: (error) Memory leak: temp\n"
                       "[test.cpp:6]: (error) Resource leak: fp\n",
                       errout_str());
@@ -2297,7 +2284,7 @@ private:
         check("FILE* f() {\n"
               "    char* temp = strdup(\"temp.txt\");\n"
               "    return fopen(temp, \"rt\");\n"
-              "}\n", s);
+              "}\n", dinit(CheckOptions, $.cpp = true, $.s = &s));
         TODO_ASSERT_EQUALS("[test.cpp:3]: (error) Memory leak: temp\n", "", errout_str());
     }
 
@@ -3131,7 +3118,7 @@ private:
               "{\n"
               "    char * buf = malloc(4);\n"
               "    free_func((void *)(1), buf);\n"
-              "}", settingsFunctionCall);
+              "}", dinit(CheckOptions, $.cpp = true, $.s = &settingsFunctionCall));
         ASSERT_EQUALS("[test.cpp:5]: (information) --check-library: Function free_func() should have <use>/<leak-ignore> configuration\n", errout_str());
 
         check("void g(void*);\n"
@@ -3162,7 +3149,7 @@ private:
         check("void f() {\n"
               "    double* a = new double[1024];\n"
               "    SomeClass::someMethod(a);\n"
-              "}\n", settingsLeakIgnore);
+              "}\n", dinit(CheckOptions, $.cpp = true, $.s = &settingsLeakIgnore));
         ASSERT_EQUALS("[test.cpp:4]: (error) Memory leak: a\n", errout_str());
 
         check("void bar(int* p) {\n"
@@ -3193,8 +3180,8 @@ private:
     const Settings settings = settingsBuilder().library("std.cfg").checkLibrary().build();
 
 #define checkP(...) checkP_(__FILE__, __LINE__, __VA_ARGS__)
-    void checkP_(const char* file, int line, const char code[], bool cpp = false) {
-        SimpleTokenizer2 tokenizer(settings, *this, code, cpp?"test.cpp":"test.c");
+    void checkP_(const char* file, int line, const char code[]) {
+        SimpleTokenizer2 tokenizer(settings, *this, code, "test.c");
 
         // Tokenizer..
         ASSERT_LOC(tokenizer.simplifyTokens1(""), file, line);
