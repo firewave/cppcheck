@@ -233,6 +233,7 @@ private:
         runChecks<CheckLeakAutoVar>(tokenizer, this);
     }
 
+    // TODO: get rid of this
     template<size_t size>
     void check_(const char* file, int line, const char (&code)[size], const Settings & s) {
         const Settings settings0 = settingsBuilder(s).checkLibrary().build();

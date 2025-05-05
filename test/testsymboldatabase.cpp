@@ -2639,6 +2639,7 @@ private:
         ASSERT_EQUALS("char", arg1->typeEndToken()->str());
     }
 
+// TODO: use options struct
 #define check(...) check_(__FILE__, __LINE__, __VA_ARGS__)
     template<size_t size>
     void check_(const char* file, int line, const char (&code)[size], bool debug = true, bool cpp = true, const Settings* pSettings = nullptr) {
