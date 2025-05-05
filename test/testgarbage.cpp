@@ -275,17 +275,23 @@ private:
         TEST_CASE(nonGarbageCode1); // #8346
     }
 
+    struct CheckCodeInternalOptions
+    {
+        CheckCodeInternalOptions() = default;
+        bool cpp = true;
+    };
+
 #define checkCodeInternal(...) checkCodeInternal_(__FILE__, __LINE__, __VA_ARGS__)
     template<size_t size>
-    std::string checkCode(const char (&code)[size], bool cpp = true) {
+    std::string checkCode(const char (&code)[size], const CheckCodeInternalOptions& options = make_default_obj()) {
         // double the tests - run each example as C as well as C++
 
         // run alternate check first. It should only ensure stability - so we catch exceptions here.
         try {
-            (void)checkCodeInternal(code, !cpp);
+            (void)checkCodeInternal(code, !options.cpp);
         } catch (const InternalError&) {}
 
-        return checkCodeInternal(code, cpp);
+        return checkCodeInternal(code, options.cpp);
     }
 
     template<size_t size>
@@ -1427,12 +1433,12 @@ private:
 
     void garbageCode162() {
         //7208
-        ASSERT_THROW_INTERNAL(checkCode("return <<  >>  x return <<  >>  x ", false), UNKNOWN_MACRO);
+        ASSERT_THROW_INTERNAL(checkCode("return <<  >>  x return <<  >>  x ", dinit(CheckCodeInternalOptions, $.cpp = false)), UNKNOWN_MACRO);
     }
 
     void garbageCode163() {
         //7228
-        ASSERT_THROW_INTERNAL(checkCode("typedef s f[](){typedef d h(;f)}", false), SYNTAX);
+        ASSERT_THROW_INTERNAL(checkCode("typedef s f[](){typedef d h(;f)}", dinit(CheckCodeInternalOptions, $.cpp = false)), SYNTAX);
     }
 
     void garbageCode164() {
@@ -1442,7 +1448,7 @@ private:
 
     void garbageCode165() {
         //7235
-        ASSERT_THROW_INTERNAL(checkCode("for(;..)", false),SYNTAX);
+        ASSERT_THROW_INTERNAL(checkCode("for(;..)", dinit(CheckCodeInternalOptions, $.cpp = false)),SYNTAX);
     }
 
     void garbageCode167() {
@@ -1452,24 +1458,24 @@ private:
 
     void garbageCode168() {
         // #7246 (segmentation fault)
-        (void)checkCode("long foo(void) { return *bar; }", false);
+        (void)checkCode("long foo(void) { return *bar; }", dinit(CheckCodeInternalOptions, $.cpp = false));
         ignore_errout(); // we do not care about the output
     }
 
     void garbageCode169() {
         // 6713
         ASSERT_THROW_INTERNAL(checkCode("( ) { ( ) ; { return } switch ( ) i\n"
-                                        "set case break ; default: ( ) }", false), SYNTAX);
+                                        "set case break ; default: ( ) }", dinit(CheckCodeInternalOptions, $.cpp = false)), SYNTAX);
     }
 
     void garbageCode170() {
         // 7255
-        ASSERT_THROW_INTERNAL(checkCode("d i(){{f*s=typeid(()0,)}}", false), SYNTAX);
+        ASSERT_THROW_INTERNAL(checkCode("d i(){{f*s=typeid(()0,)}}", dinit(CheckCodeInternalOptions, $.cpp = false)), SYNTAX);
     }
 
     void garbageCode171() {
         // 7270
-        ASSERT_THROW_INTERNAL(checkCode("(){case()?():}:", false), SYNTAX);
+        ASSERT_THROW_INTERNAL(checkCode("(){case()?():}:", dinit(CheckCodeInternalOptions, $.cpp = false)), SYNTAX);
     }
 
     void garbageCode172() {
@@ -1792,14 +1798,14 @@ private:
         ASSERT_THROW_INTERNAL(checkCode("f::y:y : <x::"), SYNTAX); // #6613
         ASSERT_THROW_INTERNAL(checkCode("a \"b\" not_eq \"c\""), SYNTAX); // #6720
         ASSERT_THROW_INTERNAL(checkCode("(int arg2) { } { } typedef void (func_type) (int, int); typedef func_type&"), SYNTAX); // #6738
-        ASSERT_THROW_INTERNAL(checkCode("&g[0]; { (g[0] 0) } =", false), SYNTAX); // #6744
-        ASSERT_THROW_INTERNAL(checkCode("{ { void foo() { struct }; { }; } }; struct S { } f =", false), SYNTAX); // #6753
+        ASSERT_THROW_INTERNAL(checkCode("&g[0]; { (g[0] 0) } =", dinit(CheckCodeInternalOptions, $.cpp = false)), SYNTAX); // #6744
+        ASSERT_THROW_INTERNAL(checkCode("{ { void foo() { struct }; { }; } }; struct S { } f =", dinit(CheckCodeInternalOptions, $.cpp = false)), SYNTAX); // #6753
         ASSERT_THROW_INTERNAL(checkCode("{ { ( ) } P ( ) ^ { } { } { } ( ) } 0"), SYNTAX); // #6772
         ASSERT_THROW_INTERNAL(checkCode("+---+"), SYNTAX); // #6948
         ASSERT_THROW_INTERNAL(checkCode("template<>\n"), SYNTAX);
         ASSERT_THROW_INTERNAL(checkCode("++4++ +  + E++++++++++ + ch " "tp.oed5[.]"), SYNTAX); // #7074
-        ASSERT_THROW_INTERNAL(checkCode("d a(){f s=0()8[]s?():0}*()?:0", false), SYNTAX); // #7236
-        ASSERT_THROW_INTERNAL(checkCode("!2 : #h2 ?:", false), SYNTAX); // #7769
+        ASSERT_THROW_INTERNAL(checkCode("d a(){f s=0()8[]s?():0}*()?:0", dinit(CheckCodeInternalOptions, $.cpp = false)), SYNTAX); // #7236
+        ASSERT_THROW_INTERNAL(checkCode("!2 : #h2 ?:", dinit(CheckCodeInternalOptions, $.cpp = false)), SYNTAX); // #7769
         ASSERT_THROW_INTERNAL(checkCode("--"), SYNTAX);
         ASSERT_THROW_INTERNAL(checkCode("volatile true , test < test < #ifdef __ppc__ true ,"), SYNTAX); // #4169
         ASSERT_THROW_INTERNAL(checkCode("a,b--\n"), SYNTAX); // #2847

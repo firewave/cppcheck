@@ -3600,8 +3600,7 @@ private:
                         "        if (y != 0) return;\n"
                         "        i++;\n"
                         "    }\n"
-                        "}",
-                        true);
+                        "}");
         ASSERT_EQUALS("", errout_str());
 
         valueFlowUninit("void f() {\n"
@@ -3611,8 +3610,7 @@ private:
                         "        if (y != 0) return;\n"
                         "        i++;\n"
                         "    }\n"
-                        "}",
-                        true);
+                        "}");
         ASSERT_EQUALS("", errout_str());
 
         valueFlowUninit("void f() {\n"
@@ -3736,7 +3734,7 @@ private:
                         "        break;\n"
                         "    }\n"
                         "    ++c;\n"
-                        "}", false);
+                        "}", dinit(ValueFlowUninitOptions, $.cpp = false));
         ASSERT_EQUALS("", errout_str());
 
         // #12030
@@ -3869,7 +3867,7 @@ private:
                         "    int x;\n"
                         "    *(((char *)&x) + 0) = 0;\n"
                         "}",
-                        false);
+                        dinit(ValueFlowUninitOptions, $.cpp = false));
         ASSERT_EQUALS("", errout_str());
 
         valueFlowUninit("void f() {\n" // #4737 - weird cast.
@@ -3881,8 +3879,7 @@ private:
         valueFlowUninit("void f() {\n"
                         "    int x;\n"
                         "    char *p = (char*)&x + 1;\n"
-                        "}",
-                        true);
+                        "}");
         ASSERT_EQUALS("", errout_str());
 
         valueFlowUninit("void f() {\n"
@@ -3931,7 +3928,7 @@ private:
                                 "    int x;\n"
                                 "    if (i >> x) { }\n"
                                 "}";
-            valueFlowUninit(code, true);
+            valueFlowUninit(code);
             ASSERT_EQUALS("", errout_str());
 
             valueFlowUninit(code, false);
@@ -4014,7 +4011,7 @@ private:
                         "out2:\n"
                         "    return ret;\n"
                         "}",
-                        false);
+                        dinit(ValueFlowUninitOptions, $.cpp = false));
         ASSERT_EQUALS("", errout_str());
 
         valueFlowUninit("void f() {\n"
@@ -4077,7 +4074,7 @@ private:
                         "    ({ if (0); });\n"
                         "    for_each(i) { }\n"
                         "}",
-                        false);
+                        dinit(ValueFlowUninitOptions, $.cpp = false));
 
         // if, if
         valueFlowUninit("void f(int a) {\n"
@@ -4149,7 +4146,7 @@ private:
                         "    else ab.a = 0;\n"
                         "    if (ab.a == 1) b = ab.b;\n"
                         "}",
-                        false);
+                        dinit(ValueFlowUninitOptions, $.cpp = false));
         ASSERT_EQUALS("", errout_str());
 
         valueFlowUninit("int f(void) {\n"
@@ -4335,7 +4332,7 @@ private:
         valueFlowUninit("void f() {\n" // #4717 - ({})
                         "    int a = ({ long b = (long)(123); 2 + b; });\n"
                         "}",
-                        false);
+                        dinit(ValueFlowUninitOptions, $.cpp = false));
         ASSERT_EQUALS("", errout_str());
     }
 
@@ -4347,7 +4344,7 @@ private:
                         "void foo() {\n"
                         "  struct myst item;\n"
                         "  bar(&item);\n"
-                        "}", false);
+                        "}", dinit(ValueFlowUninitOptions, $.cpp = false));
         ASSERT_EQUALS("", errout_str());
 
         valueFlowUninit("struct myst { int a; };\n"
@@ -4365,7 +4362,7 @@ private:
                         "  struct myst item;\n"
                         "  bar(&item);\n"
                         "  a = item.a;\n"
-                        "}", false);
+                        "}", dinit(ValueFlowUninitOptions, $.cpp = false));
         ASSERT_EQUALS("", errout_str());
 
         valueFlowUninit("void f(int& r) {}\n" // #12536
@@ -6306,7 +6303,7 @@ private:
                         "            t[n++] = s->t[i];\n"
                         "    for (int i = 0; i < n; i++)\n"
                         "        t[i];\n"
-                        "}\n", false);
+                        "}\n", dinit(ValueFlowUninitOptions, $.cpp = false));
         ASSERT_EQUALS("", errout_str());
 
         valueFlowUninit("bool g();\n"
@@ -6942,7 +6939,7 @@ private:
                         "    ab.a = (void*)&x;\n"
                         "    dostuff(&ab,0);\n"
                         "}\n",
-                        false);
+                        dinit(ValueFlowUninitOptions, $.cpp = false));
         ASSERT_EQUALS("", errout_str());
 
         valueFlowUninit("struct Element {\n"
@@ -7014,7 +7011,7 @@ private:
                         "    struct AB ab;\n"
                         "    assign(&ab.a, 0);\n"
                         "}\n",
-                        false);
+                        dinit(ValueFlowUninitOptions, $.cpp = false));
         ASSERT_EQUALS("", errout_str());
 
         valueFlowUninit(
@@ -7035,7 +7032,7 @@ private:
                         "    ab.b = 0;\n"
                         "    do_something(ab);\n"
                         "}\n",
-                        false);
+                        dinit(ValueFlowUninitOptions, $.cpp = false));
         ASSERT_EQUALS("", errout_str());
 
         {
@@ -7044,7 +7041,7 @@ private:
                             "    struct AB ab;\n"
                             "    strcpy(ab.a, STR);\n"
                             "}\n",
-                            false);
+                            dinit(ValueFlowUninitOptions, $.cpp = false));
             ASSERT_EQUALS("", errout_str());
 
             valueFlowUninit("struct AB { unsigned char a[10]; };\n" // #8999 - cast
@@ -7052,7 +7049,7 @@ private:
                             "    struct AB ab;\n"
                             "    strcpy((char *)ab.a, STR);\n"
                             "}\n",
-                            false);
+                            dinit(ValueFlowUninitOptions, $.cpp = false));
             ASSERT_EQUALS("", errout_str());
 
             valueFlowUninit("struct AB { char a[10]; };\n"
@@ -7068,7 +7065,7 @@ private:
                             "    struct AB ab;\n"
                             "    dosomething(ab.a);\n"
                             "}\n",
-                            false);
+                            dinit(ValueFlowUninitOptions, $.cpp = false));
             ASSERT_EQUALS("", errout_str());
         }
 
@@ -7079,7 +7076,7 @@ private:
                         "    ab = getAB();\n"
                         "    do_something(ab);\n"
                         "}\n",
-                        false);
+                        dinit(ValueFlowUninitOptions, $.cpp = false));
         ASSERT_EQUALS("", errout_str());
 
         {
@@ -7118,7 +7115,7 @@ private:
                         "    ab.s.c = 3;\n"
                         "    do_something(ab);\n"
                         "}\n",
-                        false);
+                        dinit(ValueFlowUninitOptions, $.cpp = false));
         ASSERT_EQUALS("", errout_str());
 
         valueFlowUninit("struct conf {\n"
@@ -7132,7 +7129,7 @@ private:
                         "   initdata(&c);\n"
                         "   do_something(c);\n"
                         "}\n",
-                        false);
+                        dinit(ValueFlowUninitOptions, $.cpp = false));
         ASSERT_EQUALS("", errout_str());
 
         valueFlowUninit("struct PIXEL {\n"
@@ -7216,7 +7213,7 @@ private:
                         "    ab.a = 0;\n"
                         "    return ab.a;\n"
                         "}\n",
-                        false);
+                        dinit(ValueFlowUninitOptions, $.cpp = false));
         ASSERT_EQUALS("", errout_str());
 
         valueFlowUninit("struct S { int a; int b; };\n" // #8299
@@ -7245,7 +7242,7 @@ private:
                         "   fred.a = do_something();\n"
                         "   if (fred.a == 0) { }\n"
                         "}\n",
-                        false);
+                        dinit(ValueFlowUninitOptions, $.cpp = false));
         ASSERT_EQUALS("", errout_str());
 
         valueFlowUninit("struct FRED {\n"
@@ -7274,7 +7271,7 @@ private:
                         " struct S s;\n"
                         " for (s.n = 0; s.n <= 10; s.n++) { }\n"
                         "}",
-                        false);
+                        dinit(ValueFlowUninitOptions, $.cpp = false));
         ASSERT_EQUALS("", errout_str());
 
         valueFlowUninit("void test2() {\n"
@@ -7351,8 +7348,7 @@ private:
                         "void foo() {\n"
                         "    A a;\n"
                         "    x = a.m;\n"
-                        "}",
-                        true);
+                        "}");
         ASSERT_EQUALS("", errout_str());
 
         // Unknown type (C)
@@ -7838,7 +7834,7 @@ private:
         valueFlowUninit("void f() {\n" // #11305
                         "    type_t a;\n"
                         "    a[0] = 0;\n"
-                        "}\n", false);
+                        "}\n", dinit(ValueFlowUninitOptions, $.cpp = false));
         ASSERT_EQUALS("", errout_str());
     }
 

@@ -1645,10 +1645,17 @@ public:
 private:
     const Settings settings = settingsBuilder().library("std.cfg").library("posix.cfg").build();
 
+    struct CheckOptions
+    {
+        CheckOptions() = default;
+        bool cpp = true;
+    };
+
+    // TODO: use options
     template<size_t size>
-    void check_(const char* file, int line, const char (&code)[size], bool cpp = true) {
+    void check_(const char* file, int line, const char (&code)[size], const CheckOptions& options = make_default_obj()) {
         // Tokenize..
-        SimpleTokenizer tokenizer(settings, *this, cpp);
+        SimpleTokenizer tokenizer(settings, *this, options.cpp);
         ASSERT_LOC(tokenizer.tokenize(code), file, line);
 
         // Check for memory leaks..
@@ -1787,14 +1794,14 @@ private:
               "    struct ABC abc;\n"
               "    abc.a = malloc(10);\n"
               "    return abc.a;\n"
-              "}", false);
+              "}", dinit(CheckOptions, $.cpp = false));
         ASSERT_EQUALS("", errout_str());
 
         check("void* foo() {\n"
               "    struct ABC abc;\n"
               "    abc.a = malloc(10);\n"
               "    return abc.b;\n"
-              "}", false);
+              "}", dinit(CheckOptions, $.cpp = false));
         ASSERT_EQUALS("[test.c:4:5]: (error) Memory leak: abc.a [memleak]\n", errout_str());
     }
 
@@ -1848,7 +1855,7 @@ private:
               "    struct s f2;\n"
               "    f2.a = malloc(100);\n"
               "    *f1 = f2;\n"
-              "}", false);
+              "}", dinit(CheckOptions, $.cpp = false));
         ASSERT_EQUALS("", errout_str());
     }
 
@@ -1859,7 +1866,7 @@ private:
               "    *&s.a = open(\"xx.log\", O_RDONLY);\n"
               "    ((s).b) = open(\"xx.log\", O_RDONLY);\n"
               "    (&s)->c = open(\"xx.log\", O_RDONLY);\n"
-              "}\n", false);
+              "}\n", dinit(CheckOptions, $.cpp = false));
         ASSERT_EQUALS("[test.c:7:1]: (error) Resource leak: s.a [resourceLeak]\n"
                       "[test.c:7:1]: (error) Resource leak: s.b [resourceLeak]\n"
                       "[test.c:7:1]: (error) Resource leak: s.c [resourceLeak]\n",
@@ -1884,7 +1891,7 @@ private:
 
         check("void run_rcmd(enum rcommand rcmd, rsh_session *sess, char *cmd) {\n"
               "    sess->fp = popen(cmd, rcmd == RSH_PIPE_READ ? \"r\" : \"w\");\n"
-              "}\n", false);
+              "}\n", dinit(CheckOptions, $.cpp = false));
         ASSERT_EQUALS("", errout_str());
 
         check("struct S { char* a[2]; };\n"
@@ -1892,13 +1899,13 @@ private:
               "void f(struct S* s, enum E e, const char* n) {\n"
               "    free(s->a[e]);\n"
               "    s->a[e] = strdup(n);\n"
-              "}\n", false);
+              "}\n", dinit(CheckOptions, $.cpp = false));
         ASSERT_EQUALS("", errout_str());
 
         check("void f(struct S** s, const char* c) {\n"
               "    *s = malloc(sizeof(struct S));\n"
               "    (*s)->value = strdup(c);\n"
-              "}\n", false);
+              "}\n", dinit(CheckOptions, $.cpp = false));
         ASSERT_EQUALS("", errout_str());
 
         check("struct S {\n"
@@ -1908,14 +1915,14 @@ private:
               "void f(struct S s[static 1U], int fd, size_t size) {\n"
               "    s->mpsz = size;\n"
               "    s->hdr = mmap(NULL, s->mpsz, PROT_READ, MAP_SHARED, fd, 0);\n"
-              "}\n", false);
+              "}\n", dinit(CheckOptions, $.cpp = false));
         ASSERT_EQUALS("", errout_str());
 
         check("void f(type_t t) {\n"
               "    t->p = malloc(10);\n"
               "    t->x.p = malloc(10);\n"
               "    t->y[2].p = malloc(10);\n"
-              "}\n", false);
+              "}\n", dinit(CheckOptions, $.cpp = false));
         ASSERT_EQUALS("", errout_str());
     }
 
@@ -1959,7 +1966,7 @@ private:
               "  A a = { 0 };\n"
               "  a.foo = (char *) malloc(10);\n"
               "  assign(&a);\n"
-              "}", false);
+              "}", dinit(CheckOptions, $.cpp = false));
         ASSERT_EQUALS("", errout_str());
     }
 
@@ -1969,7 +1976,7 @@ private:
               "  struct ABC *abc = malloc(100);\n"
               "  abc.a = (char *) malloc(10);\n"
               "  list_add_tail(&abc->list, head);\n"
-              "}", false);
+              "}", dinit(CheckOptions, $.cpp = false));
         ASSERT_EQUALS("", errout_str());
     }
 
@@ -1980,7 +1987,7 @@ private:
               "  struct ABC abc;\n"
               "  abc.a = (char *) malloc(10);\n"
               "  a(abc.a);\n"
-              "}", false);
+              "}", dinit(CheckOptions, $.cpp = false));
         ASSERT_EQUALS("", errout_str());
     }
 
@@ -2084,11 +2091,11 @@ private:
                              "    a.m = malloc(12);\n"
                              "}";
 
-        check(code1, true);
+        check(code1);
         ASSERT_EQUALS("[test.cpp:12:1]: (error) Resource leak: a.f [resourceLeak]\n"
                       "[test.cpp:12:1]: (error) Memory leak: a.c [memleak]\n"
                       "[test.cpp:12:1]: (error) Memory leak: a.m [memleak]\n", errout_str());
-        check(code1, false);
+        check(code1, dinit(CheckOptions, $.cpp = false));
         ASSERT_EQUALS("[test.c:12:1]: (error) Resource leak: a.f [resourceLeak]\n"
                       "[test.c:12:1]: (error) Memory leak: a.m [memleak]\n", errout_str());
 
@@ -2109,7 +2116,7 @@ private:
                              "    free(a.m);\n"
                              "}";
 
-        check(code2, true);
+        check(code2);
         ASSERT_EQUALS("", errout_str());
 
         // Test unknown struct. In C++, it might have a destructor
@@ -2118,9 +2125,9 @@ private:
                              "    a.f = fopen(\"test\", \"r\");\n"
                              "}";
 
-        check(code3, true);
+        check(code3);
         ASSERT_EQUALS("", errout_str());
-        check(code3, false);
+        check(code3, dinit(CheckOptions, $.cpp = false));
         ASSERT_EQUALS("[test.c:4:1]: (error) Resource leak: a.f [resourceLeak]\n", errout_str());
 
         // Test struct with destructor
@@ -2133,7 +2140,7 @@ private:
                              "    a.f = fopen(\"test\", \"r\");\n"
                              "}";
 
-        check(code4, true);
+        check(code4);
         ASSERT_EQUALS("", errout_str());
     }
 
@@ -2170,7 +2177,7 @@ private:
               "  (s).state_check_buff = (void* )malloc(1);\n"
               "  if (s.state_check_buff == 0)\n"
               "    return;\n"
-              "}", false);
+              "}", dinit(CheckOptions, $.cpp = false));
         ASSERT_EQUALS("[test.c:9:1]: (error) Memory leak: s.state_check_buff [memleak]\n", errout_str());
     }
 
@@ -2180,7 +2187,7 @@ private:
               "  foo f;\n"
               "  ((f)->realm) = strdup(realm);\n"
               "  if(f->realm == NULL) {}\n"
-              "}", false);
+              "}", dinit(CheckOptions, $.cpp = false));
         ASSERT_EQUALS("[test.c:6:1]: (error) Memory leak: f.realm [memleak]\n", errout_str());
     }
 
@@ -2191,7 +2198,7 @@ private:
               "void func() {\n"
               "    struct ABC abc;\n"
               "    abc.a = myalloc();\n"
-              "}", false);
+              "}", dinit(CheckOptions, $.cpp = false));
         ASSERT_EQUALS("[test.c:7:1]: (error) Memory leak: abc.a [memleak]\n", errout_str());
     }
 
@@ -2207,7 +2214,7 @@ private:
             "    }\n"
             "    delete[] s.p;\n"
             "    return 0;\n"
-            "}", true);
+            "}");
         ASSERT_EQUALS("", errout_str());
 
         check(
@@ -2217,7 +2224,7 @@ private:
             "      S s;\n"
             "      s.p = new int;\n"
             "    };\n"
-            "}\n", true);
+            "}\n");
         ASSERT_EQUALS("[test.cpp:6:5]: (error) Memory leak: s.p [memleak]\n", errout_str());
 
         check(
@@ -2236,7 +2243,7 @@ private:
             "    [&]() {\n"
             "        delete s.p;\n"
             "    }();\n"
-            "}\n", true);
+            "}\n");
         ASSERT_EQUALS("", errout_str());
     }
 };

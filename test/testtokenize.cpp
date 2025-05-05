@@ -534,6 +534,7 @@ private:
         return "";
     }
 
+    // TODO: use options
 #define tokenizeAndStringifyWindows(...) tokenizeAndStringifyWindows_(__FILE__, __LINE__, __VA_ARGS__)
     template<size_t size>
     std::string tokenizeAndStringifyWindows_(const char* file, int linenr, const char (&code)[size], bool expand = true, Platform::Type platform = Platform::Type::Native, bool cpp = true, bool cpp11 = true) {
@@ -560,10 +561,10 @@ private:
 
 #define tokenizeDebugListing(...) tokenizeDebugListing_(__FILE__, __LINE__, __VA_ARGS__)
     template<size_t size>
-    std::string tokenizeDebugListing_(const char* file, int line, const char (&code)[size], bool cpp = true) {
+    std::string tokenizeDebugListing_(const char* file, int line, const char (&code)[size]) {
         const Settings settings = settingsBuilder(settings0).c(Standards::C89).cpp(Standards::CPP03).build();
 
-        SimpleTokenizer tokenizer(settings, *this, cpp);
+        SimpleTokenizer tokenizer(settings, *this);
         ASSERT_LOC(tokenizer.tokenize(code), file, line);
 
         // result..

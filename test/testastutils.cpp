@@ -49,6 +49,7 @@ private:
         TEST_CASE(isUsedAsBool);
     }
 
+    // TODO: use options
 #define findLambdaEndToken(...) findLambdaEndToken_(__FILE__, __LINE__, __VA_ARGS__)
     template<size_t size>
     bool findLambdaEndToken_(const char* file, int line, const char (&code)[size], const char pattern[] = nullptr, bool checkNext = true) {
