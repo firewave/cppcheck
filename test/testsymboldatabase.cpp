@@ -2630,15 +2630,22 @@ private:
         ASSERT_EQUALS("char", arg1->typeEndToken()->str());
     }
 
-// TODO: use options struct
+    struct CheckOptions
+    {
+        CheckOptions() = default;
+        bool debug = true;
+        bool cpp = true;
+        const Settings* s = nullptr;
+    };
+
 #define check(...) check_(__FILE__, __LINE__, __VA_ARGS__)
     template<size_t size>
-    void check_(const char* file, int line, const char (&code)[size], bool debug = true, bool cpp = true, const Settings* pSettings = nullptr) {
+    void check_(const char* file, int line, const char (&code)[size], const CheckOptions& options = make_default_obj()) {
         // Check..
-        const Settings settings = settingsBuilder(pSettings ? *pSettings : settings1).debugwarnings(debug).build();
+        const Settings settings = settingsBuilder(options.s ? *options.s : settings1).debugwarnings(options.debug).build();
 
         // Tokenize..
-        SimpleTokenizer tokenizer(settings, *this, cpp);
+        SimpleTokenizer tokenizer(settings, *this, options.cpp);
         ASSERT_LOC(tokenizer.tokenize(code), file, line);
 
         // force symbol database creation
@@ -3274,11 +3281,11 @@ private:
               "static void function_declaration_after(void) __attribute__((__used__));");
         ASSERT_EQUALS("", errout_str());
 
-        check("main(int argc, char *argv[]) { }", true, false);
+        check("main(int argc, char *argv[]) { }", dinit(CheckOptions, $.cpp = false));
         ASSERT_EQUALS("", errout_str());
 
         const Settings s = settingsBuilder(settings1).severity(Severity::portability).build();
-        check("main(int argc, char *argv[]) { }", false, false, &s);
+        check("main(int argc, char *argv[]) { }", dinit(CheckOptions, $.debug = false, $.cpp = false, $.s = &s));
         ASSERT_EQUALS("[test.c:1]: (portability) Omitted return type of function 'main' defaults to int, this is not supported by ISO C99 and later standards.\n",
                       errout_str());
 
@@ -3322,7 +3329,7 @@ private:
               "template<class T> class Y { };\n"
               "Y<X<1>> x3;\n"
               "Y<X<6>>1>> x4;\n"
-              "Y<X<(6>>1)>> x5;\n", false);
+              "Y<X<(6>>1)>> x5;\n", dinit(CheckOptions, $.debug = false));
         ASSERT_EQUALS("", errout_str());
     }
 
@@ -3364,7 +3371,7 @@ private:
               "        CString::operator=(lpsz);\n"
               "        return *this;\n"
               "    }\n"
-              "};\n", false);
+              "};\n", dinit(CheckOptions, $.debug = false));
 
         ASSERT_EQUALS("", errout_str());
     }
