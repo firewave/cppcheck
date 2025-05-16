@@ -1,12 +1,12 @@
 import subprocess
 import pathlib
 
-cmd = './testrunner TestBufferOverrun'
+cmd = './testrunner TestFunctions'
 
 with subprocess.Popen(cmd.split(), stderr=subprocess.PIPE, universal_newlines=True) as p:
     out = p.stderr.read().strip()
 
-file = '/mnt/s/GitHub/cppcheck-fw/test/testbufferoverrun.cpp'
+file = '//home/user/CLionProjects/cppcheck/test/testfunctions.cpp'
 
 text = pathlib.Path(file).read_text()
 
