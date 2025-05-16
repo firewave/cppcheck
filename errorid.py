@@ -6,7 +6,7 @@ cmd = './testrunner TestBufferOverrun'
 with subprocess.Popen(cmd.split(), stderr=subprocess.PIPE, universal_newlines=True) as p:
     out = p.stderr.read().strip()
 
-file = '/home/user/CLionProjects/cppcheck/test/testbufferoverrun.cpp'
+file = '/mnt/s/GitHub/cppcheck-fw/test/testbufferoverrun.cpp'
 
 text = pathlib.Path(file).read_text()
 
