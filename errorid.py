@@ -1,12 +1,12 @@
 import subprocess
 import pathlib
 
-cmd = './testrunner TestUninitVar'
+cmd = './testrunner TestCondition'
 
 with subprocess.Popen(cmd.split(), stderr=subprocess.PIPE, universal_newlines=True) as p:
     out = p.stderr.read().strip()
 
-file = '//home/user/CLionProjects/cppcheck/test/testuninitvar.cpp'
+file = '//home/user/CLionProjects/cppcheck/test/testcondition.cpp'
 
 text = pathlib.Path(file).read_text()
 
