@@ -49,7 +49,6 @@ private:
     const Settings settings_windows = settingsBuilder().library("windows.cfg").build();
 
     void run() override {
-        mNewTemplate = true;
         TEST_CASE(tokenize1);
         TEST_CASE(tokenize2);
         TEST_CASE(tokenize4);

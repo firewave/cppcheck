@@ -32,7 +32,6 @@ private:
     const Settings settings = settingsBuilder().severity(Severity::portability).library("std.cfg").build();
 
     void run() override {
-        mNewTemplate = true;
         TEST_CASE(novardecl);
         TEST_CASE(functionpar);
         TEST_CASE(structmember);

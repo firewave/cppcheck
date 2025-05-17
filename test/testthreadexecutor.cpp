@@ -132,7 +132,6 @@ private:
     }
 
     void run() override {
-        mNewTemplate = true;
         TEST_CASE(deadlock_with_many_errors);
         TEST_CASE(many_threads);
         TEST_CASE(many_threads_showtime);

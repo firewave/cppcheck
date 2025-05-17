@@ -35,7 +35,6 @@ private:
     void run() override {
         ASSERT_EQUALS("", settings.addEnabled("internal"));
 
-        mNewTemplate = true;
         TEST_CASE(simplePatternInTokenMatch);
         TEST_CASE(complexPatternInTokenSimpleMatch);
         TEST_CASE(simplePatternSquareBrackets);

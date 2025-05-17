@@ -443,7 +443,7 @@ void TestFixture::reportErr(const ErrorMessage &msg)
     }
     else {
         if (!msg.callStack.empty()) {
-            errormessage += ErrorLogger::callStackToString(msg.callStack, mNewTemplate);
+            errormessage += ErrorLogger::callStackToString(msg.callStack, true);
             errormessage += ": ";
         }
         if (msg.severity != Severity::none) {
@@ -454,11 +454,9 @@ void TestFixture::reportErr(const ErrorMessage &msg)
             errormessage += ") ";
         }
         errormessage += msg.shortMessage();
-        if (mNewTemplate) {
-            errormessage += " [";
-            errormessage += msg.id;
-            errormessage += "]";
-        }
+        errormessage += " [";
+        errormessage += msg.id;
+        errormessage += "]";
     }
     mErrout << errormessage << std::endl;
 }

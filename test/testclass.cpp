@@ -40,7 +40,6 @@ private:
     const Settings settings3 = settingsBuilder().severity(Severity::style).library("std.cfg").severity(Severity::warning).build();
 
     void run() override {
-        mNewTemplate = true;
         TEST_CASE(virtualDestructor1);      // Base class not found => no error
         TEST_CASE(virtualDestructor2);      // Base class doesn't have a destructor
         TEST_CASE(virtualDestructor3);      // Base class has a destructor, but it's not virtual

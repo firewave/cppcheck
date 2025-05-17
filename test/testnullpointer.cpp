@@ -39,7 +39,6 @@ private:
     const Settings settings = settingsBuilder().library("std.cfg").severity(Severity::warning).build();
 
     void run() override {
-        mNewTemplate = true;
         TEST_CASE(nullpointerAfterLoop);
         TEST_CASE(nullpointer1);
         TEST_CASE(nullpointer2);

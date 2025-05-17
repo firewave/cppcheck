@@ -54,7 +54,6 @@ private:
                                "</def>";
         settings = settingsBuilder(settings).libraryxml(cfg).build();
 
-        mNewTemplate = true;
         TEST_CASE(valueFlowNumber);
         TEST_CASE(valueFlowString);
         TEST_CASE(valueFlowTypeTraits);
@@ -77,14 +76,10 @@ private:
         TEST_CASE(valueFlowBeforeConditionAssignIncDec);
         TEST_CASE(valueFlowBeforeConditionFunctionCall);
         TEST_CASE(valueFlowBeforeConditionGlobalVariables);
-        mNewTemplate = false;
         TEST_CASE(valueFlowBeforeConditionGoto);
-        mNewTemplate = true;
         TEST_CASE(valueFlowBeforeConditionIfElse);
         TEST_CASE(valueFlowBeforeConditionLoop);
-        mNewTemplate = false;
         TEST_CASE(valueFlowBeforeConditionMacro);
-        mNewTemplate = true;
         TEST_CASE(valueFlowBeforeConditionSizeof);
         TEST_CASE(valueFlowBeforeConditionSwitch);
         TEST_CASE(valueFlowBeforeConditionTernaryOp);
@@ -170,9 +165,7 @@ private:
         TEST_CASE(valueFlowImpossibleUnknownConstant);
         TEST_CASE(valueFlowContainerEqual);
 
-        mNewTemplate = false;
         TEST_CASE(valueFlowBailoutIncompleteVar);
-        mNewTemplate = true;
 
         TEST_CASE(performanceIfCount);
     }

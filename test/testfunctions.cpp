@@ -36,7 +36,6 @@ private:
                               certainty(Certainty::inconclusive).c(Standards::C11).cpp(Standards::CPP11).library("std.cfg").library("posix.cfg").build();
 
     void run() override {
-        mNewTemplate = true;
         // Prohibited functions
         TEST_CASE(prohibitedFunctions_posix);
         TEST_CASE(prohibitedFunctions_index);

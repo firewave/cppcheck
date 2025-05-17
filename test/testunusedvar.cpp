@@ -34,7 +34,6 @@ private:
     const Settings settings = settingsBuilder().severity(Severity::style).checkLibrary().library("std.cfg").build();
 
     void run() override {
-        mNewTemplate = true;
         TEST_CASE(isRecordTypeWithoutSideEffects);
         TEST_CASE(cleanFunction);
 

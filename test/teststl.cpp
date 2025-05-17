@@ -35,7 +35,6 @@ private:
     /*const*/ Settings settings = settingsBuilder().severity(Severity::warning).severity(Severity::style).severity(Severity::performance).library("std.cfg").build();
 
     void run() override {
-        mNewTemplate = true;
         TEST_CASE(outOfBounds);
         TEST_CASE(outOfBoundsSymbolic);
         TEST_CASE(outOfBoundsIndexExpression);

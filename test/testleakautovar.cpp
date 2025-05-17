@@ -33,7 +33,6 @@ private:
     const Settings settings = settingsBuilder().library("std.cfg").build();
 
     void run() override {
-        mNewTemplate = true;
         // Assign
         TEST_CASE(assign1);
         TEST_CASE(assign2);
@@ -3203,7 +3202,6 @@ private:
     }
 
     void run() override {
-        mNewTemplate = true;
         TEST_CASE(recursiveCountLimit); // #5872 #6157 #9097
     }
 
@@ -3250,7 +3248,6 @@ private:
     }
 
     void run() override {
-        mNewTemplate = true;
         TEST_CASE(returnedValue); // #9298
         TEST_CASE(deallocuse2);
         TEST_CASE(fclose_false_positive); // #9575
@@ -3355,7 +3352,6 @@ private:
     }
 
     void run() override {
-        mNewTemplate = true;
         TEST_CASE(heapDoubleFree);
     }
 
@@ -3428,7 +3424,6 @@ private:
     }
 
     void run() override {
-        mNewTemplate = true;
         TEST_CASE(memleak_getline);
         TEST_CASE(deallocuse_fdopen);
         TEST_CASE(doublefree_fdopen); // #12781

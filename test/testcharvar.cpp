@@ -33,7 +33,6 @@ private:
     const Settings settings = settingsBuilder().severity(Severity::warning).severity(Severity::portability).platform(Platform::Type::Unspecified).build();
 
     void run() override {
-        mNewTemplate = true;
         TEST_CASE(array_index_1);
         TEST_CASE(array_index_2);
         TEST_CASE(bitop);

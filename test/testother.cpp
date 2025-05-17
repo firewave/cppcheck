@@ -36,7 +36,6 @@ private:
     /*const*/ Settings _settings = settingsBuilder().library("std.cfg").build();
 
     void run() override {
-        mNewTemplate = true;
         TEST_CASE(emptyBrackets);
 
         TEST_CASE(zeroDiv1);

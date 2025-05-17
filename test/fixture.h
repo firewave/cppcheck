@@ -61,7 +61,6 @@ protected:
     std::string testToRun;
     bool quiet_tests{};
     bool dry_run{};
-    bool mNewTemplate{};
 
     virtual void run() = 0;
 

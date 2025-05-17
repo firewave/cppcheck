@@ -44,7 +44,6 @@ private:
     }
 
     void run() override {
-        mNewTemplate = true;
         TEST_CASE(testsimple);
         TEST_CASE(testfor);
         TEST_CASE(testvolatile);

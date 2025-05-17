@@ -34,7 +34,6 @@ private:
     const Settings settings = settingsBuilder().severity(Severity::style).build();
 
     void run() override {
-        mNewTemplate = true;
         TEST_CASE(incondition);
         TEST_CASE(return1);
         TEST_CASE(return2);

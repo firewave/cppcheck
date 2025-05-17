@@ -126,7 +126,6 @@ private:
 
 
     void run() override {
-        mNewTemplate = true;
         TEST_CASE(realloc1);
         TEST_CASE(realloc2);
         TEST_CASE(realloc3);
@@ -452,7 +451,6 @@ private:
     }
 
     void run() override {
-        mNewTemplate = true;
         TEST_CASE(class1);
         TEST_CASE(class2);
         TEST_CASE(class3);
@@ -1657,7 +1655,6 @@ private:
     }
 
     void run() override {
-        mNewTemplate = true;
         // testing that errors are detected
         TEST_CASE(err);
 
@@ -2266,7 +2263,6 @@ private:
     }
 
     void run() override {
-        mNewTemplate = true;
         // pass allocated memory to function..
         TEST_CASE(functionParameter);
 

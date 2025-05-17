@@ -34,7 +34,6 @@ private:
     void run() override {
         settings.severity.fill();
 
-        mNewTemplate = true;
         TEST_CASE(destructors);
         TEST_CASE(deallocThrow1);
         TEST_CASE(deallocThrow2);

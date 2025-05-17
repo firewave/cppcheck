@@ -43,7 +43,6 @@ private:
     }
 
     void run() override {
-        mNewTemplate = true;
         TEST_CASE(wrongParameterTo_va_start);
         TEST_CASE(referenceAs_va_start);
         TEST_CASE(va_end_missing);

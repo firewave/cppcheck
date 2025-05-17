@@ -34,7 +34,6 @@ private:
     const Settings settings = settingsBuilder().severity(Severity::warning).severity(Severity::style).build();
 
     void run() override {
-        mNewTemplate = true;
         TEST_CASE(stringLiteralWrite);
 
         TEST_CASE(alwaysTrueFalseStringCompare);

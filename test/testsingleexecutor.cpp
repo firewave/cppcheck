@@ -136,7 +136,6 @@ private:
     }
 
     void run() override {
-        mNewTemplate = true;
         TEST_CASE(many_files);
         TEST_CASE(many_files_showtime);
         TEST_CASE(many_files_plist);

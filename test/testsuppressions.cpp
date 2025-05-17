@@ -48,7 +48,6 @@ private:
     const std::string templateFormat{"{callstack}: ({severity}) {inconclusive:inconclusive: }{message}"};
 
     void run() override {
-        mNewTemplate = true;
         TEST_CASE(suppressionsBadId1);
         TEST_CASE(suppressionsDosFormat);     // Ticket #1836
         TEST_CASE(suppressionsFileNameWithColon);    // Ticket #1919 - filename includes colon

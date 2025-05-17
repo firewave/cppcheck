@@ -37,7 +37,6 @@ private:
 
     void run() override {
         TEST_CASE(checkTooBigShift_Unix32);
-        mNewTemplate = true;
         TEST_CASE(checkIntegerOverflow);
         TEST_CASE(signConversion);
         TEST_CASE(longCastAssign);

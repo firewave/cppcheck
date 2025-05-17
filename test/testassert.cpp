@@ -44,7 +44,6 @@ private:
     }
 
     void run() override {
-        mNewTemplate = true;
         TEST_CASE(assignmentInAssert);
         TEST_CASE(functionCallInAssert);
         TEST_CASE(memberFunctionCallInAssert);

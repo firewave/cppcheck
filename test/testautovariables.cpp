@@ -51,7 +51,6 @@ private:
     }
 
     void run() override {
-        mNewTemplate = true;
         TEST_CASE(testautovar1);
         TEST_CASE(testautovar2);
         TEST_CASE(testautovar3); // ticket #2925

@@ -32,7 +32,6 @@ private:
     const Settings settings = settingsBuilder().severity(Severity::style).severity(Severity::warning).certainty(Certainty::inconclusive).build();
 
     void run() override {
-        mNewTemplate = true;
         TEST_CASE(bitwiseOnBoolean);      // if (bool & bool)
         TEST_CASE(incrementBoolean);
         TEST_CASE(assignBoolToPointer);

@@ -34,7 +34,6 @@ private:
     const Settings settings = settingsBuilder().severity(Severity::warning).severity(Severity::portability).certainty(Certainty::inconclusive).library("std.cfg").build();
 
     void run() override {
-        mNewTemplate = true;
         TEST_CASE(sizeofsizeof);
         TEST_CASE(sizeofCalculation);
         TEST_CASE(sizeofFunction);

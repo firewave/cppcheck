@@ -54,7 +54,6 @@ private:
     }
 
     void run() override {
-        mNewTemplate = true;
         TEST_CASE(test1);
         TEST_CASE(test2);
         TEST_CASE(test3);
