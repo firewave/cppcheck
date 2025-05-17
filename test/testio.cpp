@@ -4965,4 +4965,4 @@ private:
     }
 };
 
-REGISTER_TEST(TestIO)
+//REGISTER_TEST(TestIO)

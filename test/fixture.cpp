@@ -198,7 +198,7 @@ std::string TestFixture::deleteLineNumber(const std::string &message)
 {
     std::string result(message);
     // delete line number in "...:NUMBER:..."
-    std::string::size_type pos = 0;
+    std::string::size_type pos = result.find("]:") + 2;
     while ((pos = result.find(':', pos)) != std::string::npos) {
         // get number
         if (pos + 1 == result.find_first_of("0123456789", pos + 1)) {

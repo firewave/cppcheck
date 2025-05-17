@@ -1687,7 +1687,7 @@ private:
 
         checkSimplifyTypedef(code);
         ASSERT_EQUALS_WITHOUT_LINENUMBERS(
-            "[test.cpp:3]: (debug) valueflow.cpp:6541:(valueFlow) bailout: valueFlowAfterCondition: bailing in conditional block [valueFlowBailout]\n"
+            "[test.cpp:3:25]: (debug) valueflow.cpp:6541:(valueFlow) bailout: valueFlowAfterCondition: bailing in conditional block [valueFlowBailout]\n"
             "[test.cpp:3]: (debug) valueflow.cpp:6541:(valueFlow) bailout: valueFlowAfterCondition: bailing in conditional block [valueFlowBailout]\n", // duplicate
             errout_str());
     }
@@ -3347,7 +3347,7 @@ private:
             "struct Anonymous0 { struct c * b ; } ; struct Anonymous0 * d ; void e ( struct c * a ) { if ( a < d [ 0 ] . b ) { } }",
             tok(code));
         ASSERT_EQUALS_WITHOUT_LINENUMBERS(
-            "[test.cpp:6]: (debug) valueflow.cpp:6730:(valueFlow) bailout: valueFlowAfterCondition: bailing in conditional block [valueFlowBailout]\n"
+            "[test.cpp:6:20]: (debug) valueflow.cpp:6730:(valueFlow) bailout: valueFlowAfterCondition: bailing in conditional block [valueFlowBailout]\n"
             "[test.cpp:6]: (debug) valueflow.cpp:6730:(valueFlow) bailout: valueFlowAfterCondition: bailing in conditional block [valueFlowBailout]\n", // duplicate
             errout_str());
     }
