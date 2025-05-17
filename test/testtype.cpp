@@ -110,7 +110,7 @@ private:
                 check(type + " f(" + type +" x) { return x << 31; }", dinit(CheckOptions, $.settings = &settings));
                 ASSERT_EQUALS("", errout_str());
                 check(type + " f(" + type +" x) { return x << 33; }", dinit(CheckOptions, $.settings = &settings));
-                ASSERT_EQUALS("[test.cpp:1]: (error) Shifting 32-bit value by 33 bits is undefined behaviour\n", errout_str());
+                ASSERT_EQUALS("[test.cpp:1:45]: (error) Shifting 32-bit value by 33 bits is undefined behaviour [shiftTooManyBits]\n", errout_str());
                 check(type + " f(int x) { return (x = (" + type + ")x << 32); }", dinit(CheckOptions, $.settings = &settings));
                 ASSERT_EQUALS("[test.cpp:1]: (error) Shifting 32-bit value by 32 bits is undefined behaviour\n", errout_str());
                 check(type + " foo(" + type + " x) { return x << 31; }", dinit(CheckOptions, $.settings = &settings));
@@ -124,62 +124,62 @@ private:
             for (const std::string& type : types) {
                 // c++11
                 check(type + " f(" + type +" x) { return x << 33; }", dinit(CheckOptions, $.settings = &settings));
-                ASSERT_EQUALS("[test.cpp:1]: (error) Shifting 32-bit value by 33 bits is undefined behaviour\n", errout_str());
+                ASSERT_EQUALS("[test.cpp:1:41]: (error) Shifting 32-bit value by 33 bits is undefined behaviour [shiftTooManyBits]\n", errout_str());
                 check(type + " f(int x) { return (x = (" + type + ")x << 32); }", dinit(CheckOptions, $.settings = &settings));
-                ASSERT_EQUALS("[test.cpp:1]: (error) Shifting 32-bit value by 32 bits is undefined behaviour\n", errout_str());
+                ASSERT_EQUALS("[test.cpp:1:51]: (error) Shifting 32-bit value by 32 bits is undefined behaviour [shiftTooManyBits]\n", errout_str());
                 check(type + " foo(" + type + " x) { return x << 31; }", dinit(CheckOptions, $.settings = &settings));
-                ASSERT_EQUALS("[test.cpp:1]: (error) Shifting signed 32-bit value by 31 bits is undefined behaviour\n", errout_str());
+                ASSERT_EQUALS("[test.cpp:1:43]: (error) Shifting signed 32-bit value by 31 bits is undefined behaviour [shiftTooManyBitsSigned]\n", errout_str());
                 check(type + " foo(" + type + " x) { return x << 30; }", dinit(CheckOptions, $.settings = &settings));
                 ASSERT_EQUALS("", errout_str());
 
                 // c++14
                 check(type + " foo(" + type + " x) { return x << 31; }", dinit(CheckOptions, $.settings = &settings, $.standard = Standards::CPP14));
-                ASSERT_EQUALS("[test.cpp:1]: (portability) Shifting signed 32-bit value by 31 bits is implementation-defined behaviour\n", errout_str());
+                ASSERT_EQUALS("[test.cpp:1:43]: (portability) Shifting signed 32-bit value by 31 bits is implementation-defined behaviour [shiftTooManyBitsSigned]\n", errout_str());
                 check(type + " f(int x) { return (x = (" + type + ")x << 32); }", dinit(CheckOptions, $.settings = &settings, $.standard = Standards::CPP14));
-                ASSERT_EQUALS("[test.cpp:1]: (error) Shifting 32-bit value by 32 bits is undefined behaviour\n", errout_str());
+                ASSERT_EQUALS("[test.cpp:1:51]: (error) Shifting 32-bit value by 32 bits is undefined behaviour [shiftTooManyBits]\n", errout_str());
             }
         }
         // 64 bit width types
         {
             // unsigned long long
             check("unsigned long long foo(unsigned long long x) { return x << 64; }",dinit(CheckOptions, $.settings = &settings));
-            ASSERT_EQUALS("[test.cpp:1]: (error) Shifting 64-bit value by 64 bits is undefined behaviour\n", errout_str());
+            ASSERT_EQUALS("[test.cpp:1:57]: (error) Shifting 64-bit value by 64 bits is undefined behaviour [shiftTooManyBits]\n", errout_str());
             check("unsigned long long f(int x) { return (x = (unsigned long long)x << 64); }",dinit(CheckOptions, $.settings = &settings));
-            ASSERT_EQUALS("[test.cpp:1]: (error) Shifting 64-bit value by 64 bits is undefined behaviour\n", errout_str());
+            ASSERT_EQUALS("[test.cpp:1:65]: (error) Shifting 64-bit value by 64 bits is undefined behaviour [shiftTooManyBits]\n", errout_str());
             check("unsigned long long f(unsigned long long x) { return x << 63; }",dinit(CheckOptions, $.settings = &settings));
             ASSERT_EQUALS("", errout_str());
             // [signed] long long
             check("long long foo(long long x) { return x << 64; }",dinit(CheckOptions, $.settings = &settings));
-            ASSERT_EQUALS("[test.cpp:1]: (error) Shifting 64-bit value by 64 bits is undefined behaviour\n", errout_str());
+            ASSERT_EQUALS("[test.cpp:1:39]: (error) Shifting 64-bit value by 64 bits is undefined behaviour [shiftTooManyBits]\n", errout_str());
             check("long long f(int x) { return (x = (long long)x << 64); }",dinit(CheckOptions, $.settings = &settings));
-            ASSERT_EQUALS("[test.cpp:1]: (error) Shifting 64-bit value by 64 bits is undefined behaviour\n", errout_str());
+            ASSERT_EQUALS("[test.cpp:1:47]: (error) Shifting 64-bit value by 64 bits is undefined behaviour [shiftTooManyBits]\n", errout_str());
             check("long long f(long long x) { return x << 63; }",dinit(CheckOptions, $.settings = &settings));
-            ASSERT_EQUALS("[test.cpp:1]: (error) Shifting signed 64-bit value by 63 bits is undefined behaviour\n", errout_str());
+            ASSERT_EQUALS("[test.cpp:1:37]: (error) Shifting signed 64-bit value by 63 bits is undefined behaviour [shiftTooManyBitsSigned]\n", errout_str());
             check("long long f(long long x) { return x << 62; }",dinit(CheckOptions, $.settings = &settings));
             ASSERT_EQUALS("", errout_str());
             // signed long long
             check("signed long long foo(signed long long x) { return x << 64; }",dinit(CheckOptions, $.settings = &settings));
-            ASSERT_EQUALS("[test.cpp:1]: (error) Shifting 64-bit value by 64 bits is undefined behaviour\n", errout_str());
+            ASSERT_EQUALS("[test.cpp:1:53]: (error) Shifting 64-bit value by 64 bits is undefined behaviour [shiftTooManyBits]\n", errout_str());
             check("signed long long f(long long x) { return (x = (signed long long)x << 64); }",dinit(CheckOptions, $.settings = &settings));
-            ASSERT_EQUALS("[test.cpp:1]: (error) Shifting 64-bit value by 64 bits is undefined behaviour\n", errout_str());
+            ASSERT_EQUALS("[test.cpp:1:67]: (error) Shifting 64-bit value by 64 bits is undefined behaviour [shiftTooManyBits]\n", errout_str());
             check("signed long long f(signed long long x) { return x << 63; }",dinit(CheckOptions, $.settings = &settings));
-            ASSERT_EQUALS("[test.cpp:1]: (error) Shifting signed 64-bit value by 63 bits is undefined behaviour\n", errout_str());
+            ASSERT_EQUALS("[test.cpp:1:51]: (error) Shifting signed 64-bit value by 63 bits is undefined behaviour [shiftTooManyBitsSigned]\n", errout_str());
             check("signed long long f(signed long long x) { return x << 62; }",dinit(CheckOptions, $.settings = &settings));
             ASSERT_EQUALS("", errout_str());
 
             // c++14
             check("signed long long foo(signed long long x) { return x << 64; }", dinit(CheckOptions, $.settings = &settings, $.standard = Standards::CPP14));
-            ASSERT_EQUALS("[test.cpp:1]: (error) Shifting 64-bit value by 64 bits is undefined behaviour\n", errout_str());
+            ASSERT_EQUALS("[test.cpp:1:53]: (error) Shifting 64-bit value by 64 bits is undefined behaviour [shiftTooManyBits]\n", errout_str());
             check("signed long long f(long long x) { return (x = (signed long long)x << 64); }", dinit(CheckOptions, $.settings = &settings, $.standard = Standards::CPP14));
-            ASSERT_EQUALS("[test.cpp:1]: (error) Shifting 64-bit value by 64 bits is undefined behaviour\n", errout_str());
+            ASSERT_EQUALS("[test.cpp:1:67]: (error) Shifting 64-bit value by 64 bits is undefined behaviour [shiftTooManyBits]\n", errout_str());
             check("signed long long f(signed long long x) { return x << 63; }", dinit(CheckOptions, $.settings = &settings, $.standard = Standards::CPP14));
-            ASSERT_EQUALS("[test.cpp:1]: (portability) Shifting signed 64-bit value by 63 bits is implementation-defined behaviour\n", errout_str());
+            ASSERT_EQUALS("[test.cpp:1:51]: (portability) Shifting signed 64-bit value by 63 bits is implementation-defined behaviour [shiftTooManyBitsSigned]\n", errout_str());
             check("signed long long f(signed long long x) { return x << 62; }",dinit(CheckOptions, $.settings = &settings));
             ASSERT_EQUALS("", errout_str());
         }
 
         check("void f() { int x; x = 1 >> 64; }", dinit(CheckOptions, $.settings = &settings));
-        ASSERT_EQUALS("[test.cpp:1]: (error) Shifting 32-bit value by 64 bits is undefined behaviour\n", errout_str());
+        ASSERT_EQUALS("[test.cpp:1:25]: (error) Shifting 32-bit value by 64 bits is undefined behaviour [shiftTooManyBits]\n", errout_str());
 
         check("void foo() {\n"
               "  QList<int> someList;\n"
@@ -193,8 +193,8 @@ private:
               "const unsigned int g = foo<100>(0);\n"
               "template<unsigned int I> int hoo(unsigned int x) { return x << 32; }\n"
               "const unsigned int h = hoo<100>(0);", dinit(CheckOptions, $.settings = &settings));
-        ASSERT_EQUALS("[test.cpp:4]: (error) Shifting 32-bit value by 32 bits is undefined behaviour\n"
-                      "[test.cpp:1]: (error) Shifting 32-bit value by 100 bits is undefined behaviour\n", errout_str());
+        ASSERT_EQUALS("[test.cpp:4:61]: (error) Shifting 32-bit value by 32 bits is undefined behaviour [shiftTooManyBits]\n"
+                      "[test.cpp:1:61]: (error) Shifting 32-bit value by 100 bits is undefined behaviour [shiftTooManyBits]\n", errout_str());
 
         // #7266: C++, shift in macro
         check("void f(unsigned int x) {\n"
@@ -210,8 +210,8 @@ private:
               "    constexpr const int ret = a << shift[0];\n" // shift too many bits
               "    return ret;\n"
               "}");
-        ASSERT_EQUALS("[test.cpp:5]: (error) Shifting 32-bit value by 32 bits is undefined behaviour\n"
-                      "[test.cpp:5]: (error) Signed integer overflow for expression 'a<<shift[0]'.\n", errout_str());
+        ASSERT_EQUALS("[test.cpp:5:33]: (error) Shifting 32-bit value by 32 bits is undefined behaviour [shiftTooManyBits]\n"
+                      "[test.cpp:5:33]: (error) Signed integer overflow for expression 'a<<shift[0]'. [integerOverflow]\n", errout_str());
 
         // #8885
         check("int f(int k, int rm) {\n"
@@ -222,7 +222,7 @@ private:
               "  return rm>> k;\n"
               "}");
         ASSERT_EQUALS(
-            "[test.cpp:4] -> [test.cpp:6]: (warning) Shifting signed 32-bit value by 31 bits is undefined behaviour. See condition at line 4.\n",
+            "[test.cpp:4:9] -> [test.cpp:6:12]: (warning) Shifting signed 32-bit value by 31 bits is undefined behaviour. See condition at line 4. [shiftTooManyBitsSigned]\n",
             errout_str());
 
         check("int f(int k, int rm) {\n"
@@ -234,7 +234,7 @@ private:
               "    return rm>> k;\n"
               "}");
         ASSERT_EQUALS(
-            "[test.cpp:4] -> [test.cpp:7]: (warning) Shifting signed 32-bit value by 31 bits is undefined behaviour. See condition at line 4.\n",
+            "[test.cpp:4:14] -> [test.cpp:7:14]: (warning) Shifting signed 32-bit value by 31 bits is undefined behaviour. See condition at line 4. [shiftTooManyBitsSigned]\n",
             errout_str());
 
         check("int f(int k, int rm) {\n"

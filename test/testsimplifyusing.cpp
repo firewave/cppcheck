@@ -747,7 +747,7 @@ private:
                                     "}";
             ASSERT_EQUALS(expected, tok(code));
             ASSERT_EQUALS(
-                "[test.cpp:3]: (debug) valueFlowConditionExpressions bailout: Skipping function due to incomplete variable cout\n",
+                "[test.cpp:3:5]: (debug) valueFlowConditionExpressions bailout: Skipping function due to incomplete variable cout [valueFlowBailoutIncompleteVar]\n",
                 errout_str());
         }
         {
@@ -813,7 +813,7 @@ private:
                                  "auto S :: get ( ) . int & { return i ; }";
         ASSERT_EQUALS(expected2, tok(code2));
         TODO_ASSERT_EQUALS("",
-                           "[test.cpp:6]: (debug) auto token with no type.\n"
+                           "[test.cpp:6:1]: (debug) auto token with no type. [autoNoType]\n"
                            "", errout_str());
 
         const char code3[] = "using V = int*;\n"
@@ -821,7 +821,7 @@ private:
         const char expected3[] = "auto g ( ) . const volatile int * { return { } ; }";
         ASSERT_EQUALS(expected3, tok(code3));
         TODO_ASSERT_EQUALS("",
-                           "[test.cpp:2]: (debug) auto token with no type.\n"
+                           "[test.cpp:2:1]: (debug) auto token with no type. [autoNoType]\n"
                            "", errout_str());
     }
 

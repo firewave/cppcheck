@@ -403,7 +403,7 @@ private:
         {
             SimpleTokenizer tokenizer(settings, *this);
             ASSERT(tokenizer.tokenize(code));
-            ASSERT_EQUALS("[test.cpp:1]: (information) The code 'class x y {' is not handled. You can use -I or --include to add handling of this code.\n", errout_str());
+            ASSERT_EQUALS("[test.cpp:1:1]: (information) The code 'class x y {' is not handled. You can use -I or --include to add handling of this code. [class_X_Y]\n", errout_str());
         }
     }
 

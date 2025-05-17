@@ -449,7 +449,7 @@ private:
         const char code[] = "typedef int f(int);\n"
                             "typedef const f cf;\n";
         (void)simplifyTypedefC(code);
-        ASSERT_EQUALS("[file.c:2]: (portability) It is unspecified behavior to const qualify a function type.\n", errout_str());
+        ASSERT_EQUALS("[file.c:2:9]: (portability) It is unspecified behavior to const qualify a function type. [invalidConstFunctionType]\n", errout_str());
     }
 
     void cfunction4() {
@@ -1166,7 +1166,7 @@ private:
 
         ASSERT_EQUALS(expected, tok(code, dinit(TokOptions, $.simplify = false)));
         ASSERT_EQUALS(
-            "[test.cpp:4]: (debug) valueFlowConditionExpressions bailout: Skipping function due to incomplete variable value\n",
+            "[test.cpp:4:67]: (debug) valueFlowConditionExpressions bailout: Skipping function due to incomplete variable value [valueFlowBailoutIncompleteVar]\n",
             errout_str());
     }
 
@@ -1687,8 +1687,8 @@ private:
 
         checkSimplifyTypedef(code);
         ASSERT_EQUALS_WITHOUT_LINENUMBERS(
-            "[test.cpp:3]: (debug) valueflow.cpp:6541:(valueFlow) bailout: valueFlowAfterCondition: bailing in conditional block\n"
-            "[test.cpp:3]: (debug) valueflow.cpp:6541:(valueFlow) bailout: valueFlowAfterCondition: bailing in conditional block\n", // duplicate
+            "[test.cpp:3]: (debug) valueflow.cpp:6541:(valueFlow) bailout: valueFlowAfterCondition: bailing in conditional block [valueFlowBailout]\n"
+            "[test.cpp:3]: (debug) valueflow.cpp:6541:(valueFlow) bailout: valueFlowAfterCondition: bailing in conditional block [valueFlowBailout]\n", // duplicate
             errout_str());
     }
 
@@ -2028,7 +2028,7 @@ private:
                                 "}";
         ASSERT_EQUALS(expected, tok(code));
         ASSERT_EQUALS(
-            "[test.cpp:3]: (debug) valueFlowConditionExpressions bailout: Skipping function due to incomplete variable global\n",
+            "[test.cpp:3:50]: (debug) valueFlowConditionExpressions bailout: Skipping function due to incomplete variable global [valueFlowBailoutIncompleteVar]\n",
             errout_str());
     }
 
@@ -3025,7 +3025,7 @@ private:
                             "using array_p = const array_t *;\n"
                             "array_p x;\n";
         ASSERT_EQUALS("using array_p = const unsigned char ( * ) [ 16 ] ; array_p x ;", tok(code, dinit(TokOptions, $.simplify = false)));
-        ASSERT_EQUALS("[test.cpp:2]: (debug) Failed to parse 'using array_p = const unsigned char ( * ) [ 16 ] ;'. The checking continues anyway.\n", errout_str());
+        ASSERT_EQUALS("[test.cpp:2:1]: (debug) Failed to parse 'using array_p = const unsigned char ( * ) [ 16 ] ;'. The checking continues anyway. [simplifyUsing]\n", errout_str());
     }
 
     void simplifyTypedef134() {
@@ -3213,7 +3213,7 @@ private:
                                 "} "
                                 "struct external :: ns1 :: B<1> { } ;";
             TODO_ASSERT_EQUALS(exp, act, tok(code));
-            TODO_ASSERT_EQUALS("", "[test.cpp:14]: (debug) Executable scope 'f' with unknown function.\n", errout_str());
+            TODO_ASSERT_EQUALS("", "[test.cpp:14:13]: (debug) Executable scope 'f' with unknown function. [symbolDatabaseWarning]\n", errout_str());
         }
         {
             // using "namespace external::ns1;" without redundant qualification on declaration and definition
@@ -3347,8 +3347,8 @@ private:
             "struct Anonymous0 { struct c * b ; } ; struct Anonymous0 * d ; void e ( struct c * a ) { if ( a < d [ 0 ] . b ) { } }",
             tok(code));
         ASSERT_EQUALS_WITHOUT_LINENUMBERS(
-            "[test.cpp:6]: (debug) valueflow.cpp:6730:(valueFlow) bailout: valueFlowAfterCondition: bailing in conditional block\n"
-            "[test.cpp:6]: (debug) valueflow.cpp:6730:(valueFlow) bailout: valueFlowAfterCondition: bailing in conditional block\n", // duplicate
+            "[test.cpp:6]: (debug) valueflow.cpp:6730:(valueFlow) bailout: valueFlowAfterCondition: bailing in conditional block [valueFlowBailout]\n"
+            "[test.cpp:6]: (debug) valueflow.cpp:6730:(valueFlow) bailout: valueFlowAfterCondition: bailing in conditional block [valueFlowBailout]\n", // duplicate
             errout_str());
     }
 
@@ -4278,7 +4278,7 @@ private:
         const char code[] = "typedef int f_expand(const nrv_byte *);\n"
                             "void f(f_expand *(*get_fexp(int))){}";
         checkSimplifyTypedef(code);
-        TODO_ASSERT_EQUALS("", "[test.cpp:2]: (debug) Function::addArguments found argument 'int' with varid 0.\n", errout_str());  // make sure that there is no internal error
+        TODO_ASSERT_EQUALS("", "[test.cpp:2:29]: (debug) Function::addArguments found argument 'int' with varid 0. [varid0]\n", errout_str());  // make sure that there is no internal error
     }
 
     void simplifyTypedefFunction9() {
