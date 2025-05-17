@@ -119,7 +119,7 @@ private:
             "void foo() {\n"
             "  std::cout << std::cout;\n"
             "}");
-        ASSERT_EQUALS("[test.cpp:2]: (error) Invalid usage of output stream: '<< std::cout'.\n", errout_str());
+        ASSERT_EQUALS("[test.cpp:2:3]: (error) Invalid usage of output stream: '<< std::cout'. [coutCerrMisusage]\n", errout_str());
 
         check(
             "void foo() {\n"
@@ -175,7 +175,7 @@ private:
               "    rewind(f);\n"
               "    fwrite(buffer, 5, 6, f);\n"
               "}");
-        ASSERT_EQUALS("[test.cpp:5]: (error) Write operation on a file that was opened only for reading.\n", errout_str());
+        ASSERT_EQUALS("[test.cpp:5:5]: (error) Write operation on a file that was opened only for reading. [writeReadOnlyFile]\n", errout_str());
 
         check("void foo(FILE*& f) {\n"
               "    f = _wfopen(name, L\"r\");\n"
@@ -403,7 +403,7 @@ private:
               "    if(a) fwrite(buffer, 5, 6, f);\n"
               "    else  fread(buffer, 5, 6, f);\n"
               "}");
-        ASSERT_EQUALS("[test.cpp:4]: (error) Read operation on a file that was opened only for writing.\n", errout_str());
+        ASSERT_EQUALS("[test.cpp:4:11]: (error) Read operation on a file that was opened only for writing. [readWriteOnlyFile]\n", errout_str());
     }
 
     void useClosedFile() {
@@ -685,7 +685,7 @@ private:
               "    FILE* f = fopen(\"\", \"a\");\n"
               "    fseek(f, 0, SEEK_SET);\n"
               "}");
-        ASSERT_EQUALS("[test.cpp:3]: (warning) Repositioning operation performed on a file opened in append mode has no effect.\n", errout_str());
+        ASSERT_EQUALS("[test.cpp:3:5]: (warning) Repositioning operation performed on a file opened in append mode has no effect. [seekOnAppendedFile]\n", errout_str());
 
         check("void foo() {\n"
               "    FILE* f = fopen(\"\", \"a\");\n"
@@ -707,7 +707,7 @@ private:
               "{\n"
               "    fflush(stdin);\n"
               "}", dinit(CheckOptions, $.portability = true));
-        ASSERT_EQUALS("[test.cpp:3]: (portability) fflush() called on input stream 'stdin' may result in undefined behaviour on non-linux systems.\n", errout_str());
+        ASSERT_EQUALS("[test.cpp:3:5]: (portability) fflush() called on input stream 'stdin' may result in undefined behaviour on non-linux systems. [fflushOnInputStream]\n", errout_str());
 
         check("void foo()\n"
               "{\n"
@@ -738,7 +738,7 @@ private:
               "    FILE *f1 = fopen(\"tmp\", \"wt\");\n"
               "    FILE *f2 = fopen(\"tmp\", \"rt\");\n"
               "}");
-        ASSERT_EQUALS("[test.cpp:3]: (warning) The file '\"tmp\"' is opened for read and write access at the same time on different streams\n", errout_str());
+        ASSERT_EQUALS("[test.cpp:3:16]: (warning) The file '\"tmp\"' is opened for read and write access at the same time on different streams [incompatibleFileOpen]\n", errout_str());
     }
 
 
@@ -769,7 +769,7 @@ private:
               "    scanf(\"aa%ld\", &a);\n" // No %s
               "    scanf(\"%*[^~]\");\n" // Ignore input
               "}");
-        ASSERT_EQUALS("[test.cpp:4]: (warning) scanf format string requires 0 parameters but 1 is given.\n", errout_str());
+        ASSERT_EQUALS("[test.cpp:4:5]: (warning) scanf format string requires 0 parameters but 1 is given. [wrongPrintfScanfArgNum]\n", errout_str());
     }
 
     void testScanf3() { // ticket #3494
@@ -4900,14 +4900,14 @@ private:
               "    printf(\"%zu\", s);\n"
               "    printf(\"%f\", s);\n"
               "}\n", dinit(CheckOptions, $.portability = true));
-        ASSERT_EQUALS("[test.cpp:4]: (portability) %f in format string (no. 1) requires 'double' but the argument type is 'size_t {aka unsigned long}'.\n", errout_str());
+        ASSERT_EQUALS("[test.cpp:4:5]: (portability) %f in format string (no. 1) requires 'double' but the argument type is 'size_t {aka unsigned long}'. [invalidPrintfArgType_float]\n", errout_str());
     }
 
     void testPrintfParenthesis() { // #8489
         check("void f(int a) {\n"
               "    printf(\"%f\", (a >> 24) & 0xff);\n"
               "}");
-        ASSERT_EQUALS("[test.cpp:2]: (warning) %f in format string (no. 1) requires 'double' but the argument type is 'signed int'.\n", errout_str());
+        ASSERT_EQUALS("[test.cpp:2:5]: (warning) %f in format string (no. 1) requires 'double' but the argument type is 'signed int'. [invalidPrintfArgType_float]\n", errout_str());
 
         check("void f(int a) {\n"
               "    printf(\"%f\", 0xff & (a >> 24));\n"

@@ -110,7 +110,7 @@ private:
                 check(type + " f(" + type +" x) { return x << 31; }", dinit(CheckOptions, $.settings = &settings));
                 ASSERT_EQUALS("", errout_str());
                 check(type + " f(" + type +" x) { return x << 33; }", dinit(CheckOptions, $.settings = &settings));
-                ASSERT_EQUALS("[test.cpp:1]: (error) Shifting 32-bit value by 33 bits is undefined behaviour\n", errout_str());
+                ASSERT_EQUALS("[test.cpp:1:45]: (error) Shifting 32-bit value by 33 bits is undefined behaviour [shiftTooManyBits]\n", errout_str());
                 check(type + " f(int x) { return (x = (" + type + ")x << 32); }", dinit(CheckOptions, $.settings = &settings));
                 ASSERT_EQUALS("[test.cpp:1]: (error) Shifting 32-bit value by 32 bits is undefined behaviour\n", errout_str());
                 check(type + " foo(" + type + " x) { return x << 31; }", dinit(CheckOptions, $.settings = &settings));
