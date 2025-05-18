@@ -11,7 +11,6 @@ def __remove_std_lookup_log(l : list, exepath):
     return l
 
 
-# TODO: test with FILESDIR
 def test_lib_lookup(tmpdir):
     test_file = os.path.join(tmpdir, 'test.c')
     with open(test_file, 'wt'):
@@ -24,7 +23,6 @@ def test_lib_lookup(tmpdir):
     assert exitcode == 0, stdout if stdout else stderr
     lines = __remove_std_lookup_log(stdout.splitlines(), exepath)
     assert lines == [
-        "looking for library 'gnu'",
         "looking for library 'gnu.cfg'",
         "looking for library '{}/gnu.cfg'".format(exepath),
         "looking for library '{}/cfg/gnu.cfg'".format(exepath),
@@ -32,7 +30,65 @@ def test_lib_lookup(tmpdir):
     ]
 
 
-# TODO: test with FILESDIR
+def test_lib_lookup_ext(tmpdir):
+    test_file = os.path.join(tmpdir, 'test.c')
+    with open(test_file, 'wt'):
+        pass
+
+    exitcode, stdout, stderr, exe = cppcheck_ex(['--debug-lookup=library', '--library=gnu.cfg', test_file])
+    exepath = os.path.dirname(exe)
+    if sys.platform == 'win32':
+        exepath = exepath.replace('\\', '/')
+    assert exitcode == 0, stdout if stdout else stderr
+    lines = __remove_std_lookup_log(stdout.splitlines(), exepath)
+    assert lines == [
+        "looking for library 'gnu.cfg'",
+        "looking for library '{}/gnu.cfg'".format(exepath),
+        "looking for library '{}/cfg/gnu.cfg'".format(exepath),
+        'Checking {} ...'.format(test_file)
+    ]
+
+
+def test_lib_lookup_relative_notfound(tmpdir):
+    test_file = os.path.join(tmpdir, 'test.c')
+    with open(test_file, 'wt'):
+        pass
+
+    exitcode, stdout, stderr, exe = cppcheck_ex(['--debug-lookup=library', '--library=config/gnu.xml', test_file])
+    exepath = os.path.dirname(exe)
+    if sys.platform == 'win32':
+        exepath = exepath.replace('\\', '/')
+    assert exitcode == 1, stdout if stdout else stderr
+    lines = __remove_std_lookup_log(stdout.splitlines(), exepath)
+    assert lines == [
+        "looking for library 'config/gnu.xml'",
+        "looking for library '{}/config/gnu.xml'".format(exepath),
+        "looking for library '{}/cfg/config/gnu.xml'".format(exepath),
+        "library not found: 'config/gnu.xml'",
+        "cppcheck: Failed to load library configuration file 'config/gnu.xml'. File not found"
+    ]
+
+
+def test_lib_lookup_relative_noext_notfound(tmpdir):
+    test_file = os.path.join(tmpdir, 'test.c')
+    with open(test_file, 'wt'):
+        pass
+
+    exitcode, stdout, stderr, exe = cppcheck_ex(['--debug-lookup=library', '--library=config/gnu', test_file])
+    exepath = os.path.dirname(exe)
+    if sys.platform == 'win32':
+        exepath = exepath.replace('\\', '/')
+    assert exitcode == 1, stdout if stdout else stderr
+    lines = __remove_std_lookup_log(stdout.splitlines(), exepath)
+    assert lines == [
+        "looking for library 'config/gnu.cfg'",
+        "looking for library '{}/config/gnu.cfg'".format(exepath),
+        "looking for library '{}/cfg/config/gnu.cfg'".format(exepath),
+        "library not found: 'config/gnu'",
+        "cppcheck: Failed to load library configuration file 'config/gnu'. File not found"
+    ]
+
+
 def test_lib_lookup_notfound(tmpdir):
     test_file = os.path.join(tmpdir, 'test.c')
     with open(test_file, 'wt'):
@@ -46,7 +102,6 @@ def test_lib_lookup_notfound(tmpdir):
     lines = __remove_std_lookup_log(stdout.splitlines(), exepath)
     assert lines == [
         # TODO: specify which folder is actually used for lookup here
-        "looking for library 'none'",  # TODO: this could conflict with the platform lookup
         "looking for library 'none.cfg'",
         # TODO: lookup of '{exepath}/none' missing - could conflict with the platform lookup though
         "looking for library '{}/none.cfg'".format(exepath),
@@ -120,7 +175,6 @@ def test_lib_lookup_nofile(tmpdir):
     assert exitcode == 0, stdout if stdout else stderr
     lines = __remove_std_lookup_log(stdout.splitlines(), exepath)
     assert lines == [
-        "looking for library 'gtk'",
         "looking for library 'gtk.cfg'",
         "looking for library '{}/gtk.cfg'".format(exepath),
         "looking for library '{}/cfg/gtk.cfg'".format(exepath),
@@ -140,11 +194,9 @@ def test_lib_lookup_multi(tmpdir):
     assert exitcode == 0, stdout if stdout else stderr
     lines = __remove_std_lookup_log(stdout.splitlines(), exepath)
     assert lines == [
-        "looking for library 'posix'",
         "looking for library 'posix.cfg'",
         "looking for library '{}/posix.cfg'".format(exepath),
         "looking for library '{}/cfg/posix.cfg'".format(exepath),
-        "looking for library 'gnu'",
         "looking for library 'gnu.cfg'",
         "looking for library '{}/gnu.cfg'".format(exepath),
         "looking for library '{}/cfg/gnu.cfg'".format(exepath),
@@ -167,7 +219,6 @@ def test_platform_lookup_builtin(tmpdir):
 
 
 # TODO: behaves differently when using a CMake build
-# TODO: test with FILESDIR
 @pytest.mark.skip
 def test_platform_lookup_external(tmpdir):
     test_file = os.path.join(tmpdir, 'test.c')
@@ -190,7 +241,6 @@ def test_platform_lookup_external(tmpdir):
     ]
 
 
-# TODO: test with FILESDIR
 def test_platform_lookup_external_notfound(tmpdir):
     test_file = os.path.join(tmpdir, 'test.c')
     with open(test_file, 'wt'):
@@ -218,7 +268,6 @@ def test_platform_lookup_external_notfound(tmpdir):
     ]
 
 
-# TODO: test with FILESDIR
 def test_addon_lookup(tmpdir):
     test_file = os.path.join(tmpdir, 'test.c')
     with open(test_file, 'wt'):
@@ -237,7 +286,6 @@ def test_addon_lookup(tmpdir):
     ]
 
 
-# TODO: test with FILESDIR
 def test_addon_lookup_ext(tmpdir):
     test_file = os.path.join(tmpdir, 'test.c')
     with open(test_file, 'wt'):
@@ -256,7 +304,6 @@ def test_addon_lookup_ext(tmpdir):
     ]
 
 
-# TODO: test with FILESDIR
 def test_addon_lookup_notfound(tmpdir):
     test_file = os.path.join(tmpdir, 'test.c')
     with open(test_file, 'wt'):
@@ -275,7 +322,6 @@ def test_addon_lookup_notfound(tmpdir):
     ]
 
 
-# TODO: test with FILESDIR
 def test_addon_lookup_ext_notfound(tmpdir):
     test_file = os.path.join(tmpdir, 'test.c')
     with open(test_file, 'wt'):
@@ -294,7 +340,6 @@ def test_addon_lookup_ext_notfound(tmpdir):
     ]
 
 
-# TODO: test with FILESDIR
 @pytest.mark.skip
 def test_config_lookup(tmpdir):
     test_file = os.path.join(tmpdir, 'test.c')
@@ -318,7 +363,6 @@ def test_config_lookup(tmpdir):
     ]
 
 
-# TODO: test with FILESDIR
 def test_config_lookup_notfound(tmpdir):
     test_file = os.path.join(tmpdir, 'test.c')
     with open(test_file, 'wt'):
@@ -334,3 +378,7 @@ def test_config_lookup_notfound(tmpdir):
         'no configuration found',
         'Checking {} ...'.format(test_file)
     ]
+
+# TODO: test with FILESDIR
+# TODO: test all extension-less lookups
+# TODO: test with extension already in place

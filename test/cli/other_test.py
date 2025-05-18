@@ -3544,3 +3544,6 @@ void f()
     assert stderr.splitlines() == [
         "{}:2:1: error: Code 'template<...' is invalid C code. [syntaxError]".format(test_file)
     ]
+
+# TODO: test all extension-less lookups
+# TODO: test with extension already in place
