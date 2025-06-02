@@ -295,6 +295,7 @@ private:
         ASSERT_EQUALS("        <error id=\"id\" severity=\"warning\" msg=\"\" verbose=\"\" remark=\"remark\"/>", msg.toXML());
     }
 
+    // TODO: test as roundtrip instead
     void ToXml() const {
         const ErrorMessage::FileLocation dir1loc{"dir1/a.cpp", 1, 1};
         const ErrorMessage::FileLocation dir2loc{"dir2\\a.cpp", 1, 1};
