@@ -341,7 +341,7 @@ private:
                                " cwe=\"123\""
                                " inconclusive=\"true\""
                                " msg=\"Programming error.\""
-                               " verbose=\"Verbose error\""
+                               " verbose=\"Verbose error:\012line1\012line2\""
                                " hash=\"456\""
                                ">\n"
                                "  <location file=\"bar.cpp\" line=\"8\" column=\"1\"/>\n"
@@ -357,7 +357,7 @@ private:
         ASSERT_EQUALS(123u, msg.cwe.id);
         ASSERT_EQUALS_ENUM(Certainty::inconclusive, msg.certainty);
         ASSERT_EQUALS("Programming error.", msg.shortMessage());
-        ASSERT_EQUALS("Verbose error", msg.verboseMessage());
+        ASSERT_EQUALS("Verbose error:\nline1\nline2", msg.verboseMessage());
         ASSERT_EQUALS(456u, msg.hash);
         ASSERT_EQUALS(2u, msg.callStack.size());
         ASSERT_EQUALS("foo.cpp", msg.callStack.front().getfile());
