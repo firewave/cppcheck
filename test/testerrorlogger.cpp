@@ -55,9 +55,9 @@ private:
         TEST_CASE(CustomFormatLocations);
         TEST_CASE(ToXmlV2);
         TEST_CASE(ToXmlV2RemarkComment);
-        TEST_CASE(ToXmlV2Locations);
+        TEST_CASE(ToXml);
         TEST_CASE(ToXmlV2Encoding);
-        TEST_CASE(FromXmlV2);
+        TEST_CASE(FromXml);
         TEST_CASE(ToXmlV3);
 
         // Inconclusive results in xml reports..
@@ -295,7 +295,7 @@ private:
         ASSERT_EQUALS("        <error id=\"id\" severity=\"warning\" msg=\"\" verbose=\"\" remark=\"remark\"/>", msg.toXML());
     }
 
-    void ToXmlV2Locations() const {
+    void ToXml() const {
         const ErrorMessage::FileLocation dir1loc{"dir1/a.cpp", 1, 1};
         const ErrorMessage::FileLocation dir2loc{"dir2\\a.cpp", 1, 1};
         ErrorMessage::FileLocation dir3loc{"dir/a.cpp", 1, 1};
@@ -304,9 +304,9 @@ private:
         dir4loc.setfile("dir4\\a.cpp");
         std::list<ErrorMessage::FileLocation> locs = { dir4loc, dir3loc, dir2loc, dir1loc, fooCpp5, barCpp8_i };
 
-        ErrorMessage msg(std::move(locs), "", Severity::error, "Programming error.\nVerbose error", "errorId", Certainty::normal);
+        ErrorMessage msg(std::move(locs), "", Severity::error, "Programming error.\nVerbose error:\nline1\nline2", "errorId", Certainty::normal);
         std::string message;
-        message += "        <error id=\"errorId\" severity=\"error\" msg=\"Programming error.\" verbose=\"Verbose error\">\n";
+        message += "        <error id=\"errorId\" severity=\"error\" msg=\"Programming error.\" verbose=\"Verbose error:\\012line1\\012line2\">\n";
         message += "            <location file=\"bar.cpp\" line=\"8\" column=\"1\" info=\"\\303\\244\"/>\n";
         message += "            <location file=\"foo.cpp\" line=\"5\" column=\"1\"/>\n";
         message += "            <location file=\"dir1/a.cpp\" line=\"1\" column=\"1\"/>\n";
@@ -334,7 +334,7 @@ private:
         }
     }
 
-    void FromXmlV2() const {
+    void FromXml() const {
         const char xmldata[] = "<?xml version=\"1.0\"?>\n"
                                "<error id=\"errorId\""
                                " severity=\"error\""
@@ -345,7 +345,7 @@ private:
                                " hash=\"456\""
                                ">\n"
                                "  <location file=\"bar.cpp\" line=\"8\" column=\"1\"/>\n"
-                               "  <location file=\"foo.cpp\" line=\"5\" column=\"2\"/>\n"
+                               "  <location file=\"foo.cpp\" line=\"5\" column=\"2\" info=\"info\"/>\n"
                                "</error>";
         tinyxml2::XMLDocument doc;
         ASSERT(doc.Parse(xmldata, sizeof(xmldata)) == tinyxml2::XML_SUCCESS);
@@ -363,9 +363,11 @@ private:
         ASSERT_EQUALS("foo.cpp", msg.callStack.front().getfile());
         ASSERT_EQUALS(5, msg.callStack.front().line);
         ASSERT_EQUALS(2u, msg.callStack.front().column);
+        ASSERT_EQUALS("info", msg.callStack.front().getinfo());
         ASSERT_EQUALS("bar.cpp", msg.callStack.back().getfile());
         ASSERT_EQUALS(8, msg.callStack.back().line);
         ASSERT_EQUALS(1u, msg.callStack.back().column);
+        ASSERT_EQUALS("", msg.callStack.back().getinfo());
     }
 
     void ToXmlV3() const {
