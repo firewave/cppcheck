@@ -342,7 +342,7 @@ private:
                                " cwe=\"123\""
                                " inconclusive=\"true\""
                                " msg=\"Programming error.\""
-                               " verbose=\"Verbose error:\012line1\012line2\""
+                               " verbose=\"Verbose error:\\012line1\\012line2\""
                                " hash=\"456\""
                                ">\n"
                                "  <location file=\"bar.cpp\" line=\"8\" column=\"1\"/>\n"

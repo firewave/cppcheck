@@ -90,6 +90,7 @@ static bool skipAnalysis(const std::string &analyzerInfoFile, std::size_t hash, 
     if (error != tinyxml2::XML_SUCCESS)
         return false;
 
+    // TODO: check name of root node
     const tinyxml2::XMLElement * const rootNode = doc.FirstChildElement();
     if (rootNode == nullptr)
         return false;
