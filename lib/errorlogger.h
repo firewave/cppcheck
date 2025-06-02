@@ -208,7 +208,7 @@ public:
     static ErrorMessage fromInternalError(const InternalError &internalError, const TokenList *tokenList, const std::string &filename, const std::string& msg = "");
 
 private:
-    static std::string fixInvalidChars(const std::string& raw);
+    static std::string escapeXmlChars(const std::string& raw);
 
     /** Short message */
     std::string mShortMessage;

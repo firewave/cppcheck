@@ -342,7 +342,7 @@ private:
                                " cwe=\"123\""
                                " inconclusive=\"true\""
                                " msg=\"Programming error.\""
-                               " verbose=\"Verbose error:\\012line1\\012line2\""
+                               " verbose=\"Verbose error:&#12;line1&#12;line2\""
                                " hash=\"456\""
                                ">\n"
                                "  <location file=\"bar.cpp\" line=\"8\" column=\"1\"/>\n"
@@ -358,7 +358,7 @@ private:
         ASSERT_EQUALS(123u, msg.cwe.id);
         ASSERT_EQUALS_ENUM(Certainty::inconclusive, msg.certainty);
         ASSERT_EQUALS("Programming error.", msg.shortMessage());
-        ASSERT_EQUALS("Verbose error:\nline1\nline2", msg.verboseMessage());
+        ASSERT_EQUALS("Verbose error:\xcline1\xcline2", msg.verboseMessage());
         ASSERT_EQUALS(456u, msg.hash);
         ASSERT_EQUALS(2u, msg.callStack.size());
         ASSERT_EQUALS("foo.cpp", msg.callStack.front().getfile());
@@ -495,6 +495,7 @@ private:
         }
     }
 
+    // TODO: update with properly escaped data
     void SerializeSanitize() const {
         std::list<ErrorMessage::FileLocation> locs;
         ErrorMessage msg(std::move(locs), "", Severity::error, std::string("Illegal character in \"foo\001bar\""), "errorId", Certainty::normal);

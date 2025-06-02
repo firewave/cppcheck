@@ -279,12 +279,12 @@ std::string ErrorMessage::serialize() const
     serializeString(oss, severityToString(severity));
     serializeString(oss, std::to_string(cwe.id));
     serializeString(oss, std::to_string(hash));
-    serializeString(oss, fixInvalidChars(remark));
+    serializeString(oss, escapeXmlChars(remark));
     serializeString(oss, file0);
     serializeString(oss, (certainty == Certainty::inconclusive) ? "1" : "0");
 
-    const std::string saneShortMessage = fixInvalidChars(mShortMessage);
-    const std::string saneVerboseMessage = fixInvalidChars(mVerboseMessage);
+    const std::string saneShortMessage = escapeXmlChars(mShortMessage);
+    const std::string saneVerboseMessage = escapeXmlChars(mVerboseMessage);
 
     serializeString(oss, saneShortMessage);
     serializeString(oss, saneVerboseMessage);
@@ -459,10 +459,10 @@ std::string ErrorMessage::getXMLFooter(int xmlVersion)
     return xmlVersion == 3 ? "</results>" : "    </errors>\n</results>";
 }
 
-// There is no utf-8 support around but the strings should at least be safe for to tinyxml2.
-// See #5300 "Invalid encoding in XML output" and  #6431 "Invalid XML created - Invalid encoding of string literal "
-std::string ErrorMessage::fixInvalidChars(const std::string& raw)
+// See #5300 "Invalid encoding in XML output" and #6431 "Invalid XML created - Invalid encoding of string literal "
+std::string ErrorMessage::escapeXmlChars(const std::string& raw)
 {
+    return raw;
     std::string result;
     result.reserve(raw.length());
     auto from=raw.cbegin();
@@ -473,7 +473,7 @@ std::string ErrorMessage::fixInvalidChars(const std::string& raw)
             std::ostringstream es;
             // straight cast to (unsigned) doesn't work out.
             const unsigned uFrom = static_cast<unsigned char>(*from);
-            es << '\\' << std::setbase(8) << std::setw(3) << std::setfill('0') << uFrom;
+            es << "&#" << std::setbase(8) << uFrom << ';';
             result += es.str();
         }
         ++from;
@@ -491,8 +491,8 @@ std::string ErrorMessage::toXML() const
     printer.PushAttribute("severity", severityToString(severity).c_str());
     if (!classification.empty())
         printer.PushAttribute("classification", classification.c_str());
-    printer.PushAttribute("msg", fixInvalidChars(mShortMessage).c_str());
-    printer.PushAttribute("verbose", fixInvalidChars(mVerboseMessage).c_str());
+    printer.PushAttribute("msg", escapeXmlChars(mShortMessage).c_str());
+    printer.PushAttribute("verbose", escapeXmlChars(mVerboseMessage).c_str());
     if (cwe.id)
         printer.PushAttribute("cwe", cwe.id);
     if (hash)
@@ -504,7 +504,7 @@ std::string ErrorMessage::toXML() const
         printer.PushAttribute("file0", file0.c_str());
 
     if (!remark.empty())
-        printer.PushAttribute("remark", fixInvalidChars(remark).c_str());
+        printer.PushAttribute("remark", escapeXmlChars(remark).c_str());
 
     for (auto it = callStack.crbegin(); it != callStack.crend(); ++it) {
         printer.OpenElement("location", false);
@@ -512,7 +512,7 @@ std::string ErrorMessage::toXML() const
         printer.PushAttribute("line", std::max(it->line,0));
         printer.PushAttribute("column", it->column);
         if (!it->getinfo().empty())
-            printer.PushAttribute("info", fixInvalidChars(it->getinfo()).c_str());
+            printer.PushAttribute("info", escapeXmlChars(it->getinfo()).c_str());
         printer.CloseElement(false);
     }
     for (std::string::size_type pos = 0; pos < mSymbolNames.size();) {
