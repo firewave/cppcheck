@@ -1616,15 +1616,19 @@ namespace {
                 const Function* f = ftok->function();
                 ValueFlow::Value result = unknown();
                 if (expr->str() == "(") {
-                    std::vector<const Token*> tokArgs = getArguments(expr);
-                    std::vector<ValueFlow::Value> args(tokArgs.size());
-                    std::transform(
-                        tokArgs.cbegin(), tokArgs.cend(), args.begin(), [&](const Token* tok) {
-                        return execute(tok);
-                    });
+                    auto get_args = [&]() -> std::vector<ValueFlow::Value> {
+                        std::vector<const Token*> tokArgs = getArguments(expr);
+                        std::vector<ValueFlow::Value> args(tokArgs.size());
+                        std::transform(
+                            tokArgs.cbegin(), tokArgs.cend(), args.begin(), [&](const Token* tok) {
+                            return execute(tok);
+                        });
+                        return args;
+                    };
                     if (f) {
                         if (fdepth >= 0 && !f->isImplicitlyVirtual()) {
                             ProgramMemory functionState;
+                            auto args = get_args();
                             for (std::size_t i = 0; i < args.size(); ++i) {
                                 const Variable* const arg = f->getArgumentVar(i);
                                 if (!arg)
@@ -1642,12 +1646,12 @@ namespace {
                     } else {
                         BuiltinLibraryFunction lf = getBuiltinLibraryFunction(ftok->str());
                         if (lf)
-                            return lf(args);
+                            return lf(get_args());
                         const std::string& returnValue = settings.library.returnValue(ftok);
                         if (!returnValue.empty()) {
                             std::unordered_map<nonneg int, ValueFlow::Value> arg_map;
                             int argn = 0;
-                            for (const ValueFlow::Value& v : args) {
+                            for (const ValueFlow::Value& v : get_args()) {
                                 if (!v.isUninitValue())
                                     arg_map[argn] = v;
                                 argn++;
