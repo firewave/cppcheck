@@ -248,6 +248,9 @@ struct ReferenceToken {
         : token(t)
         , errors(std::move(e))
     {}
+    bool operator==(const ReferenceToken &other) const {
+        return (token == other.token) && (errors == other.errors);
+    }
     const Token* token;
     ErrorPath errors;
 };
