@@ -68,7 +68,6 @@
     <ClCompile Include="findtoken.cpp" />
     <ClCompile Include="forwardanalyzer.cpp" />
     <ClCompile Include="fwdanalysis.cpp" />
-    <ClCompile Include="importproject.cpp" />
     <ClCompile Include="infer.cpp" />
     <ClCompile Include="keywords.cpp" />
     <ClCompile Include="library.cpp" />
@@ -141,7 +140,6 @@
     <ClInclude Include="findtoken.h" />
     <ClInclude Include="forwardanalyzer.h" />
     <ClInclude Include="fwdanalysis.h" />
-    <ClInclude Include="importproject.h" />
     <ClInclude Include="infer.h" />
     <ClInclude Include="json.h" />
     <ClInclude Include="keywords.h" />

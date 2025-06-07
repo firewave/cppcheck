@@ -35,6 +35,7 @@
     <ClCompile Include="..\cli\stacktrace.cpp" />
     <ClCompile Include="..\cli\threadexecutor.cpp" />
     <ClCompile Include="..\frontend\frontend.cpp" />
+    <ClCompile Include="..\frontend\importproject.cpp" />
     <ClCompile Include="fixture.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
@@ -127,6 +128,7 @@
     <ClInclude Include="..\cli\stacktrace.h" />
     <ClInclude Include="..\cli\threadexecutor.h" />
     <ClInclude Include="..\frontend\frontend.h" />
+    <ClInclude Include="..\frontend\importproject.h" />
     <ClInclude Include="fixture.h" />
     <ClInclude Include="helpers.h" />
     <ClInclude Include="options.h" />

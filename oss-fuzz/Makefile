@@ -76,7 +76,6 @@ LIBOBJ =      $(libcppdir)/valueflow.o \
               $(libcppdir)/findtoken.o \
               $(libcppdir)/forwardanalyzer.o \
               $(libcppdir)/fwdanalysis.o \
-              $(libcppdir)/importproject.o \
               $(libcppdir)/infer.o \
               $(libcppdir)/keywords.o \
               $(libcppdir)/library.o \
@@ -272,9 +271,6 @@ $(libcppdir)/forwardanalyzer.o: ../lib/forwardanalyzer.cpp ../lib/addoninfo.h ..
 
 $(libcppdir)/fwdanalysis.o: ../lib/fwdanalysis.cpp ../lib/addoninfo.h ../lib/astutils.h ../lib/checkers.h ../lib/config.h ../lib/errortypes.h ../lib/fwdanalysis.h ../lib/library.h ../lib/mathlib.h ../lib/platform.h ../lib/settings.h ../lib/smallvector.h ../lib/sourcelocation.h ../lib/standards.h ../lib/symboldatabase.h ../lib/templatesimplifier.h ../lib/token.h ../lib/utils.h ../lib/vfvalue.h
 	$(CXX) ${LIB_FUZZING_ENGINE} $(CPPFLAGS) $(CXXFLAGS) -c -o $@ $(libcppdir)/fwdanalysis.cpp
-
-$(libcppdir)/importproject.o: ../lib/importproject.cpp ../externals/picojson/picojson.h ../externals/tinyxml2/tinyxml2.h ../lib/addoninfo.h ../lib/checkers.h ../lib/config.h ../lib/errortypes.h ../lib/filesettings.h ../lib/importproject.h ../lib/json.h ../lib/library.h ../lib/mathlib.h ../lib/path.h ../lib/platform.h ../lib/settings.h ../lib/standards.h ../lib/suppressions.h ../lib/templatesimplifier.h ../lib/token.h ../lib/tokenlist.h ../lib/utils.h ../lib/vfvalue.h ../lib/xml.h
-	$(CXX) ${LIB_FUZZING_ENGINE} $(CPPFLAGS) $(CXXFLAGS) -c -o $@ $(libcppdir)/importproject.cpp
 
 $(libcppdir)/infer.o: ../lib/infer.cpp ../lib/calculate.h ../lib/config.h ../lib/errortypes.h ../lib/infer.h ../lib/mathlib.h ../lib/templatesimplifier.h ../lib/token.h ../lib/utils.h ../lib/valueptr.h ../lib/vfvalue.h
 	$(CXX) ${LIB_FUZZING_ENGINE} $(CPPFLAGS) $(CXXFLAGS) -c -o $@ $(libcppdir)/infer.cpp

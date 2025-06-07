@@ -232,6 +232,7 @@
     <ClInclude Include="stacktrace.h" />
     <ClInclude Include="threadexecutor.h" />
     <ClInclude Include="..\frontend\frontend.h" />
+    <ClInclude Include="..\frontend\importproject.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\lib\cppcheck.vcxproj">
@@ -256,6 +257,7 @@
     <ClCompile Include="stacktrace.cpp" />
     <ClCompile Include="threadexecutor.cpp" />
     <ClCompile Include="..\frontend\frontend.cpp" />
+    <ClCompile Include="..\frontend\importproject.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets" />

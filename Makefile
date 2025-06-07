@@ -227,7 +227,6 @@ LIBOBJ =      $(libcppdir)/valueflow.o \
               $(libcppdir)/findtoken.o \
               $(libcppdir)/forwardanalyzer.o \
               $(libcppdir)/fwdanalysis.o \
-              $(libcppdir)/importproject.o \
               $(libcppdir)/infer.o \
               $(libcppdir)/keywords.o \
               $(libcppdir)/library.o \
@@ -256,7 +255,8 @@ LIBOBJ =      $(libcppdir)/valueflow.o \
 EXTOBJ =      externals/simplecpp/simplecpp.o \
               externals/tinyxml2/tinyxml2.o
 
-FEOBJ =       frontend/frontend.o
+FEOBJ =       frontend/frontend.o \
+              frontend/importproject.o
 
 CLIOBJ =      cli/cmdlineparser.o \
               cli/cppcheckexecutor.o \
@@ -584,9 +584,6 @@ $(libcppdir)/forwardanalyzer.o: lib/forwardanalyzer.cpp lib/addoninfo.h lib/anal
 $(libcppdir)/fwdanalysis.o: lib/fwdanalysis.cpp lib/addoninfo.h lib/astutils.h lib/checkers.h lib/config.h lib/errortypes.h lib/fwdanalysis.h lib/library.h lib/mathlib.h lib/platform.h lib/settings.h lib/smallvector.h lib/sourcelocation.h lib/standards.h lib/symboldatabase.h lib/templatesimplifier.h lib/token.h lib/utils.h lib/vfvalue.h
 	$(CXX) ${INCLUDE_FOR_LIB} $(CPPFLAGS) $(CXXFLAGS) -c -o $@ $(libcppdir)/fwdanalysis.cpp
 
-$(libcppdir)/importproject.o: lib/importproject.cpp externals/picojson/picojson.h externals/tinyxml2/tinyxml2.h lib/addoninfo.h lib/checkers.h lib/config.h lib/errortypes.h lib/filesettings.h lib/importproject.h lib/json.h lib/library.h lib/mathlib.h lib/path.h lib/platform.h lib/settings.h lib/standards.h lib/suppressions.h lib/templatesimplifier.h lib/token.h lib/tokenlist.h lib/utils.h lib/vfvalue.h lib/xml.h
-	$(CXX) ${INCLUDE_FOR_LIB} $(CPPFLAGS) $(CXXFLAGS) -c -o $@ $(libcppdir)/importproject.cpp
-
 $(libcppdir)/infer.o: lib/infer.cpp lib/calculate.h lib/config.h lib/errortypes.h lib/infer.h lib/mathlib.h lib/templatesimplifier.h lib/token.h lib/utils.h lib/valueptr.h lib/vfvalue.h
 	$(CXX) ${INCLUDE_FOR_LIB} $(CPPFLAGS) $(CXXFLAGS) -c -o $@ $(libcppdir)/infer.cpp
 
@@ -662,7 +659,10 @@ $(libcppdir)/vfvalue.o: lib/vfvalue.cpp lib/config.h lib/errortypes.h lib/mathli
 frontend/frontend.o: frontend/frontend.cpp frontend/frontend.h
 	$(CXX) ${INCLUDE_FOR_FE} $(CPPFLAGS) $(CXXFLAGS) -c -o $@ frontend/frontend.cpp
 
-cli/cmdlineparser.o: cli/cmdlineparser.cpp cli/cmdlinelogger.h cli/cmdlineparser.h cli/filelister.h externals/tinyxml2/tinyxml2.h lib/addoninfo.h lib/check.h lib/checkers.h lib/color.h lib/config.h lib/cppcheck.h lib/errorlogger.h lib/errortypes.h lib/filesettings.h lib/importproject.h lib/library.h lib/mathlib.h lib/path.h lib/pathmatch.h lib/platform.h lib/settings.h lib/standards.h lib/suppressions.h lib/timer.h lib/utils.h lib/xml.h
+frontend/importproject.o: frontend/importproject.cpp externals/picojson/picojson.h externals/tinyxml2/tinyxml2.h frontend/importproject.h lib/addoninfo.h lib/checkers.h lib/config.h lib/errortypes.h lib/filesettings.h lib/json.h lib/library.h lib/mathlib.h lib/path.h lib/platform.h lib/settings.h lib/standards.h lib/suppressions.h lib/templatesimplifier.h lib/token.h lib/tokenlist.h lib/utils.h lib/vfvalue.h lib/xml.h
+	$(CXX) ${INCLUDE_FOR_FE} $(CPPFLAGS) $(CXXFLAGS) -c -o $@ frontend/importproject.cpp
+
+cli/cmdlineparser.o: cli/cmdlineparser.cpp cli/cmdlinelogger.h cli/cmdlineparser.h cli/filelister.h externals/tinyxml2/tinyxml2.h lib/addoninfo.h lib/check.h lib/checkers.h lib/color.h lib/config.h lib/cppcheck.h lib/errorlogger.h lib/errortypes.h lib/filesettings.h lib/library.h lib/mathlib.h lib/path.h lib/pathmatch.h lib/platform.h lib/settings.h lib/standards.h lib/suppressions.h lib/timer.h lib/utils.h lib/xml.h
 	$(CXX) ${INCLUDE_FOR_CLI} $(CPPFLAGS) $(CXXFLAGS) -c -o $@ cli/cmdlineparser.cpp
 
 cli/cppcheckexecutor.o: cli/cppcheckexecutor.cpp cli/cmdlinelogger.h cli/cmdlineparser.h cli/cppcheckexecutor.h cli/executor.h cli/processexecutor.h cli/sehwrapper.h cli/signalhandler.h cli/singleexecutor.h cli/threadexecutor.h externals/picojson/picojson.h lib/addoninfo.h lib/analyzerinfo.h lib/check.h lib/checkers.h lib/checkersreport.h lib/color.h lib/config.h lib/cppcheck.h lib/errorlogger.h lib/errortypes.h lib/filesettings.h lib/json.h lib/library.h lib/mathlib.h lib/path.h lib/platform.h lib/settings.h lib/standards.h lib/suppressions.h lib/utils.h
@@ -776,7 +776,7 @@ test/testfunctions.o: test/testfunctions.cpp lib/addoninfo.h lib/check.h lib/che
 test/testgarbage.o: test/testgarbage.cpp lib/addoninfo.h lib/check.h lib/checkers.h lib/color.h lib/config.h lib/errorlogger.h lib/errortypes.h lib/library.h lib/mathlib.h lib/path.h lib/platform.h lib/settings.h lib/standards.h lib/templatesimplifier.h lib/token.h lib/tokenize.h lib/tokenlist.h lib/utils.h lib/vfvalue.h test/fixture.h test/helpers.h
 	$(CXX) ${INCLUDE_FOR_TEST} $(CPPFLAGS) $(CXXFLAGS) -c -o $@ test/testgarbage.cpp
 
-test/testimportproject.o: test/testimportproject.cpp lib/addoninfo.h lib/check.h lib/checkers.h lib/color.h lib/config.h lib/errorlogger.h lib/errortypes.h lib/filesettings.h lib/importproject.h lib/library.h lib/mathlib.h lib/path.h lib/platform.h lib/settings.h lib/standards.h lib/suppressions.h lib/utils.h test/fixture.h test/redirect.h
+test/testimportproject.o: test/testimportproject.cpp lib/addoninfo.h lib/check.h lib/checkers.h lib/color.h lib/config.h lib/errorlogger.h lib/errortypes.h lib/filesettings.h lib/library.h lib/mathlib.h lib/path.h lib/platform.h lib/settings.h lib/standards.h lib/suppressions.h lib/utils.h test/fixture.h test/redirect.h
 	$(CXX) ${INCLUDE_FOR_TEST} $(CPPFLAGS) $(CXXFLAGS) -c -o $@ test/testimportproject.cpp
 
 test/testincompletestatement.o: test/testincompletestatement.cpp lib/addoninfo.h lib/check.h lib/checkers.h lib/checkother.h lib/color.h lib/config.h lib/errorlogger.h lib/errortypes.h lib/library.h lib/mathlib.h lib/path.h lib/platform.h lib/settings.h lib/standards.h lib/tokenize.h lib/tokenlist.h lib/utils.h test/fixture.h test/helpers.h
