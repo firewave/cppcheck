@@ -353,7 +353,7 @@ $(libcppdir)/vfvalue.o: ../lib/vfvalue.cpp ../lib/config.h ../lib/errortypes.h .
 ../frontend/frontend.o: ../frontend/frontend.cpp ../frontend/frontend.h
 	$(CXX) ${LIB_FUZZING_ENGINE} $(CPPFLAGS) $(CXXFLAGS) -c -o $@ ../frontend/frontend.cpp
 
-../frontend/importproject.o: ../frontend/importproject.cpp ../frontend/importproject.h externals/picojson/picojson.h externals/tinyxml2/tinyxml2.h lib/addoninfo.h lib/checkers.h lib/config.h lib/errortypes.h lib/filesettings.h lib/json.h lib/library.h lib/mathlib.h lib/path.h lib/platform.h lib/settings.h lib/standards.h lib/suppressions.h lib/templatesimplifier.h lib/token.h lib/tokenlist.h lib/utils.h lib/vfvalue.h lib/xml.h
+../frontend/importproject.o: ../frontend/importproject.cpp ../frontend/importproject.h
 	$(CXX) ${LIB_FUZZING_ENGINE} $(CPPFLAGS) $(CXXFLAGS) -c -o $@ ../frontend/importproject.cpp
 
 
