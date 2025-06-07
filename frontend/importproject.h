@@ -51,7 +51,7 @@ namespace cppcheck {
 /**
  * @brief Importing project settings.
  */
-class CPPCHECKLIB WARN_UNUSED ImportProject {
+class WARN_UNUSED ImportProject {
 public:
     enum class Type : std::uint8_t {
         NONE,
