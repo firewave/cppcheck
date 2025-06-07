@@ -335,7 +335,7 @@ static void makeMatchcompiler(std::ostream& fout, const std::string& toolsPrefix
          << "endif\n\n";
 }
 
-static void write_ossfuzz_makefile(std::vector<std::string> libfiles_prio, std::vector<std::string> extfiles)
+static void write_ossfuzz_makefile(std::vector<std::string> libfiles_prio, std::vector<std::string> extfiles, std::vector<std::string> fefiles)
 {
     for (auto& l : libfiles_prio)
     {
@@ -345,6 +345,11 @@ static void write_ossfuzz_makefile(std::vector<std::string> libfiles_prio, std::
     for (auto& e : extfiles)
     {
         e = "../" + e;
+    }
+
+    for (auto& fe : fefiles)
+    {
+        fe = "../" + fe;
     }
 
     std::ofstream fout("oss-fuzz/Makefile");
@@ -363,6 +368,8 @@ static void write_ossfuzz_makefile(std::vector<std::string> libfiles_prio, std::
     fout << '\n';
     fout << "EXTOBJ =      " << objfiles(extfiles) << "\n";
     fout << '\n';
+    fout << "FEOBJ =      " << objfiles(fefiles) << "\n";
+    fout << '\n';
     fout << "oss-fuzz-client: $(EXTOBJ) $(LIBOBJ) main.o type2.o\n";
     fout << "\t${CXX} $(CPPFLAGS) ${CXXFLAGS} -o $@ $^ ${LIB_FUZZING_ENGINE}\n";
     fout << '\n';
@@ -372,8 +379,11 @@ static void write_ossfuzz_makefile(std::vector<std::string> libfiles_prio, std::
     fout << "translate: translate.o type2.o\n";
     fout << "\t${CXX} -std=c++11 -g ${CXXFLAGS} -o $@ type2.cpp translate.cpp\n";
     fout << '\n';
+    fout << "import-fuzz: $(FEOBJ) $(LIBOBJ) import-fuzz-main.o\n";
+    fout << "\t${CXX} $(CPPFLAGS) ${CXXFLAGS} -o $@ $^ ${LIB_FUZZING_ENGINE}\n";
+    fout << '\n';
     fout << "clean:\n";
-    fout << "\trm -f *.o build/*.o oss-fuzz-client no-fuzz translate\n";
+    fout << "\trm -f *.o build/*.o oss-fuzz-client no-fuzz translate import-fuzz\n";
     fout << '\n';
     fout << "preprare-samples:\n";
     fout << "\trm -rf samples\n";
@@ -399,6 +409,7 @@ static void write_ossfuzz_makefile(std::vector<std::string> libfiles_prio, std::
 
     compilefiles(fout, extfiles, "${LIB_FUZZING_ENGINE}");
     compilefiles(fout, libfiles_prio, "${LIB_FUZZING_ENGINE}");
+    compilefiles(fout, fefiles, "${LIB_FUZZING_ENGINE}");
 
     fout << '\n';
     fout << "type2.o: type2.cpp type2.h\n";
@@ -877,7 +888,7 @@ int main(int argc, char **argv)
     compilefiles(fout, extfiles, "");
     compilefiles(fout, toolsfiles, "${INCLUDE_FOR_LIB}");
 
-    write_ossfuzz_makefile(libfiles_prio, extfiles);
+    write_ossfuzz_makefile(libfiles_prio, extfiles, frontendfiles);
 
     return 0;
 }
