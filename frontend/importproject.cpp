@@ -187,7 +187,10 @@ ImportProject::Type ImportProject::import(const std::string &filename, Settings 
     std::ifstream fin(filename);
     if (!fin.is_open())
         return ImportProject::Type::MISSING;
+}
 
+ImportProject::Type ImportProject::import(std::ifstream &fin, Settings *settings, Suppressions *supprs)
+{
     mPath = Path::getPathFromFilename(Path::fromNativeSeparators(filename));
     if (!mPath.empty() && !endsWith(mPath,'/'))
         mPath += '/';

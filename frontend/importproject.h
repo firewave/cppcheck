@@ -95,6 +95,7 @@ public:
     void ignoreOtherConfigs(const std::string &cfg);
 
     Type import(const std::string &filename, Settings *settings=nullptr, Suppressions *supprs=nullptr);
+    Type import(std::ifstream &fin, Settings *settings=nullptr, Suppressions *supprs=nullptr);
 protected:
     bool importCompileCommands(std::istream &istr);
     bool importCppcheckGuiProject(std::istream &istr, Settings &settings, Suppressions &supprs);
