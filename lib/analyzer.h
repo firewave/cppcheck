@@ -110,21 +110,22 @@ struct Analyzer {
             return get(Match);
         }
 
-        Action& operator|=(Action a) {
+        Action& operator|=(const Action &a) {
             set(a.mFlag);
             return *this;
         }
 
-        friend Action operator|(Action a, Action b) {
+        friend Action operator|(const Action& a, const Action& b) {
+            Action res = a;
             a |= b;
-            return a;
+            return res;
         }
 
-        friend bool operator==(Action a, Action b) {
+        friend bool operator==(const Action &a, const Action &b) {
             return a.mFlag == b.mFlag;
         }
 
-        friend bool operator!=(Action a, Action b) {
+        friend bool operator!=(const Action &a, const Action &b) {
             return a.mFlag != b.mFlag;
         }
 
