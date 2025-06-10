@@ -21,7 +21,13 @@ if(CPPCHK_GLIBCXX_DEBUG AND UNIX AND CMAKE_BUILD_TYPE STREQUAL "Debug")
             else()
                 add_definitions(-D_LIBCPP_ENABLE_ASSERTIONS=1)
             endif()
-            # TODO: also add _LIBCPP_ENABLE_THREAD_SAFETY_ANNOTATIONS?
+            # TODO: also add?
+            # _LIBCPP_ENABLE_THREAD_SAFETY_ANNOTATIONS
+            # _LIBCPP_ABI_BOUNDED_ITERATORS
+            # _LIBCPP_ABI_BOUNDED_ITERATORS_IN_STRING
+            # _LIBCPP_ABI_BOUNDED_ITERATORS_IN_VECTOR
+            # _LIBCPP_ABI_BOUNDED_UNIQUE_PTR
+            # _LIBCPP_ABI_BOUNDED_ITERATORS_IN_STD_ARRAY
         endif()
     else()
         # TODO: check if this can be enabled again for Clang - also done in Makefile
