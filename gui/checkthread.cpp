@@ -142,7 +142,7 @@ void CheckThread::run()
         ctuInfo.swap(mCtuInfo);
         qDebug() << "Whole program analysis";
         std::list<FileWithDetails> files2;
-        std::transform(mFiles.cbegin(), mFiles.cend(), std::back_inserter(files2), [&](const QString& file) {
+        std::transform(mFiles.cbegin(), mFiles.cend(), std::back_inserter(files2), [&](const QString& file) -> FileWithDetails {
             return FileWithDetails{file.toStdString(), Path::identify(file.toStdString(), mSettings.cppHeaderProbe), 0};
         });
         cppcheck.analyseWholeProgram(mSettings.buildDir, files2, {}, ctuInfo);
@@ -430,7 +430,7 @@ void CheckThread::parseClangErrors(const QString &tool, const QString &file0, QS
             continue;
 
         std::list<ErrorMessage::FileLocation> callstack;
-        std::transform(e.errorPath.cbegin(), e.errorPath.cend(), std::back_inserter(callstack), [](const QErrorPathItem& path) {
+        std::transform(e.errorPath.cbegin(), e.errorPath.cend(), std::back_inserter(callstack), [](const QErrorPathItem& path) -> ErrorMessage::FileLocation {
             return ErrorMessage::FileLocation(path.file.toStdString(), path.info.toStdString(), path.line, path.column);
         });
         const std::string f0 = file0.toStdString();

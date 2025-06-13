@@ -522,7 +522,7 @@ private:
 
     void memoize() const {
         int count = 0;
-        auto f = [&count]() {
+        auto f = [&count]() -> int {
             ++count;
             return count;
         };
