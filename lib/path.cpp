@@ -189,6 +189,17 @@ bool Path::isAbsolute(const std::string& path)
 #endif
 }
 
+bool Path::isRelative(const std::string& path)
+{
+#if defined(_WIN32)
+    constexpr char sep = '/';
+#else
+    constexpr char sep = '\\';
+#endif
+    const std::string nativePath = toNativeSeparators(path);
+    return (nativePath.find('\\') != std::string::npos) && !isAbsolute(path);
+}
+
 std::string Path::getRelativePath(const std::string& absolutePath, const std::vector<std::string>& basePaths)
 {
     for (const std::string &bp : basePaths) {

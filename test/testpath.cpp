@@ -57,6 +57,7 @@ private:
         TEST_CASE(getAbsolutePath);
         TEST_CASE(exists);
         TEST_CASE(fromNativeSeparators);
+        TEST_CASE(isRelative)
     }
 
     void removeQuotationMarks() const {
@@ -617,6 +618,13 @@ private:
         ASSERT_EQUALS("/lib/file.c", Path::fromNativeSeparators("\\lib\\file.c"));
         ASSERT_EQUALS("//lib/file.c", Path::fromNativeSeparators("\\\\lib\\file.c"));
         ASSERT_EQUALS("./lib/file.c", Path::fromNativeSeparators(".\\lib\\file.c"));
+    }
+
+    void isRelative() const {
+        ASSERT_EQUALS(true, Path::isRelative("file"));
+        ASSERT_EQUALS(true, Path::isRelative("dir/file"));
+
+        ASSERT_EQUALS(false, Path::isRelative("/dir/file"));
     }
 };
 
