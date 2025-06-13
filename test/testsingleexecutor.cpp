@@ -108,7 +108,7 @@ private:
         std::string exe;
         std::vector<std::string> args;
         // NOLINTNEXTLINE(performance-unnecessary-value-param)
-        CppCheck cppcheck(s, supprs, *this, true, [&executeCommandCalled, &exe, &args](std::string e,std::vector<std::string> a,std::string,std::string&){
+        CppCheck cppcheck(s, supprs, *this, true, [&executeCommandCalled, &exe, &args](std::string e,std::vector<std::string> a,std::string,std::string&) -> int {
             executeCommandCalled = true;
             exe = std::move(e);
             args = std::move(a);

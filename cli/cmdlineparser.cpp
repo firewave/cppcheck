@@ -187,7 +187,7 @@ bool CmdLineParser::fillSettingsFromArgs(int argc, const char* const argv[])
 
     // Output a warning for the user if he tries to exclude headers
     const std::vector<std::string>& ignored = getIgnoredPaths();
-    const bool warn = std::any_of(ignored.cbegin(), ignored.cend(), [](const std::string& i) {
+    const bool warn = std::any_of(ignored.cbegin(), ignored.cend(), [](const std::string& i) -> bool {
         return Path::isHeader(i);
     });
     if (warn) {
@@ -207,7 +207,7 @@ bool CmdLineParser::fillSettingsFromArgs(int argc, const char* const argv[])
         std::list<FileSettings> fileSettings;
         if (!mSettings.fileFilters.empty()) {
             // filter only for the selected filenames from all project files
-            std::copy_if(fileSettingsRef.cbegin(), fileSettingsRef.cend(), std::back_inserter(fileSettings), [&](const FileSettings &fs) {
+            std::copy_if(fileSettingsRef.cbegin(), fileSettingsRef.cend(), std::back_inserter(fileSettings), [&](const FileSettings &fs) -> bool {
                 return matchglobs(mSettings.fileFilters, fs.filename());
             });
             if (fileSettings.empty()) {
@@ -257,11 +257,11 @@ bool CmdLineParser::fillSettingsFromArgs(int argc, const char* const argv[])
         }
 
         // sort the markup last
-        std::copy_if(fileSettings.cbegin(), fileSettings.cend(), std::back_inserter(mFileSettings), [&](const FileSettings &fs) {
+        std::copy_if(fileSettings.cbegin(), fileSettings.cend(), std::back_inserter(mFileSettings), [&](const FileSettings &fs) -> bool {
             return !mSettings.library.markupFile(fs.filename()) || !mSettings.library.processMarkupAfterCode(fs.filename());
         });
 
-        std::copy_if(fileSettings.cbegin(), fileSettings.cend(), std::back_inserter(mFileSettings), [&](const FileSettings &fs) {
+        std::copy_if(fileSettings.cbegin(), fileSettings.cend(), std::back_inserter(mFileSettings), [&](const FileSettings &fs) -> bool {
             return mSettings.library.markupFile(fs.filename()) && mSettings.library.processMarkupAfterCode(fs.filename());
         });
 
@@ -305,7 +305,7 @@ bool CmdLineParser::fillSettingsFromArgs(int argc, const char* const argv[])
             while (it != filesResolved.end()) {
                 const std::string& name = it->path();
                 // TODO: log if duplicated files were dropped
-                filesResolved.erase(std::remove_if(std::next(it), filesResolved.end(), [&](const FileWithDetails& entry) {
+                filesResolved.erase(std::remove_if(std::next(it), filesResolved.end(), [&](const FileWithDetails& entry) -> bool {
                     return entry.path() == name;
                 }), filesResolved.end());
                 ++it;
@@ -360,11 +360,11 @@ bool CmdLineParser::fillSettingsFromArgs(int argc, const char* const argv[])
         }
 
         // sort the markup last
-        std::copy_if(files.cbegin(), files.cend(), std::inserter(mFiles, mFiles.end()), [&](const FileWithDetails& entry) {
+        std::copy_if(files.cbegin(), files.cend(), std::inserter(mFiles, mFiles.end()), [&](const FileWithDetails& entry) -> bool {
             return !mSettings.library.markupFile(entry.path()) || !mSettings.library.processMarkupAfterCode(entry.path());
         });
 
-        std::copy_if(files.cbegin(), files.cend(), std::inserter(mFiles, mFiles.end()), [&](const FileWithDetails& entry) {
+        std::copy_if(files.cbegin(), files.cend(), std::inserter(mFiles, mFiles.end()), [&](const FileWithDetails& entry) -> bool {
             return mSettings.library.markupFile(entry.path()) && mSettings.library.processMarkupAfterCode(entry.path());
         });
 
@@ -2206,7 +2206,7 @@ std::list<FileWithDetails> CmdLineParser::filterFiles(const std::vector<std::str
 #else
     constexpr bool caseInsensitive = false;
 #endif
-    std::copy_if(filesResolved.cbegin(), filesResolved.cend(), std::inserter(files, files.end()), [&](const FileWithDetails& entry) {
+    std::copy_if(filesResolved.cbegin(), filesResolved.cend(), std::inserter(files, files.end()), [&](const FileWithDetails& entry) -> bool {
         return matchglobs(fileFilters, entry.path(), caseInsensitive) || matchglobs(fileFilters, entry.spath(), caseInsensitive);
     });
     return files;
