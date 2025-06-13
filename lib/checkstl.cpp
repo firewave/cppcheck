@@ -180,7 +180,7 @@ void CheckStl::outOfBounds()
             }
             if (indexTok && !indexTok->hasKnownIntValue()) {
                 const ValueFlow::Value* value =
-                    ValueFlow::findValue(indexTok->values(), *mSettings, [&](const ValueFlow::Value& v) {
+                    ValueFlow::findValue(indexTok->values(), *mSettings, [&](const ValueFlow::Value& v) -> bool {
                     if (!v.isSymbolicValue())
                         return false;
                     if (v.isImpossible())
@@ -719,7 +719,7 @@ static bool isSameIteratorContainerExpression(const Token* tok1,
         const auto address1 = getAddressContainer(tok1);
         const auto address2 = getAddressContainer(tok2);
         return std::any_of(address1.begin(), address1.end(), [&](const Token* tok1) -> bool {
-            return std::any_of(address2.begin(), address2.end(), [&](const Token* tok2) {
+            return std::any_of(address2.begin(), address2.end(), [&](const Token* tok2) -> bool {
                 return isSameExpression(false, tok1, tok2, settings, false, false);
             });
         });
@@ -740,7 +740,7 @@ static std::vector<ValueFlow::Value> pruneLifetimes(std::vector<ValueFlow::Value
             const Token* tok2 = v.tokvalue;
             return start->lifetimeKind == v.lifetimeKind && (astHasToken(tok1, tok2) || astHasToken(tok2, tok1));
         });
-        auto root = std::min_element(start, it, [](const ValueFlow::Value& x, const ValueFlow::Value& y) {
+        auto root = std::min_element(start, it, [](const ValueFlow::Value& x, const ValueFlow::Value& y) -> bool {
             return x.tokvalue != y.tokvalue && astHasToken(x.tokvalue, y.tokvalue);
         });
         result.push_back(*root);
@@ -751,7 +751,7 @@ static std::vector<ValueFlow::Value> pruneLifetimes(std::vector<ValueFlow::Value
 
 static ValueFlow::Value getLifetimeIteratorValue(const Token* tok, MathLib::bigint path = 0)
 {
-    auto findIterVal = [](const std::vector<ValueFlow::Value>& values, const std::vector<ValueFlow::Value>::const_iterator beg) {
+    auto findIterVal = [](const std::vector<ValueFlow::Value>& values, const std::vector<ValueFlow::Value>::const_iterator beg) -> std::vector<ValueFlow::Value>::const_iterator {
         return std::find_if(beg, values.cend(), [](const ValueFlow::Value& v) -> bool {
             return v.lifetimeKind == ValueFlow::Value::LifetimeKind::Iterator;
         });
@@ -1188,7 +1188,7 @@ void CheckStl::invalidContainer()
                     const ValueFlow::Value* v = nullptr;
                     ErrorPath errorPath;
                     PathAnalysis::Info info =
-                        PathAnalysis{endToken}.forwardFind([&](const PathAnalysis::Info& info) {
+                        PathAnalysis{endToken}.forwardFind([&](const PathAnalysis::Info& info) -> bool {
                         if (!info.tok->variable())
                             return false;
                         if (info.tok->varId() == 0)

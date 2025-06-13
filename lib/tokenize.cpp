@@ -2409,7 +2409,7 @@ namespace {
             const ScopeInfo3 * tempScope = this;
             while (tempScope) {
                 // check children
-                auto it = std::find_if(tempScope->children.cbegin(), tempScope->children.cend(), [&](const ScopeInfo3& child) {
+                auto it = std::find_if(tempScope->children.cbegin(), tempScope->children.cend(), [&](const ScopeInfo3& child) -> bool {
                     return &child != this && child.type == Record && (child.name == scope || child.fullName == scope);
                 });
                 if (it != tempScope->children.end())
@@ -3404,16 +3404,16 @@ bool Tokenizer::simplifyTokens1(const std::string &configuration, int fileIndex)
 
     const SHOWTIME_MODES showTime = mTimerResults ? mSettings.showtime : SHOWTIME_MODES::SHOWTIME_NONE;
 
-    Timer::run("Tokenizer::simplifyTokens1::createAst", showTime, mTimerResults, [&]() {
+    Timer::run("Tokenizer::simplifyTokens1::createAst", showTime, mTimerResults, [&]() -> void {
         list.createAst();
         list.validateAst(mSettings.debugnormal);
     });
 
-    Timer::run("Tokenizer::simplifyTokens1::createSymbolDatabase", showTime, mTimerResults, [&]() {
+    Timer::run("Tokenizer::simplifyTokens1::createSymbolDatabase", showTime, mTimerResults, [&]() -> void {
         createSymbolDatabase();
     });
 
-    Timer::run("Tokenizer::simplifyTokens1::setValueType", showTime, mTimerResults, [&]() {
+    Timer::run("Tokenizer::simplifyTokens1::setValueType", showTime, mTimerResults, [&]() -> void {
         mSymbolDatabase->setValueTypeInTokenList(false);
         mSymbolDatabase->setValueTypeInTokenList(true);
     });
@@ -3428,7 +3428,7 @@ bool Tokenizer::simplifyTokens1(const std::string &configuration, int fileIndex)
     const bool doValueFlow = !disableValueflowEnv || (std::strcmp(disableValueflowEnv, "1") != 0);
 
     if (doValueFlow) {
-        Timer::run("Tokenizer::simplifyTokens1::ValueFlow", showTime, mTimerResults, [&]() {
+        Timer::run("Tokenizer::simplifyTokens1::ValueFlow", showTime, mTimerResults, [&]() -> void {
             ValueFlow::setValues(list, *mSymbolDatabase, mErrorLogger, mSettings, mTimerResults);
         });
 
@@ -5214,7 +5214,7 @@ void Tokenizer::setVarIdPass2()
             continue;
 
         // What member variables are there in this class?
-        std::transform(classnameTokens.cbegin(), classnameTokens.cend(), std::back_inserter(scopeInfo), [&](const Token* tok) {
+        std::transform(classnameTokens.cbegin(), classnameTokens.cend(), std::back_inserter(scopeInfo), [&](const Token* tok) -> ScopeInfo2 {
             return ScopeInfo2(tok->str(), tokStart->link());
         });
 
@@ -5611,7 +5611,7 @@ bool Tokenizer::simplifyTokenList1(const char FileName[])
     const SHOWTIME_MODES showTime = mTimerResults ? mSettings.showtime : SHOWTIME_MODES::SHOWTIME_NONE;
 
     // Bail out if code is garbage
-    Timer::run("Tokenizer::simplifyTokens1::simplifyTokenList1::findGarbageCode", showTime, mTimerResults, [&]() {
+    Timer::run("Tokenizer::simplifyTokens1::simplifyTokenList1::findGarbageCode", showTime, mTimerResults, [&]() -> void {
         findGarbageCode();
     });
 
@@ -5768,7 +5768,7 @@ bool Tokenizer::simplifyTokenList1(const char FileName[])
     simplifyTypedefLHS();
 
     // typedef..
-    Timer::run("Tokenizer::simplifyTokens1::simplifyTokenList1::simplifyTypedef", showTime, mTimerResults, [&]() {
+    Timer::run("Tokenizer::simplifyTokens1::simplifyTokenList1::simplifyTypedef", showTime, mTimerResults, [&]() -> void {
         simplifyTypedef();
     });
 
@@ -5862,7 +5862,7 @@ bool Tokenizer::simplifyTokenList1(const char FileName[])
         simplifyTypeIntrinsics();
 
         // Handle templates..
-        Timer::run("Tokenizer::simplifyTokens1::simplifyTokenList1::simplifyTemplates", showTime, mTimerResults, [&]() {
+        Timer::run("Tokenizer::simplifyTokens1::simplifyTokenList1::simplifyTemplates", showTime, mTimerResults, [&]() -> void {
             simplifyTemplates();
         });
 
@@ -5889,7 +5889,7 @@ bool Tokenizer::simplifyTokenList1(const char FileName[])
 
     validate(); // #6772 "segmentation fault (invalid code) in Tokenizer::setVarId"
 
-    Timer::run("Tokenizer::simplifyTokens1::simplifyTokenList1::setVarId", showTime, mTimerResults, [&](){
+    Timer::run("Tokenizer::simplifyTokens1::simplifyTokenList1::setVarId", showTime, mTimerResults, [&]() -> void {
         setVarId();
     });
 
@@ -6432,7 +6432,7 @@ void Tokenizer::splitTemplateRightAngleBrackets(bool check)
         if (tok->str() == "{")
             ++scopeLevel;
         else if (tok->str() == "}") {
-            vars.erase(std::remove_if(vars.begin(), vars.end(), [scopeLevel](const std::pair<std::string, int>& v) {
+            vars.erase(std::remove_if(vars.begin(), vars.end(), [scopeLevel](const std::pair<std::string, int>& v) -> bool {
                 return v.second == scopeLevel;
             }), vars.end());
             --scopeLevel;
@@ -9638,7 +9638,7 @@ void Tokenizer::simplifyKeyword()
             tok->deleteNext();
 
         if (c99) {
-            auto getTypeTokens = [tok]() {
+            auto getTypeTokens = [tok]() -> std::vector<Token *> {
                 std::vector<Token*> ret;
                 for (Token *temp = tok; Token::Match(temp, "%name%"); temp = temp->previous()) {
                     if (!temp->isKeyword())
@@ -10911,7 +10911,7 @@ void Tokenizer::setDirectives(std::list<Directive> directives)
 bool Tokenizer::hasIfdef(const Token *start, const Token *end) const
 {
     const auto& directives = mDirectives;
-    return std::any_of(directives.cbegin(), directives.cend(), [&](const Directive& d) {
+    return std::any_of(directives.cbegin(), directives.cend(), [&](const Directive& d) -> bool {
         return startsWith(d.str, "#if") &&
                d.linenr >= start->linenr() &&
                d.linenr <= end->linenr() &&
@@ -10924,7 +10924,7 @@ bool Tokenizer::isPacked(const Token * bodyStart) const
 {
     const auto& directives = mDirectives;
     // TODO: should this return true if the #pragma exists in any line before the start token?
-    return std::any_of(directives.cbegin(), directives.cend(), [&](const Directive& d) {
+    return std::any_of(directives.cbegin(), directives.cend(), [&](const Directive& d) -> bool {
         return d.linenr < bodyStart->linenr() && d.str == "#pragma pack(1)" && d.file == list.getFiles().front();
     });
 }
