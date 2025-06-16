@@ -171,16 +171,9 @@ bool Platform::set(const std::string& platformstr, std::string& errstr, const st
         return false;
     }
     else {
-        bool found = false;
-        for (const std::string& path : paths) {
-            if (debug)
-                std::cout << "looking for platform '" + platformstr + "' relative to '" + path + "'" << std::endl;
-            if (loadFromFile(path.c_str(), platformstr, debug)) {
-                found = true;
-                break;
-            }
+        if (loadFromFile(paths, platformstr, debug)) {
         }
-        if (!found) {
+        else {
             errstr = "unrecognized platform: '" + platformstr + "'.";
             return false;
         }
@@ -189,7 +182,7 @@ bool Platform::set(const std::string& platformstr, std::string& errstr, const st
     return true;
 }
 
-bool Platform::loadFromFile(const char exename[], const std::string &filename, bool debug)
+bool Platform::loadFromFile(const std::vector<std::string>& paths, const std::string &filename, bool debug)
 {
     const bool is_abs_path = Path::isAbsolute(filename);
 
@@ -200,15 +193,25 @@ bool Platform::loadFromFile(const char exename[], const std::string &filename, b
         fullfilename += ".xml";
 
     // TODO: use native separators
-    std::vector<std::string> filenames{
-        fullfilename,
-    };
-    if (!is_abs_path) {
-        filenames.push_back("platforms/" + fullfilename);
-        if (exename && (std::string::npos != Path::fromNativeSeparators(exename).find('/'))) {
-            filenames.push_back(Path::getPathFromFilename(Path::fromNativeSeparators(exename)) + fullfilename);
-            filenames.push_back(Path::getPathFromFilename(Path::fromNativeSeparators(exename)) + "platforms/" + fullfilename);
+    std::vector<std::string> filenames;
+    if (is_abs_path)
+    {
+        filenames.push_back(fullfilename);
+    }
+    else {
+        for (const std::string& path : paths)
+        {
+            std::string ppath = Path::fromNativeSeparators(path);
+            if (ppath.find('/') != std::string::npos)
+            {
+                ppath = Path::getPathFromFilename(std::move(ppath));
+            }
+            filenames.push_back(ppath + fullfilename);
+            filenames.push_back(ppath + "platforms/" + fullfilename);
         }
+        // TODO: this loads from CWD - is this intended?
+        filenames.push_back(fullfilename);
+        filenames.push_back("platforms/" + fullfilename);
 #ifdef FILESDIR
         std::string filesdir = FILESDIR;
         if (!filesdir.empty() && filesdir[filesdir.size()-1] != '/')

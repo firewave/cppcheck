@@ -409,6 +409,7 @@ def test_platform_lookup_notfound(tmpdir):
 
 def test_platform_lookup_notfound_project(tmpdir):  # #13939
     project_file, _ = __create_gui_project(tmpdir)
+    project_path = os.path.dirname(project_file)
 
     exitcode, stdout, _, exe = cppcheck_ex(['--debug-lookup=platform', '--platform=none', '--project={}'.format(project_file)])
     exepath = os.path.dirname(exe)
@@ -419,17 +420,20 @@ def test_platform_lookup_notfound_project(tmpdir):  # #13939
     assert exitcode == 1, stdout
     lines = stdout.splitlines()
     assert lines == [
-        # TODO: needs to look relative to project file first
+        "looking for platform 'none' relative to '{}'".format(project_file),
+        "try to load platform file '{}/none.xml' ... Error=XML_ERROR_FILE_NOT_FOUND ErrorID=3 (0x3) Line number=0: filename={}/none.xml".format(project_path, exepath),
+        "try to load platform file '{}/platforms/none.xml' ... Error=XML_ERROR_FILE_NOT_FOUND ErrorID=3 (0x3) Line number=0: filename={}/platforms/none.xml".format(project_path, exepath),
         "looking for platform 'none' relative to '{}'".format(exepath_bin),
-        "try to load platform file 'none.xml' ... Error=XML_ERROR_FILE_NOT_FOUND ErrorID=3 (0x3) Line number=0: filename=none.xml",
-        "try to load platform file 'platforms/none.xml' ... Error=XML_ERROR_FILE_NOT_FOUND ErrorID=3 (0x3) Line number=0: filename=platforms/none.xml",
         "try to load platform file '{}/none.xml' ... Error=XML_ERROR_FILE_NOT_FOUND ErrorID=3 (0x3) Line number=0: filename={}/none.xml".format(exepath, exepath),
         "try to load platform file '{}/platforms/none.xml' ... Error=XML_ERROR_FILE_NOT_FOUND ErrorID=3 (0x3) Line number=0: filename={}/platforms/none.xml".format(exepath, exepath),
+        # TODO: the following lookups are in CWD - is this intended?
+        "try to load platform file 'none.xml' ... Error=XML_ERROR_FILE_NOT_FOUND ErrorID=3 (0x3) Line number=0: filename=none.xml",
+        "try to load platform file 'platforms/none.xml' ... Error=XML_ERROR_FILE_NOT_FOUND ErrorID=3 (0x3) Line number=0: filename=platforms/none.xml",
         "cppcheck: error: unrecognized platform: 'none'."
     ]
 
 
-def test_platform_lookup_notfound_compdb(tmpdir):  # #13939
+def test_platform_lookup_notfound_compdb(tmpdir):
     compdb_file, _ = __create_compdb(tmpdir)
 
     exitcode, stdout, _, exe = cppcheck_ex(['--debug-lookup=platform', '--platform=none', '--project={}'.format(compdb_file)])
@@ -441,7 +445,6 @@ def test_platform_lookup_notfound_compdb(tmpdir):  # #13939
     assert exitcode == 1, stdout
     lines = stdout.splitlines()
     assert lines == [
-        # TODO: needs to look relative to project file first
         "looking for platform 'none' relative to '{}'".format(exepath_bin),
         "try to load platform file 'none.xml' ... Error=XML_ERROR_FILE_NOT_FOUND ErrorID=3 (0x3) Line number=0: filename=none.xml",
         "try to load platform file 'platforms/none.xml' ... Error=XML_ERROR_FILE_NOT_FOUND ErrorID=3 (0x3) Line number=0: filename=platforms/none.xml",
