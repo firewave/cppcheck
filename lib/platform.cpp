@@ -175,7 +175,9 @@ bool Platform::set(const std::string& platformstr, std::string& errstr, const st
         for (const std::string& path : paths) {
             if (debug)
                 std::cout << "looking for platform '" + platformstr + "' in '" + path + "'" << std::endl;
-            if (loadFromFile(path.c_str(), platformstr, debug)) {
+            // TODO: differentiate between missing and failure
+            std::string errmsg;
+            if (loadFromFile(path.c_str(), platformstr, errmsg, debug)) {
                 found = true;
                 break;
             }
@@ -189,7 +191,7 @@ bool Platform::set(const std::string& platformstr, std::string& errstr, const st
     return true;
 }
 
-bool Platform::loadFromFile(const char exename[], const std::string &filename, bool debug)
+bool Platform::loadFromFile(const char exename[], const std::string &filename, std::string& errmsg, bool debug)
 {
     const bool is_abs_path = Path::isAbsolute(filename);
 
@@ -237,7 +239,7 @@ bool Platform::loadFromFile(const char exename[], const std::string &filename, b
     if (err != tinyxml2::XML_SUCCESS)
         return false;
 
-    return loadFromXmlDocument(&doc);
+    return loadFromXmlDocument(&doc, errmsg);
 }
 
 static unsigned int xmlTextAsUInt(const tinyxml2::XMLElement* node, bool& error)
@@ -248,15 +250,26 @@ static unsigned int xmlTextAsUInt(const tinyxml2::XMLElement* node, bool& error)
     return retval;
 }
 
-bool Platform::loadFromXmlDocument(const tinyxml2::XMLDocument *doc)
+bool Platform::loadFromXmlDocument(const tinyxml2::XMLDocument *doc, std::string& errmsg)
 {
     const tinyxml2::XMLElement * const rootnode = doc->FirstChildElement();
 
-    if (!rootnode || std::strcmp(rootnode->Name(), "platform") != 0)
+    if (!rootnode)
+    {
+        errmsg = "no root node found";
         return false;
+    }
 
-    bool error = false;
+    if (std::strcmp(rootnode->Name(), "platform") != 0)
+    {
+        errmsg = "invalid root node";
+        return false;
+    }
+
+    // TODO: improve error reporting
+    bool res = true;
     for (const tinyxml2::XMLElement *node = rootnode->FirstChildElement(); node; node = node->NextSiblingElement()) {
+        bool error = false;
         const char* name = node->Name();
         if (std::strcmp(name, "default-sign") == 0) {
             const char* str = node->GetText();
@@ -293,6 +306,11 @@ bool Platform::loadFromXmlDocument(const tinyxml2::XMLDocument *doc)
                     sizeof_wchar_t = xmlTextAsUInt(sz, error);
             }
         }
+        if (error)
+        {
+            res = false;
+            errmsg = std::string("'") + name + "' failed";
+        }
     }
 
     short_bit = char_bit * sizeof_short;
@@ -301,7 +319,7 @@ bool Platform::loadFromXmlDocument(const tinyxml2::XMLDocument *doc)
     long_long_bit = char_bit * sizeof_long_long;
 
     type = Type::File;
-    return !error;
+    return res;
 }
 
 std::string Platform::getLimitsDefines(bool c99) const
