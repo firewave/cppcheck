@@ -743,4 +743,4 @@ def test_config_invalid(tmpdir):
     ]
 
 # TODO: test with FILESDIR
-# TODO: test with loading relative to projects
+# TODO: test with loading relative to projects - FileSettings and FileWithDetails
