@@ -306,6 +306,7 @@ bool Platform::loadFromXmlDocument(const tinyxml2::XMLDocument *doc, std::string
                     sizeof_wchar_t = xmlTextAsUInt(sz, error);
             }
         }
+        // TODO: are errors reported when subsequent XML operation suggests? bail out on first error?
         if (error)
         {
             res = false;
