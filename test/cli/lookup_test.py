@@ -715,6 +715,7 @@ def test_config_lookup_notfound(tmpdir):
         'Checking {} ...'.format(test_file)
     ]
 
+
 def test_config_invalid(tmpdir):
     cppcheck_exe = __lookup_cppcheck_exe()
     bin_dir = os.path.dirname(cppcheck_exe)
@@ -742,3 +743,4 @@ def test_config_invalid(tmpdir):
     ]
 
 # TODO: test with FILESDIR
+# TODO: test with loading relative to projects
