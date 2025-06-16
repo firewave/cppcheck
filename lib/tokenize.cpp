@@ -3895,7 +3895,7 @@ void Tokenizer::arraySizeAfterValueFlow()
             Dimension d;
             d.num = maxIndex + 1;
             std::vector<Dimension> dimensions{d};
-            const_cast<Variable*>(var)->setDimensions(dimensions);
+            const_cast<Variable*>(var)->setDimensions(std::move(dimensions));
         }
     }
 }

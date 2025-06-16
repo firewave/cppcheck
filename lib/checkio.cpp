@@ -505,8 +505,8 @@ static bool findFormat(nonneg int arg, const Token *firstArg,
         Token::Match(argTok->variable()->typeStartToken(), "char|wchar_t") &&
         (argTok->variable()->isPointer() ||
          (argTok->variable()->dimensions().size() == 1 &&
-          argTok->variable()->dimensionKnown(0) &&
-          argTok->variable()->dimension(0) != 0))) {
+          argTok->variable()->dimensions()[0].known &&
+          argTok->variable()->dimensions()[0].num != 0))) {
         formatArgTok = argTok->nextArgument();
         if (!argTok->values().empty()) {
             const auto value = std::find_if(
@@ -711,7 +711,7 @@ void CheckIO::checkFormatString(const Token * const tok,
                                 if (argInfo.variableInfo && argInfo.isKnownType() && argInfo.variableInfo->isArray() && (argInfo.variableInfo->dimensions().size() == 1) && argInfo.variableInfo->dimensions()[0].known) {
                                     if (!width.empty()) {
                                         const int numWidth = strToInt<int>(width);
-                                        if (numWidth != (argInfo.variableInfo->dimension(0) - 1))
+                                        if (numWidth != (argInfo.variableInfo->dimensions()[0].num - 1))
                                             invalidScanfFormatWidthError(tok, numFormat, numWidth, argInfo.variableInfo, specifier);
                                     }
                                 }
@@ -734,7 +734,7 @@ void CheckIO::checkFormatString(const Token * const tok,
                                 if (argInfo.variableInfo && argInfo.isKnownType() && argInfo.variableInfo->isArray() && (argInfo.variableInfo->dimensions().size() == 1) && argInfo.variableInfo->dimensions()[0].known) {
                                     if (!width.empty()) {
                                         const int numWidth = strToInt<int>(width);
-                                        if (numWidth > argInfo.variableInfo->dimension(0))
+                                        if (numWidth > argInfo.variableInfo->dimensions()[0].num)
                                             invalidScanfFormatWidthError(tok, numFormat, numWidth, argInfo.variableInfo, std::string(1, *i));
                                     }
                                 }
@@ -2006,7 +2006,8 @@ void CheckIO::invalidScanfFormatWidthError(const Token* tok, nonneg int numForma
     std::string varname;
 
     if (var) {
-        arrlen = var->dimension(0);
+        assert(!var->dimensions().empty());
+        arrlen = var->dimensions()[0].num;
         varname = var->name();
     }
 

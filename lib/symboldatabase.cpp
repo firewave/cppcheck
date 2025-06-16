@@ -3964,7 +3964,7 @@ void SymbolDatabase::printVariable(const Variable *var, const char *indent) cons
 
     std::cout << indent << "mDimensions:";
     for (std::size_t i = 0; i < var->dimensions().size(); i++) {
-        std::cout << " " << var->dimension(i);
+        std::cout << " " << var->dimensions()[i].num;
         if (!var->dimensions()[i].known)
             std::cout << "?";
     }

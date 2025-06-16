@@ -360,7 +360,7 @@ CTU::FileInfo *CTU::getFileInfo(const Tokenizer &tokenizer)
                     fileInfo->functionCalls.push_back(std::move(functionCall));
                 }
                 // array
-                if (argtok->variable() && argtok->variable()->isArray() && argtok->variable()->dimensions().size() == 1 && argtok->variable()->dimensionKnown(0)) {
+                if (argtok->variable() && argtok->variable()->isArray() && argtok->variable()->dimensions().size() == 1 && argtok->variable()->dimensions()[0].known) {
                     FileInfo::FunctionCall functionCall;
                     functionCall.callValueType = ValueFlow::Value::ValueType::BUFFER_SIZE;
                     functionCall.callId = getFunctionId(tokenizer, tokFunction);
@@ -369,7 +369,7 @@ CTU::FileInfo *CTU::getFileInfo(const Tokenizer &tokenizer)
                     functionCall.callArgNr = argnr + 1;
                     functionCall.callArgumentExpression = argtok->expressionString();
                     const auto typeSize = argtok->valueType()->typeSize(tokenizer.getSettings().platform);
-                    functionCall.callArgValue.value = typeSize > 0 ? argtok->variable()->dimension(0) * typeSize : -1;
+                    functionCall.callArgValue.value = typeSize > 0 ? argtok->variable()->dimensions()[0].num * typeSize : -1;
                     functionCall.warning = false;
                     fileInfo->functionCalls.push_back(std::move(functionCall));
                 }

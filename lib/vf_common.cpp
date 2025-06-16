@@ -220,9 +220,9 @@ namespace ValueFlow
                     sz1->variable() &&
                     sz1->variable()->isArray() &&
                     !sz1->variable()->dimensions().empty() &&
-                    sz1->variable()->dimensionKnown(0) &&
+                    sz1->variable()->dimensions()[0].known &&
                     Token::Match(sz2->astOperand2(), "*|[") && Token::Match(sz2->astOperand2()->astOperand1(), "%varid%", varid1)) {
-                    Value value(sz1->variable()->dimension(0));
+                    Value value(sz1->variable()->dimensions()[0].num);
                     if (!tok2->isTemplateArg() && settings.platform.type != Platform::Type::Unspecified)
                         value.setKnown();
                     setTokenValue(tok->tokAt(4), std::move(value), settings);
@@ -234,9 +234,10 @@ namespace ValueFlow
                     // find the size of the type
                     size_t size = 0;
                     if (var->isEnumType()) {
-                        size = settings.platform.sizeof_int;
                         if (var->type()->classScope && var->type()->classScope->enumType)
                             size = getSizeOfType(var->type()->classScope->enumType, settings);
+                        else
+                            size = settings.platform.sizeof_int;
                     } else if (var->valueType()) {
                         size = getSizeOf(*var->valueType(), settings);
                     } else if (!var->type()) {
@@ -245,10 +246,12 @@ namespace ValueFlow
                     // find the number of elements
                     size_t count = 1;
                     for (size_t i = 0; i < var->dimensions().size(); ++i) {
-                        if (var->dimensionKnown(i))
-                            count *= var->dimension(i);
-                        else
+                        const auto& dim = var->dimensions()[i];
+                        if (!dim.known) {
                             count = 0;
+                            break;
+                        }
+                        count *= dim.num;
                     }
                     if (size && count > 0) {
                         Value value(count * size);

@@ -1523,7 +1523,7 @@ static bool isLargeContainer(const Variable* var, const Settings& settings)
     }
     const ValueType vtElem = ValueType::parseDecl(vt->containerTypeToken, settings);
     const auto elemSize = std::max<std::size_t>(ValueFlow::getSizeOf(vtElem, settings), 1);
-    const auto arraySize = var->dimension(0) * elemSize;
+    const auto arraySize = var->dimensions()[0].num * elemSize;
     return arraySize > maxByValueSize;
 }
 
@@ -3394,10 +3394,10 @@ void CheckOther::checkIncompleteArrayFill()
                     continue;
 
                 const Variable *var = tok2->variable();
-                if (!var || !var->isArray() || var->dimensions().empty() || !var->dimension(0))
+                if (!var || !var->isArray() || var->dimensions().empty() || !var->dimensions()[0].num)
                     continue;
 
-                if (!args[2]->hasKnownIntValue() || args[2]->getKnownIntValue() != var->dimension(0))
+                if (!args[2]->hasKnownIntValue() || args[2]->getKnownIntValue() != var->dimensions()[0].num)
                     continue;
                 int size = mTokenizer->sizeOfType(var->typeStartToken());
                 if (size == 0 && var->valueType()->pointer)

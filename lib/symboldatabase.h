@@ -545,24 +545,8 @@ public:
         return mDimensions;
     }
 
-    /**
-     * Get array dimension length.
-     * @return length of dimension
-     */
-    MathLib::bigint dimension(nonneg int index_) const {
-        return mDimensions.at(index_).num;
-    }
-
-    /**
-     * Get array dimension known.
-     * @return length of dimension known
-     */
-    bool dimensionKnown(nonneg int index_) const {
-        return mDimensions.at(index_).known;
-    }
-
-    void setDimensions(const std::vector<Dimension> &dimensions_) {
-        mDimensions = dimensions_;
+    void setDimensions(std::vector<Dimension> dimensions_) {
+        mDimensions = std::move(dimensions_);
     }
 
     /**
