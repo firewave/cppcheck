@@ -450,6 +450,9 @@ CmdLineParser::Result CmdLineParser::parseFromArgs(int argc, const char* const a
     ImportProject::Type projectType = ImportProject::Type::NONE;
     ImportProject project;
     std::string vsConfig;
+    std::string platform;
+
+    std::vector<std::string> lookupPaths{argv[0]};
 
     bool executorAuto = true;
 
@@ -1098,26 +1101,9 @@ CmdLineParser::Result CmdLineParser::parseFromArgs(int argc, const char* const a
 
         // Specify platform
         else if (std::strncmp(argv[i], "--platform=", 11) == 0) {
-            const std::string platform(11+argv[i]);
-
-            std::string errstr;
-            const std::vector<std::string> paths = {argv[0]};
-            if (!mSettings.platform.set(platform, errstr, paths, mSettings.debuglookup || mSettings.debuglookupPlatform)) {
-                mLogger.printError(errstr);
-                return Result::Fail;
-            }
-
-            // TODO: remove
-            // these are loaded via external files and thus have Settings::PlatformFile set instead.
-            // override the type so they behave like the regular platforms.
-            if (platform == "unix32-unsigned") {
-                mSettings.platform.type = Platform::Type::Unix32;
-                mLogger.printMessage("The platform 'unix32-unsigned' has been deprecated and will be removed in Cppcheck 2.19. Please use '--platform=unix32 --funsigned-char' instead");
-            }
-            else if (platform == "unix64-unsigned") {
-                mSettings.platform.type = Platform::Type::Unix64;
-                mLogger.printMessage("The platform 'unix64-unsigned' has been deprecated and will be removed in Cppcheck 2.19. Please use '--platform=unix64 --funsigned-char' instead");
-            }
+            std::string p = 11 + argv[i];
+            // TODO: check for empty
+            platform = std::move(p);
         }
 
         // Write results in results.plist
@@ -1210,17 +1196,11 @@ CmdLineParser::Result CmdLineParser::parseFromArgs(int argc, const char* const a
                 const auto& excludedPaths = project.guiProject.excludedPaths;
                 std::copy(excludedPaths.cbegin(), excludedPaths.cend(), std::back_inserter(mIgnoredPaths));
 
-                std::string platform(project.guiProject.platform);
+                if (!project.guiProject.platform.empty())
+                    platform = project.guiProject.platform;
 
-                // keep existing platform from command-line intact
-                if (!platform.empty()) {
-                    std::string errstr;
-                    const std::vector<std::string> paths = {projectFile, argv[0]};
-                    if (!mSettings.platform.set(platform, errstr, paths, mSettings.debuglookup || mSettings.debuglookupPlatform)) {
-                        mLogger.printError(errstr);
-                        return Result::Fail;
-                    }
-                }
+                // look for external files relative to project first
+                lookupPaths.insert(lookupPaths.cbegin(), projectFile);
 
                 const auto& projectFileGui = project.guiProject.projectFile;
                 if (!projectFileGui.empty()) {
@@ -1650,6 +1630,27 @@ CmdLineParser::Result CmdLineParser::parseFromArgs(int argc, const char* const a
         } else {
             // TODO: bail out when this does nothing
             project.selectOneVsConfig(mSettings.platform.type);
+        }
+    }
+
+    if (!platform.empty())
+    {
+        std::string errstr;
+        if (!mSettings.platform.set(platform, errstr, lookupPaths, mSettings.debuglookup || mSettings.debuglookupPlatform)) {
+            mLogger.printError(errstr);
+            return Result::Fail;
+        }
+
+        // TODO: remove
+        // these are loaded via external files and thus have Settings::PlatformFile set instead.
+        // override the type so they behave like the regular platforms.
+        if (platform == "unix32-unsigned") {
+            mSettings.platform.type = Platform::Type::Unix32;
+            mLogger.printMessage("The platform 'unix32-unsigned' has been deprecated and will be removed in Cppcheck 2.19. Please use '--platform=unix32 --funsigned-char' instead");
+        }
+        else if (platform == "unix64-unsigned") {
+            mSettings.platform.type = Platform::Type::Unix64;
+            mLogger.printMessage("The platform 'unix64-unsigned' has been deprecated and will be removed in Cppcheck 2.19. Please use '--platform=unix64 --funsigned-char' instead");
         }
     }
 
