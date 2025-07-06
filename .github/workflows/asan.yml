@@ -22,7 +22,7 @@ jobs:
 
     env:
       QT_VERSION: 6.9.1
-      ASAN_OPTIONS: detect_stack_use_after_return=1
+      ASAN_OPTIONS: detect_stack_use_after_return=1:suppressions=asan-suppr.txt
       # TODO: figure out why there are cache misses with PCH enabled
       CCACHE_SLOPPINESS: pch_defines,time_macros
 
