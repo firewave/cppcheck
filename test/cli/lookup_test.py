@@ -404,7 +404,6 @@ def test_platform_lookup_notfound(tmpdir):
     ]
 
 
-# TODO: test with invalid file in project path
 # TODO: test with non-file in project path
 def test_platform_lookup_notfound_project(tmpdir):  # #13939
     project_file, _ = __create_gui_project(tmpdir)
@@ -429,6 +428,54 @@ def test_platform_lookup_notfound_project(tmpdir):  # #13939
         "try to load platform file '{}/none.xml' ... Error=XML_ERROR_FILE_NOT_FOUND ErrorID=3 (0x3) Line number=0: filename={}/none.xml".format(exepath, exepath),
         "try to load platform file '{}/platforms/none.xml' ... Error=XML_ERROR_FILE_NOT_FOUND ErrorID=3 (0x3) Line number=0: filename={}/platforms/none.xml".format(exepath, exepath),
         "cppcheck: error: unrecognized platform: 'none'."
+    ]
+
+
+# TODO: test with invalid file in other paths?
+def test_platform_lookup_invalid_project(tmpdir):
+    project_file, _ = __create_gui_project(tmpdir)
+    project_path = os.path.dirname(project_file)
+
+    avr8_project_file = os.path.join(project_path, 'avr8.xml')
+    with open(avr8_project_file, 'wt') as f:
+        f.write('')
+
+    exitcode, stdout, _ = cppcheck(['--debug-lookup=platform', '--platform=avr8', '--project={}'.format(project_file)])
+    if sys.platform == 'win32':
+        project_path = project_path.replace('\\', '/')
+    assert exitcode == 1, stdout
+    lines = stdout.splitlines()
+    assert lines == [
+        "looking for platform 'avr8'",
+        "try to load platform file '{}/avr8.xml' ... Error=XML_ERROR_EMPTY_DOCUMENT ErrorID=13 (0xd) Line number=0".format(project_path, project_path),
+        "cppcheck: error: unrecognized platform: 'avr8'."
+    ]
+
+
+def test_platform_lookup_nofile_project(tmpdir):
+    project_file, test_file = __create_gui_project(tmpdir)
+    project_path = os.path.dirname(project_file)
+
+    avr8_project_path = os.path.join(project_path, 'avr8.xml')
+    os.mkdir(avr8_project_path)
+
+    exitcode, stdout, _, exe = cppcheck_ex(['--debug-lookup=platform', '--platform=avr8', '--project={}'.format(project_file)])
+    cwd = os.getcwd()
+    exepath = os.path.dirname(exe)
+    if sys.platform == 'win32':
+        cwd = cwd.replace('\\', '/')
+        exepath = exepath.replace('\\', '/')
+        project_path = project_path.replace('\\', '/')
+    assert exitcode == 0, stdout
+    lines = stdout.splitlines()
+    assert lines == [
+        "looking for platform 'avr8'",
+        "try to load platform file '{}/avr8.xml' ... Error=XML_ERROR_FILE_NOT_FOUND ErrorID=3 (0x3) Line number=0: filename={}/avr8.xml".format(project_path, project_path),
+        "try to load platform file '{}/platforms/avr8.xml' ... Error=XML_ERROR_FILE_NOT_FOUND ErrorID=3 (0x3) Line number=0: filename={}/platforms/avr8.xml".format(project_path, project_path),
+        # TODO: the following lookups are in CWD - is this intended?
+        "try to load platform file '{}/avr8.xml' ... Error=XML_ERROR_FILE_NOT_FOUND ErrorID=3 (0x3) Line number=0: filename={}/avr8.xml".format(cwd, cwd),
+        "try to load platform file '{}/platforms/avr8.xml' ... Success".format(cwd, cwd),
+        'Checking {} ...'.format(test_file)
     ]
 
 
