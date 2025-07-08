@@ -341,7 +341,7 @@ def test_platform_lookup_builtin(tmpdir):
     ]
 
 
-@pytest.mark.skip  # TODO: fails when not run from the root folder
+#@pytest.mark.skip  # TODO: fails when not run from the root folder
 def test_platform_lookup(tmpdir):
     test_file = os.path.join(tmpdir, 'test.c')
     with open(test_file, 'wt'):
@@ -355,13 +355,13 @@ def test_platform_lookup(tmpdir):
     lines = stdout.splitlines()
     assert lines == [
         "looking for platform 'avr8'",
-        "try to load platform file '{}/avr8.xml' ... Error=XML_ERROR_FILE_NOT_FOUND ErrorID=3 (0x3) Line number=0: filename={}/avr8.xml".format(cwd, cwd),
+        "try to load platform file '{}/avr8.xml' ... XML_ERROR_FILE_NOT_FOUND".format(cwd),
         "try to load platform file '{}/platforms/avr8.xml' ... Success".format(cwd),
         'Checking {} ...'.format(test_file)
     ]
 
 
-@pytest.mark.skip  # TODO: fails when not run from the root folder
+#@pytest.mark.skip  # TODO: fails when not run from the root folder
 def test_platform_lookup_ext(tmpdir):
     test_file = os.path.join(tmpdir, 'test.c')
     with open(test_file, 'wt'):
@@ -375,7 +375,7 @@ def test_platform_lookup_ext(tmpdir):
     lines = stdout.splitlines()
     assert lines == [
         "looking for platform 'avr8.xml'",
-        "try to load platform file '{}/avr8.xml' ... Error=XML_ERROR_FILE_NOT_FOUND ErrorID=3 (0x3) Line number=0: filename={}/avr8.xml".format(cwd, cwd),
+        "try to load platform file '{}/avr8.xml' ... XML_ERROR_FILE_NOT_FOUND".format(cwd),
         "try to load platform file '{}/platforms/avr8.xml' ... Success".format(cwd),
         'Checking {} ...'.format(test_file)
     ]
@@ -396,10 +396,10 @@ def test_platform_lookup_notfound(tmpdir):
     lines = stdout.splitlines()
     assert lines == [
         "looking for platform 'none'",
-        "try to load platform file '{}/none.xml' ... Error=XML_ERROR_FILE_NOT_FOUND ErrorID=3 (0x3) Line number=0: filename={}/none.xml".format(cwd, cwd),
-        "try to load platform file '{}/platforms/none.xml' ... Error=XML_ERROR_FILE_NOT_FOUND ErrorID=3 (0x3) Line number=0: filename={}/platforms/none.xml".format(cwd, cwd),
-        "try to load platform file '{}/none.xml' ... Error=XML_ERROR_FILE_NOT_FOUND ErrorID=3 (0x3) Line number=0: filename={}/none.xml".format(exepath, exepath),
-        "try to load platform file '{}/platforms/none.xml' ... Error=XML_ERROR_FILE_NOT_FOUND ErrorID=3 (0x3) Line number=0: filename={}/platforms/none.xml".format(exepath, exepath),
+        "try to load platform file '{}/none.xml' ... XML_ERROR_FILE_NOT_FOUND".format(cwd),
+        "try to load platform file '{}/platforms/none.xml' ... XML_ERROR_FILE_NOT_FOUND".format(cwd),
+        "try to load platform file '{}/none.xml' ... XML_ERROR_FILE_NOT_FOUND".format(exepath),
+        "try to load platform file '{}/platforms/none.xml' ... XML_ERROR_FILE_NOT_FOUND".format(exepath),
         "cppcheck: error: unrecognized platform: 'none'."
     ]
 
@@ -421,13 +421,13 @@ def test_platform_lookup_notfound_project(tmpdir):  # #13939
     lines = stdout.splitlines()
     assert lines == [
         "looking for platform 'none'",
-        "try to load platform file '{}/none.xml' ... Error=XML_ERROR_FILE_NOT_FOUND ErrorID=3 (0x3) Line number=0: filename={}/none.xml".format(project_path, project_path),
-        "try to load platform file '{}/platforms/none.xml' ... Error=XML_ERROR_FILE_NOT_FOUND ErrorID=3 (0x3) Line number=0: filename={}/platforms/none.xml".format(project_path, project_path),
+        "try to load platform file '{}/none.xml' ... XML_ERROR_FILE_NOT_FOUND".format(project_path),
+        "try to load platform file '{}/platforms/none.xml' ... XML_ERROR_FILE_NOT_FOUND".format(project_path),
         # TODO: the following lookups are in CWD - is this intended?
-        "try to load platform file '{}/none.xml' ... Error=XML_ERROR_FILE_NOT_FOUND ErrorID=3 (0x3) Line number=0: filename={}/none.xml".format(cwd, cwd),
-        "try to load platform file '{}/platforms/none.xml' ... Error=XML_ERROR_FILE_NOT_FOUND ErrorID=3 (0x3) Line number=0: filename={}/platforms/none.xml".format(cwd, cwd),
-        "try to load platform file '{}/none.xml' ... Error=XML_ERROR_FILE_NOT_FOUND ErrorID=3 (0x3) Line number=0: filename={}/none.xml".format(exepath, exepath),
-        "try to load platform file '{}/platforms/none.xml' ... Error=XML_ERROR_FILE_NOT_FOUND ErrorID=3 (0x3) Line number=0: filename={}/platforms/none.xml".format(exepath, exepath),
+        "try to load platform file '{}/none.xml' ... XML_ERROR_FILE_NOT_FOUND".format(cwd),
+        "try to load platform file '{}/platforms/none.xml' ... XML_ERROR_FILE_NOT_FOUND".format(cwd),
+        "try to load platform file '{}/none.xml' ... XML_ERROR_FILE_NOT_FOUND".format(exepath),
+        "try to load platform file '{}/platforms/none.xml' ... XML_ERROR_FILE_NOT_FOUND".format(exepath),
         "cppcheck: error: unrecognized platform: 'none'."
     ]
 
@@ -445,10 +445,10 @@ def test_platform_lookup_notfound_compdb(tmpdir):
     lines = stdout.splitlines()
     assert lines == [
         "looking for platform 'none'",
-        "try to load platform file '{}/none.xml' ... Error=XML_ERROR_FILE_NOT_FOUND ErrorID=3 (0x3) Line number=0: filename={}/none.xml".format(cwd, cwd),
-        "try to load platform file '{}/platforms/none.xml' ... Error=XML_ERROR_FILE_NOT_FOUND ErrorID=3 (0x3) Line number=0: filename={}/platforms/none.xml".format(cwd, cwd),
-        "try to load platform file '{}/none.xml' ... Error=XML_ERROR_FILE_NOT_FOUND ErrorID=3 (0x3) Line number=0: filename={}/none.xml".format(exepath, exepath),
-        "try to load platform file '{}/platforms/none.xml' ... Error=XML_ERROR_FILE_NOT_FOUND ErrorID=3 (0x3) Line number=0: filename={}/platforms/none.xml".format(exepath, exepath),
+        "try to load platform file '{}/none.xml' ... XML_ERROR_FILE_NOT_FOUND".format(cwd),
+        "try to load platform file '{}/platforms/none.xml' ... XML_ERROR_FILE_NOT_FOUND".format(cwd),
+        "try to load platform file '{}/none.xml' ... XML_ERROR_FILE_NOT_FOUND".format(exepath),
+        "try to load platform file '{}/platforms/none.xml' ... XML_ERROR_FILE_NOT_FOUND".format(exepath),
         "cppcheck: error: unrecognized platform: 'none'."
     ]
 
@@ -468,10 +468,10 @@ def test_platform_lookup_ext_notfound(tmpdir):
     lines = stdout.splitlines()
     assert lines == [
         "looking for platform 'none.xml'",
-        "try to load platform file '{}/none.xml' ... Error=XML_ERROR_FILE_NOT_FOUND ErrorID=3 (0x3) Line number=0: filename={}/none.xml".format(cwd, cwd),
-        "try to load platform file '{}/platforms/none.xml' ... Error=XML_ERROR_FILE_NOT_FOUND ErrorID=3 (0x3) Line number=0: filename={}/platforms/none.xml".format(cwd, cwd),
-        "try to load platform file '{}/none.xml' ... Error=XML_ERROR_FILE_NOT_FOUND ErrorID=3 (0x3) Line number=0: filename={}/none.xml".format(exepath, exepath),
-        "try to load platform file '{}/platforms/none.xml' ... Error=XML_ERROR_FILE_NOT_FOUND ErrorID=3 (0x3) Line number=0: filename={}/platforms/none.xml".format(exepath, exepath),
+        "try to load platform file '{}/none.xml' ... XML_ERROR_FILE_NOT_FOUND".format(cwd),
+        "try to load platform file '{}/platforms/none.xml' ... XML_ERROR_FILE_NOT_FOUND".format(cwd),
+        "try to load platform file '{}/none.xml' ... XML_ERROR_FILE_NOT_FOUND".format(exepath),
+        "try to load platform file '{}/platforms/none.xml' ... XML_ERROR_FILE_NOT_FOUND".format(exepath),
         "cppcheck: error: unrecognized platform: 'none.xml'."
     ]
 
@@ -491,10 +491,10 @@ def test_platform_lookup_relative_notfound(tmpdir):
     lines = stdout.splitlines()
     assert lines == [
         "looking for platform 'platform/none.xml'",
-        "try to load platform file '{}/platform/none.xml' ... Error=XML_ERROR_FILE_NOT_FOUND ErrorID=3 (0x3) Line number=0: filename={}/platform/none.xml".format(cwd, cwd),
-        "try to load platform file '{}/platforms/platform/none.xml' ... Error=XML_ERROR_FILE_NOT_FOUND ErrorID=3 (0x3) Line number=0: filename={}/platforms/platform/none.xml".format(cwd, cwd),
-        "try to load platform file '{}/platform/none.xml' ... Error=XML_ERROR_FILE_NOT_FOUND ErrorID=3 (0x3) Line number=0: filename={}/platform/none.xml".format(exepath, exepath),
-        "try to load platform file '{}/platforms/platform/none.xml' ... Error=XML_ERROR_FILE_NOT_FOUND ErrorID=3 (0x3) Line number=0: filename={}/platforms/platform/none.xml".format(exepath, exepath),
+        "try to load platform file '{}/platform/none.xml' ... XML_ERROR_FILE_NOT_FOUND".format(cwd),
+        "try to load platform file '{}/platforms/platform/none.xml' ... XML_ERROR_FILE_NOT_FOUND".format(cwd),
+        "try to load platform file '{}/platform/none.xml' ... XML_ERROR_FILE_NOT_FOUND".format(exepath),
+        "try to load platform file '{}/platforms/platform/none.xml' ... XML_ERROR_FILE_NOT_FOUND".format(exepath),
         "cppcheck: error: unrecognized platform: 'platform/none.xml'."
     ]
 
@@ -514,10 +514,10 @@ def test_platform_lookup_relative_noext_notfound(tmpdir):
     lines = stdout.splitlines()
     assert lines == [
         "looking for platform 'platform/none'",
-        "try to load platform file '{}/platform/none.xml' ... Error=XML_ERROR_FILE_NOT_FOUND ErrorID=3 (0x3) Line number=0: filename={}/platform/none.xml".format(cwd, cwd),
-        "try to load platform file '{}/platforms/platform/none.xml' ... Error=XML_ERROR_FILE_NOT_FOUND ErrorID=3 (0x3) Line number=0: filename={}/platforms/platform/none.xml".format(cwd, cwd),
-        "try to load platform file '{}/platform/none.xml' ... Error=XML_ERROR_FILE_NOT_FOUND ErrorID=3 (0x3) Line number=0: filename={}/platform/none.xml".format(exepath, exepath),
-        "try to load platform file '{}/platforms/platform/none.xml' ... Error=XML_ERROR_FILE_NOT_FOUND ErrorID=3 (0x3) Line number=0: filename={}/platforms/platform/none.xml".format(exepath, exepath),
+        "try to load platform file '{}/platform/none.xml' ... XML_ERROR_FILE_NOT_FOUND".format(cwd),
+        "try to load platform file '{}/platforms/platform/none.xml' ... XML_ERROR_FILE_NOT_FOUND".format(cwd),
+        "try to load platform file '{}/platform/none.xml' ... XML_ERROR_FILE_NOT_FOUND".format(exepath),
+        "try to load platform file '{}/platforms/platform/none.xml' ... XML_ERROR_FILE_NOT_FOUND".format(exepath),
         "cppcheck: error: unrecognized platform: 'platform/none'."
     ]
 
@@ -555,12 +555,12 @@ def test_platform_lookup_absolute_notfound(tmpdir):
     lines = stdout.splitlines()
     assert lines == [
         "looking for platform '{}'".format(platform_file),
-        "try to load platform file '{}' ... Error=XML_ERROR_FILE_NOT_FOUND ErrorID=3 (0x3) Line number=0: filename={}".format(platform_file, platform_file),
+        "try to load platform file '{}' ... XML_ERROR_FILE_NOT_FOUND".format(platform_file),
         "cppcheck: error: unrecognized platform: '{}'.".format(platform_file)
     ]
 
 
-@pytest.mark.skip  # TODO: fails when not run from the root folder
+#@pytest.mark.skip  # TODO: fails when not run from the root folder
 def test_platform_lookup_nofile(tmpdir):
     test_file = os.path.join(tmpdir, 'test.c')
     with open(test_file, 'wt'):
@@ -578,9 +578,9 @@ def test_platform_lookup_nofile(tmpdir):
     lines = stdout.splitlines()
     assert lines == [
         "looking for platform 'avr8'",
-        "try to load platform file '{}/avr8.xml' ... Error=XML_ERROR_FILE_NOT_FOUND ErrorID=3 (0x3) Line number=0: filename={}/avr8.xml".format(cwd, cwd),
+        "try to load platform file '{}/avr8.xml' ... XML_ERROR_FILE_NOT_FOUND".format(cwd),
         "try to load platform file '{}/platforms/avr8.xml' ... Success".format(cwd),
-        'Checking {}1 ...'.format(test_file)
+        'Checking {} ...'.format(test_file)
     ]
 
 
@@ -601,7 +601,7 @@ def test_platform_lookup_invalid(tmpdir):
     lines = stdout.splitlines()
     assert lines == [
         "looking for platform 'avr8'",
-        "try to load platform file '{}/avr8.xml' ... Error=XML_ERROR_PARSING_TEXT ErrorID=8 (0x8) Line number=1".format(cwd),
+        "try to load platform file '{}/avr8.xml' ... XML_ERROR_PARSING_TEXT".format(cwd),
         "cppcheck: error: unrecognized platform: 'avr8'."
     ]
 

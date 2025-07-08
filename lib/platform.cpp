@@ -235,7 +235,7 @@ bool Platform::loadFromFile(const std::vector<std::string>& paths, const std::st
             break;
         }
         if (debug)
-            std::cout << doc.ErrorStr() << std::endl;
+            std::cout << tinyxml2::XMLDocument::ErrorIDToName(err) << std::endl;
         if (err != tinyxml2::XML_ERROR_FILE_NOT_FOUND)
             break;
     }
