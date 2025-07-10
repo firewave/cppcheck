@@ -162,3 +162,7 @@ lib/preprocessor.cpp:2103:5: error: ‘errorLogger’ was not declared in this s
 |     ^~~~~~~~~~~
 |     _errorLogger
 ```
+- compilation of `SmallVector` with GCC 13 fails for at least 2.10 and 2.11
+```
+
+```
