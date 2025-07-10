@@ -8,7 +8,8 @@ from bisect_common import *
 def run(cppcheck_path, options, elapsed_time=None):
     timeout = None
     if elapsed_time:
-        timeout = elapsed_time * 2
+        # TODO: improve handling for very short run-times
+        timeout = min(elapsed_time + 10, elapsed_time * 2)  # 10 second additional time should be sufficient
     cmd = options.split()
     cmd.insert(0, cppcheck_path)
     print('running {}'.format(cppcheck_path))
@@ -20,7 +21,7 @@ def run(cppcheck_path, options, elapsed_time=None):
                 return None
             print('done')
         except subprocess.TimeoutExpired:
-            print('timeout')
+            print('timeout: {}'.format(timeout))
             p.kill()
             p.communicate()
             return False
