@@ -140,7 +140,7 @@ Use the following data as respective parameters:
 make: python: No such file or directory
 ```
 RESOLVED: a hot-patch is applied before compilation.
-- 1.39 to 1.49 (possibly more versions - 1.54 and up work) cannot be compiled:
+- 1.39 to 1.53 cannot be compiled:
 ```
 lib/mathlib.cpp:70:42: error: invalid conversion from ‘char’ to ‘char**’ [-fpermissive]
    70 |         return std::strtoul(str.c_str(), '\0', 16);
