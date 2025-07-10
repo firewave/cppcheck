@@ -9,7 +9,7 @@ def run(cppcheck_path, options, elapsed_time=None):
     timeout = None
     if elapsed_time:
         # TODO: improve handling for very short run-times
-        timeout = min(elapsed_time + 10, elapsed_time * 2)  # 10 second additional time should be sufficient
+        timeout = min(elapsed_time + 5, elapsed_time * 2)  # 5 second additional time should be sufficient
     cmd = options.split()
     cmd.insert(0, cppcheck_path)
     print('running {}'.format(cppcheck_path))
