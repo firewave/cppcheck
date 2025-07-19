@@ -71,6 +71,14 @@ private:
         check("int buf[256];\n"
               "void foo()\n"
               "{\n"
+              "    signed char ch = 0x80;\n"
+              "    buf[ch] = 0;\n"
+              "}");
+        ASSERT_EQUALS("[test.cpp:5]: (warning) Signed 'char' type used as array index.\n", errout_str());
+
+        check("int buf[256];\n"
+              "void foo()\n"
+              "{\n"
               "    char ch = 0;\n"
               "    buf[ch] = 0;\n"
               "}");
@@ -93,6 +101,14 @@ private:
         ASSERT_EQUALS("[test.cpp:5:5]: (portability) 'char' type used as array index. [unknownSignCharArrayIndex]\n", errout_str());
 
         check("int buf[256];\n"
+              "void foo()\n"
+              "{\n"
+              "    signed char ch = 0x80;\n"
+              "    buf[ch] = 0;\n"
+              "}");
+        ASSERT_EQUALS("[test.cpp:5]: (warning) Signed 'char' type used as array index.\n", errout_str());
+
+        check("int buf[256];\n"
               "void foo(signed char ch)\n"
               "{\n"
               "    buf[ch] = 0;\n"
@@ -112,6 +128,13 @@ private:
               "    buf[ch] = 0;\n"
               "}");
         ASSERT_EQUALS("[test.cpp:3:24]: (portability) 'char' type used as array index. [unknownSignCharArrayIndex]\n", errout_str());
+
+        check("void foo(char* buf)\n"
+              "{\n"
+              "    signed char ch = 0x80;"
+              "    buf[ch] = 0;\n"
+              "}");
+        ASSERT_EQUALS("[test.cpp:3]: (warning) Signed 'char' type used as array index.\n", errout_str());
 
         check("void foo(char* buf)\n"
               "{\n"
