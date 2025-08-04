@@ -19,6 +19,7 @@
 #include <set>
 #include <string>
 #include <unordered_map>
+#include <utility>
 #include <vector>
 
 #ifdef _WIN32
@@ -36,7 +37,7 @@
 #ifdef SIMPLECPP_WINDOWS
 #  include <cstdint>
 #else
-#  include <sys/stat.h>
+#  include <sys/types.h>
 #endif
 
 #if defined(_MSC_VER)

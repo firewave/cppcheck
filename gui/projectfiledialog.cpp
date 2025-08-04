@@ -30,7 +30,9 @@
 
 #include "ui_projectfile.h"
 
+#include <algorithm>
 #include <array>
+#include <iterator>
 #include <list>
 #include <string>
 #include <utility>

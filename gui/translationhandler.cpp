@@ -21,6 +21,9 @@
 #include "config.h"
 #include "common.h"
 
+#include <algorithm>
+#include <iterator>
+
 #include <QApplication>
 #include <QCoreApplication>
 #include <QFile>
