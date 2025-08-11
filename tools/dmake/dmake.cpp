@@ -708,7 +708,7 @@ int main(int argc, char **argv)
 
     // Makefile settings..
     if (release) {
-        makeConditionalVariable(fout, "CXXFLAGS", "-O2 -DNDEBUG -Wall -Wno-sign-compare -Wno-multichar");
+        makeConditionalVariable(fout, "CXXFLAGS", "-O2 -DNDEBUG -Wall -Wno-sign-compare -Wno-multichar,");
     } else {
         makeConditionalVariable(fout, "CXXFLAGS",
                                 "-pedantic "
@@ -726,7 +726,7 @@ int main(int argc, char **argv)
                                 "-Wno-multichar "
                                 "-Woverloaded-virtual "
                                 "$(CPPCHK_GLIBCXX_DEBUG) "
-                                "-g");
+                                "-g ");
     }
 
     fout << "ifeq (g++, $(findstring g++,$(CXX)))\n"
@@ -749,6 +749,9 @@ int main(int argc, char **argv)
          << "else ifneq ($(HAVE_RULES),)\n"
          << "    $(error invalid HAVE_RULES value '$(HAVE_RULES)')\n"
          << "endif\n\n";
+
+    fout << "CXXFLAGS += $(CXXOPTS)";
+    fout << "LDFLAGS += $(LDOPTS)";
 
     makeConditionalVariable(fout, "PREFIX", "/usr");
     makeConditionalVariable(fout, "INCLUDE_FOR_LIB", "-Ilib -isystem externals -isystem externals/picojson -isystem externals/simplecpp -isystem externals/tinyxml2");
