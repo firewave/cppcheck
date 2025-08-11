@@ -53,12 +53,11 @@ jobs:
         with:
           key: ${{ github.workflow }}-${{ github.job }}-${{ matrix.os }}
 
-      # TODO: bail out on warning
       - name: Build cppcheck
         run: |
           export PATH="/mingw64/lib/ccache/bin:$PATH"
           # set RDYNAMIC to work around broken MinGW detection
-          make VERBOSE=1 RDYNAMIC=-lshlwapi -j$(nproc) cppcheck
+          make VERBOSE=1 RDYNAMIC=-lshlwapi -j$(nproc) CXXOPTS="-Werror" cppcheck
         env:
           LDFLAGS: -fuse-ld=lld # use lld for faster linking
 
@@ -66,7 +65,7 @@ jobs:
         run: |
           export PATH="/mingw64/lib/ccache/bin:$PATH"
           # set RDYNAMIC to work around broken MinGW detection
-          make VERBOSE=1 RDYNAMIC=-lshlwapi -j$(nproc) testrunner
+          make VERBOSE=1 RDYNAMIC=-lshlwapi -j$(nproc) CXXOPTS="-Werror" testrunner
         env:
           LDFLAGS: -fuse-ld=lld # use lld for faster linking
 
