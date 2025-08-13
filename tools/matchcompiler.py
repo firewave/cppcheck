@@ -206,7 +206,7 @@ class MatchCompiler:
                 arg2 = ', const int varid'
 
             ret = '// pattern: ' + pattern + '\n'
-            ret += 'static inline bool match' + \
+            ret += 'MAYBE_UNUSED static inline bool match' + \
                 str(nr) + '(' + tokenType + '* tok' + arg2 + ') {\n'
             returnStatement = 'return false;\n'
 
@@ -290,7 +290,7 @@ class MatchCompiler:
             more_args += ', int varid'
 
         ret = '// pattern: ' + pattern + '\n'
-        ret += 'template<class T> static inline T * findmatch' + \
+        ret += 'template<class T> MAYBE_UNUSED static inline T * findmatch' + \
             str(findmatchnr) + '(T * start_tok' + more_args + ') {\n'
         ret += '    for (; start_tok' + endCondition + \
             '; start_tok = start_tok->next()) {\n'
@@ -373,7 +373,7 @@ class MatchCompiler:
         if varId:
             more_args = ', const int varid'
 
-        ret = 'static inline bool match_verify' + \
+        ret = 'MAYBE_UNUSED static inline bool match_verify' + \
             str(verifyNumber) + '(const Token *tok' + more_args + ') {\n'
 
         origMatchName = 'Match'
@@ -509,7 +509,7 @@ class MatchCompiler:
         if varId:
             more_args += ', const int varid'
 
-        ret = 'template < class T > static inline T * findmatch_verify' + \
+        ret = 'template < class T > MAYBE_UNUSED static inline T * findmatch_verify' + \
             str(verifyNumber) + '(T * tok' + more_args + ') {\n'
 
         origFindMatchName = 'findmatch'
@@ -715,17 +715,22 @@ class MatchCompiler:
         if line_directive:
             lineno = '#line 1 "' + srcname + '"\n'
 
+        hasRawFuncs = len(self._rawMatchFunctions)
+
         header = '#include "matchcompiler.h"\n'
         header += '#include <string>\n'
         header += '#include <cstring>\n'
-        if len(self._rawMatchFunctions):
+        if hasRawFuncs:
             header += '#include "errorlogger.h"\n'
             header += '#include "token.h"\n'
+            header += '#define MAYBE_UNUSED [[maybe_unused]]\n'
 
         with io.open(destname, 'wt', encoding="utf-8") as fout:
-            if modified or len(self._rawMatchFunctions):
+            if modified or hasRawFuncs:
                 fout.write(header)
                 fout.write(strFunctions)
+            if hasRawFuncs:
+                fout.write('#undef MAYBE_UNUSED\n')
             fout.write(lineno)
             fout.write(code)
 
