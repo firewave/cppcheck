@@ -1,5 +1,6 @@
 # TODO: when using ccache and matchcompiler this will accessed before the file was generated and thus the build fails
 set(srcs_lib pathmatch.cpp path.cpp utils.cpp)
+set(srcs_tools "")
 foreach(file ${srcs_lib})
     if (NOT USE_MATCHCOMPILER_OPT STREQUAL "Off")
         set(src "${CMAKE_BINARY_DIR}/lib/build/mc_${file}")
