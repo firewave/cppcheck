@@ -504,7 +504,7 @@ double MathLib::toDoubleNumber(const std::string &str, const Token * const tok)
 {
     if (isCharLiteral(str)) {
         try {
-            return simplecpp::characterLiteralToLL(str);
+            return static_cast<double>(simplecpp::characterLiteralToLL(str));
         } catch (const std::exception& e) {
             throw InternalError(tok, "Internal Error. MathLib::toDoubleNumber: characterLiteralToLL(" + str + ") => " + e.what());
         }
