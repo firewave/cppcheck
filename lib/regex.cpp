@@ -281,7 +281,7 @@ namespace {
     };
 }
 
-std::shared_ptr<Regex> Regex::create(std::string pattern, std::string& err)
+std::shared_ptr<Regex> Regex::create(std::string pattern, Type type, std::string& err)
 {
     auto* regex = new StdRegex(std::move(pattern));
     err = regex->compile();
