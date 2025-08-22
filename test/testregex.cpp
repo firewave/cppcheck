@@ -189,6 +189,7 @@ private:
 #undef assertRegex
 };
 
+// TODO: test with Std
 REGISTER_TEST(TestRegEx)
 
 #endif // HAVE_RULES
