@@ -162,7 +162,8 @@ void ProgramMemory::setUnknown(const Token* expr) {
 
 bool ProgramMemory::hasValue(nonneg int exprid) const
 {
-    assert(exprid);
+    if (exprid == 0)
+        return false;
     const auto it = find(exprid);
     return it != mValues->cend();
 }
