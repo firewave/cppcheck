@@ -66,8 +66,11 @@ void ProgramMemory::setValue(const Token* expr, const ValueFlow::Value& value) {
         [&](const Token* tok) -> std::vector<MathLib::bigint> {
         if (const ValueFlow::Value* v = tok->getKnownValue(ValueFlow::Value::ValueType::INT))
             return {v->intvalue};
+        const auto exprid = tok->exprId();
+        if (exprid == 0)
+            return {};
         MathLib::bigint result = 0;
-        if (getIntValue(tok->exprId(), result))
+        if (getIntValue(exprid, result))
             return {result};
         return {};
     },
