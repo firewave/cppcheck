@@ -78,6 +78,7 @@ void ProgramMemory::setValue(const Token* expr, const ValueFlow::Value& value) {
 
 const ValueFlow::Value* ProgramMemory::getValue(nonneg int exprid, bool impossible) const
 {
+    assert(exprid);
     const auto it = find(exprid);
     const bool found = it != mValues->cend() && (impossible || !it->second.isImpossible());
     if (found)
@@ -157,11 +158,13 @@ void ProgramMemory::setUnknown(const Token* expr) {
 
 bool ProgramMemory::hasValue(nonneg int exprid) const
 {
+    assert(exprid);
     const auto it = find(exprid);
     return it != mValues->cend();
 }
 
 const ValueFlow::Value& ProgramMemory::at(nonneg int exprid) const {
+    assert(exprid);
     const auto it = find(exprid);
     if (it == mValues->cend()) {
         throw std::out_of_range("ProgramMemory::at");
@@ -170,6 +173,7 @@ const ValueFlow::Value& ProgramMemory::at(nonneg int exprid) const {
 }
 
 ValueFlow::Value& ProgramMemory::at(nonneg int exprid) {
+    assert(exprid);
     copyOnWrite();
 
     const auto it = find(exprid);
