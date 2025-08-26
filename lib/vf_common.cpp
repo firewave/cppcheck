@@ -294,7 +294,7 @@ namespace ValueFlow
                 }
             } else if (!tok2->type()) {
                 const ValueType& vt = ValueType::parseDecl(tok2, settings);
-                size_t sz = getSizeOf(vt, settings, ValueFlow::Accuracy::ExactOrZero);
+                MathLib::biguint sz = getSizeOf(vt, settings, ValueFlow::Accuracy::ExactOrZero);
                 const Token* brac = tok2->astParent();
                 while (Token::simpleMatch(brac, "[")) {
                     const Token* num = brac->astOperand2();
