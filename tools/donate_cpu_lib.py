@@ -11,6 +11,7 @@ import signal
 import tarfile
 import shlex
 import copy
+import lzma
 
 
 # Version scheme (MAJOR.MINOR.PATCH) should orientate on "Semantic Versioning" https://semver.org/
@@ -623,8 +624,13 @@ def diff_results(ver1, results1, ver2, results2):
     return ret
 
 
-def __send_all(connection, data):
+def __send_all(connection, data, compress):
     bytes_ = data.encode('ascii', 'ignore')
+    if compress:
+        print("__send_all() - {} (before)".format(len(bytes_)))
+        compressor = lzma.LZMACompressor(format=lzma.FORMAT_RAW)
+        bytes_ = compressor.compress(bytes_)
+        print("__send_all() - {} (after)".format(len(bytes_)))
     while bytes_:
         num = connection.send(bytes_)
         if num < len(bytes_):
