@@ -1614,15 +1614,19 @@ namespace {
                 const Function* f = ftok->function();
                 ValueFlow::Value result = unknown();
                 if (expr->str() == "(") {
-                    std::vector<const Token*> tokArgs = getArguments(expr);
-                    std::vector<ValueFlow::Value> args(tokArgs.size());
-                    std::transform(
-                        tokArgs.cbegin(), tokArgs.cend(), args.begin(), [&](const Token* tok) {
-                        return execute(tok);
-                    });
+                    auto getArgs_f = [this](const Token* expr) {
+                        std::vector<const Token*> tokArgs = getArguments(expr);
+                        std::vector<ValueFlow::Value> args(tokArgs.size());
+                        std::transform(
+                            tokArgs.cbegin(), tokArgs.cend(), args.begin(), [&](const Token* tok) {
+                            return execute(tok);
+                        });
+                        return args;
+                    };
                     if (f) {
                         if (fdepth >= 0 && !f->isImplicitlyVirtual()) {
                             ProgramMemory functionState;
+                            std::vector<ValueFlow::Value> args = getArgs_f(expr);
                             for (std::size_t i = 0; i < args.size(); ++i) {
                                 const Variable* const arg = f->getArgumentVar(i);
                                 if (!arg)
@@ -1640,14 +1644,14 @@ namespace {
                     } else {
                         BuiltinLibraryFunction lf = getBuiltinLibraryFunction(ftok->str());
                         if (lf)
-                            return lf(args);
+                            return lf(getArgs_f(expr));
                         const std::string& returnValue = settings.library.returnValue(ftok);
                         if (!returnValue.empty()) {
                             std::unordered_map<nonneg int, ValueFlow::Value> arg_map;
                             int argn = 0;
-                            for (const ValueFlow::Value& v : args) {
+                            for (ValueFlow::Value& v : getArgs_f(expr)) {
                                 if (!v.isUninitValue())
-                                    arg_map[argn] = v;
+                                    arg_map[argn] = std::move(v);
                                 argn++;
                             }
                             return evaluateLibraryFunction(arg_map, returnValue, settings, ftok->isCpp());
