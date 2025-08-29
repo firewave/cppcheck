@@ -1217,7 +1217,7 @@ private:
                                     "#undef z\n"
                                     "int z;\n"
                                     "z = 0;\n";
-            ASSERT_EQUALS("\n\nint z ;\nz = 0 ;", PreprocessorHelper::getcode(settings0, *this, filedata, {""}, "test.c"));
+            ASSERT_EQUALS("\n\nint z ;\nz = 0 ;", PreprocessorHelper::getcode(settings0, *this, filedata, "test.c"));
         }
     }
 
@@ -1635,14 +1635,14 @@ private:
                                     "#if A\n"
                                     "FOO\n"
                                     "#endif";
-            ASSERT_EQUALS("", PreprocessorHelper::getcode(settings0, *this, filedata,{""},"test.c"));
+            ASSERT_EQUALS("", PreprocessorHelper::getcode(settings0, *this, filedata,"test.c"));
         }
         {
             const char filedata[] = "#define A 1\n"
                                     "#if A==1\n"
                                     "FOO\n"
                                     "#endif";
-            ASSERT_EQUALS("\n\nFOO", PreprocessorHelper::getcode(settings0, *this, filedata,{""},"test.c"));
+            ASSERT_EQUALS("\n\nFOO", PreprocessorHelper::getcode(settings0, *this, filedata,"test.c"));
         }
     }
 
@@ -1652,7 +1652,7 @@ private:
                                 "#if (B==A) || (B==C)\n"
                                 "FOO\n"
                                 "#endif";
-        ASSERT_EQUALS("\n\n\nFOO", PreprocessorHelper::getcode(settings0, *this, filedata,{""},"test.c"));
+        ASSERT_EQUALS("\n\n\nFOO", PreprocessorHelper::getcode(settings0, *this, filedata,"test.c"));
     }
 
     void define_if3() {
@@ -1660,7 +1660,7 @@ private:
                                 "#if (A==0)\n"
                                 "FOO\n"
                                 "#endif";
-        ASSERT_EQUALS("\n\nFOO", PreprocessorHelper::getcode(settings0, *this, filedata,{""},"test.c"));
+        ASSERT_EQUALS("\n\nFOO", PreprocessorHelper::getcode(settings0, *this, filedata,"test.c"));
     }
 
     void define_if4() {
@@ -1668,7 +1668,7 @@ private:
                                 "#if X==123\n"
                                 "FOO\n"
                                 "#endif";
-        ASSERT_EQUALS("\n\nFOO", PreprocessorHelper::getcode(settings0, *this, filedata,{""},"test.c"));
+        ASSERT_EQUALS("\n\nFOO", PreprocessorHelper::getcode(settings0, *this, filedata,"test.c"));
     }
 
     void define_if5() { // #4516 - #define B (A & 0x00f0)
@@ -1678,7 +1678,7 @@ private:
                                     "#if B==0x0010\n"
                                     "FOO\n"
                                     "#endif";
-            ASSERT_EQUALS("\n\n\nFOO", PreprocessorHelper::getcode(settings0, *this, filedata,{""},"test.c"));
+            ASSERT_EQUALS("\n\n\nFOO", PreprocessorHelper::getcode(settings0, *this, filedata,"test.c"));
         }
         {
             const char filedata[] = "#define A 0x00f0\n"
@@ -1687,14 +1687,14 @@ private:
                                     "#if C==0x0010\n"
                                     "FOO\n"
                                     "#endif";
-            ASSERT_EQUALS("\n\n\n\nFOO", PreprocessorHelper::getcode(settings0, *this, filedata,{""},"test.c"));
+            ASSERT_EQUALS("\n\n\n\nFOO", PreprocessorHelper::getcode(settings0, *this, filedata,"test.c"));
         }
         {
             const char filedata[] = "#define A (1+A)\n" // don't hang for recursive macros
                                     "#if A==1\n"
                                     "FOO\n"
                                     "#endif";
-            ASSERT_EQUALS("\n\nFOO", PreprocessorHelper::getcode(settings0, *this, filedata,"","test.c"));
+            ASSERT_EQUALS("\n\nFOO", PreprocessorHelper::getcode(settings0, *this, filedata,"test.c"));
         }
     }
 
@@ -1817,7 +1817,7 @@ private:
                                 "B me;\n";
 
         // Preprocess => actual result..
-        ASSERT_EQUALS("\n\n\n\n\n\n$int me ;", PreprocessorHelper::getcode(settings0, *this, filedata, {""}, "a.cpp"));
+        ASSERT_EQUALS("\n\n\n\n\n\n$int me ;", PreprocessorHelper::getcode(settings0, *this, filedata, "a.cpp"));
         ASSERT_EQUALS("\n\n\n\n\n\n$char me ;", PreprocessorHelper::getcode(settings0, *this, filedata, {"A"}, "a.cpp"));
     }
 
@@ -1828,7 +1828,7 @@ private:
                                 "A(123);";
 
         // Preprocess => actual result..
-        const std::map<std::string, std::string> actual = PreprocessorHelper::getcode(settings0, *this, filedata, "file.c";
+        const std::map<std::string, std::string> actual = PreprocessorHelper::getcode(settings0, *this, filedata, "file.c");
 
         ASSERT_EQUALS(1U, actual.size());
         ASSERT_EQUALS("\n\n\n123 ;", actual.at(""));
@@ -1841,7 +1841,7 @@ private:
                                 "#endif\n";
 
         // Preprocess => actual result..
-        ASSERT_EQUALS("", PreprocessorHelper::getcode(settings0, *this, filedata, {""}, "a.cpp"));
+        ASSERT_EQUALS("", PreprocessorHelper::getcode(settings0, *this, filedata, "a.cpp"));
         ASSERT_EQUALS("", PreprocessorHelper::getcode(settings0, *this, filedata, {"A"}, "a.cpp"));
     }
 
@@ -2029,14 +2029,14 @@ private:
     void predefine5() {  // #3737, #5119 - automatically define __cplusplus
         // #3737...
         const char code[] = "#ifdef __cplusplus\n123\n#endif";
-        ASSERT_EQUALS("",      PreprocessorHelper::getcode(settings0, *this, code, {""}, "test.c"));
-        ASSERT_EQUALS("\n123", PreprocessorHelper::getcode(settings0, *this, code, {""}, "test.cpp"));
+        ASSERT_EQUALS("",      PreprocessorHelper::getcode(settings0, *this, code, "test.c"));
+        ASSERT_EQUALS("\n123", PreprocessorHelper::getcode(settings0, *this, code, "test.cpp"));
     }
 
     void predefine6() { // automatically define __STDC_VERSION__
         const char code[] = "#ifdef __STDC_VERSION__\n123\n#endif";
-        ASSERT_EQUALS("\n123", PreprocessorHelper::getcode(settings0, *this, code, {""}, "test.c"));
-        ASSERT_EQUALS("",      PreprocessorHelper::getcode(settings0, *this, code, {""}, "test.cpp"));
+        ASSERT_EQUALS("\n123", PreprocessorHelper::getcode(settings0, *this, code, "test.c"));
+        ASSERT_EQUALS("",      PreprocessorHelper::getcode(settings0, *this, code, "test.cpp"));
     }
 
     void strictAnsi() {
@@ -2044,16 +2044,16 @@ private:
         Settings settings;
 
         settings.standards.setStd("gnu99");
-        ASSERT_EQUALS("", PreprocessorHelper::getcode(settings, *this, code, {""}, "test.c"));
+        ASSERT_EQUALS("", PreprocessorHelper::getcode(settings, *this, code, "test.c"));
 
         settings.standards.setStd("c99");
-        ASSERT_EQUALS("\n123", PreprocessorHelper::getcode(settings, *this, code, {""}, "test.c"));
+        ASSERT_EQUALS("\n123", PreprocessorHelper::getcode(settings, *this, code, "test.c"));
 
         settings.standards.setStd("gnu++11");
-        ASSERT_EQUALS("", PreprocessorHelper::getcode(settings, *this, code, {""}, "test.cpp"));
+        ASSERT_EQUALS("", PreprocessorHelper::getcode(settings, *this, code, "test.cpp"));
 
         settings.standards.setStd("c++11");
-        ASSERT_EQUALS("\n123", PreprocessorHelper::getcode(settings, *this, code, {""}, "test.cpp"));
+        ASSERT_EQUALS("\n123", PreprocessorHelper::getcode(settings, *this, code, "test.cpp"));
     }
 
     void invalidElIf() {
@@ -2572,15 +2572,15 @@ private:
         Settings settings;
 
         settings.standards.setStd("c++11");
-        ASSERT_EQUALS("", PreprocessorHelper::getcode(settings, *this, code, {""}, "test.cpp"));
+        ASSERT_EQUALS("", PreprocessorHelper::getcode(settings, *this, code, "test.cpp"));
         ASSERT_EQUALS("[test.cpp:1:0]: (error) failed to evaluate #if condition, undefined function-like macro invocation: __has_include( ... ) [preprocessorErrorDirective]\n", errout_str());
 
         settings.standards.setStd("c++17");
-        ASSERT_EQUALS("", PreprocessorHelper::getcode(settings, *this, code, {""}, "test.cpp"));
+        ASSERT_EQUALS("", PreprocessorHelper::getcode(settings, *this, code, "test.cpp"));
         ASSERT_EQUALS("", errout_str());
 
         settings.standards.setStd("gnu++11");
-        ASSERT_EQUALS("", PreprocessorHelper::getcode(settings, *this, code, {""}, "test.cpp"));
+        ASSERT_EQUALS("", PreprocessorHelper::getcode(settings, *this, code, "test.cpp"));
         ASSERT_EQUALS("", errout_str());
     }
 
@@ -2589,7 +2589,7 @@ private:
         const char code[] = "void f(long l) {\n"
                             "  if (l > INT_MAX) {}\n"
                             "}";
-        const std::string actual = PreprocessorHelper::getcode(settings0, *this, code, {""}, "test.c");
+        const std::string actual = PreprocessorHelper::getcode(settings0, *this, code, "test.c");
         ASSERT_EQUALS("void f ( long l ) {\n"
                       "if ( l > $2147483647 ) { }\n"
                       "}", actual);

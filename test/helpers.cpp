@@ -115,6 +115,12 @@ ScopedFile::~ScopedFile() {
 }
 
 // TODO: we should be using the actual Preprocessor implementation
+std::string PreprocessorHelper::getcode(const Settings& settings, ErrorLogger& errorlogger, const std::string &filedata, const std::string &filename, SuppressionList *inlineSuppression)
+{
+    const std::map<std::string, std::string> cfgcode = getcode(settings, errorlogger, filedata.c_str(), std::set<std::string>{""}, filename, inlineSuppression);
+    return cfgcode.at("");
+}
+
 std::map<std::string, std::string> PreprocessorHelper::getcode(const Settings& settings, ErrorLogger& errorlogger, const std::string &filedata, std::set<std::string> cfgs, const std::string &filename, SuppressionList *inlineSuppression)
 {
     return getcode(settings, errorlogger, filedata.c_str(), std::move(cfgs), filename, inlineSuppression);

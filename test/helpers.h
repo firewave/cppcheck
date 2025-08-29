@@ -168,10 +168,11 @@ public:
      * Note: for testing only.
      *
      * @param filedata file data including preprocessing 'if', 'define', etc
-     * @param cfgs configuration to read out
      * @param filename name of source file
      * @param inlineSuppression the inline suppressions
      */
+    static std::string getcode(const Settings& settings, ErrorLogger& errorlogger, const std::string &filedata, const std::string &filename, SuppressionList *inlineSuppression = nullptr);
+
     static std::map<std::string, std::string> getcode(const Settings& settings, ErrorLogger& errorlogger, const std::string &filedata, std::set<std::string> cfgs, const std::string &filename, SuppressionList *inlineSuppression = nullptr);
     static std::map<std::string, std::string> getcode(const Settings& settings, ErrorLogger& errorlogger, const char code[], const std::string &filename, SuppressionList *inlineSuppression = nullptr);
 
