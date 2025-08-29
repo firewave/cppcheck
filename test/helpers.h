@@ -192,7 +192,7 @@ public:
     }
 
     template<size_t size>
-    static std::map<std::string, std::string> getcode(const Settings& settings, ErrorLogger& errorlogger, const char (&code)[size], const std::string &filename = "file.c", SuppressionList *inlineSuppression = nullptr)
+    static std::map<std::string, std::string> getcode(const Settings& settings, ErrorLogger& errorlogger, const char (&code)[size], const std::string &filename, SuppressionList *inlineSuppression = nullptr)
     {
         return getcode(settings, errorlogger, code, size-1, filename, inlineSuppression);
     }
@@ -200,8 +200,8 @@ public:
 private:
     static std::string getcode(const Settings& settings, ErrorLogger& errorlogger, const char* code, std::size_t size, const std::string &cfg, const std::string &filename, SuppressionList *inlineSuppression);
 
-    static std::map<std::string, std::string> getcode(const Settings& settings, ErrorLogger& errorlogger, const char* code, std::size_t size, const std::string &filename = "file.c", SuppressionList *inlineSuppression = nullptr);
-    static std::map<std::string, std::string> getcode(const Settings& settings, ErrorLogger& errorlogger, const char* code, std::size_t size, std::set<std::string> cfgs, const std::string &filename = "file.c", SuppressionList *inlineSuppression = nullptr);
+    static std::map<std::string, std::string> getcode(const Settings& settings, ErrorLogger& errorlogger, const char* code, std::size_t size, const std::string &filename, SuppressionList *inlineSuppression);
+    static std::map<std::string, std::string> getcode(const Settings& settings, ErrorLogger& errorlogger, const char* code, std::size_t size, std::set<std::string> cfgs, const std::string &filename, SuppressionList *inlineSuppression);
 };
 
 namespace cppcheck {
