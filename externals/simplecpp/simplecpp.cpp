@@ -466,17 +466,10 @@ simplecpp::TokenList::TokenList(std::istream &istr, std::vector<std::string> &fi
     readfile(stream,filename,outputList);
 }
 
-simplecpp::TokenList::TokenList(const unsigned char* data, std::size_t size, std::vector<std::string> &filenames, const std::string &filename, OutputList *outputList)
+simplecpp::TokenList::TokenList(const unsigned char* data, std::size_t size, std::vector<std::string> &filenames, const std::string &filename, OutputList *outputList, int /*unused*/)
     : frontToken(nullptr), backToken(nullptr), files(filenames)
 {
     StdCharBufStream stream(data, size);
-    readfile(stream,filename,outputList);
-}
-
-simplecpp::TokenList::TokenList(const char* data, std::size_t size, std::vector<std::string> &filenames, const std::string &filename, OutputList *outputList)
-    : frontToken(nullptr), backToken(nullptr), files(filenames)
-{
-    StdCharBufStream stream(reinterpret_cast<const unsigned char*>(data), size);
     readfile(stream,filename,outputList);
 }
 
@@ -761,18 +754,18 @@ void simplecpp::TokenList::readfile(Stream &stream, const std::string &filename,
             while (stream.good() && ch != '\n') {
                 currentToken += ch;
                 ch = stream.readChar();
-                if(ch == '\\') {
+                if (ch == '\\') {
                     TokenString tmp;
                     char tmp_ch = ch;
-                    while((stream.good()) && (tmp_ch == '\\' || tmp_ch == ' ' || tmp_ch == '\t')) {
+                    while ((stream.good()) && (tmp_ch == '\\' || tmp_ch == ' ' || tmp_ch == '\t')) {
                         tmp += tmp_ch;
                         tmp_ch = stream.readChar();
                     }
-                    if(!stream.good()) {
+                    if (!stream.good()) {
                         break;
                     }
 
-                    if(tmp_ch != '\n') {
+                    if (tmp_ch != '\n') {
                         currentToken += tmp;
                     } else {
                         const TokenString check_portability = currentToken + tmp;
@@ -1667,7 +1660,7 @@ namespace simplecpp {
             }
 
             invalidHashHash(const Location &loc, const std::string &macroName, const std::string &message)
-                : Error(loc, format(macroName, message)) { }
+                : Error(loc, format(macroName, message)) {}
 
             static inline invalidHashHash unexpectedToken(const Location &loc, const std::string &macroName, const Token *tokenA) {
                 return invalidHashHash(loc, macroName, "Unexpected token '"+ tokenA->str()+"'");
@@ -2385,12 +2378,17 @@ namespace simplecpp {
 namespace simplecpp {
 
 #ifdef __CYGWIN__
+    static bool startsWith(const std::string &s, const std::string &p)
+    {
+        return (s.size() >= p.size()) && std::equal(p.begin(), p.end(), s.begin());
+    }
+
     std::string convertCygwinToWindowsPath(const std::string &cygwinPath)
     {
         std::string windowsPath;
 
         std::string::size_type pos = 0;
-        if (cygwinPath.size() >= 11 && startsWith_(cygwinPath, "/cygdrive/")) {
+        if (cygwinPath.size() >= 11 && startsWith(cygwinPath, "/cygdrive/")) {
             const unsigned char driveLetter = cygwinPath[10];
             if (std::isalpha(driveLetter)) {
                 if (cygwinPath.size() == 11) {
@@ -2667,7 +2665,7 @@ static unsigned long long stringToULLbounded(
     int base = 0,
     std::ptrdiff_t minlen = 1,
     std::size_t maxlen = std::string::npos
-)
+    )
 {
     const std::string sub = s.substr(pos, maxlen);
     const char * const start = sub.c_str();
@@ -3349,7 +3347,7 @@ void simplecpp::preprocess(simplecpp::TokenList &output, const simplecpp::TokenL
             includetokenstack.push(filedata->tokens.cfront());
     }
 
-    std::map<std::string, std::list<Location> > maybeUsedMacros;
+    std::map<std::string, std::list<Location>> maybeUsedMacros;
 
     for (const Token *rawtok = nullptr; rawtok || !includetokenstack.empty();) {
         if (rawtok == nullptr) {
@@ -3746,11 +3744,11 @@ simplecpp::cstd_t simplecpp::getCStd(const std::string &std)
 {
     if (std == "c90" || std == "c89" || std == "iso9899:1990" || std == "iso9899:199409" || std == "gnu90" || std == "gnu89")
         return C89;
-    if (std == "c99" || std == "c9x" || std == "iso9899:1999" || std == "iso9899:199x" || std == "gnu99"|| std == "gnu9x")
+    if (std == "c99" || std == "c9x" || std == "iso9899:1999" || std == "iso9899:199x" || std == "gnu99" || std == "gnu9x")
         return C99;
     if (std == "c11" || std == "c1x" || std == "iso9899:2011" || std == "gnu11" || std == "gnu1x")
         return C11;
-    if (std == "c17" || std == "c18" || std == "iso9899:2017" || std == "iso9899:2018" || std == "gnu17"|| std == "gnu18")
+    if (std == "c17" || std == "c18" || std == "iso9899:2017" || std == "iso9899:2018" || std == "gnu17" || std == "gnu18")
         return C17;
     if (std == "c23" || std == "gnu23" || std == "c2x" || std == "gnu2x")
         return C23;
