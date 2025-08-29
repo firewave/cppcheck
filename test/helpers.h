@@ -176,12 +176,21 @@ public:
      *
      * Note: for testing only.
      *
-     * @param filedata file data including preprocessing 'if', 'define', etc
+     * @param code file data including preprocessing 'if', 'define', etc
      * @param cfg configuration to read out
      * @param filename name of source file
      * @param inlineSuppression the inline suppressions
      */
-    static std::string getcode(const Settings& settings, ErrorLogger& errorlogger, const std::string &filedata, const std::string &cfg, const std::string &filename, SuppressionList *inlineSuppression = nullptr);
+    template<size_t size>
+    static std::string getcode(const Settings& settings, ErrorLogger& errorlogger, const char (&code)[size], const std::string &cfg, const std::string &filename, SuppressionList *inlineSuppression = nullptr)
+    {
+        return getcode(settings, errorlogger, code, size-1, cfg, filename, inlineSuppression);
+    }
+    static std::string getcode(const Settings& settings, ErrorLogger& errorlogger, const std::string &filedata, const std::string &cfg, const std::string &filename, SuppressionList *inlineSuppression = nullptr)
+    {
+        return getcode(settings, errorlogger, filedata.data(), filedata.size(), cfg, filename, inlineSuppression);
+    }
+
     template<size_t size>
     static std::map<std::string, std::string> getcode(const Settings& settings, ErrorLogger& errorlogger, const char (&code)[size], const std::string &filename = "file.c", SuppressionList *inlineSuppression = nullptr)
     {
@@ -189,6 +198,8 @@ public:
     }
 
 private:
+    static std::string getcode(const Settings& settings, ErrorLogger& errorlogger, const char* code, std::size_t size, const std::string &cfg, const std::string &filename, SuppressionList *inlineSuppression);
+
     static std::map<std::string, std::string> getcode(const Settings& settings, ErrorLogger& errorlogger, const char* code, std::size_t size, const std::string &filename = "file.c", SuppressionList *inlineSuppression = nullptr);
     static std::map<std::string, std::string> getcode(const Settings& settings, ErrorLogger& errorlogger, const char* code, std::size_t size, std::set<std::string> cfgs, const std::string &filename = "file.c", SuppressionList *inlineSuppression = nullptr);
 };
