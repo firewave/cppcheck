@@ -134,6 +134,7 @@ std::map<std::string, std::string> PreprocessorHelper::getcode(const Settings& s
     simplecpp::OutputList outputList;
     std::vector<std::string> files;
 
+    // TODO: get rid of size
     simplecpp::TokenList tokens(code, size, files, Path::simplifyPath(filename), &outputList);
     Preprocessor preprocessor(settings, errorlogger, Path::identify(tokens.getFiles()[0], false));
     if (inlineSuppression)
@@ -163,6 +164,7 @@ std::map<std::string, std::string> PreprocessorHelper::getcode(const Settings& s
 
 void SimpleTokenizer2::preprocess(const char* code, std::size_t size, std::vector<std::string> &files, const std::string& file0, Tokenizer& tokenizer, ErrorLogger& errorlogger)
 {
+    // TODO: get rid of size
     const simplecpp::TokenList tokens1(code, size, files, file0);
 
     Preprocessor preprocessor(tokenizer.getSettings(), errorlogger, Path::identify(tokens1.getFiles()[0], false));

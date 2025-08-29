@@ -570,7 +570,7 @@ private:
     void directiveDump(const char (&code)[size], const char filename[], const Settings& settings, std::ostream& ostr) {
         simplecpp::OutputList outputList;
         std::vector<std::string> files;
-        const simplecpp::TokenList tokens1(code, size-1, files, filename, &outputList);
+        const simplecpp::TokenList tokens1(code, files, filename, &outputList);
         Preprocessor preprocessor(settings, *this, Path::identify(tokens1.getFiles()[0], false));
         std::list<Directive> directives = preprocessor.createDirectives(tokens1);
 
@@ -8701,7 +8701,7 @@ private:
         // Preprocess file..
         simplecpp::OutputList outputList;
         std::vector<std::string> files;
-        const simplecpp::TokenList tokens1(raw_code, sizeof(raw_code), files, "", &outputList);
+        const simplecpp::TokenList tokens1(raw_code, files, "", &outputList);
         const std::string filedata = tokens1.stringify();
         const std::string code = PreprocessorHelper::getcode(settingsDefault, *this, filedata, "", "test.c");
 
