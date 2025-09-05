@@ -51,8 +51,7 @@ elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
 endif()
 
 if (REGISTER_GUI_TESTS)
-    # TODO: might crash - see #13223
-    #add_test(NAME test-resultstree COMMAND $<TARGET_FILE:test-resultstree> -platform offscreen)
+    add_test(NAME test-resultstree COMMAND $<TARGET_FILE:test-resultstree> -platform offscreen)
 endif()
 
 add_dependencies(gui-tests test-resultstree)
