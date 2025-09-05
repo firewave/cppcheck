@@ -27,15 +27,12 @@
 #include "tokenlist.h"
 
 #include <cstddef>
-#include <map>
-#include <set>
 #include <stdexcept>
 #include <sstream>
 #include <string>
 #include <vector>
 
 class Token;
-class SuppressionList;
 class ErrorLogger;
 namespace tinyxml2 {
     class XMLDocument;
@@ -157,27 +154,6 @@ private:
     const std::string mName;
     const std::string mPath;
     const std::string mFullPath;
-};
-
-class PreprocessorHelper
-{
-public:
-    /**
-     * Get preprocessed code for a given configuration
-     *
-     * Note: for testing only.
-     *
-     * @param filedata file data including preprocessing 'if', 'define', etc
-     * @param cfg configuration to read out
-     * @param filename name of source file
-     * @param inlineSuppression the inline suppressions
-     */
-    static std::string getcodeforcfg(const Settings& settings, ErrorLogger& errorlogger, const std::string &filedata, const std::string &cfg, const std::string &filename, SuppressionList *inlineSuppression = nullptr);
-
-    static std::map<std::string, std::string> getcode(const Settings& settings, ErrorLogger& errorlogger, const char code[], const std::string &filename = "file.c");
-
-private:
-    static std::map<std::string, std::string> getcode(const Settings& settings, ErrorLogger& errorlogger, const char code[], std::set<std::string> cfgs, const std::string &filename, SuppressionList *inlineSuppression);
 };
 
 namespace cppcheck {
