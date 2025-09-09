@@ -436,6 +436,7 @@ std::string ErrorMessage::getXMLHeader(std::string productName, int xmlVersion)
     const std::string version = nameAndVersion.first.empty() ? CppCheck::version() : nameAndVersion.second;
 
     tinyxml2::XMLPrinter printer;
+    printer.setProcessedEntities(false);
 
     // standard xml header
     printer.PushDeclaration("xml version=\"1.0\" encoding=\"UTF-8\"");
@@ -484,6 +485,7 @@ std::string ErrorMessage::fixInvalidChars(const std::string& raw)
 std::string ErrorMessage::toXML() const
 {
     tinyxml2::XMLPrinter printer(nullptr, false, 2);
+    printer.setProcessedEntities(false);
     printer.OpenElement("error", false);
     printer.PushAttribute("id", id.c_str());
     if (!guideline.empty())

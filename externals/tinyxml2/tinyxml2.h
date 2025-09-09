@@ -2327,6 +2327,10 @@ public:
 		_firstElement = resetToFirstElement;
     }
 
+	void setProcessedEntities(bool b) {
+	    _processEntities = b;
+    }
+
 protected:
 	virtual bool CompactMode( const XMLElement& )	{ return _compactMode; }
 
