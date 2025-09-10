@@ -4935,7 +4935,7 @@ protected:
 
 static void valueFlowCondition(const ValuePtr<ConditionHandler>& handler,
                                TokenList& tokenlist,
-                               SymbolDatabase& symboldatabase,
+                               const SymbolDatabase& symboldatabase,
                                ErrorLogger& errorLogger,
                                const Settings& settings,
                                const std::set<const Scope*>& skippedFunctions)

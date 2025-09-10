@@ -242,16 +242,16 @@ private:
         return _checkSuppression(files, useFS, suppression);
     }
 
-    unsigned int checkSuppressionFiles(std::map<std::string, std::string> &f, const std::string &suppression = "") {
+    unsigned int checkSuppressionFiles(const std::map<std::string, std::string> &f, const std::string &suppression = "") {
         return _checkSuppression(f, false, suppression);
     }
 
-    unsigned int checkSuppressionFS(std::map<std::string, std::string> &f, const std::string &suppression = "") {
+    unsigned int checkSuppressionFS(const std::map<std::string, std::string> &f, const std::string &suppression = "") {
         return _checkSuppression(f, true, suppression);
     }
 
     // Check the suppression for multiple files
-    unsigned int _checkSuppression(std::map<std::string, std::string> &f, bool useFS, const std::string &suppression = "") {
+    unsigned int _checkSuppression(const std::map<std::string, std::string> &f, bool useFS, const std::string &suppression = "") {
         std::list<FileSettings> fileSettings;
 
         std::list<FileWithDetails> filelist;
