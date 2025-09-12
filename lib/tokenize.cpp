@@ -5009,7 +5009,6 @@ void Tokenizer::setVarIdPass1()
             if (scopeStack.top().isExecutable && !scopeStack.top().isStructInit && Token::Match(tok, "%name% [,)[]")) {
                 bool par = false;
                 const Token* start;
-                Token* end;
 
                 // search begin of function declaration
                 for (start = tok; Token::Match(start, "%name%|*|&|,|("); start = start->previous()) {
@@ -5026,17 +5025,21 @@ void Tokenizer::setVarIdPass1()
                         break;
                 }
 
-                // search end of function declaration
-                for (end = tok->next(); Token::Match(end, "%name%|*|&|,|[|]|%num%"); end = end->next()) {}
+                if (par) {
+                    // there are tokens which can't appear at the begin of a function declaration such as "return"
+                    const bool isNotstartKeyword = start->next() && notstart.find(start->strAt(1)) != notstart.end();
+                    if (!isNotstartKeyword) {
+                        Token* end;
+                        // search end of function declaration
+                        for (end = tok->next(); Token::Match(end, "%name%|*|&|,|[|]|%num%"); end = end->next()) {}
 
-                // there are tokens which can't appear at the begin of a function declaration such as "return"
-                const bool isNotstartKeyword = start->next() && notstart.find(start->strAt(1)) != notstart.end();
-
-                // now check if it is a function (pointer) declaration
-                if ((Token::simpleMatch(start, ") (") || Token::Match(start, "[;{}] %type% %name%|*")) && par && Token::Match(end, ") [;=]") && !isNotstartKeyword) {
-                    // function declaration => don't set varid
-                    tok = end;
-                    continue;
+                        // now check if it is a function (pointer) declaration
+                        if ((Token::simpleMatch(start, ") (") || Token::Match(start, "[;{}] %type% %name%|*")) && par && Token::Match(end, ") [;=]") && !isNotstartKeyword) {
+                                // function declaration => don't set varid
+                                tok = end;
+                                continue;
+                            }
+                    }
                 }
             }
 
