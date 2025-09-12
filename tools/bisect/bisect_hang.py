@@ -11,7 +11,7 @@ def run(cppcheck_path, options, elapsed_time=None, factor=2):
         timeout = elapsed_time * factor
     cmd = options.split()
     cmd.insert(0, cppcheck_path)
-    print('running {}'.format(cppcheck_path))
+    print('running (timeout: {}) {}'.format(timeout, cppcheck_path))
     with subprocess.Popen(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL) as p:
         try:
             p.communicate(timeout=timeout)
@@ -39,12 +39,14 @@ else:
     elapsed_time = None
 if len(sys.argv) == 5:
     invert = sys.argv[4] == "2"
-    factor = 0.5
 else:
     invert = False
-    factor = 2
 
 # TODO: adjust factor for very small/big values
+if invert:
+    factor = 0.5
+else:
+    factor = 2
 
 try:
     cppcheck_path = build_cppcheck(bisect_path)
