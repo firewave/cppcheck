@@ -5,10 +5,10 @@ import sys
 from bisect_common import *
 
 # TODO: detect missing file
-def run(cppcheck_path, options, elapsed_time=None):
+def run(cppcheck_path, options, elapsed_time=None, factor=2):
     timeout = None
     if elapsed_time:
-        timeout = elapsed_time * 2
+        timeout = elapsed_time * factor
     cmd = options.split()
     cmd.insert(0, cppcheck_path)
     print('running {}'.format(cppcheck_path))
@@ -39,8 +39,12 @@ else:
     elapsed_time = None
 if len(sys.argv) == 5:
     invert = sys.argv[4] == "2"
+    factor = 0.5
 else:
     invert = False
+    factor = 2
+
+# TODO: adjust factor for very small/big values
 
 try:
     cppcheck_path = build_cppcheck(bisect_path)
@@ -59,7 +63,7 @@ if not elapsed_time:
     sys.exit(round(elapsed_time + .5))  # return the time
 
 t = time.perf_counter()
-run_res = run(cppcheck_path, options, elapsed_time)
+run_res = run(cppcheck_path, options, elapsed_time, factor)
 run_time = time.perf_counter() - t
 
 if not elapsed_time:
