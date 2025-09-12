@@ -214,7 +214,7 @@ for entry in versions:
             if out == "timeout":
                 data_str = "0.0" # TODO: how to handle these properly?
             elif ec != 0:
-                continue # skip errors
+                data_str = "-1.0" # TODO: how to handle these properly?
             else:
                 data_str = '{}'.format((end - start) / 1000.0 / 1000.0 / 1000.0)
             print('"{}",{}'.format(ver_str, data_str))
