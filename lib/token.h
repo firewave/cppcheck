@@ -61,10 +61,6 @@ struct ScopeInfo2 {
 
 enum class TokenDebug : std::uint8_t { None, ValueFlow, ValueType };
 
-// TODO: move these to Token when TokenImpl has been moved into the implementation
-enum CppcheckAttributesType : std::uint8_t { LOW, HIGH };
-enum class Cpp11init : std::uint8_t { UNKNOWN, CPP11INIT, NOINIT };
-
 /// @addtogroup Core
 /// @{
 
@@ -484,6 +480,7 @@ public:
     void addAttributeCleanup(const std::string& funcname);
     const std::string& getAttributeCleanup() const;
     bool hasAttributeCleanup() const;
+    enum CppcheckAttributesType : std::uint8_t { LOW, HIGH };
     void setCppcheckAttribute(CppcheckAttributesType type, MathLib::bigint value);
     bool getCppcheckAttribute(CppcheckAttributesType type, MathLib::bigint &value) const;
     bool hasCppcheckAttributes() const;
@@ -1377,6 +1374,7 @@ public:
     void scopeInfo(std::shared_ptr<ScopeInfo2> newScopeInfo);
     std::shared_ptr<ScopeInfo2> scopeInfo() const;
 
+    enum class Cpp11init : std::uint8_t { UNKNOWN, CPP11INIT, NOINIT };
     void setCpp11init(bool cpp11init) const;
     Cpp11init isCpp11init() const;
 

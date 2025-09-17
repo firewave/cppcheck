@@ -2917,7 +2917,7 @@ void Token::setCpp11init(bool cpp11init) const
     mImpl->mCpp11init=cpp11init ? Cpp11init::CPP11INIT : Cpp11init::NOINIT;
 }
 
-Cpp11init Token::isCpp11init() const {
+Token::Cpp11init Token::isCpp11init() const {
     return mImpl->mCpp11init;
 }
 
