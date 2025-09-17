@@ -39,6 +39,7 @@
 #include <functional>
 #include <iostream>
 #include <iterator>
+#include <limits>
 #include <map>
 #include <set>
 #include <sstream>
@@ -58,6 +59,99 @@ namespace {
     };
 }
 
+struct Token::Impl {
+    nonneg int mVarId{};
+    nonneg int mFileIndex{};
+    nonneg int mLineNumber{};
+    nonneg int mColumn{};
+    nonneg int mExprId{};
+
+    // original template argument location
+    int mTemplateArgFileIndex{-1};
+    int mTemplateArgLineNumber{-1};
+    int mTemplateArgColumn{-1};
+
+    /**
+     * A value from 0-100 that provides a rough idea about where in the token
+     * list this token is located.
+     */
+    nonneg int mProgressValue{};
+
+    /**
+     * Token index. Position in token list
+     */
+    nonneg int mIndex{};
+
+    /** Bitfield bit count. */
+    short mBits = -1;
+
+    // AST..
+    Token* mAstOperand1{};
+    Token* mAstOperand2{};
+    Token* mAstParent{};
+
+    // symbol database information
+    const Scope* mScope{};
+    union {
+        const Function *mFunction;
+        const Variable *mVariable;
+        const ::Type* mType;
+        const Enumerator *mEnumerator;
+    };
+
+    // original name like size_t
+    std::string* mOriginalName{};
+
+    // If this token came from a macro replacement list, this is the name of that macro
+    std::string* mMacroName{};
+
+    // ValueType
+    ValueType* mValueType{};
+
+    // ValueFlow
+    std::list<ValueFlow::Value>* mValues{};
+
+    // Pointer to a template in the template simplifier
+    std::set<TemplateSimplifier::TokenAndName*>* mTemplateSimplifierPointers{};
+
+    // Pointer to the object representing this token's scope
+    std::shared_ptr<ScopeInfo2> mScopeInfo;
+
+    // __cppcheck_in_range__
+    struct CppcheckAttributes {
+        CppcheckAttributesType type{LOW};
+        MathLib::bigint value{};
+        CppcheckAttributes* next{};
+    };
+    CppcheckAttributes* mCppcheckAttributes{};
+
+    // alignas expressions
+    std::unique_ptr<std::vector<std::string>> mAttributeAlignas;
+    void addAttributeAlignas(const std::string& a) {
+        if (!mAttributeAlignas)
+            mAttributeAlignas = std::unique_ptr<std::vector<std::string>>(new std::vector<std::string>());
+        if (std::find(mAttributeAlignas->cbegin(), mAttributeAlignas->cend(), a) == mAttributeAlignas->cend())
+            mAttributeAlignas->push_back(a);
+    }
+
+    std::string mAttributeCleanup;
+
+    // For memoization, to speed up parsing of huge arrays #8897
+    Cpp11init mCpp11init{Cpp11init::UNKNOWN};
+
+    TokenDebug mDebug{};
+
+    void setCppcheckAttribute(CppcheckAttributesType type, MathLib::bigint value);
+    bool getCppcheckAttribute(CppcheckAttributesType type, MathLib::bigint &value) const;
+
+    Impl() : mFunction(nullptr) {}
+
+    ~Impl();
+
+    Impl(const Impl &) = delete;
+    Impl operator=(const Impl &) = delete;
+};
+
 const std::list<ValueFlow::Value> Token::mEmptyValueList;
 const std::string Token::mEmptyString;
 
@@ -67,7 +161,7 @@ Token::Token(const TokenList& tokenlist, std::shared_ptr<TokensFrontBack> tokens
     , mIsC(mList.isC())
     , mIsCpp(mList.isCPP())
 {
-    mImpl = new TokenImpl();
+    mImpl = new Impl();
 }
 
 Token::Token(const Token* tok)
@@ -215,6 +309,20 @@ static const std::unordered_set<std::string> stdTypes = { "bool"
 bool Token::isStandardType(const std::string& str)
 {
     return stdTypes.find(str) != stdTypes.end();
+}
+
+const Enumerator *Token::enumerator() const
+{
+    return mTokType == eEnumerator ? mImpl->mEnumerator : nullptr;
+}
+
+void Token::enumerator(const Enumerator *e)
+{
+    mImpl->mEnumerator = e;
+    if (e)
+        tokType(eEnumerator);
+    else if (mTokType == eEnumerator)
+        tokType(eName);
 }
 
 void Token::update_property_isStandardType()
@@ -606,6 +714,36 @@ int Token::multiCompare(const Token *tok, const char *haystack, nonneg int varid
     return multiCompareImpl(tok, haystack, varid);
 }
 
+nonneg int Token::fileIndex() const
+{
+    return mImpl->mFileIndex;
+}
+
+void Token::fileIndex(nonneg int indexOfFile)
+{
+    mImpl->mFileIndex = indexOfFile;
+}
+
+nonneg int Token::linenr() const
+{
+    return mImpl->mLineNumber;
+}
+
+void Token::linenr(nonneg int lineNumber)
+{
+    mImpl->mLineNumber = lineNumber;
+}
+
+nonneg int Token::column() const
+{
+    return mImpl->mColumn;
+}
+
+void Token::column(nonneg int c)
+{
+    mImpl->mColumn = c;
+}
+
 bool Token::simpleMatch(const Token *tok, const char pattern[], size_t pattern_len)
 {
     if (!tok)
@@ -811,6 +949,11 @@ void Token::move(Token *srcStart, Token *srcEnd, Token *newLocation)
         tok->mImpl->mProgressValue = newLocation->mImpl->mProgressValue;
 }
 
+nonneg int Token::progressValue() const
+{
+    return mImpl->mProgressValue;
+}
+
 template<class T, REQUIRES("T must be a Token class", std::is_convertible<T*, const Token*> )>
 static T* nextArgumentImpl(T *thisTok)
 {
@@ -970,6 +1113,16 @@ Token * Token::findOpeningBracket()
     return const_cast<Token*>(static_cast<const Token*>(this)->findOpeningBracket());
 }
 
+const std::string & Token::originalName() const
+{
+    return mImpl->mOriginalName ? *mImpl->mOriginalName : mEmptyString;
+}
+
+const std::list<ValueFlow::Value>& Token::values() const
+{
+    return mImpl->mValues ? *mImpl->mValues : mEmptyValueList;
+}
+
 //---------------------------------------------------------------------------
 
 template<class T, REQUIRES("T must be a Token class", std::is_convertible<T*, const Token*> )>
@@ -1049,6 +1202,16 @@ Token *Token::findmatch(Token * const startTok, const char pattern[], const Toke
     return findmatchImpl(startTok, pattern, end, varId);
 }
 
+void Token::scope(const Scope *s)
+{
+    mImpl->mScope = s;
+}
+
+const Scope *Token::scope() const
+{
+    return mImpl->mScope;
+}
+
 void Token::function(const Function *f)
 {
     mImpl->mFunction = f;
@@ -1059,6 +1222,25 @@ void Token::function(const Function *f)
             tokType(eFunction);
     } else if (mTokType == eFunction)
         tokType(eName);
+}
+
+const Function *Token::function() const
+{
+    return mTokType == eFunction || mTokType == eLambda ? mImpl->mFunction : nullptr;
+}
+
+void Token::variable(const Variable *v)
+{
+    mImpl->mVariable = v;
+    if (v || mImpl->mVarId)
+        tokType(eVariable);
+    else if (mTokType == eVariable)
+        tokType(eName);
+}
+
+const Variable *Token::variable() const
+{
+    return mTokType == eVariable ? mImpl->mVariable : nullptr;
 }
 
 Token* Token::insertToken(const std::string& tokenStr, bool prepend)
@@ -1218,6 +1400,43 @@ void Token::eraseTokens(Token *begin, const Token *end)
     while (begin->next() && begin->next() != end) {
         begin->deleteNext();
     }
+}
+
+nonneg int Token::varId() const
+{
+    return mImpl->mVarId;
+}
+
+void Token::varId(nonneg int id)
+{
+    if (mImpl->mVarId == id)
+        return;
+
+    mImpl->mVarId = id;
+    update_property_info();
+}
+
+nonneg int Token::exprId() const
+{
+    if (mImpl->mExprId)
+        return mImpl->mExprId;
+    return mImpl->mVarId;
+}
+
+void Token::exprId(nonneg int id)
+{
+    mImpl->mExprId = id;
+}
+
+void Token::setUniqueExprId()
+{
+    assert(mImpl->mExprId > 0);
+    mImpl->mExprId |= 1 << efIsUnique;
+}
+
+bool Token::isUniqueExprId() const
+{
+    return (mImpl->mExprId & (1 << efIsUnique)) != 0;
 }
 
 void Token::createMutualLinks(Token *begin, Token *end)
@@ -1443,6 +1662,35 @@ void Token::astParent(Token* tok)
     mImpl->mAstParent = tok;
 }
 
+Token * Token::astOperand1()
+{
+    return mImpl->mAstOperand1;
+}
+
+const Token * Token::astOperand1() const
+{
+    return mImpl->mAstOperand1;
+}
+
+Token * Token::astOperand2() {
+    return mImpl->mAstOperand2;
+}
+
+const Token * Token::astOperand2() const
+{
+    return mImpl->mAstOperand2;
+}
+
+Token * Token::astParent()
+{
+    return mImpl->mAstParent;
+}
+
+const Token * Token::astParent() const
+{
+    return mImpl->mAstParent;
+}
+
 void Token::astOperand1(Token *tok)
 {
     if (mImpl->mAstOperand1)
@@ -1499,6 +1747,22 @@ static const Token* goToRightParenthesis(const Token* start, const Token* end)
         }
     }
     return end;
+}
+
+Token *Token::astTop()
+{
+    Token *ret = this;
+    while (ret->mImpl->mAstParent)
+        ret = ret->mImpl->mAstParent;
+    return ret;
+}
+
+const Token *Token::astTop() const
+{
+    const Token *ret = this;
+    while (ret->mImpl->mAstParent)
+        ret = ret->mImpl->mAstParent;
+    return ret;
 }
 
 std::pair<const Token *, const Token *> Token::findExpressionStartEndTokens() const
@@ -1579,6 +1843,23 @@ bool Token::isCalculation() const
     return true;
 }
 
+void Token::clearValueFlow()
+{
+    delete mImpl->mValues;
+    mImpl->mValues = nullptr;
+}
+
+// cppcheck-suppress unusedFunction - used in tests only
+std::string Token::astString(const char *sep) const
+{
+    std::string ret;
+    if (mImpl->mAstOperand1)
+        ret = mImpl->mAstOperand1->astString(sep);
+    if (mImpl->mAstOperand2)
+        ret += mImpl->mAstOperand2->astString(sep);
+    return ret + sep + mStr;
+}
+
 bool Token::isUnaryPreOp() const
 {
     if (!astOperand1() || astOperand2())
@@ -1596,6 +1877,95 @@ bool Token::isUnaryPreOp() const
         tokafter  = tokafter->mPrevious;
     }
     return false; // <- guess
+}
+
+bool Token::isExpandedMacro() const
+{
+    return !!mImpl->mMacroName;
+}
+
+std::vector<std::string> Token::getAttributeAlignas() const
+{
+    return mImpl->mAttributeAlignas ? *mImpl->mAttributeAlignas : std::vector<std::string>();
+}
+
+bool Token::hasAttributeAlignas() const
+{
+    return !!mImpl->mAttributeAlignas;
+}
+
+void Token::addAttributeAlignas(const std::string& a)
+{
+    mImpl->addAttributeAlignas(a);
+}
+
+void Token::addAttributeCleanup(const std::string& funcname)
+{
+    mImpl->mAttributeCleanup = funcname;
+}
+
+const std::string& Token::getAttributeCleanup() const
+{
+    return mImpl->mAttributeCleanup;
+}
+
+bool Token::hasAttributeCleanup() const
+{
+    return !mImpl->mAttributeCleanup.empty();
+}
+
+void Token::setCppcheckAttribute(CppcheckAttributesType type, MathLib::bigint value)
+{
+    mImpl->setCppcheckAttribute(type, value);
+}
+
+bool Token::getCppcheckAttribute(CppcheckAttributesType type, MathLib::bigint &value) const
+{
+    return mImpl->getCppcheckAttribute(type, value);
+}
+
+// cppcheck-suppress unusedFunction
+bool Token::hasCppcheckAttributes() const
+{
+    return nullptr != mImpl->mCppcheckAttributes;
+}
+
+bool Token::isBitfield() const
+{
+    return mImpl->mBits >= 0;
+}
+
+short Token::bits() const
+{
+    return mImpl->mBits;
+}
+
+const std::set<TemplateSimplifier::TokenAndName*>* Token::templateSimplifierPointers() const
+{
+    return mImpl->mTemplateSimplifierPointers;
+}
+
+std::set<TemplateSimplifier::TokenAndName*>* Token::templateSimplifierPointers()
+{
+    return mImpl->mTemplateSimplifierPointers;
+}
+
+void Token::templateSimplifierPointer(TemplateSimplifier::TokenAndName* tokenAndName)
+{
+    if (!mImpl->mTemplateSimplifierPointers)
+        mImpl->mTemplateSimplifierPointers = new std::set<TemplateSimplifier::TokenAndName*>;
+    mImpl->mTemplateSimplifierPointers->insert(tokenAndName);
+}
+
+bool Token::setBits(const MathLib::bigint b)
+{
+    const MathLib::bigint max = std::numeric_limits<short>::max();
+    if (b > max) {
+        mImpl->mBits = max;
+        return false;
+    }
+    mImpl->mBits = b < 0 ? -1 : b;
+    return true;
 }
 
 static std::string stringFromTokenRange(const Token* start, const Token* end)
@@ -2303,6 +2673,17 @@ bool Token::addValue(const ValueFlow::Value &value)
     return true;
 }
 
+void Token::removeValues(std::function<bool(const ValueFlow::Value &)> pred)
+{
+    if (mImpl->mValues)
+        mImpl->mValues->remove_if(std::move(pred));
+}
+
+nonneg int Token::index() const
+{
+    return mImpl->mIndex;
+}
+
 void Token::assignProgressValues(Token *tok)
 {
     int total_count = 0;
@@ -2319,6 +2700,11 @@ void Token::assignIndexes()
     int index = (mPrevious ? mPrevious->mImpl->mIndex : 0) + 1;
     for (Token *tok = this; tok; tok = tok->next())
         tok->mImpl->mIndex = index++;
+}
+
+const ValueType *Token::valueType() const
+{
+    return mImpl->mValueType;
 }
 
 void Token::setValueType(ValueType *vt)
@@ -2344,6 +2730,10 @@ void Token::type(const ::Type *t)
         isEnumType(mImpl->mType->isEnumType());
     } else if (mTokType == eType)
         tokType(eName);
+}
+
+const ::Type *Token::type() const {
+    return mTokType == eType ? mImpl->mType : nullptr;
 }
 
 const ::Type* Token::typeOf(const Token* tok, const Token** typeTok)
@@ -2522,6 +2912,25 @@ std::shared_ptr<ScopeInfo2> Token::scopeInfo() const
     return mImpl->mScopeInfo;
 }
 
+void Token::setCpp11init(bool cpp11init) const
+{
+    mImpl->mCpp11init=cpp11init ? Cpp11init::CPP11INIT : Cpp11init::NOINIT;
+}
+
+Cpp11init Token::isCpp11init() const {
+    return mImpl->mCpp11init;
+}
+
+TokenDebug Token::getTokenDebug() const
+{
+    return mImpl->mDebug;
+}
+
+void Token::setTokenDebug(TokenDebug td)
+{
+    mImpl->mDebug = td;
+}
+
 // if there is a known INT value it will always be the first entry
 bool Token::hasKnownIntValue() const
 {
@@ -2574,6 +2983,14 @@ const ValueFlow::Value* Token::getKnownValue(ValueFlow::Value::ValueType t) cons
         return value.isKnown() && value.valueType == t;
     });
     return it == mImpl->mValues->end() ? nullptr : &*it;
+}
+
+MathLib::bigint Token::getKnownIntValue() const
+{
+    assert(!mImpl->mValues->empty());
+    assert(mImpl->mValues->front().isKnown());
+    assert(mImpl->mValues->front().valueType == ValueFlow::Value::ValueType::INT);
+    return mImpl->mValues->front().intvalue;
 }
 
 const ValueFlow::Value* Token::getValue(const MathLib::bigint val) const
@@ -2642,7 +3059,7 @@ const ValueFlow::Value* Token::getContainerSizeValue(const MathLib::bigint val) 
     return it == mImpl->mValues->end() ? nullptr : &*it;
 }
 
-TokenImpl::~TokenImpl()
+Token::Impl::~Impl()
 {
     delete mMacroName;
     delete mOriginalName;
@@ -2663,7 +3080,7 @@ TokenImpl::~TokenImpl()
     }
 }
 
-void TokenImpl::setCppcheckAttribute(CppcheckAttributesType type, MathLib::bigint value)
+void Token::Impl::setCppcheckAttribute(CppcheckAttributesType type, MathLib::bigint value)
 {
     CppcheckAttributes *attr = mCppcheckAttributes;
     while (attr && attr->type != type)
@@ -2679,7 +3096,7 @@ void TokenImpl::setCppcheckAttribute(CppcheckAttributesType type, MathLib::bigin
     }
 }
 
-bool TokenImpl::getCppcheckAttribute(CppcheckAttributesType type, MathLib::bigint &value) const
+bool Token::Impl::getCppcheckAttribute(CppcheckAttributesType type, MathLib::bigint &value) const
 {
     CppcheckAttributes *attr = mCppcheckAttributes;
     while (attr && attr->type != type)
@@ -2738,4 +3155,32 @@ void Token::templateArgFrom(const Token* fromToken) {
     mImpl->mTemplateArgFileIndex = fromToken ? fromToken->mImpl->mFileIndex : -1;
     mImpl->mTemplateArgLineNumber = fromToken ? fromToken->mImpl->mLineNumber : -1;
     mImpl->mTemplateArgColumn = fromToken ? fromToken->mImpl->mColumn : -1;
+}
+
+int Token::templateArgFileIndex() const
+{
+    return mImpl->mTemplateArgFileIndex;
+}
+
+int Token::templateArgLineNumber() const
+{
+    return mImpl->mTemplateArgLineNumber;
+}
+
+int Token::templateArgColumn() const
+{
+    return mImpl->mTemplateArgColumn;
+}
+
+const std::string& Token::getMacroName() const
+{
+    return mImpl->mMacroName ? *mImpl->mMacroName : mEmptyString;
+}
+
+void Token::setMacroName(std::string name)
+{
+    if (!mImpl->mMacroName)
+        mImpl->mMacroName = new std::string(std::move(name));
+    else
+        *mImpl->mMacroName = std::move(name);
 }
