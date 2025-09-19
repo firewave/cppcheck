@@ -120,25 +120,32 @@ Timer::~Timer()
     stop();
 }
 
-void Timer::stop()
+void Timer::restart()
+{
+    mStart = std::clock();
+    mStopped = false;
+}
+
+double Timer::stop()
 {
     if ((mShowTimeMode != SHOWTIME_MODES::SHOWTIME_NONE) && !mStopped) {
         const std::clock_t end = std::clock();
         const std::clock_t diff = end - mStart;
+        const double sec = static_cast<double>(diff) / CLOCKS_PER_SEC;
 
         if (mShowTimeMode == SHOWTIME_MODES::SHOWTIME_FILE) {
-            const double sec = static_cast<double>(diff) / CLOCKS_PER_SEC;
             std::lock_guard<std::mutex> l(stdCoutLock);
             std::cout << mStr << ": " << sec << "s" << std::endl;
         } else if (mShowTimeMode == SHOWTIME_MODES::SHOWTIME_FILE_TOTAL) {
-            const double sec = static_cast<double>(diff) / CLOCKS_PER_SEC;
             std::lock_guard<std::mutex> l(stdCoutLock);
             std::cout << "Check time: " << mStr << ": " << sec << "s" << std::endl;
         } else {
             if (mTimerResults)
                 mTimerResults->addResults(mStr, diff);
         }
+        mStopped = true;
+        return sec;
     }
 
-    mStopped = true;
+    return -1.0;
 }

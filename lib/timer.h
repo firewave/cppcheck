@@ -79,7 +79,8 @@ public:
     Timer(const Timer&) = delete;
     Timer& operator=(const Timer&) = delete;
 
-    void stop();
+    void restart();
+    double stop();
 
     static void run(std::string str, SHOWTIME_MODES showtimeMode, TimerResultsIntf* timerResults, const std::function<void()>& f) {
         Timer t(std::move(str), showtimeMode, timerResults);

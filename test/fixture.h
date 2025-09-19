@@ -27,6 +27,7 @@
 #include "platform.h"
 #include "settings.h"
 #include "standards.h"
+#include "timer.h"
 
 #include <cstddef>
 #include <cstdint>
@@ -41,6 +42,7 @@
 
 class options;
 class Tokenizer;
+class Timer;
 enum class Certainty : std::uint8_t;
 enum class Severity : std::uint8_t;
 
@@ -289,6 +291,8 @@ private:
 
     std::ostringstream mOutput;
     std::ostringstream mErrout;
+
+    std::unique_ptr<Timer> mTimer;
 
     void reportOut(const std::string &outmsg, Color c = Color::Reset) override;
     void reportErr(const ErrorMessage &msg) override;

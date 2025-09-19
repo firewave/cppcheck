@@ -24,6 +24,7 @@
 #include "library.h"
 #include "options.h"
 #include "redirect.h"
+#include "timer.h"
 
 #include <algorithm>
 #include <cstdio>
@@ -86,7 +87,8 @@ std::size_t TestFixture::todos_counter = 0;
 std::size_t TestFixture::succeeded_todos_counter = 0;
 
 TestFixture::TestFixture(const char * const _name)
-    : classname(_name)
+    : mTimer(new Timer("", SHOWTIME_MODES::SHOWTIME_SUMMARY))
+    , classname(_name)
 {}
 
 
@@ -109,6 +111,7 @@ bool TestFixture::prepareTest(const char testname[])
             std::fflush(stdout);
         } else {
             std::cout << classname << "::" << mTestname << std::endl;
+            mTimer->restart();
         }
         return !dry_run;
     }
@@ -117,6 +120,8 @@ bool TestFixture::prepareTest(const char testname[])
 
 void TestFixture::teardownTest()
 {
+    std::cout << mTimer->stop() << std::endl;
+
     teardownTestInternal();
 
     {
