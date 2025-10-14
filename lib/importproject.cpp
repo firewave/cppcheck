@@ -1452,7 +1452,7 @@ bool ImportProject::importCppcheckGuiProject(std::istream &istr, Settings &setti
             temp.addons.insert(addons.cbegin(), addons.cend());
             if (settings.premium) {
                 auto it = temp.addons.find("misra");
-                if (it != temp.addons.end()) {
+                if (it != temp.addons.cend()) {
                     temp.addons.erase(it);
                     temp.premiumArgs += " --misra-c-2012";
                 }
@@ -1570,7 +1570,7 @@ void ImportProject::selectOneVsConfig(Platform::Type platform)
             remove = true;
         else if ((platform == Platform::Type::Win32A || platform == Platform::Type::Win32W) && fs.platformType == Platform::Type::Win64)
             remove = true;
-        else if (filenames.find(fs.filename()) != filenames.end())
+        else if (filenames.find(fs.filename()) != filenames.cend())
             remove = true;
         if (remove) {
             it = fileSettings.erase(it);

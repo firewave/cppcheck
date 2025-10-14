@@ -2040,7 +2040,7 @@ void Tokenizer::simplifyTypedefCpp()
                         removed1.resize(idx);
                     if (removed1 == classPath && !removed1.empty()) {
                         for (auto it = spaceInfo.crbegin(); it != spaceInfo.crend(); ++it) {
-                            if (it->recordTypes.find(start->str()) != it->recordTypes.end()) {
+                            if (it->recordTypes.find(start->str()) != it->recordTypes.cend()) {
                                 std::string::size_type spaceIdx = 0;
                                 std::string::size_type startIdx = 0;
                                 while ((spaceIdx = removed1.find(' ', startIdx)) != std::string::npos) {
@@ -4527,10 +4527,10 @@ static void addTemplateVarIdUsage(const std::string &tokstr,
                                   const std::unordered_map<std::string, nonneg int>& variableMap,
                                   std::set<nonneg int>& templateVarIdUsage) {
     const auto v = templateVarUsage.find(tokstr);
-    if (v != templateVarUsage.end()) {
+    if (v != templateVarUsage.cend()) {
         for (const std::string& varname: v->second) {
             const auto it = variableMap.find(varname);
-            if (it != variableMap.end())
+            if (it != variableMap.cend())
                 templateVarIdUsage.insert(it->second);
         }
     }
@@ -4587,7 +4587,7 @@ static bool setVarIdClassDeclaration(Token* const startToken,
             inEnum = false;
         } else if (initList && indentlevel == 0 && Token::Match(tok->previous(), "[,:] %name% [({]")) {
             const auto it = variableMap.map(false).find(tok->str());
-            if (it != variableMap.map(false).end()) {
+            if (it != variableMap.map(false).cend()) {
                 tok->varId(it->second);
             }
         } else if (tok->isName() && tok->varId() <= scopeStartVarId) {
@@ -4605,7 +4605,7 @@ static bool setVarIdClassDeclaration(Token* const startToken,
 
                 if (!inEnum) {
                     const auto it = variableMap.map(false).find(tok->str());
-                    if (it != variableMap.map(false).end()) {
+                    if (it != variableMap.map(false).cend()) {
                         tok->varId(it->second);
                         setVarIdStructMembers(tok, structMembers, variableMap.getVarId());
                     } else if (tok->str().back() == '>') {
@@ -4981,7 +4981,7 @@ void Tokenizer::setVarIdPass1()
                             if (tok->isName() && !(Token::simpleMatch(tok->next(), "<") &&
                                                    Token::Match(tok->tokAt(-1), ":: %name%"))) {
                                 const auto it = variableMap.map(false).find(tok->str());
-                                if (it != variableMap.map(false).end())
+                                if (it != variableMap.map(false).cend())
                                     tok->varId(it->second);
                             }
                             tok = tok->next();
@@ -5043,7 +5043,7 @@ void Tokenizer::setVarIdPass1()
                 for (end = tok->next(); Token::Match(end, "%name%|*|&|,|[|]|%num%"); end = end->next()) {}
 
                 // there are tokens which can't appear at the begin of a function declaration such as "return"
-                const bool isNotstartKeyword = start->next() && notstart.find(start->strAt(1)) != notstart.end();
+                const bool isNotstartKeyword = start->next() && notstart.find(start->strAt(1)) != notstart.cend();
 
                 // now check if it is a function (pointer) declaration
                 if ((Token::simpleMatch(start, ") (") || Token::Match(start, "[;{}] %type% %name%|*")) && par && Token::Match(end, ") [;=]") && !isNotstartKeyword) {
@@ -5056,7 +5056,7 @@ void Tokenizer::setVarIdPass1()
             if (tok->varId() == 0 && (!scopeStack.top().isEnum || !(Token::Match(tok->previous(), "{|,") && Token::Match(tok->next(), ",|=|}"))) &&
                 !Token::simpleMatch(tok->next(), ": ;") && !(tok->tokAt(-1) && Token::Match(tok->tokAt(-2), "{|, ."))) {
                 const auto it = variableMap.map(globalNamespace).find(tok->str());
-                if (it != variableMap.map(globalNamespace).end()) {
+                if (it != variableMap.map(globalNamespace).cend()) {
                     tok->varId(it->second);
                     setVarIdStructMembers(tok, structMembers, variableMap.getVarId());
                 }
@@ -5314,7 +5314,7 @@ void Tokenizer::setVarIdPass2()
                 std::string scopeName3(scopeName2);
                 while (!scopeName3.empty()) {
                     std::string name = scopeName3 + baseClassName;
-                    if (varsByClass.find(name) != varsByClass.end()) {
+                    if (varsByClass.find(name) != varsByClass.cend()) {
                         baseClassName = std::move(name);
                         break;
                     }

@@ -707,7 +707,7 @@ void CheckIO::checkFormatString(const Token * const tok,
                             switch (*i) {
                             case 's':
                             case ']': // charset
-                                specifier += (*i == 's' || bracketBeg == formatString.end()) ? std::string{ 's' } : std::string{ bracketBeg, i + 1 };
+                                specifier += (*i == 's' || bracketBeg == formatString.cend()) ? std::string{ 's' } : std::string{ bracketBeg, i + 1 };
                                 if (argInfo.variableInfo && argInfo.isKnownType() && argInfo.variableInfo->isArray() && (argInfo.variableInfo->dimensions().size() == 1) && argInfo.variableInfo->dimensions()[0].known) {
                                     if (!width.empty()) {
                                         const int numWidth = strToInt<int>(width);
@@ -972,7 +972,7 @@ void CheckIO::checkFormatString(const Token * const tok,
                             case 'z':
                             case 'L':
                                 // Expect an alphabetical character after these specifiers
-                                if ((i + 1) != formatString.end() && !isalpha(*(i+1))) {
+                                if ((i + 1) != formatString.cend() && !isalpha(*(i+1))) {
                                     specifier += *i;
                                     invalidLengthModifierError(tok, numFormat, specifier);
                                     done = true;
@@ -989,7 +989,7 @@ void CheckIO::checkFormatString(const Token * const tok,
                         std::string specifier;
                         bool done = false;
                         while (!done) {
-                            if (i == formatString.end()) {
+                            if (i == formatString.cend()) {
                                 break;
                             }
                             switch (*i) {
@@ -1261,8 +1261,8 @@ void CheckIO::checkFormatString(const Token * const tok,
                             case 'h': // Can be 'hh' (signed char or unsigned char) or 'h' (short int or unsigned short int)
                             case 'l': { // Can be 'll' (long long int or unsigned long long int) or 'l' (long int or unsigned long int)
                                 // If the next character is the same (which makes 'hh' or 'll') then expect another alphabetical character
-                                if ((i + 1) != formatString.end() && *(i + 1) == *i) {
-                                    if ((i + 2) != formatString.end() && !isalpha(*(i + 2))) {
+                                if ((i + 1) != formatString.cend() && *(i + 1) == *i) {
+                                    if ((i + 2) != formatString.cend() && !isalpha(*(i + 2))) {
                                         std::string modifier;
                                         modifier += *i;
                                         modifier += *(i + 1);
@@ -1273,7 +1273,7 @@ void CheckIO::checkFormatString(const Token * const tok,
                                         specifier += *i++;
                                     }
                                 } else {
-                                    if ((i + 1) != formatString.end() && !isalpha(*(i + 1))) {
+                                    if ((i + 1) != formatString.cend() && !isalpha(*(i + 1))) {
                                         std::string modifier;
                                         modifier += *i;
                                         invalidLengthModifierError(tok, numFormat, modifier);
@@ -1296,7 +1296,7 @@ void CheckIO::checkFormatString(const Token * const tok,
                             case 't': // ptrdiff_t
                             case 'L': // long double
                                 // Expect an alphabetical character after these specifiers
-                                if ((i + 1) != formatString.end() && !isalpha(*(i+1))) {
+                                if ((i + 1) != formatString.cend() && !isalpha(*(i+1))) {
                                     specifier += *i;
                                     invalidLengthModifierError(tok, numFormat, specifier);
                                     done = true;

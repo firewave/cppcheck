@@ -99,7 +99,7 @@ private:
     {
         std::map<std::string, std::string> cfgcode = getcode(settings, errorlogger, code, size, std::set<std::string>{cfg}, filename, inlineSuppression);
         const auto it = cfgcode.find(cfg);
-        if (it == cfgcode.end())
+        if (it == cfgcode.cend())
             return "";
         return it->second;
     }
@@ -1950,10 +1950,10 @@ private:
 
         // Compare results..
         ASSERT_EQUALS(4, actual.size());
-        ASSERT(actual.find("") != actual.end());
-        ASSERT(actual.find("BAR=BAR") != actual.end());
-        ASSERT(actual.find("FOO=FOO") != actual.end());
-        ASSERT(actual.find("BAR=BAR;FOO=FOO") != actual.end());
+        ASSERT(actual.find("") != actual.cend());
+        ASSERT(actual.find("BAR=BAR") != actual.cend());
+        ASSERT(actual.find("FOO=FOO") != actual.cend());
+        ASSERT(actual.find("BAR=BAR;FOO=FOO") != actual.cend());
     }
 
 
@@ -1987,9 +1987,9 @@ private:
         // cases should be fixed whenever this other bug is fixed
         ASSERT_EQUALS(2U, actual.size());
 
-        ASSERT_EQUALS_MSG(true, (actual.find("A=A") != actual.end()), "A is expected to be checked but it was not checked");
+        ASSERT_EQUALS_MSG(true, (actual.find("A=A") != actual.cend()), "A is expected to be checked but it was not checked");
 
-        ASSERT_EQUALS_MSG(true, (actual.find("A=A;A=A;B=B") == actual.end()), "A;A;B is expected to NOT be checked but it was checked");
+        ASSERT_EQUALS_MSG(true, (actual.find("A=A;A=A;B=B") == actual.cend()), "A;A;B is expected to NOT be checked but it was checked");
     }
 
     void invalid_define_1() {

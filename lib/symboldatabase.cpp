@@ -1257,7 +1257,7 @@ void SymbolDatabase::createSymbolDatabaseSetTypePointers()
         if (Token::simpleMatch(tok->next(), "<"))
             continue;
 
-        if (typenames.find(tok->str()) == typenames.end())
+        if (typenames.find(tok->str()) == typenames.cend())
             continue;
 
         const Type *type = findVariableType(tok->scope(), tok);
@@ -1424,7 +1424,7 @@ void SymbolDatabase::createSymbolDatabaseSetVariablePointers()
             const ValueType* vt = tok->astParent()->astOperand1()->valueType();
             const Library::Container* cont = vt->container;
             auto it = cont->functions.find(tok->str());
-            if (it != cont->functions.end() && isContainerYieldElement(it->second.yield) && vt->containerTypeToken) {
+            if (it != cont->functions.cend() && isContainerYieldElement(it->second.yield) && vt->containerTypeToken) {
                 Token* memberTok = tok->linkAt(1)->tokAt(2);
                 const Scope* scope = vt->containerTypeToken->scope();
                 const Type* contType{};
@@ -1549,7 +1549,7 @@ void SymbolDatabase::createSymbolDatabaseIncompleteVars()
             fstr.insert(0, ftok->strAt(-1) + "::");
             ftok = ftok->tokAt(-2);
         }
-        if (mSettings.library.functions().find(fstr) != mSettings.library.functions().end())
+        if (mSettings.library.functions().find(fstr) != mSettings.library.functions().cend())
             continue;
         if (tok->isCpp()) {
             const Token* parent = tok->astParent();
@@ -1690,8 +1690,8 @@ namespace {
                     std::swap(key.operand1, key.operand2);
             }
 
-            const auto it = exprIdMap.find(key);
-            if (it == exprIdMap.end()) {
+            const auto it = utils::as_const(exprIdMap).find(key);
+            if (it == exprIdMap.cend()) {
                 exprIdMap[key] = id;
                 tok->astParent()->exprId(id);
                 ++id;
@@ -1736,7 +1736,7 @@ void SymbolDatabase::createSymbolDatabaseExprIds()
     }
 
     auto exprScopes = functionScopes; // functions + global lambdas + namespaces
-    std::copy_if(scopeList.front().nestedList.begin(), scopeList.front().nestedList.end(), std::back_inserter(exprScopes), [](const Scope* scope) {
+    std::copy_if(scopeList.front().nestedList.cbegin(), scopeList.front().nestedList.cend(), std::back_inserter(exprScopes), [](const Scope* scope) {
         return scope && (scope->type == ScopeType::eLambda || scope->type == ScopeType::eNamespace);
     });
 
@@ -1786,8 +1786,8 @@ void SymbolDatabase::createSymbolDatabaseExprIds()
                     tok->exprId(id);
                     ++id;
                 } else {
-                    const auto it = baseIds.find(tok->str());
-                    if (it != baseIds.end() && compareTokenFlags(tok, it->second.second, /*macro*/ true)) {
+                    const auto it = utils::as_const(baseIds).find(tok->str());
+                    if (it != baseIds.cend() && compareTokenFlags(tok, it->second.second, /*macro*/ true)) {
                         tok->exprId(it->second.first);
                     } else {
                         baseIds[tok->str()] = { id, tok };
@@ -2172,7 +2172,7 @@ namespace {
                 }
                 return false;
             });
-            if (it != scope->functionList.end())
+            if (it != scope->functionList.cend())
                 return &*it;
         }
         return nullptr;
@@ -2237,7 +2237,7 @@ bool SymbolDatabase::isFunctionWithoutSideEffects(const Function& func, const To
                 return false;
             }
             // check if global variable is changed
-            if (bodyVariable->isGlobal() || (pointersToGlobals.find(bodyVariable) != pointersToGlobals.end())) {
+            if (bodyVariable->isGlobal() || (pointersToGlobals.find(bodyVariable) != pointersToGlobals.cend())) {
                 const int indirect = bodyVariable->isArray() ? bodyVariable->dimensions().size() : bodyVariable->isPointer();
                 if (isVariableChanged(bodyToken, indirect, mSettings)) {
                     return false;
@@ -2388,7 +2388,7 @@ void SymbolDatabase::debugSymbolDatabase() const
             ErrorPath errorPath;
             if (tok->valueType()) {
                 msg += tok->valueType()->str();
-                errorPath.insert(errorPath.end(), tok->valueType()->debugPath.cbegin(), tok->valueType()->debugPath.cend());
+                errorPath.insert(errorPath.cend(), tok->valueType()->debugPath.cbegin(), tok->valueType()->debugPath.cend());
 
             } else {
                 msg += "missing";
@@ -5569,7 +5569,7 @@ const Enumerator * SymbolDatabase::findEnumerator(const Token * tok, std::set<st
         }
     } else { // unqualified name
 
-        if (tokensThatAreNotEnumeratorValues.find(tokStr) != tokensThatAreNotEnumeratorValues.end())
+        if (tokensThatAreNotEnumeratorValues.find(tokStr) != tokensThatAreNotEnumeratorValues.cend())
             return nullptr;
 
         if (tok->scope()->type == ScopeType::eGlobal) {
@@ -5888,7 +5888,7 @@ std::vector<const Scope*> Scope::findAssociatedScopes() const
                 if (contains(result, base->classScope))
                     continue;
                 std::vector<const Scope*> baseScopes = base->classScope->findAssociatedScopes();
-                result.insert(result.end(), baseScopes.cbegin(), baseScopes.cend());
+                result.insert(result.cend(), baseScopes.cbegin(), baseScopes.cend());
             }
         }
     }
@@ -6465,7 +6465,7 @@ static S* findRecordInNestedListImpl(S& thisScope, const std::string& name, bool
     }
 
     for (const auto& u : thisScope.usingList) {
-        if (!u.scope || u.scope == &thisScope || visited.find(u.scope) != visited.end())
+        if (!u.scope || u.scope == &thisScope || visited.find(u.scope) != visited.cend())
             continue;
         visited.emplace(u.scope);
         S* nestedScope = findRecordInNestedListImpl<S, T>(const_cast<S&>(*u.scope), name, false, visited);
@@ -8021,7 +8021,7 @@ void SymbolDatabase::setValueTypeInTokenList(bool reportDebugWarnings, Token *to
                         tok->astOperand1()->astOperand1()->valueType()->container) {
                         const Library::Container *cont = tok->astOperand1()->astOperand1()->valueType()->container;
                         const auto it = cont->functions.find(tok->astOperand1()->astOperand2()->str());
-                        if (it != cont->functions.end()) {
+                        if (it != cont->functions.cend()) {
                             if (it->second.yield == Library::Container::Yield::START_ITERATOR ||
                                 it->second.yield == Library::Container::Yield::END_ITERATOR ||
                                 it->second.yield == Library::Container::Yield::ITERATOR) {

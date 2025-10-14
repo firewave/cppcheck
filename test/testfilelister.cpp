@@ -89,7 +89,7 @@ private:
         ASSERT_EQUALS_ENUM(Standards::Language::CPP, it->lang());
 
         it = find_file(dirprefix + "lib/tokenize.cpp");
-        ASSERT(it != files.end());
+        ASSERT(it != files.cend());
         ASSERT_EQUALS_ENUM(Standards::Language::CPP, it->lang());
 
         it = find_file(dirprefix + "gui/main.cpp");
