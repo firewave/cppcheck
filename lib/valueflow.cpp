@@ -675,7 +675,7 @@ static std::vector<const Token*> evaluateType(const Token* start, const Token* e
                     auto inner = evaluateType(t.first, t.second);
                     if (inner.empty())
                         return {};
-                    result.insert(result.end(), inner.begin(), inner.end());
+                    result.insert(result.cend(), inner.cbegin(), inner.cend());
                 }
             } else if (Token::Match(tok->next(), "( %name% (|{") && Token::Match(tok->linkAt(3), "}|) )")) {
                 const Token* ftok = tok->tokAt(3);
@@ -685,7 +685,7 @@ static std::vector<const Token*> evaluateType(const Token* start, const Token* e
                 auto inner = evaluateType(t.first, t.second);
                 if (inner.empty())
                     return {};
-                result.insert(result.end(), inner.begin(), inner.end());
+                result.insert(result.cend(), inner.cbegin(), inner.cend());
             } else {
                 // We cant evaluate the decltype so bail
                 return {};
@@ -698,7 +698,7 @@ static std::vector<const Token*> evaluateType(const Token* start, const Token* e
                 if (inner.empty())
                     return {};
                 result.push_back(tok);
-                result.insert(result.end(), inner.begin(), inner.end());
+                result.insert(result.cend(), inner.cbegin(), inner.cend());
                 tok = tok->link();
             }
             result.push_back(tok);
@@ -3269,7 +3269,7 @@ static void valueFlowLifetime(TokenList &tokenlist, ErrorLogger &errorLogger, co
                 for (const ReferenceToken& rt : followAllReferences(tok2, false)) {
                     ValueFlow::Value value = master;
                     value.tokvalue = rt.token;
-                    value.errorPath.insert(value.errorPath.begin(), rt.errors.cbegin(), rt.errors.cend());
+                    value.errorPath.insert(value.errorPath.cbegin(), rt.errors.cbegin(), rt.errors.cend());
                     if (Token::simpleMatch(parent, "("))
                         setTokenValue(parent, std::move(value), settings);
                     else
@@ -5932,7 +5932,7 @@ static std::vector<ValueFlow::Value> getCommonValuesFromTokens(const std::vector
             return false;
         return (v.isIntValue() || v.isContainerSizeValue() || v.isFloatValue());
     });
-    std::for_each(toks.begin() + 1, toks.end(), [&](const Token* tok) {
+    std::for_each(toks.cbegin() + 1, toks.cend(), [&](const Token* tok) {
         auto it = std::remove_if(result.begin(), result.end(), [&](const ValueFlow::Value& v) {
             return std::none_of(tok->values().cbegin(), tok->values().cend(), [&](const ValueFlow::Value& v2) {
                 return v.equalValue(v2) && v.valueKind == v2.valueKind;

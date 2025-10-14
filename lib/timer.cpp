@@ -50,7 +50,7 @@ void TimerResults::showResults(SHOWTIME_MODES mode) const
         std::lock_guard<std::mutex> l(mResultsSync);
 
         data.reserve(mResults.size());
-        data.insert(data.begin(), mResults.cbegin(), mResults.cend());
+        data.insert(data.cbegin(), mResults.cbegin(), mResults.cend());
     }
     std::sort(data.begin(), data.end(), more_second_sec);
 

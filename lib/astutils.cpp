@@ -2994,7 +2994,7 @@ bool isVariablesChanged(const Token* start,
                         const Settings& settings)
 {
     std::set<int> varids;
-    std::transform(vars.cbegin(), vars.cend(), std::inserter(varids, varids.begin()), [](const Variable* var) {
+    std::transform(vars.cbegin(), vars.cend(), std::inserter(varids, varids.cbegin()), [](const Variable* var) {
         return var->declarationId();
     });
     const bool globalvar = std::any_of(vars.cbegin(), vars.cend(), [](const Variable* var) {
