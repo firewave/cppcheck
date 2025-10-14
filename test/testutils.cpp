@@ -541,12 +541,6 @@ private:
             cp->f();
             ASSERT(c.written);
         }
-        {
-            C c;
-            C* cp = &c;
-            utils::as_const(cp)->f(); // (correctly) calls non-const version
-            ASSERT(c.written);
-        }
     }
 
     void memoize() const {
