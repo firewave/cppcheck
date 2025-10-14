@@ -125,7 +125,7 @@ static void CppcheckSignalHandler(int signo, siginfo_t * info, void * context)
     killid = getpid();
 #endif
 
-    const auto it = utils::as_const(listofsignals).find(signo);
+    const auto it = listofsignals.find(signo);
     const char * const signame = (it==listofsignals.cend()) ? "unknown" : it->second.c_str();
     bool unexpectedSignal=true; // unexpected indicates program failure
     bool terminate=true; // exit process/thread

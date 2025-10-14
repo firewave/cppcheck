@@ -407,6 +407,9 @@ namespace utils {
     template<class T>
     constexpr typename std::add_const<T>::type & as_const(T& t) noexcept
     {
+        // std::as_const does not work on pointers so we should avoid such code
+        static_assert(!std::is_pointer<T>::value, "type may not be a pointer");
+        static_assert(!std::is_const<T>::value, "type is altready const");
         // NOLINTNEXTLINE(bugprone-return-const-ref-from-parameter) - potential false positive
         return t;
     }
