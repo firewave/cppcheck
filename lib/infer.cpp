@@ -168,7 +168,7 @@ namespace {
         static std::vector<const ValueFlow::Value*> merge(std::vector<const ValueFlow::Value*> x,
                                                           const std::vector<const ValueFlow::Value*>& y)
         {
-            x.insert(x.end(), y.cbegin(), y.cend());
+            x.insert(x.cend(), y.cbegin(), y.cend());
             return x;
         }
 

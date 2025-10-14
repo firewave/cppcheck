@@ -47,7 +47,7 @@ struct Library::LibraryData
     struct Platform {
         const PlatformType *platform_type(const std::string &name) const {
             const auto it = mPlatformTypes.find(name);
-            return (it != mPlatformTypes.end()) ? &(it->second) : nullptr;
+            return (it != mPlatformTypes.cend()) ? &(it->second) : nullptr;
         }
         std::map<std::string, PlatformType> mPlatformTypes;
     };
@@ -61,10 +61,10 @@ struct Library::LibraryData
             mSuffixes.insert(std::move(suffix));
         }
         bool isPrefix(const std::string& prefix) const {
-            return (mPrefixes.find(prefix) != mPrefixes.end());
+            return (mPrefixes.find(prefix) != mPrefixes.cend());
         }
         bool isSuffix(const std::string& suffix) const {
-            return (mSuffixes.find(suffix) != mSuffixes.end());
+            return (mSuffixes.find(suffix) != mSuffixes.cend());
         }
 
     private:
@@ -98,7 +98,7 @@ struct Library::LibraryData
             return mOffset;
         }
         bool isBlock(const std::string& blockName) const {
-            return mBlocks.find(blockName) != mBlocks.end();
+            return mBlocks.find(blockName) != mBlocks.cend();
         }
 
     private:
@@ -238,7 +238,7 @@ Library::Error Library::load(const char exename[], const char path[], bool debug
         absolute_path = Path::getAbsoluteFilePath(fullfilename);
 
     if (error == tinyxml2::XML_SUCCESS) {
-        if (mData->mFiles.find(absolute_path) == mData->mFiles.end()) {
+        if (mData->mFiles.find(absolute_path) == mData->mFiles.cend()) {
             Error err = load(doc);
             if (err.errorcode == ErrorCode::OK)
                 mData->mFiles.insert(std::move(absolute_path));
@@ -1178,7 +1178,7 @@ std::string Library::getFunctionName(const Token *ftok, bool &error) const
                     tok = tok->next();
                 }
                 name += "::" + ftok->str();
-                if (mData->mFunctions.find(name) != mData->mFunctions.end() && matchArguments(ftok, name))
+                if (mData->mFunctions.find(name) != mData->mFunctions.cend() && matchArguments(ftok, name))
                     return name;
             }
         }
@@ -1270,7 +1270,7 @@ const Library::AllocFunc* Library::getAllocFuncInfo(const Token *tok) const
     if (!tok)
         return nullptr;
     const std::string funcname = getFunctionName(tok);
-    return isNotLibraryFunction(tok) && mData->mFunctions.find(funcname) != mData->mFunctions.end() ? nullptr : getAllocDealloc(mData->mAlloc, funcname);
+    return isNotLibraryFunction(tok) && mData->mFunctions.find(funcname) != mData->mFunctions.cend() ? nullptr : getAllocDealloc(mData->mAlloc, funcname);
 }
 
 /** get deallocation info for function */
@@ -1281,7 +1281,7 @@ const Library::AllocFunc* Library::getDeallocFuncInfo(const Token *tok) const
     if (!tok)
         return nullptr;
     const std::string funcname = getFunctionName(tok);
-    return isNotLibraryFunction(tok) && mData->mFunctions.find(funcname) != mData->mFunctions.end() ? nullptr : getAllocDealloc(mData->mDealloc, funcname);
+    return isNotLibraryFunction(tok) && mData->mFunctions.find(funcname) != mData->mFunctions.cend() ? nullptr : getAllocDealloc(mData->mDealloc, funcname);
 }
 
 /** get reallocation info for function */
@@ -1292,7 +1292,7 @@ const Library::AllocFunc* Library::getReallocFuncInfo(const Token *tok) const
     if (!tok)
         return nullptr;
     const std::string funcname = getFunctionName(tok);
-    return isNotLibraryFunction(tok) && mData->mFunctions.find(funcname) != mData->mFunctions.end() ? nullptr : getAllocDealloc(mData->mRealloc, funcname);
+    return isNotLibraryFunction(tok) && mData->mFunctions.find(funcname) != mData->mFunctions.cend() ? nullptr : getAllocDealloc(mData->mRealloc, funcname);
 }
 
 /** get allocation id for function */
@@ -1812,7 +1812,7 @@ bool Library::isnotnoreturn(const Token *ftok) const
     if (isNotLibraryFunction(ftok))
         return hasAnyTypeCheck(getFunctionName(ftok));
     const auto it = utils::as_const(mData->mNoReturn).find(getFunctionName(ftok));
-    if (it == mData->mNoReturn.end())
+    if (it == mData->mNoReturn.cend())
         return false;
     if (it->second == LibraryData::FalseTrueMaybe::Maybe)
         return false;
@@ -1821,7 +1821,7 @@ bool Library::isnotnoreturn(const Token *ftok) const
 
 bool Library::markupFile(const std::string &path) const
 {
-    return mData->mMarkupExtensions.find(Path::getFilenameExtensionInLowerCase(path)) != mData->mMarkupExtensions.end();
+    return mData->mMarkupExtensions.find(Path::getFilenameExtensionInLowerCase(path)) != mData->mMarkupExtensions.cend();
 }
 
 bool Library::processMarkupAfterCode(const std::string &path) const
@@ -1995,7 +1995,7 @@ const Library::Container * getLibraryContainer(const Token * tok)
 Library::TypeCheck Library::getTypeCheck(std::string check,  std::string typeName) const
 {
     auto it = mData->mTypeChecks.find(std::pair<std::string, std::string>(std::move(check), std::move(typeName)));
-    return it == mData->mTypeChecks.end() ? TypeCheck::def : it->second;
+    return it == mData->mTypeChecks.cend() ? TypeCheck::def : it->second;
 }
 
 bool Library::hasAnyTypeCheck(const std::string& typeName) const
@@ -2035,37 +2035,37 @@ const std::set<std::string> &Library::markupExtensions() const
 
 bool Library::isexporter(const std::string &prefix) const
 {
-    return mData->mExporters.find(prefix) != mData->mExporters.end();
+    return mData->mExporters.find(prefix) != mData->mExporters.cend();
 }
 
 bool Library::isexportedprefix(const std::string &prefix, const std::string &token) const
 {
     const auto it = utils::as_const(mData->mExporters).find(prefix);
-    return (it != mData->mExporters.end() && it->second.isPrefix(token));
+    return (it != mData->mExporters.cend() && it->second.isPrefix(token));
 }
 
 bool Library::isexportedsuffix(const std::string &prefix, const std::string &token) const
 {
     const auto it = utils::as_const(mData->mExporters).find(prefix);
-    return (it != mData->mExporters.end() && it->second.isSuffix(token));
+    return (it != mData->mExporters.cend() && it->second.isSuffix(token));
 }
 
 bool Library::isreflection(const std::string &token) const
 {
-    return mData->mReflection.find(token) != mData->mReflection.end();
+    return mData->mReflection.find(token) != mData->mReflection.cend();
 }
 
 int Library::reflectionArgument(const std::string &token) const
 {
     const auto it = utils::as_const(mData->mReflection).find(token);
-    if (it != mData->mReflection.end())
+    if (it != mData->mReflection.cend())
         return it->second;
     return -1;
 }
 
 bool Library::isentrypoint(const std::string &func) const
 {
-    return func == "main" || mData->mEntrypoints.find(func) != mData->mEntrypoints.end();
+    return func == "main" || mData->mEntrypoints.find(func) != mData->mEntrypoints.cend();
 }
 
 const std::set<std::string>& Library::defines() const
@@ -2076,18 +2076,18 @@ const std::set<std::string>& Library::defines() const
 const Library::PodType *Library::podtype(const std::string &name) const
 {
     const auto it = utils::as_const(mData->mPodTypes).find(name);
-    return (it != mData->mPodTypes.end()) ? &(it->second) : nullptr;
+    return (it != mData->mPodTypes.cend()) ? &(it->second) : nullptr;
 }
 
 const Library::PlatformType *Library::platform_type(const std::string &name, const std::string & platform) const
 {
     const auto it = utils::as_const(mData->mPlatforms).find(platform);
-    if (it != mData->mPlatforms.end()) {
+    if (it != mData->mPlatforms.cend()) {
         const PlatformType * const type = it->second.platform_type(name);
         if (type)
             return type;
     }
 
     const auto it2 = utils::as_const(mData->mPlatformTypes).find(name);
-    return (it2 != mData->mPlatformTypes.end()) ? &(it2->second) : nullptr;
+    return (it2 != mData->mPlatformTypes.cend()) ? &(it2->second) : nullptr;
 }

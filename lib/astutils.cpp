@@ -650,7 +650,7 @@ static std::vector<const Token*> getParentMembers(const Token* tok)
     for (const Token* tok2 : astFlatten(parent, ".")) {
         if (Token::simpleMatch(tok2, "(") && Token::simpleMatch(tok2->astOperand1(), ".")) {
             std::vector<const Token*> sub = getParentMembers(tok2->astOperand1());
-            result.insert(result.end(), sub.cbegin(), sub.cend());
+            result.insert(result.cend(), sub.cbegin(), sub.cend());
         }
         result.push_back(tok2);
     }
@@ -1322,7 +1322,7 @@ SmallVector<ReferenceToken> followAllReferences(const Token* tok,
 
         if (!result.empty()) {
             SmallVector<ReferenceToken> refs_result;
-            refs_result.insert(refs_result.end(), result.cbegin(), result.cend());
+            refs_result.insert(refs_result.cend(), result.cbegin(), result.cend());
             return refs_result;
         }
 
@@ -1376,7 +1376,7 @@ SmallVector<ReferenceToken> followAllReferences(const Token* tok,
         }
         if (!result.empty()) {
             SmallVector<ReferenceToken> refs_result;
-            refs_result.insert(refs_result.end(), result.cbegin(), result.cend());
+            refs_result.insert(refs_result.cend(), result.cbegin(), result.cend());
             return refs_result;
         }
     }
@@ -3410,7 +3410,7 @@ static ExprUsage getFunctionUsage(const Token* tok, int indirect, const Settings
                 auto it = std::find_if(scope->functionList.cbegin(), scope->functionList.cend(), [](const Function& f) {
                     return f.isConstructor();
                 });
-                if (it != scope->functionList.end())
+                if (it != scope->functionList.cend())
                     func = &*it;
             }
         }

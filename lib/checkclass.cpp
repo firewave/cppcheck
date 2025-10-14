@@ -3782,7 +3782,7 @@ bool CheckClass::analyseWholeProgram(const CTU::FileInfo &ctu, const std::list<C
             continue;
         for (const MyFileInfo::NameLoc &nameLoc : fi->classDefinitions) {
             auto it = all.find(nameLoc.className);
-            if (it == all.end()) {
+            if (it == all.cend()) {
                 all[nameLoc.className] = nameLoc;
                 continue;
             }

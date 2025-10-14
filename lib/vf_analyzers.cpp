@@ -451,7 +451,7 @@ private:
             {">>=", "<<="},
             {"^=", "^="}};
         auto it = lookup.find(assign);
-        if (it == lookup.end()) {
+        if (it == lookup.cend()) {
             static const std::string s_empty_string;
             return s_empty_string;
         }
@@ -558,7 +558,7 @@ private:
             }
             if (!r.empty()) {
                 if (value) {
-                    value->errorPath.insert(value->errorPath.end(), v.errorPath.cbegin(), v.errorPath.cend());
+                    value->errorPath.insert(value->errorPath.cend(), v.errorPath.cbegin(), v.errorPath.cend());
                     value->intvalue = r.front() + v.intvalue;
                     if (toImpossible)
                         value->setImpossible();
@@ -961,7 +961,7 @@ struct MultiValueFlowAnalyzer : ValueFlowAnalyzer {
         if (tok->varId() == 0)
             return nullptr;
         auto it = values.find(tok->varId());
-        if (it == values.end())
+        if (it == values.cend())
             return nullptr;
         return &it->second;
     }
@@ -1500,7 +1500,7 @@ struct ContainerExpressionAnalyzer : ExpressionAnalyzer {
                 bool isVariadic = false;
                 if (const Library::Function* libFunc = settings.library.getFunction(tok->tokAt(2))) {
                     const auto& argChecks = libFunc->argumentChecks;
-                    isVariadic = argChecks.find(-1) != argChecks.end() && argChecks.at(-1).variadic;
+                    isVariadic = argChecks.find(-1) != argChecks.cend() && argChecks.at(-1).variadic;
                 }
                 if (args.size() < 2 || action == Library::Container::Action::APPEND || isVariadic)
                     return Action::Read | Action::Write | Action::Incremental;
@@ -1531,7 +1531,7 @@ struct ContainerExpressionAnalyzer : ExpressionAnalyzer {
                 auto it = std::find_if(rhs->values().cbegin(), rhs->values().cend(), [&](const ValueFlow::Value& rhsval) {
                     return rhsval.isKnown() && rhsval.isContainerSizeValue();
                 });
-                if (it != rhs->values().end())
+                if (it != rhs->values().cend())
                     n = it->intvalue;
             }
         } else if (astIsLHS(tok) && Token::Match(tok->astParent(), ". %name% (")) {

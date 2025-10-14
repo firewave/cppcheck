@@ -224,7 +224,7 @@ bool Path::acceptFile(const std::string &path, const std::set<std::string> &extr
     Standards::Language l = identify(path, false, &header);
     if (lang)
         *lang = l;
-    return (l != Standards::Language::None && !header) || extra.find(getFilenameExtension(path)) != extra.end();
+    return (l != Standards::Language::None && !header) || extra.find(getFilenameExtension(path)) != extra.cend();
 }
 
 static bool hasEmacsCppMarker(const char* path)
@@ -341,7 +341,7 @@ Standards::Language Path::identify(const std::string &path, bool cppHeaderProbe,
     }
     if (ext == ".C")
         return Standards::Language::CPP;
-    if (c_src_exts.find(ext) != c_src_exts.end())
+    if (c_src_exts.find(ext) != c_src_exts.cend())
         return Standards::Language::C;
     // cppcheck-suppress knownConditionTrueFalse - TODO: FP
     if (!caseInsensitiveFilesystem())
@@ -353,9 +353,9 @@ Standards::Language Path::identify(const std::string &path, bool cppHeaderProbe,
             return Standards::Language::CPP;
         return Standards::Language::C;
     }
-    if (cpp_src_exts.find(ext) != cpp_src_exts.end())
+    if (cpp_src_exts.find(ext) != cpp_src_exts.cend())
         return Standards::Language::CPP;
-    if (header_exts.find(ext) != header_exts.end()) {
+    if (header_exts.find(ext) != header_exts.cend()) {
         if (header)
             *header = true;
         return Standards::Language::CPP;

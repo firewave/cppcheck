@@ -647,29 +647,29 @@ bool CheckLeakAutoVar::checkScope(const Token * const startToken,
 
                 // Conditional allocation in varInfo1
                 for (auto it = varInfo1.alloctype.cbegin(); it != varInfo1.alloctype.cend(); ++it) {
-                    if (varInfo2.alloctype.find(it->first) == varInfo2.alloctype.end() &&
-                        old.alloctype.find(it->first) == old.alloctype.end()) {
+                    if (varInfo2.alloctype.find(it->first) == varInfo2.alloctype.cend() &&
+                        old.alloctype.find(it->first) == old.alloctype.cend()) {
                         varInfo.conditionalAlloc.insert(it->first);
                     }
                 }
 
                 // Conditional allocation in varInfo2
                 for (auto it = varInfo2.alloctype.cbegin(); it != varInfo2.alloctype.cend(); ++it) {
-                    if (varInfo1.alloctype.find(it->first) == varInfo1.alloctype.end() &&
-                        old.alloctype.find(it->first) == old.alloctype.end()) {
+                    if (varInfo1.alloctype.find(it->first) == varInfo1.alloctype.cend() &&
+                        old.alloctype.find(it->first) == old.alloctype.cend()) {
                         varInfo.conditionalAlloc.insert(it->first);
                     }
                 }
 
                 // Conditional allocation/deallocation
                 for (auto it = varInfo1.alloctype.cbegin(); it != varInfo1.alloctype.cend(); ++it) {
-                    if (it->second.managed() && conditionalAlloc.find(it->first) != conditionalAlloc.end()) {
+                    if (it->second.managed() && conditionalAlloc.find(it->first) != conditionalAlloc.cend()) {
                         varInfo.conditionalAlloc.erase(it->first);
                         varInfo2.erase(it->first);
                     }
                 }
                 for (auto it = varInfo2.alloctype.cbegin(); it != varInfo2.alloctype.cend(); ++it) {
-                    if (it->second.managed() && conditionalAlloc.find(it->first) != conditionalAlloc.end()) {
+                    if (it->second.managed() && conditionalAlloc.find(it->first) != conditionalAlloc.cend()) {
                         varInfo.conditionalAlloc.erase(it->first);
                         varInfo1.erase(it->first);
                     }
@@ -940,7 +940,7 @@ void CheckLeakAutoVar::changeAllocStatusIfRealloc(std::map<int, VarInfo::AllocIn
     const Library::AllocFunc* f = mSettings->library.getReallocFuncInfo(fTok);
     if (f && f->arg == -1 && f->reallocArg > 0 && f->reallocArg <= numberOfArguments(fTok)) {
         const Token* argTok = getArguments(fTok).at(f->reallocArg - 1);
-        if (alloctype.find(argTok->varId()) != alloctype.end()) {
+        if (alloctype.find(argTok->varId()) != alloctype.cend()) {
             VarInfo::AllocInfo& argAlloc = alloctype[argTok->varId()];
             if (argAlloc.type != 0 && argAlloc.type != f->groupId)
                 mismatchError(fTok, argAlloc.allocTok, argTok->str());

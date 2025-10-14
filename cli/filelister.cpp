@@ -141,7 +141,7 @@ static std::string addFiles2(std::list<FileWithDetails>&files, const std::string
                             return a.path() < b.path();
                         });
 
-                        files.insert(files.end(), std::make_move_iterator(filesSorted.begin()), std::make_move_iterator(filesSorted.end()));
+                        files.insert(files.cend(), std::make_move_iterator(filesSorted.begin()), std::make_move_iterator(filesSorted.end()));
                     }
                     else if (debug)
                     {
@@ -176,7 +176,7 @@ std::string FileLister::addFiles(std::list<FileWithDetails> &files, const std::s
     filesSorted.sort([](const FileWithDetails& a, const FileWithDetails& b) {
         return a.path() < b.path();
     });
-    files.insert(files.end(), std::make_move_iterator(filesSorted.begin()), std::make_move_iterator(filesSorted.end()));
+    files.insert(files.cend(), std::make_move_iterator(filesSorted.begin()), std::make_move_iterator(filesSorted.end()));
 
     return err;
 }
@@ -297,7 +297,7 @@ std::string FileLister::addFiles(std::list<FileWithDetails> &files, const std::s
     filesSorted.sort([](const FileWithDetails& a, const FileWithDetails& b) {
         return a.path() < b.path();
     });
-    files.insert(files.end(), std::make_move_iterator(filesSorted.begin()), std::make_move_iterator(filesSorted.end()));
+    files.insert(files.cend(), std::make_move_iterator(filesSorted.begin()), std::make_move_iterator(filesSorted.end()));
 
     return err;
 }

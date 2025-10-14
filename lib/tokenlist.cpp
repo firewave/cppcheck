@@ -2219,7 +2219,7 @@ bool TokenList::isKeyword(const std::string &str) const
 {
     if (isCPP()) {
         const auto &cpp_keywords = Keywords::getAll(mSettings.standards.cpp);
-        const bool b = cpp_keywords.find(str) != cpp_keywords.end();
+        const bool b = cpp_keywords.find(str) != cpp_keywords.cend();
         if (b) {
             // TODO: integrate into keywords?
             // types and literals are not handled as keywords
@@ -2231,7 +2231,7 @@ bool TokenList::isKeyword(const std::string &str) const
     }
 
     const auto &c_keywords = Keywords::getAll(mSettings.standards.c);
-    const bool b = c_keywords.find(str) != c_keywords.end();
+    const bool b = c_keywords.find(str) != c_keywords.cend();
     if (b) {
         // TODO: integrate into Keywords?
         // types are not handled as keywords

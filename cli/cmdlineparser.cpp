@@ -1586,7 +1586,7 @@ CmdLineParser::Result CmdLineParser::parseFromArgs(int argc, const char* const a
     }
 
     if (inputAsFilter) {
-        mSettings.fileFilters.insert(mSettings.fileFilters.end(), mPathNames.cbegin(), mPathNames.cend());
+        mSettings.fileFilters.insert(mSettings.fileFilters.cend(), mPathNames.cbegin(), mPathNames.cend());
         mPathNames.clear();
     }
 

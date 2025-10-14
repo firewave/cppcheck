@@ -267,7 +267,7 @@ void CheckStl::outOfBoundsError(const Token *tok, const std::string &containerNa
             errorPath = std::move(errorPath1);
         else {
             errorPath = std::move(errorPath1);
-            errorPath.splice(errorPath.end(), errorPath2);
+            errorPath.splice(errorPath.cend(), errorPath2);
         }
     }
 
@@ -1233,8 +1233,8 @@ void CheckStl::invalidContainer()
                     });
                     if (!info.tok)
                         continue;
-                    errorPath.insert(errorPath.end(), info.errorPath.cbegin(), info.errorPath.cend());
-                    errorPath.insert(errorPath.end(), r.errorPath.cbegin(), r.errorPath.cend());
+                    errorPath.insert(errorPath.cend(), info.errorPath.cbegin(), info.errorPath.cend());
+                    errorPath.insert(errorPath.cend(), r.errorPath.cbegin(), r.errorPath.cend());
                     if (v) {
                         invalidContainerError(info.tok, r.tok, v, std::move(errorPath));
                     } else {
@@ -2484,7 +2484,7 @@ void CheckStl::checkDereferenceInvalidIterator2()
                         return true;
                     return false;
                 });
-                if (it == contValues.end())
+                if (it == contValues.cend())
                     continue;
                 cValue = &*it;
                 if (value.isIteratorStartValue() && value.intvalue > cValue->intvalue)
@@ -3309,7 +3309,7 @@ static const ValueFlow::Value* getOOBIterValue(const Token* tok, const ValueFlow
         }
         return false;
     });
-    return it != tok->values().end() ? &*it : nullptr;
+    return it != tok->values().cend() ? &*it : nullptr;
 }
 
 void CheckStl::eraseIteratorOutOfBounds()

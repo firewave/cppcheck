@@ -296,7 +296,7 @@ namespace clangimport {
             return mDeclMap.find(addr) != mDeclMap.cend();
         }
 
-        const Scope *getScope(const std::string &addr) {
+        const Scope *getScope(const std::string &addr) const {
             auto it = mDeclMap.find(addr);
             return (it == mDeclMap.end() ? nullptr : it->second.scope);
         }
@@ -663,7 +663,7 @@ const Scope *clangimport::AstNode::getNestedInScope(TokenList &tokenList)
 {
     if (!tokenList.back())
         return &mData->mSymbolDatabase.scopeList.front();
-    if (tokenList.back()->str() == "}" && mData->mNotScope.find(tokenList.back()) == mData->mNotScope.end())
+    if (tokenList.back()->str() == "}" && mData->mNotScope.find(tokenList.back()) == mData->mNotScope.cend())
         return tokenList.back()->scope()->nestedIn;
     return tokenList.back()->scope();
 }
@@ -726,7 +726,7 @@ Scope *clangimport::AstNode::createScope(TokenList &tokenList, ScopeType scopeTy
         }
         std::list<Variable> &varlist = const_cast<Scope *>(def->scope())->varlist;
         for (auto var = varlist.cbegin(); var != varlist.cend();) {
-            if (replaceVar.find(&(*var)) != replaceVar.end())
+            if (replaceVar.find(&(*var)) != replaceVar.cend())
                 var = varlist.erase(var);
             else
                 ++var;

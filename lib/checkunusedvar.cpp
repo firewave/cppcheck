@@ -521,7 +521,7 @@ static const Token* doAssignment(Variables &variables, const Token *tok, bool de
                             // not in same scope as declaration
                             else {
                                 // no other assignment in this scope
-                                if (var1->_assignments.find(scope) == var1->_assignments.end() ||
+                                if (var1->_assignments.find(scope) == var1->_assignments.cend() ||
                                     scope->type == ScopeType::eSwitch) {
                                     // nothing to replace
                                     // cppcheck-suppress duplicateBranch - remove when TODO below is address

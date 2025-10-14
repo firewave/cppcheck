@@ -482,7 +482,7 @@ private:
 
     static const AllocFunc* getAllocDealloc(const std::map<std::string, AllocFunc> &data, const std::string &name) {
         const auto it = data.find(name);
-        return (it == data.end()) ? nullptr : &it->second;
+        return (it == data.cend()) ? nullptr : &it->second;
     }
 
     enum DetectContainer : std::uint8_t { ContainerOnly, IteratorOnly, Both };

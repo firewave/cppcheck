@@ -826,7 +826,7 @@ unsigned int CppCheck::check(const FileSettings &fs)
     if (fs.platformType != Platform::Type::Unspecified)
         tempSettings.platform.set(fs.platformType);
     if (mSettings.clang) {
-        tempSettings.includePaths.insert(tempSettings.includePaths.end(), fs.systemIncludePaths.cbegin(), fs.systemIncludePaths.cend());
+        tempSettings.includePaths.insert(tempSettings.includePaths.cend(), fs.systemIncludePaths.cbegin(), fs.systemIncludePaths.cend());
         // need to pass the externally provided ErrorLogger instead of our internal wrapper
         CppCheck temp(tempSettings, mSuppressions, mErrorLoggerDirect, mUseGlobalSuppressions, mExecuteCommand);
         // TODO: propagate back mFileInfo
@@ -2042,8 +2042,8 @@ bool CppCheck::analyseWholeProgram()
         for (const Check::FileInfo *fi : mFileInfo) {
             const auto *fi2 = dynamic_cast<const CTU::FileInfo *>(fi);
             if (fi2) {
-                ctu.functionCalls.insert(ctu.functionCalls.end(), fi2->functionCalls.cbegin(), fi2->functionCalls.cend());
-                ctu.nestedCalls.insert(ctu.nestedCalls.end(), fi2->nestedCalls.cbegin(), fi2->nestedCalls.cend());
+                ctu.functionCalls.insert(ctu.functionCalls.cend(), fi2->functionCalls.cbegin(), fi2->functionCalls.cend());
+                ctu.nestedCalls.insert(ctu.nestedCalls.cend(), fi2->nestedCalls.cbegin(), fi2->nestedCalls.cend());
             }
         }
     }

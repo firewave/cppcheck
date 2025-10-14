@@ -972,10 +972,10 @@ static void valueFlowArrayElement(TokenList& tokenlist, const Settings& settings
                 if (arrayValue.valueKind == indexValue.valueKind)
                     result.valueKind = arrayValue.valueKind;
 
-                result.errorPath.insert(result.errorPath.end(),
+                result.errorPath.insert(result.errorPath.cend(),
                                         arrayValue.errorPath.cbegin(),
                                         arrayValue.errorPath.cend());
-                result.errorPath.insert(result.errorPath.end(),
+                result.errorPath.insert(result.errorPath.cend(),
                                         indexValue.errorPath.cbegin(),
                                         indexValue.errorPath.cend());
 
@@ -998,7 +998,7 @@ static void valueFlowArrayElement(TokenList& tokenlist, const Settings& settings
                     const ValueFlow::Value* v = arg->getKnownValue(ValueFlow::Value::ValueType::INT);
                     if (v) {
                         result.intvalue = v->intvalue;
-                        result.errorPath.insert(result.errorPath.end(), v->errorPath.cbegin(), v->errorPath.cend());
+                        result.errorPath.insert(result.errorPath.cend(), v->errorPath.cbegin(), v->errorPath.cend());
                         setTokenValue(tok, std::move(result), settings);
                     }
                 }
@@ -1787,7 +1787,7 @@ static std::vector<ValueFlow::LifetimeToken> getLifetimeTokens(const Token* tok,
                         std::vector<ValueFlow::LifetimeToken> arglts = ValueFlow::LifetimeToken::setInconclusive(
                             getLifetimeTokens(argTok, escape, std::move(lt.errorPath), pred, settings, depth - returns.size()),
                             returns.size() > 1);
-                        result.insert(result.end(), arglts.cbegin(), arglts.cend());
+                        result.insert(result.cend(), arglts.cbegin(), arglts.cend());
                     }
                 }
             }
@@ -1830,7 +1830,7 @@ static std::vector<ValueFlow::LifetimeToken> getLifetimeTokens(const Token* tok,
                     continue;
                 if (v.tokvalue == tok)
                     continue;
-                errorPath.insert(errorPath.end(), v.errorPath.cbegin(), v.errorPath.cend());
+                errorPath.insert(errorPath.cend(), v.errorPath.cbegin(), v.errorPath.cend());
                 return ValueFlow::LifetimeToken::setAddressOf(
                     getLifetimeTokens(v.tokvalue, escape, std::move(errorPath), pred, settings, depth - 1),
                     false);
@@ -1846,7 +1846,7 @@ static std::vector<ValueFlow::LifetimeToken> getLifetimeTokens(const Token* tok,
         auto it = std::find_if(vts.cbegin(), vts.cend(), [&](const ValueType& vt) {
             return vt.isTypeEqual(vartok->valueType());
         });
-        if (it != vts.end())
+        if (it != vts.cend())
             return getLifetimeTokens(vartok, escape, std::move(errorPath), pred, settings, depth - 1);
     }
     return {{tok, std::move(errorPath)}};
@@ -1878,7 +1878,7 @@ static const Token* getLifetimeToken(const Token* tok, ErrorPath& errorPath, con
         return nullptr;
     if (addressOf)
         *addressOf = lts.front().addressOf;
-    errorPath.insert(errorPath.end(), lts.front().errorPath.cbegin(), lts.front().errorPath.cend());
+    errorPath.insert(errorPath.cend(), lts.front().errorPath.cbegin(), lts.front().errorPath.cend());
     return lts.front().token;
 }
 
@@ -2308,7 +2308,7 @@ struct LifetimeStore {
             if (!pred(lt.token))
                 return false;
             ErrorPath er = errorPath;
-            er.insert(er.end(), lt.errorPath.cbegin(), lt.errorPath.cend());
+            er.insert(er.cend(), lt.errorPath.cbegin(), lt.errorPath.cend());
             er.emplace_back(argtok, message);
 
             ValueFlow::Value value;
@@ -2400,9 +2400,9 @@ struct LifetimeStore {
                 if (!pred(lt.token))
                     return false;
                 ErrorPath er = v.errorPath;
-                er.insert(er.end(), lt.errorPath.cbegin(), lt.errorPath.cend());
+                er.insert(er.cend(), lt.errorPath.cbegin(), lt.errorPath.cend());
                 er.emplace_back(argtok, message);
-                er.insert(er.end(), errorPath.cbegin(), errorPath.cend());
+                er.insert(er.cend(), errorPath.cbegin(), errorPath.cend());
 
                 ValueFlow::Value value;
                 value.valueType = ValueFlow::Value::ValueType::LIFETIME;
@@ -2466,7 +2466,7 @@ struct LifetimeStore {
             ErrorPath er = v.errorPath;
             const Variable *var = ValueFlow::getLifetimeVariable(tok2, er, settings);
             // TODO: the inserted data is never used
-            er.insert(er.end(), errorPath.cbegin(), errorPath.cend());
+            er.insert(er.cend(), errorPath.cbegin(), errorPath.cend());
             if (!var)
                 continue;
             const Token * const varDeclEndToken = var->declEndToken();
@@ -3986,7 +3986,7 @@ static void valueFlowForwardConst(Token* start,
                     for (ValueFlow::Value value : values) {
                         if (refs.size() > 1)
                             value.setInconclusive();
-                        value.errorPath.insert(value.errorPath.end(), it->errors.cbegin(), it->errors.cend());
+                        value.errorPath.insert(value.errorPath.cend(), it->errors.cbegin(), it->errors.cend());
                         setTokenValue(tok, std::move(value), settings);
                     }
                     return;
@@ -4010,7 +4010,7 @@ static void valueFlowForwardConst(Token* start,
                         if (!value.isImpossible())
                             value.valueKind = v.valueKind;
                         value.bound = v.bound;
-                        value.errorPath.insert(value.errorPath.end(), v.errorPath.cbegin(), v.errorPath.cend());
+                        value.errorPath.insert(value.errorPath.cend(), v.errorPath.cbegin(), v.errorPath.cend());
                         setTokenValue(tok, std::move(value), settings);
                     }
                 }
@@ -4154,7 +4154,7 @@ static void valueFlowForwardAssign(Token* const tok,
             return false;
         });
         std::list<ValueFlow::Value> constValues;
-        constValues.splice(constValues.end(), values, it, values.end());
+        constValues.splice(constValues.cend(), values, it, values.end());
         valueFlowForwardConst(nextExpression, endOfVarScope, expr->variable(), constValues, settings);
     }
     if (isInitialVarAssign(expr)) {
@@ -4531,12 +4531,12 @@ struct ConditionHandler {
             bool then = !inverted || !inverted2;
 
             if (!Token::Match(condTok, "!=|=|(|.") && condTok != vartok) {
-                thenValues.insert(thenValues.end(), true_values.cbegin(), true_values.cend());
+                thenValues.insert(thenValues.cend(), true_values.cbegin(), true_values.cend());
                 if (allowImpossible && (known || isConditionKnown(ctx, !then)))
                     insertImpossible(elseValues, false_values);
             }
             if (!Token::Match(condTok, "==|!")) {
-                elseValues.insert(elseValues.end(), false_values.cbegin(), false_values.cend());
+                elseValues.insert(elseValues.cend(), false_values.cbegin(), false_values.cend());
                 if (allowImpossible && (known || isConditionKnown(ctx, then))) {
                     insertImpossible(thenValues, true_values);
                     if (isBool())
@@ -4667,7 +4667,7 @@ struct ConditionHandler {
 
             std::list<ValueFlow::Value> values = cond.true_values;
             if (cond.true_values != cond.false_values)
-                values.insert(values.end(), cond.false_values.cbegin(), cond.false_values.cend());
+                values.insert(values.cend(), cond.false_values.cbegin(), cond.false_values.cend());
 
             // extra logic for unsigned variables 'i>=1' => possible value can also be 0
             if (Token::Match(tok, "<|>|<=|>=")) {
@@ -5924,8 +5924,8 @@ static std::vector<ValueFlow::Value> getCommonValuesFromTokens(const std::vector
     if (toks.empty())
         return {};
     std::vector<ValueFlow::Value> result;
-    std::copy_if(toks.front()->values().begin(),
-                 toks.front()->values().end(),
+    std::copy_if(toks.front()->values().cbegin(),
+                 toks.front()->values().cend(),
                  std::back_inserter(result),
                  [&](const ValueFlow::Value& v) {
         if (!v.isKnown() && !v.isImpossible())
@@ -5938,7 +5938,7 @@ static std::vector<ValueFlow::Value> getCommonValuesFromTokens(const std::vector
                 return v.equalValue(v2) && v.valueKind == v2.valueKind;
             });
         });
-        result.erase(it, result.end());
+        result.erase(it, result.cend());
     });
     return result;
 }
@@ -7247,7 +7247,7 @@ static void valueFlowUnknownFunctionReturn(TokenList& tokenlist, const Settings&
             }
         }
 
-        if (settings.checkUnknownFunctionReturn.find(tok->strAt(-1)) == settings.checkUnknownFunctionReturn.end())
+        if (settings.checkUnknownFunctionReturn.find(tok->strAt(-1)) == settings.checkUnknownFunctionReturn.cend())
             continue;
         std::vector<MathLib::bigint> unknownValues = settings.library.unknownReturnValues(tok->astOperand1());
         if (unknownValues.empty())
@@ -7281,7 +7281,7 @@ static void valueFlowDebug(TokenList& tokenlist, ErrorLogger& errorLogger, const
         for (const ValueFlow::Value& v : tok->values()) {
             std::string msg = "The value is " + debugString(v);
             ErrorPath errorPath = v.errorPath;
-            errorPath.insert(errorPath.end(), v.debugPath.cbegin(), v.debugPath.cend());
+            errorPath.insert(errorPath.cend(), v.debugPath.cbegin(), v.debugPath.cend());
             errorPath.emplace_back(tok, "");
             errorLogger.reportErr({std::move(errorPath), &tokenlist, Severity::debug, "valueFlow", msg, CWE{0}, Certainty::normal});
         }

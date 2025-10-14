@@ -156,7 +156,7 @@ private:
             auto it = std::find_if(currScope->functionList.cbegin(), currScope->functionList.cend(), [&](const Function& f) {
                 return f.tokenDef->str() == str;
             });
-            if (it != currScope->functionList.end())
+            if (it != currScope->functionList.cend())
                 return &*it;
             currScope = currScope->nestedIn;
         }

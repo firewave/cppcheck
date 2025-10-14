@@ -1308,7 +1308,7 @@ static void pruneConditions(std::vector<const Token*>& conds,
         if (cond->exprId() == 0)
             return false;
         auto it = state.find(cond->exprId());
-        if (it == state.end())
+        if (it == state.cend())
             return false;
         const ValueFlow::Value& v = it->second;
         return isTrueOrFalse(v, !b);
@@ -1439,7 +1439,7 @@ namespace {
                         auto it = std::find_if(diffConditions2.cbegin(), diffConditions2.cend(), [&](const Token* cond2) {
                             return evalSameCondition(*pm, cond2, cond1, settings);
                         });
-                        if (it == diffConditions2.end())
+                        if (it == diffConditions2.cend())
                             break;
                         diffConditions2.erase(it);
                     }

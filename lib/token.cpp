@@ -139,7 +139,7 @@ void Token::update_property_info()
                 tokType(eKeyword);
                 update_property_isStandardType();
                 if (mTokType != eType) // cannot be a control-flow keyword when it is a type
-                    setFlag(fIsControlFlowKeyword, controlFlowKeywords.find(mStr) != controlFlowKeywords.end());
+                    setFlag(fIsControlFlowKeyword, controlFlowKeywords.find(mStr) != controlFlowKeywords.cend());
             }
             else if (mStr == "asm") { // TODO: not a keyword
                 tokType(eKeyword);
@@ -213,7 +213,7 @@ static const std::unordered_set<std::string> stdTypes = { "bool"
 
 bool Token::isStandardType(const std::string& str)
 {
-    return stdTypes.find(str) != stdTypes.end();
+    return stdTypes.find(str) != stdTypes.cend();
 }
 
 void Token::update_property_isStandardType()

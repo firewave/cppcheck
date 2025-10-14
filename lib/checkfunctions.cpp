@@ -659,7 +659,7 @@ void CheckFunctions::checkLibraryMatchFunctions()
         if (functionName.empty())
             continue;
 
-        if (mSettings->library.functions().find(functionName) != mSettings->library.functions().end())
+        if (mSettings->library.functions().find(functionName) != mSettings->library.functions().cend())
             continue;
 
         if (mSettings->library.podtype(tok->expressionString()))

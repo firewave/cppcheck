@@ -816,7 +816,7 @@ private:
     }
 
     static void append_vector(std::vector<std::string> &dest, const std::vector<std::string> &src) {
-        dest.insert(dest.end(), src.cbegin(), src.cend());
+        dest.insert(dest.cend(), src.cbegin(), src.cend());
     }
 
     void matchOp() {

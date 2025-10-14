@@ -524,7 +524,7 @@ void CheckOther::suspiciousFloatingPointCast()
                     }
                 }
             }
-            if (!parentVt || std::find(sourceTypes.cbegin(), sourceTypes.cend(), parentVt->type) == sourceTypes.end())
+            if (!parentVt || std::find(sourceTypes.cbegin(), sourceTypes.cend(), parentVt->type) == sourceTypes.cend())
                 continue;
 
             suspiciousFloatingPointCastError(tok);
@@ -2780,7 +2780,7 @@ namespace {
                 const auto nc = std::find_if(it.second.cbegin(), it.second.cend(), notconst);
                 if (nc == it.second.cend()) {
                     // ok to add all of them
-                    constFunctions.splice(constFunctions.end(), it.second);
+                    constFunctions.splice(constFunctions.cend(), it.second);
                 }
             }
         }
@@ -4321,11 +4321,11 @@ void CheckOther::comparePointersError(const Token *tok, const ValueFlow::Value *
     const char * const id = (verb[0] == 'C') ? "comparePointers" : "subtractPointers";
     if (v1) {
         errorPath.emplace_back(v1->tokvalue->variable()->nameToken(), "Variable declared here.");
-        errorPath.insert(errorPath.end(), v1->errorPath.cbegin(), v1->errorPath.cend());
+        errorPath.insert(errorPath.cend(), v1->errorPath.cbegin(), v1->errorPath.cend());
     }
     if (v2) {
         errorPath.emplace_back(v2->tokvalue->variable()->nameToken(), "Variable declared here.");
-        errorPath.insert(errorPath.end(), v2->errorPath.cbegin(), v2->errorPath.cend());
+        errorPath.insert(errorPath.cend(), v2->errorPath.cbegin(), v2->errorPath.cend());
     }
     errorPath.emplace_back(tok, "");
     reportError(
@@ -4465,8 +4465,8 @@ void CheckOther::checkUnionZeroInit()
         const ValueType *vt = tok->valueType();
         if (vt == nullptr || vt->typeScope == nullptr)
             continue;
-        auto it = unionsByScopeId.find(vt->typeScope);
-        if (it == unionsByScopeId.end())
+        auto it = utils::as_const(unionsByScopeId).find(vt->typeScope);
+        if (it == unionsByScopeId.cend())
             continue;
         const Union &u = it->second;
         if (!u.isLargestMemberFirst()) {

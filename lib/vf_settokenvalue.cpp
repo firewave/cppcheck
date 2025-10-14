@@ -195,7 +195,7 @@ namespace ValueFlow
         if (x == y)
             return true;
         auto it = compatibleTypes.find(x);
-        if (it == compatibleTypes.end())
+        if (it == compatibleTypes.cend())
             return false;
         return it->second.count(y) > 0;
     }
