@@ -442,7 +442,7 @@ private:
 
     static const std::string& invertAssign(const std::string& assign)
     {
-        static std::unordered_map<std::string, std::string> lookup = {{"=", "="},
+        static const std::unordered_map<std::string, std::string> lookup = {{"=", "="},
             {"+=", "-="},
             {"-=", "+="},
             {"*=", "/="},

@@ -94,7 +94,7 @@ private:
     static std::string getcodeforcfg(const Settings& settings, ErrorLogger& errorlogger, const char* code, std::size_t size, const std::string &cfg, const std::string &filename, SuppressionList *inlineSuppression = nullptr)
     {
         std::map<std::string, std::string> cfgcode = getcode(settings, errorlogger, code, size, std::set<std::string>{cfg}, filename, inlineSuppression);
-        const auto it = cfgcode.find(cfg);
+        const auto it = utils::as_const(cfgcode).find(cfg);
         if (it == cfgcode.cend())
             return "";
         return it->second;
