@@ -2640,6 +2640,7 @@ private:
     }
 
 #define check(...) check_(__FILE__, __LINE__, __VA_ARGS__)
+    // TODO: use options
     template<size_t size>
     void check_(const char* file, int line, const char (&code)[size], bool debug = true, bool cpp = true, const Settings* pSettings = nullptr) {
         // Check..
@@ -9347,6 +9348,7 @@ private:
         }
     }
 #define typeOf(...) typeOf_(__FILE__, __LINE__, __VA_ARGS__)
+    // TODO: use options
     template<size_t size>
     std::string typeOf_(const char* file, int line, const char (&code)[size], const char pattern[], bool cpp = true, const Settings *settings = nullptr) {
         SimpleTokenizer tokenizer(settings ? *settings : settings2, *this, cpp);

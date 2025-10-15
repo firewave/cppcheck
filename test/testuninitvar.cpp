@@ -3592,6 +3592,18 @@ private:
     }
 
 #define valueFlowUninit(...) valueFlowUninit_(__FILE__, __LINE__, __VA_ARGS__)
+    // TODO: use options
+    template<size_t size>
+    void valueFlowUninit_(const char* file, int line, const char (&code)[size], bool cpp = true)
+    {
+        SimpleTokenizer tokenizer(settings, *this, cpp);
+        ASSERT_LOC(tokenizer.tokenize(code), file, line);
+
+        // Check for redundant code..
+        CheckUninitVar checkuninitvar(&tokenizer, &settings, this);
+        (checkuninitvar.valueFlowUninit)();
+    }
+
     void valueFlowUninit2_value()
     {
         valueFlowUninit("void f() {\n"
@@ -3601,8 +3613,7 @@ private:
                         "        if (y != 0) return;\n"
                         "        i++;\n"
                         "    }\n"
-                        "}",
-                        true);
+                        "}");
         ASSERT_EQUALS("", errout_str());
 
         valueFlowUninit("void f() {\n"
@@ -3612,8 +3623,7 @@ private:
                         "        if (y != 0) return;\n"
                         "        i++;\n"
                         "    }\n"
-                        "}",
-                        true);
+                        "}");
         ASSERT_EQUALS("", errout_str());
 
         valueFlowUninit("void f() {\n"
@@ -3882,8 +3892,7 @@ private:
         valueFlowUninit("void f() {\n"
                         "    int x;\n"
                         "    char *p = (char*)&x + 1;\n"
-                        "}",
-                        true);
+                        "}");
         ASSERT_EQUALS("", errout_str());
 
         valueFlowUninit("void f() {\n"
@@ -5468,18 +5477,27 @@ private:
         TODO_ASSERT_EQUALS("", "[test.c:4:14]: (error) Uninitialized variable: d [legacyUninitvar]\n", errout_str());
     }
 
+#define ctu(...) ctu_(__FILE__, __LINE__, __VA_ARGS__)
     template<size_t size>
-    void valueFlowUninit_(const char* file, int line, const char (&code)[size], bool cpp = true)
-    {
-        SimpleTokenizer tokenizer(settings, *this, cpp);
+    void ctu_(const char* file, int line, const char (&code)[size]) {
+        // Tokenize..
+        SimpleTokenizer tokenizer(settings, *this);
         ASSERT_LOC(tokenizer.tokenize(code), file, line);
 
-        // Check for redundant code..
-        CheckUninitVar checkuninitvar(&tokenizer, &settings, this);
-        (checkuninitvar.valueFlowUninit)();
+        CTU::FileInfo *ctu = CTU::getFileInfo(tokenizer);
+
+        // Check code..
+        std::list<Check::FileInfo*> fileInfo;
+        Check& c = getCheck<CheckUninitVar>();
+        fileInfo.push_back(c.getFileInfo(tokenizer, settings, ""));
+        c.analyseWholeProgram(*ctu, fileInfo, settings, *this); // TODO: check result
+        while (!fileInfo.empty()) {
+            delete fileInfo.back();
+            fileInfo.pop_back();
+        }
+        delete ctu;
     }
 
-#define ctu(code) ctu_(__FILE__, __LINE__, code)
     void valueFlowUninitTest() {
         // #9735 - FN
         valueFlowUninit("typedef struct\n"
@@ -7352,8 +7370,7 @@ private:
                         "void foo() {\n"
                         "    A a;\n"
                         "    x = a.m;\n"
-                        "}",
-                        true);
+                        "}");
         ASSERT_EQUALS("", errout_str());
 
         // Unknown type (C)
@@ -7950,26 +7967,6 @@ private:
                         "    p = &s;\n"
                         "}\n");
         ASSERT_EQUALS("", errout_str());
-    }
-
-    template<size_t size>
-    void ctu_(const char* file, int line, const char (&code)[size]) {
-        // Tokenize..
-        SimpleTokenizer tokenizer(settings, *this);
-        ASSERT_LOC(tokenizer.tokenize(code), file, line);
-
-        CTU::FileInfo *ctu = CTU::getFileInfo(tokenizer);
-
-        // Check code..
-        std::list<Check::FileInfo*> fileInfo;
-        Check& c = getCheck<CheckUninitVar>();
-        fileInfo.push_back(c.getFileInfo(tokenizer, settings, ""));
-        c.analyseWholeProgram(*ctu, fileInfo, settings, *this); // TODO: check result
-        while (!fileInfo.empty()) {
-            delete fileInfo.back();
-            fileInfo.pop_back();
-        }
-        delete ctu;
     }
 
     void ctuTest() {

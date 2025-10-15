@@ -296,8 +296,8 @@ private:
         return false;
     }
 
-#define testValueOfXInconclusive(code, linenr, value) testValueOfXInconclusive_(code, linenr, value, __FILE__, __LINE__)
-    bool testValueOfXInconclusive_(const char code[], unsigned int linenr, int value, const char* file, int line) {
+#define testValueOfXInconclusive(...) testValueOfXInconclusive_(__FILE__, __LINE__, __VA_ARGS__)
+    bool testValueOfXInconclusive_(const char* file, int line, const char code[], unsigned int linenr, int value) {
         // Tokenize..
         SimpleTokenizer tokenizer(settings, *this);
         ASSERT_LOC(tokenizer.tokenize(code), file, line);
@@ -319,6 +319,7 @@ private:
     }
 
 #define testValueOfX(...) testValueOfX_(__FILE__, __LINE__, __VA_ARGS__)
+    // TODO: use options
     bool testValueOfX_(const char* file, int line, const char code[], unsigned int linenr, int value, const Settings *s = nullptr) {
         const Settings *settings1 = s ? s : &settings;
 
@@ -373,8 +374,8 @@ private:
         return false;
     }
 
-#define getErrorPathForX(code, linenr) getErrorPathForX_(code, linenr, __FILE__, __LINE__)
-    std::string getErrorPathForX_(const char code[], unsigned int linenr, const char* file, int line) {
+#define getErrorPathForX(...) getErrorPathForX_(__FILE__, __LINE__, __VA_ARGS__)
+    std::string getErrorPathForX_(const char* file, int line, const char code[], unsigned int linenr) {
         // Tokenize..
         SimpleTokenizer tokenizer(settings, *this);
         ASSERT_LOC(tokenizer.tokenize(code), file, line);
@@ -417,7 +418,7 @@ private:
 
 #define testLifetimeOfX(...) testLifetimeOfX_(__FILE__, __LINE__, __VA_ARGS__)
     template<size_t size>
-    bool testLifetimeOfX_(const char* file, int line, const char (&code)[size], unsigned int linenr, const char value[], ValueFlow::Value::LifetimeScope lifetimeScope = ValueFlow::Value::LifetimeScope::Local) {
+    bool testLifetimeOfX_(const char* file, int line, const char (&code)[size], unsigned int linenr, const char value[]) {
         // Tokenize..
         SimpleTokenizer tokenizer(settings, *this);
         ASSERT_LOC(tokenizer.tokenize(code), file, line);
@@ -426,7 +427,7 @@ private:
         for (const Token *tok = tokenizer.tokens(); tok; tok = tok->next()) {
             if (tok->str() == "x" && tok->linenr() == linenr) {
                 if (std::any_of(tok->values().cbegin(), tok->values().cend(), [&](const ValueFlow::Value& v) {
-                    return v.isLifetimeValue() && v.lifetimeScope == lifetimeScope && Token::simpleMatch(v.tokvalue, value, len);
+                    return v.isLifetimeValue() && v.lifetimeScope == ValueFlow::Value::LifetimeScope::Local && Token::simpleMatch(v.tokvalue, value, len);
                 }))
                     return true;
             }
@@ -469,9 +470,9 @@ private:
         return false;
     }
 
-#define testConditionalValueOfX(code, linenr, value) testConditionalValueOfX_(code, linenr, value, __FILE__, __LINE__)
+#define testConditionalValueOfX(...) testConditionalValueOfX_(__FILE__, __LINE__, __VA_ARGS__)
     template<size_t size>
-    bool testConditionalValueOfX_(const char (&code)[size], unsigned int linenr, int value, const char* file, int line) {
+    bool testConditionalValueOfX_(const char* file, int line, const char (&code)[size], unsigned int linenr, int value) {
         // Tokenize..
         SimpleTokenizer tokenizer(settings, *this);
         ASSERT_LOC(tokenizer.tokenize(code), file, line);
@@ -500,6 +501,7 @@ private:
     }
 
 #define tokenValues(...) tokenValues_(__FILE__, __LINE__, __VA_ARGS__)
+    // TODO: use options
     std::list<ValueFlow::Value> tokenValues_(const char* file, int line, const char code[], const char tokstr[], const Settings *s = nullptr, bool cpp = true) {
         SimpleTokenizer tokenizer(s ? *s : settings, *this, cpp);
         ASSERT_LOC(tokenizer.tokenize(code), file, line);
@@ -507,8 +509,8 @@ private:
         return tok ? tok->values() : std::list<ValueFlow::Value>();
     }
 
-    std::list<ValueFlow::Value> tokenValues_(const char* file, int line, const char code[], const char tokstr[], ValueFlow::Value::ValueType vt, const Settings *s = nullptr) {
-        std::list<ValueFlow::Value> values = tokenValues_(file, line, code, tokstr, s);
+    std::list<ValueFlow::Value> tokenValues_(const char* file, int line, const char code[], const char tokstr[], ValueFlow::Value::ValueType vt) {
+        std::list<ValueFlow::Value> values = tokenValues_(file, line, code, tokstr);
         values.remove_if([&](const ValueFlow::Value& v) {
             return v.valueType != vt;
         });
@@ -517,9 +519,9 @@ private:
 
 #define lifetimeValues(...) lifetimeValues_(__FILE__, __LINE__, __VA_ARGS__)
     template<size_t size>
-    std::vector<std::string> lifetimeValues_(const char* file, int line, const char (&code)[size], const char tokstr[], const Settings *s = nullptr) {
+    std::vector<std::string> lifetimeValues_(const char* file, int line, const char (&code)[size], const char tokstr[]) {
         std::vector<std::string> result;
-        SimpleTokenizer tokenizer(s ? *s : settings, *this);
+        SimpleTokenizer tokenizer(settings, *this);
         ASSERT_LOC(tokenizer.tokenize(code), file, line);
         const Token *tok = Token::findmatch(tokenizer.tokens(), tokstr);
         if (!tok)
@@ -535,6 +537,7 @@ private:
     }
 
 #define valueOfTok(...) valueOfTok_(__FILE__, __LINE__, __VA_ARGS__)
+    // TODO: use options
     ValueFlow::Value valueOfTok_(const char* file, int line, const char code[], const char tokstr[], const Settings *s = nullptr, bool cpp = true) {
         std::list<ValueFlow::Value> values = removeImpossible(tokenValues_(file, line, code, tokstr, s, cpp));
         return values.size() == 1U && !values.front().isTokValue() ? values.front() : ValueFlow::Value();
@@ -545,11 +548,9 @@ private:
                               int line,
                               const char code[],
                               const char tokstr[],
-                              int value,
-                              const Settings* s = nullptr,
-                              bool cpp = true)
+                              int value)
     {
-        std::list<ValueFlow::Value> values = removeImpossible(tokenValues_(file, line, code, tokstr, s, cpp));
+        std::list<ValueFlow::Value> values = removeImpossible(tokenValues_(file, line, code, tokstr));
         return std::any_of(values.begin(), values.end(), [&](const ValueFlow::Value& v) {
             return v.isKnown() && v.isIntValue() && v.intvalue == value;
         });
@@ -9104,7 +9105,7 @@ private:
         ASSERT_EQUALS(1U, tokenValues(code, "v .", &s).size());
     }
 
-#define testBitfields(structBody, expectedSize) testBitfields_(__FILE__, __LINE__, structBody, expectedSize)
+#define testBitfields(...) testBitfields_(__FILE__, __LINE__, __VA_ARGS__)
     void testBitfields_(const char *file, int line, const std::string &structBody, std::size_t expectedSize) {
         const Settings settingsUnix64 = settingsBuilder().platform(Platform::Type::Unix64).build();
         const std::string code = "struct S { " + structBody + " }; const std::size_t size = sizeof(S);";
