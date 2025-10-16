@@ -207,7 +207,14 @@ public:
     TestRegExStd() : TestRegExBase("TestRegExStd", Regex::Type::Std) {}
 };
 
+class TestRegExPcre2 : public TestRegExBase {
+public:
+    TestRegExPcre2() : TestRegExBase("TestRegExPcre2", Regex::Type::Pcre2) {}
+};
+
+
 REGISTER_TEST(TestRegExPcre)
 REGISTER_TEST(TestRegExStd)
+REGISTER_TEST(TestRegExPcre2)
 
 #endif // HAVE_RULES
