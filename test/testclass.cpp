@@ -7626,10 +7626,10 @@ private:
                             "    }\n"
                             "};";
 
-        checkConst(code, dinit(CheckConstOptions, $.s = &settings0, $.inconclusive = true));
+        checkConst(code);
         ASSERT_EQUALS("[test.cpp:3:10]: (performance, inconclusive) Technically the member function 'foo::f' can be static (but you may consider moving to unnamed namespace). [functionStatic]\n", errout_str());
 
-        checkConst(code, dinit(CheckConstOptions, $.s = &settings0, $.inconclusive = false)); // TODO: Set inconclusive to true (preprocess it)
+        checkConst(code, dinit(CheckConstOptions, $.inconclusive = false)); // TODO: Set inconclusive to true (preprocess it)
         ASSERT_EQUALS("", errout_str());
     }
 

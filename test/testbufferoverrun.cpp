@@ -36,6 +36,8 @@ public:
 
 private:
     /*const*/ Settings settings0 = settingsBuilder().library("std.cfg").severity(Severity::warning).severity(Severity::style).severity(Severity::portability).build();
+    const Settings settings0_i = settingsBuilder(settings0).certainty(Certainty::inconclusive).build();
+    const Settings settings1 = settingsBuilder(settings0).severity(Severity::performance).certainty(Certainty::inconclusive).build();
 
     struct CheckOptions
     {
@@ -46,7 +48,7 @@ private:
 #define check(...) check_(__FILE__, __LINE__, __VA_ARGS__)
     template<size_t size>
     void check_(const char* file, int line, const char (&code)[size], const CheckOptions& options = make_default_obj()) {
-        const Settings settings = options.s ? *options.s : settingsBuilder(settings0).certainty(Certainty::inconclusive).build();
+        const Settings& settings = options.s ? *options.s : settings0_i;
 
         // Tokenize..
         SimpleTokenizer tokenizer(settings, *this, options.cpp);
@@ -58,10 +60,8 @@ private:
 
     // TODO: get rid of this
     void check_(const char* file, int line, const std::string& code) {
-        const Settings settings = settingsBuilder(settings0).certainty(Certainty::inconclusive).build();
-
         // Tokenize..
-        SimpleTokenizer tokenizer(settings, *this);
+        SimpleTokenizer tokenizer(settings0_i, *this);
         ASSERT_LOC(tokenizer.tokenize(code), file, line);
 
         // Check for buffer overruns..
@@ -72,9 +72,7 @@ private:
     template<size_t size>
     void checkP_(const char* file, int line, const char (&code)[size])
     {
-        const Settings settings = settingsBuilder(settings0).severity(Severity::performance).certainty(Certainty::inconclusive).build();
-
-        SimpleTokenizer2 tokenizer(settings, *this, code, "test.cpp");
+        SimpleTokenizer2 tokenizer(settings1, *this, code, "test.cpp");
 
         // Tokenizer..
         ASSERT_LOC(tokenizer.simplifyTokens1(""), file, line);
@@ -2722,7 +2720,7 @@ private:
               "    char str[6] = \"\\0\";\n"
               "    unsigned short port = 65535;\n"
               "    snprintf(str, sizeof(str), \"%hu\", port);\n"
-              "}", dinit(CheckOptions, $.s = &settings0, $.cpp = false));
+              "}", dinit(CheckOptions, $.cpp = false));
         ASSERT_EQUALS("", errout_str());
 
         check("int f(int x) {\n" // #11020
