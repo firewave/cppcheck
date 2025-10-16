@@ -41,7 +41,8 @@ public:
     {
         Unknown = 0,
         Pcre = 1,
-        Std = 2
+        Std = 2,
+        Pcre2 = 3
     };
 
     static std::shared_ptr<Regex> create(std::string pattern, Type type, std::string& err);
