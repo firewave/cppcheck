@@ -434,6 +434,7 @@ void ErrorMessage::deserialize(const std::string &data)
     }
 }
 
+// TODO: add version properly
 std::string ErrorMessage::getXMLHeader(std::string productName, int xmlVersion)
 {
     const auto nameAndVersion = Settings::getNameAndVersion(productName);

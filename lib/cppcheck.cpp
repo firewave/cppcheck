@@ -853,7 +853,9 @@ unsigned int CppCheck::check(const FileSettings &fs)
 std::size_t CppCheck::calculateHash(const Preprocessor& preprocessor, const std::string& filePath) const
 {
     std::ostringstream toolinfo;
-    toolinfo << (mSettings.cppcheckCfgProductName.empty() ? CPPCHECK_VERSION_STRING : mSettings.cppcheckCfgProductName);
+    toolinfo << mSettings.productName;
+    toolinfo << CppCheck::version();
+    toolinfo << CppCheck::extraVersion();
     toolinfo << (mSettings.severity.isEnabled(Severity::warning) ? 'w' : ' ');
     toolinfo << (mSettings.severity.isEnabled(Severity::style) ? 's' : ' ');
     toolinfo << (mSettings.severity.isEnabled(Severity::performance) ? 'p' : ' ');
