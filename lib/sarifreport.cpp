@@ -177,6 +177,7 @@ picojson::value SarifReport::serializeRuns(const std::string& productName, const
     return picojson::value(runs);
 }
 
+// TODO: add version properly
 std::string SarifReport::serialize(std::string productName) const
 {
     const auto nameAndVersion = Settings::getNameAndVersion(productName);
