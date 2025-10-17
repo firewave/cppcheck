@@ -114,7 +114,7 @@ std::string Settings::loadCppcheckCfg(Settings& settings, Suppressions& suppress
             const auto& v = it->second;
             if (!v.is<std::string>())
                 return "'productName' is not a string";
-            settings.cppcheckCfgProductName = v.get<std::string>();
+            settings.productName = v.get<std::string>();
         }
     }
     {

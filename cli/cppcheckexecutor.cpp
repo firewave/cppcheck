@@ -117,7 +117,7 @@ namespace {
 
         ~StdLogger() override {
             if (mSettings.outputFormat == Settings::OutputFormat::sarif) {
-                reportErr(mSarifReport.serialize(mSettings.cppcheckCfgProductName));
+                reportErr(mSarifReport.serialize(mSettings.productName));
             }
             delete mErrorOutput;
         }
@@ -389,7 +389,7 @@ int CppCheckExecutor::check_internal(const Settings& settings, Suppressions& sup
         stdLogger.resetLatestProgressOutputTime();
 
     if (settings.outputFormat == Settings::OutputFormat::xml) {
-        stdLogger.reportErr(ErrorMessage::getXMLHeader(settings.cppcheckCfgProductName, settings.xml_version));
+        stdLogger.reportErr(ErrorMessage::getXMLHeader(settings.productName, settings.xml_version));
     }
 
     if (!settings.buildDir.empty()) {
