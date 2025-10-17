@@ -124,7 +124,7 @@ protected:
     /**
      * Print help text to the console.
      */
-    void printHelp(bool premium) const;
+    void printHelp() const;
 
 private:
     template<typename T>

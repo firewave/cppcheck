@@ -354,7 +354,7 @@ CmdLineParser::Result CmdLineParser::parseFromArgs(int argc, const char* const a
         return Result::Fail;
 
     if (argc <= 1) {
-        printHelp(mSettings.premium);
+        printHelp();
         return Result::Exit;
     }
 
@@ -380,7 +380,7 @@ CmdLineParser::Result CmdLineParser::parseFromArgs(int argc, const char* const a
         if (std::strcmp(argv[i], "--errorlist") == 0) {
             {
                 XMLErrorMessagesLogger xmlLogger;
-                std::cout << ErrorMessage::getXMLHeader(mSettings.cppcheckCfgProductName, 2);
+                std::cout << ErrorMessage::getXMLHeader(mSettings.productName, 2);
                 CppCheck::getErrorMessages(xmlLogger);
                 std::cout << ErrorMessage::getXMLFooter(2) << std::endl;
             }
@@ -389,7 +389,7 @@ CmdLineParser::Result CmdLineParser::parseFromArgs(int argc, const char* const a
 
         // Print help
         if (std::strcmp(argv[i], "-h") == 0 || std::strcmp(argv[i], "--help") == 0) {
-            printHelp(mSettings.premium);
+            printHelp();
             return Result::Exit;
         }
 
@@ -1695,16 +1695,10 @@ CmdLineParser::Result CmdLineParser::parseFromArgs(int argc, const char* const a
     return Result::Success;
 }
 
-void CmdLineParser::printHelp(bool premium) const
+void CmdLineParser::printHelp() const
 {
-    // TODO: fetch URL from config like product name?
-    const std::string manualUrl(premium ?
-                                "https://files.cppchecksolutions.com/manual.pdf" :
-                                "https://cppcheck.sourceforge.io/manual.pdf");
-
     std::ostringstream oss;
-    // TODO: display product name
-    oss << "Cppcheck - A tool for static C/C++ code analysis\n"
+    oss << mSettings.productName << " - A tool for static C/C++ code analysis\n"
         "\n"
         "Syntax:\n"
         "    cppcheck [OPTIONS] [files or paths]\n"
@@ -1904,7 +1898,7 @@ void CmdLineParser::printHelp(bool premium) const
         "    --plist-output=<path>\n"
         "                         Generate Clang-plist output files in folder.\n";
 
-    if (premium) {
+    if (mSettings.premium) {
         oss <<
             "    --premium=<option>\n"
             "                         Coding standards:\n"
@@ -2075,7 +2069,7 @@ void CmdLineParser::printHelp(bool premium) const
         "  cppcheck -I inc1/ -I inc2/ f.cpp\n"
         "\n"
         "For more information:\n"
-        "    " << manualUrl << "\n"
+        "    " << mSettings.manualUrl << "\n"
         "\n"
         "Many thanks to the 3rd party libraries we use:\n"
         " * tinyxml2 -- loading project/library/ctu files.\n"
@@ -2087,13 +2081,10 @@ void CmdLineParser::printHelp(bool premium) const
 }
 
 std::string CmdLineParser::getVersion() const {
-    // TODO: this should not contain the version - it should set the extraVersion
-    if (!mSettings.cppcheckCfgProductName.empty())
-        return mSettings.cppcheckCfgProductName;
     const char * const extraVersion = CppCheck::extraVersion();
     if (*extraVersion != '\0')
-        return std::string("Cppcheck ") + CppCheck::version() + " ("+ extraVersion + ')';
-    return std::string("Cppcheck ") + CppCheck::version();
+        return mSettings.productName + " " + CppCheck::version() + " ("+ extraVersion + ')';
+    return mSettings.productName + " " + CppCheck::version();
 }
 
 bool CmdLineParser::tryLoadLibrary(Library& destination, const std::string& basepath, const char* filename, bool debug)
@@ -2200,7 +2191,7 @@ bool CmdLineParser::loadCppcheckCfg()
         mLogger.printError("could not load cppcheck.cfg - " + cfgErr);
         return false;
     }
-    mSettings.premium = startsWith(mSettings.cppcheckCfgProductName, "Cppcheck Premium");
+    mSettings.premium = startsWith(mSettings.productName, "Cppcheck Premium");
     return true;
 }
 

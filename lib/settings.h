@@ -113,6 +113,7 @@ public:
 
     static std::string loadCppcheckCfg(Settings& settings, Suppressions& suppressions, bool debug = false);
 
+    // TODO: name should not contain version
     static std::pair<std::string, std::string> getNameAndVersion(const std::string& productName);
 
     /** @brief Report type */
@@ -179,9 +180,6 @@ public:
 
     /** @brief include paths excluded from checking the configuration */
     std::set<std::string> configExcludePaths;
-
-    /** cppcheck.cfg: Custom product name */
-    std::string cppcheckCfgProductName;
 
     /** cppcheck.cfg: About text */
     std::string cppcheckCfgAbout;
@@ -294,6 +292,8 @@ public:
     int loadAverage{};
 #endif
 
+    std::string manualUrl{"https://cppcheck.sourceforge.io/manual.pdf"};
+
     /** @brief Maximum number of configurations to check before bailing.
         Default is 12. (--max-configs=N) */
     int maxConfigs = 12;
@@ -329,6 +329,9 @@ public:
 
     /** @brief Using -E for debugging purposes */
     bool preprocessOnly{};
+
+    /** cppcheck.cfg: Custom product name */
+    std::string productName{"Cppcheck"};
 
     /** @brief Is --quiet given? */
     bool quiet{};
