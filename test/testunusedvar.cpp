@@ -2070,20 +2070,20 @@ private:
     void structmember_header() {
         checkStructMemberUsage("struct S {\n"
                                "int i;\n"
-                               "};\n", true);
+                               "};\n");
         ASSERT_EQUALS("", errout_str());
 
         checkStructMemberUsage("struct S {\n"
                                "protected:"
                                "int i;\n"
-                               "};\n", true);
+                               "};\n");
         ASSERT_EQUALS("", errout_str());
 
         checkStructMemberUsage("struct S {\n"
                                "struct S1 {"
                                "int i;\n"
                                "};"
-                               "};\n", true);
+                               "};\n");
         ASSERT_EQUALS("", errout_str());
 
         checkStructMemberUsage("struct S {\n"
@@ -2091,23 +2091,23 @@ private:
                                "struct S1 {"
                                "int i;\n"
                                "};"
-                               "};\n", true);
+                               "};\n");
         ASSERT_EQUALS("", errout_str());
 
         checkStructMemberUsage("extern struct S {\n"
                                "int i;\n"
-                               "};\n", true);
+                               "};\n");
         ASSERT_EQUALS("error", errout_str());
 
         checkStructMemberUsage("__declspec(dllexport) struct S {\n"
                                "int i;\n"
-                               "};\n", true);
+                               "};\n");
         ASSERT_EQUALS("error", errout_str());
 
         checkStructMemberUsage("struct S {\n"
                                "private:"
                                "int i;\n"
-                               "};\n", true);
+                               "};\n");
         ASSERT_EQUALS("error", errout_str());
 
         checkStructMemberUsage("struct S {\n"
@@ -2115,7 +2115,7 @@ private:
                                "struct S1 {"
                                "int i;\n"
                                "};"
-                               "};\n", true);
+                               "};\n");
         ASSERT_EQUALS("error", errout_str());
     }
 
