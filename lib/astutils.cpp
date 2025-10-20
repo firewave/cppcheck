@@ -1072,12 +1072,14 @@ bool isAliasOf(const Token* tok, const Token* expr, nonneg int* indirect)
     const Token* r = nullptr;
     if (indirect)
         *indirect = 1;
+    const nonneg int exprId = expr->exprId();
     for (const ReferenceToken& ref : followAllReferences(tok)) {
         const bool pointer = astIsPointer(ref.token);
         r = findAstNode(expr, [&](const Token* childTok) {
-            if (childTok->exprId() == 0)
+            const nonneg int childExprId = childTok->exprId();
+            if (childExprId == 0)
                 return false;
-            if (ref.token != tok && expr->exprId() == childTok->exprId()) {
+            if (ref.token != tok && exprId == childExprId) {
                 if (indirect)
                     *indirect = 0;
                 return true;
@@ -1088,7 +1090,7 @@ bool isAliasOf(const Token* tok, const Token* expr, nonneg int* indirect)
                 if (val.isLocalLifetimeValue() || (pointer && val.isSymbolicValue() && val.intvalue == 0)) {
                     if (findAstNode(val.tokvalue,
                                     [&](const Token* aliasTok) {
-                        return aliasTok != childTok && aliasTok->exprId() == childTok->exprId();
+                        return aliasTok != childTok && aliasTok->exprId() == childExprId;
                     })) {
                         return true;
                     }
