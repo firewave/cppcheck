@@ -1072,7 +1072,7 @@ bool isAliasOf(const Token* tok, const Token* expr, nonneg int* indirect)
     const Token* r = nullptr;
     if (indirect)
         *indirect = 1;
-    const nonneg int exprId = expr->exprId();
+    const nonneg int exprId = expr ? expr->exprId() : 0;
     for (const ReferenceToken& ref : followAllReferences(tok)) {
         const bool pointer = astIsPointer(ref.token);
         r = findAstNode(expr, [&](const Token* childTok) {
