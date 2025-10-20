@@ -968,7 +968,7 @@ unsigned int CppCheck::checkInternal(const FileWithDetails& file, const std::str
         });
         if (output_it != outputList.cend()) {
             const simplecpp::Output &output = *output_it;
-            std::string locfile = Path::fromNativeSeparators(output.location.file());
+            std::string locfile = Path::fromNativeSeparators(tokens1.file(output.location));
             if (mSettings.relativePaths)
                 locfile = Path::getRelativePath(locfile, mSettings.basePaths);
 
@@ -978,7 +978,7 @@ unsigned int CppCheck::checkInternal(const FileWithDetails& file, const std::str
                                 "", // TODO: is this correct?
                                 Severity::error,
                                 output.msg,
-                                "syntaxError",
+                                "syntaxError", // TODO: needs proper mapping - e.g. FILE_NOT_FOUND thrown from FileStream ctor
                                 Certainty::normal);
             mErrorLogger.reportErr(errmsg);
             return mLogger->exitcode();
@@ -1192,7 +1192,7 @@ unsigned int CppCheck::checkInternal(const FileWithDetails& file, const std::str
                         fdump << "    <cpp version=\"" << mSettings.standards.getCPP() << "\"/>" << std::endl;
                         fdump << "  </standards>" << std::endl;
                         fdump << getLibraryDumpData();
-                        preprocessor.dump(fdump);
+                        preprocessor.dump(tokens1, fdump);
                         tokenizer.dump(fdump);
                         fdump << "</dump>" << std::endl;
                     }
@@ -1219,14 +1219,14 @@ unsigned int CppCheck::checkInternal(const FileWithDetails& file, const std::str
                     ErrorMessage errmsg = ErrorMessage::fromInternalError(e, &tokenizer.list, file.spath());
                     mErrorLogger.reportErr(errmsg);
                 }
-            } catch (const simplecpp::Output &o) {
+            } catch (const simplecpp::Output &o) { // TODO: reduce scope - can only be thrown by Preprocessor::preprocess()
                 // #error etc during preprocessing
-                configurationError.push_back((currentConfig.empty() ? "\'\'" : currentConfig) + " : [" + o.location.file() + ':' + std::to_string(o.location.line) + "] " + o.msg);
+                configurationError.push_back((currentConfig.empty() ? "\'\'" : currentConfig) + " : [" + tokens1.file(o.location) + ':' + std::to_string(o.location.line) + "] " + o.msg);
                 --checkCount; // don't count invalid configurations
 
                 if (!hasValidConfig && currCfg == *configurations.rbegin()) {
                     // If there is no valid configuration then report error..
-                    std::string locfile = Path::fromNativeSeparators(o.location.file());
+                    std::string locfile = Path::fromNativeSeparators(tokens1.file(o.location));
                     if (mSettings.relativePaths)
                         locfile = Path::getRelativePath(locfile, mSettings.basePaths);
 

@@ -371,8 +371,8 @@ namespace simplecpp {
 
     /** Tracking #if/#elif expressions */
     struct SIMPLECPP_LIB IfCond {
-        explicit IfCond(const Location& location, const std::string &E, long long result) : location(location), E(E), result(result) {}
-        Location location; // location of #if/#elif
+        explicit IfCond(const Token* tok, const std::string &E, long long result) : tok(tok), E(E), result(result) {}
+        const Token* tok; // location of #if/#elif
         std::string E; // preprocessed condition
         long long result; // condition result
     };

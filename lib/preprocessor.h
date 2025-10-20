@@ -68,7 +68,6 @@ struct CPPCHECKLIB Directive {
     std::vector<DirectiveToken> strTokens;
 
     /** record a directive (possibly filtering src) */
-    Directive(const simplecpp::Location & _loc, std::string _str);
     Directive(std::string _file, int _linenr, std::string _str);
 };
 
@@ -145,14 +144,14 @@ public:
     /**
      * dump all directives present in source file
      */
-    void dump(std::ostream &out) const;
+    void dump(const simplecpp::TokenList &tokens, std::ostream &out) const;
 
     static bool hasErrors(const simplecpp::Output &output);
 
 private:
-    void handleErrors(const simplecpp::OutputList &outputList, bool throwError);
+    void handleErrors(const simplecpp::TokenList& rawtokens, const simplecpp::OutputList &outputList, bool throwError);
 
-    void reportOutput(const simplecpp::OutputList &outputList, bool showerror);
+    void reportOutput(const simplecpp::TokenList &rawtokens, const simplecpp::OutputList &outputList, bool showerror);
 
     static void simplifyPragmaAsmPrivate(simplecpp::TokenList &tokenList);
 

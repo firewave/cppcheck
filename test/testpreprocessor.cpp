@@ -56,7 +56,7 @@ private:
         const simplecpp::TokenList tokens1 = simplecpp::TokenList(code, files, "file.cpp", &outputList);
         Preprocessor p(settingsDefault, errorLogger, Path::identify(tokens1.getFiles()[0], false));
         simplecpp::TokenList tokens2 = p.preprocess(tokens1, "", files, true);
-        p.reportOutput(outputList, true);
+        p.reportOutput(tokens1, outputList, true);
         return tokens2.stringify();
     }
 
@@ -125,7 +125,7 @@ private:
         preprocessor.removeComments(tokens);
         preprocessor.simplifyPragmaAsm(tokens);
 
-        preprocessor.reportOutput(outputList, true);
+        preprocessor.reportOutput(tokens, outputList, true);
 
         if (Preprocessor::hasErrors(outputList))
             return {};
