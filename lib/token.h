@@ -91,6 +91,7 @@ private:
         nonneg int mLineNumber{};
         nonneg int mColumn{};
         nonneg int mExprId{};
+        nonneg int mExprIdRet{};
 
         // original template argument location
         int mTemplateArgFileIndex{-1};
@@ -1023,16 +1024,23 @@ public:
             return;
 
         mImpl->mVarId = id;
+        if (mImpl->mExprId == 0)
+            mImpl->mExprIdRet = mImpl->mVarId;
         update_property_info();
     }
 
     nonneg int exprId() const {
-        if (mImpl->mExprId)
-            return mImpl->mExprId;
-        return mImpl->mVarId;
+        return mImpl->mExprIdRet;
     }
     void exprId(nonneg int id) {
+        if (mImpl->mExprId == id)
+            return;
+
         mImpl->mExprId = id;
+        if (mImpl->mExprId == 0)
+            mImpl->mExprIdRet = mImpl->mVarId;
+        else
+            mImpl->mExprIdRet = mImpl->mExprId;
     }
 
     void setUniqueExprId()
