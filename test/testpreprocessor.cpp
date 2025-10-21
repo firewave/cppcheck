@@ -65,7 +65,7 @@ private:
         simplecpp::TokenList tokens1 = simplecpp::TokenList(code, files, "file.cpp", &outputList);
         PreprocessorTest p(tokens1, settingsDefault, errorLogger, Path::identify(tokens1.getFiles()[0], false));
         simplecpp::TokenList tokens2 = p.preprocess("", files, true);
-        p.reportOutput(outputList, true);
+        (void)p.reportOutput(outputList, true);
         return tokens2.stringify();
     }
 
@@ -134,9 +134,7 @@ private:
         preprocessor.removeComments();
         preprocessor.simplifyPragmaAsm();
 
-        preprocessor.reportOutput(outputList, true);
-
-        if (PreprocessorTest::hasErrors(outputList))
+        if (preprocessor.reportOutput(outputList, true))
             return {};
 
         std::map<std::string, std::string> cfgcode;
