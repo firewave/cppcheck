@@ -52,6 +52,7 @@ private:
         TEST_CASE(ErrorMessageVerbose);
         TEST_CASE(ErrorMessageVerboseLocations);
         TEST_CASE(ErrorMessageFromInternalError);
+        TEST_CASE(ErrorMessageCode);
         TEST_CASE(CustomFormat);
         TEST_CASE(CustomFormat2);
         TEST_CASE(CustomFormatLocations);
@@ -342,6 +343,25 @@ private:
         testReportType(ReportType::certC, Severity::error, "resourceLeak", "L3", "FIO42-C");
     }
 
+    void ErrorMessageCode() const {
+        ScopedFile file("code.cpp",
+                        "int i;\n"
+                        "int i2;\n"
+                        "int i3;\n"
+                        );
+
+        ErrorMessage::FileLocation codeCpp3_5{"code.cpp", 3, 5};
+        std::list<ErrorMessage::FileLocation> locs = { codeCpp3_5 };
+        ErrorMessage msg(std::move(locs), emptyString, Severity::error, "Programming error.\nVerbose error", "errorId", Certainty::normal);
+        ASSERT_EQUALS(1, msg.callStack.size());
+        ASSERT_EQUALS("Programming error.", msg.shortMessage());
+        ASSERT_EQUALS("Verbose error", msg.verboseMessage());
+        ASSERT_EQUALS("code.cpp:3:5: error: Programming error. [errorId]\n"
+                      "int i3;\n"
+                      "    ^",
+                      msg.toString(false, "{file}:{line}:{column}: {severity}:{inconclusive:inconclusive:} {message} [{id}]\n{code}"));
+    }
+
     void CustomFormat() const {
         std::list<ErrorMessage::FileLocation> locs(1, fooCpp5);
         ErrorMessage msg(std::move(locs), "", Severity::error, "Programming error.\nVerbose error", "errorId", Certainty::normal);
@@ -618,8 +638,7 @@ private:
     }
 
     void SerializeFileLocation() const {
-        ErrorMessage::FileLocation loc1(":/,;", "abcd:/,", 654, 33);
-        loc1.setfile("[]:;,()");
+        ErrorMessage::FileLocation loc1("[]:;,()", "abcd:/,", 654, 33);
 
         ErrorMessage msg({std::move(loc1)}, "", Severity::error, "Programming error", "errorId", Certainty::inconclusive);
 
@@ -635,12 +654,11 @@ private:
                       "17 Programming error"
                       "0 "
                       "1 "
-                      "27 654\t33\t[]:;,()\t:/,;\tabcd:/,", msg_str);
+                      "22 654\t33\t[]:;,()\tabcd:/,", msg_str);
 
         ErrorMessage msg2;
         ASSERT_NO_THROW(msg2.deserialize(msg_str));
         ASSERT_EQUALS("[]:;,()", msg2.callStack.front().getfile(false));
-        ASSERT_EQUALS(":/,;", msg2.callStack.front().getOrigFile(false));
         ASSERT_EQUALS(654, msg2.callStack.front().line);
         ASSERT_EQUALS(33, msg2.callStack.front().column);
         ASSERT_EQUALS("abcd:/,", msg2.callStack.front().getinfo());
