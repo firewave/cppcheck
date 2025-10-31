@@ -55,7 +55,7 @@ class CPPCHECKLIB Tokenizer {
     friend class TestTokenizer;
 
 public:
-    Tokenizer(TokenList tokenList, ErrorLogger &errorLogger);
+    Tokenizer(TokenList tokenList, LIFETIMEBOUND ErrorLogger &errorLogger);
     ~Tokenizer();
 
     void setTimerResults(TimerResults *tr) {
