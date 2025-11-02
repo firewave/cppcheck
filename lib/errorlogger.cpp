@@ -256,9 +256,9 @@ ErrorMessage ErrorMessage::fromInternalError(const InternalError &internalError,
     if (tokenList && internalError.token) {
         locationList.emplace_back(internalError.token, tokenList);
     } else {
-        locationList.emplace_back(filename, 0, 0);
+        locationList.emplace_back(filename);
         if (tokenList && (filename != tokenList->getSourceFilePath())) {
-            locationList.emplace_back(tokenList->getSourceFilePath(), 0, 0);
+            locationList.emplace_back(tokenList->getSourceFilePath());
         }
     }
     ErrorMessage errmsg(std::move(locationList),
@@ -722,13 +722,27 @@ std::string ErrorLogger::callStackToString(const std::list<ErrorMessage::FileLoc
     return str;
 }
 
+ErrorMessage::FileLocation::FileLocation(const std::string &file)
+    : fileIndex(0), line(-1), column(0), mOrigFileName(file), mFileName(Path::simplifyPath(file))
+{}
+
 ErrorMessage::FileLocation::FileLocation(const std::string &file, int line, unsigned int column)
     : fileIndex(0), line(line), column(column), mOrigFileName(file), mFileName(Path::simplifyPath(file))
+{
+    assert(line != -1);
+    assert(column != 0);
+}
+
+ErrorMessage::FileLocation::FileLocation(const std::string &file, std::string info)
+    : fileIndex(0), line(-1), column(0), mOrigFileName(file), mFileName(Path::simplifyPath(file)), mInfo(std::move(info))
 {}
 
 ErrorMessage::FileLocation::FileLocation(const std::string &file, std::string info, int line, unsigned int column)
     : fileIndex(0), line(line), column(column), mOrigFileName(file), mFileName(Path::simplifyPath(file)), mInfo(std::move(info))
-{}
+{
+    assert(line != -1);
+    assert(column != 0);
+}
 
 ErrorMessage::FileLocation::FileLocation(const Token* tok, const TokenList* tokenList)
     : fileIndex(tok->fileIndex()), line(tok->linenr()), column(tok->column()), mOrigFileName(tokenList->getOrigFile(tok)), mFileName(Path::simplifyPath(tokenList->file(tok)))

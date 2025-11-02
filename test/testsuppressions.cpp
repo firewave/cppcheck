@@ -1489,7 +1489,7 @@ private:
         {
             SuppressionList suppressions;
             addCheckedSuppression(suppressions, {"abc", "a.c", 10U});
-            addCheckedSuppression(suppressions, {"unmatchedSuppression", "*", SuppressionList::Suppression::NO_LINE});
+            addCheckedSuppression(suppressions, {"unmatchedSuppression", "*"});
             ASSERT_EQUALS(false, CppCheckExecutor::reportUnmatchedSuppressions(settingsDefault, suppressions, files, fs, *this));
             ASSERT_EQUALS("", errout_str());
         }
@@ -1498,7 +1498,7 @@ private:
         {
             SuppressionList suppressions;
             addCheckedSuppression(suppressions, {"abc", "a.c", 10U});
-            addCheckedSuppression(suppressions, {"unmatchedSuppression", "", SuppressionList::Suppression::NO_LINE});
+            addCheckedSuppression(suppressions, {"unmatchedSuppression", ""});
             ASSERT_EQUALS(false, CppCheckExecutor::reportUnmatchedSuppressions(settingsDefault, suppressions, files, fs, *this));
             ASSERT_EQUALS("", errout_str());
         }
@@ -1507,7 +1507,7 @@ private:
         {
             SuppressionList suppressions;
             addCheckedSuppression(suppressions, {"abc", "a.c", 10U});
-            addCheckedSuppression(suppressions, {"unmatchedSuppression", "a.c", SuppressionList::Suppression::NO_LINE});
+            addCheckedSuppression(suppressions, {"unmatchedSuppression", "a.c"});
             ASSERT_EQUALS(false, CppCheckExecutor::reportUnmatchedSuppressions(settingsDefault, suppressions, files, fs, *this));
             ASSERT_EQUALS("", errout_str());
         }

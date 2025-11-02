@@ -67,7 +67,10 @@ public:
 
     struct CPPCHECKLIB Suppression {
         Suppression() = default;
-        Suppression(std::string id, std::string file, int line=NO_LINE) : errorId(std::move(id)), fileName(std::move(file)), lineNumber(line) {}
+        Suppression(std::string id, std::string file) : errorId(std::move(id)), fileName(std::move(file)) {}
+        Suppression(std::string id, std::string file, int line) : errorId(std::move(id)), fileName(std::move(file)), lineNumber(line) {
+            assert(lineNumber != NO_LINE);
+        }
 
         bool operator<(const Suppression &other) const {
             if (errorId != other.errorId)
@@ -90,7 +93,7 @@ public:
         bool operator==(const Suppression &other) const {
             if (errorId != other.errorId)
                 return false;
-            if (lineNumber < other.lineNumber)
+            if (lineNumber != other.lineNumber)
                 return false;
             if (fileName != other.fileName)
                 return false;
@@ -154,6 +157,7 @@ public:
         int lineNumber = NO_LINE;
         int lineBegin = NO_LINE;
         int lineEnd = NO_LINE;
+        int column{0};
         Type type = Type::unique;
         std::string symbolName;
         std::string macroName;

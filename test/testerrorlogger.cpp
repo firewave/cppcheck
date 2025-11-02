@@ -222,7 +222,7 @@ private:
     }
 
     void FileLocationSetFile() const {
-        ErrorMessage::FileLocation loc("foo1.cpp", 0, 0);
+        ErrorMessage::FileLocation loc("foo1.cpp");
         loc.setfile("foo.cpp");
         ASSERT_EQUALS("foo1.cpp", loc.getOrigFile(false));
         ASSERT_EQUALS("foo.cpp", loc.getfile(false));
