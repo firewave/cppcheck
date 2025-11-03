@@ -45,8 +45,6 @@ struct newInstantiation;
 
 /** @brief Simplify templates from the preprocessed and partially simplified code. */
 class CPPCHECKLIB TemplateSimplifier {
-    friend class TestSimplifyTemplate;
-
 public:
     explicit TemplateSimplifier(Tokenizer &tokenizer);
 
@@ -264,8 +262,10 @@ public:
      * @return last token of declaration or nullptr if syntax error
      */
     static Token *findTemplateDeclarationEnd(Token *tok);
+    // cppcheck-suppress unusedFunction - used in tests only
     static const Token *findTemplateDeclarationEnd(const Token *tok);
 
+protected:
     /**
      * Match template declaration/instantiation
      * @param instance template instantiation
@@ -276,6 +276,7 @@ public:
      */
     static bool instantiateMatch(const Token *instance, std::size_t numberOfArguments, bool variadic, const char patternAfter[]);
 
+public: // TODO: only needs to be public for tests
     /**
      * Match template declaration/instantiation
      * @param tok The ">" token e.g. before "class"
@@ -284,6 +285,7 @@ public:
      */
     int getTemplateNamePosition(const Token *tok);
 
+private:
     /**
      * Get class template name position
      * @param tok The ">" token e.g. before "class"
@@ -308,6 +310,7 @@ public:
      * */
     static bool getTemplateNamePositionTemplateVariable(const Token *tok, int &namepos);
 
+public:
     /**
      * Simplify templates
      * @param maxtime time when the simplification should be stopped
@@ -322,6 +325,7 @@ public:
      */
     static bool simplifyNumericCalculations(Token *tok, bool isTemplate = true);
 
+private:
     /**
      * Simplify constant calculations such as "1+2" => "3".
      * This also performs simple cleanup of parentheses etc.
@@ -336,7 +340,6 @@ public:
      */
     void simplifyTemplateArgs(Token *start, const Token *end, std::vector<newInstantiation>* newInst = nullptr);
 
-private:
     /**
      * Get template declarations
      * @return true if code has templates.
@@ -443,6 +446,7 @@ private:
                               const std::list<std::string> &typeStringsUsedInTemplateInstantiation,
                               const std::string &newName);
 
+protected:
     /**
      * @brief TemplateParametersInDeclaration
      * @param tok  template < typename T, typename S >
@@ -454,6 +458,7 @@ private:
         const Token * tok,
         std::vector<const Token *> & typeParametersInDeclaration);
 
+private:
     /**
      * Remove a specific "template < ..." template class/function
      */
