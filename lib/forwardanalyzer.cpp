@@ -612,13 +612,13 @@ namespace {
                 } else if (tok->str() == ";" && tok->astParent()) {
                     Token* top = tok->astTop();
                     if (Token::Match(top->previous(), "for|while (") && Token::simpleMatch(top->link(), ") {")) {
-                        Token* endCond = top->link();
-                        Token* endBlock = endCond->linkAt(1);
                         Token* condTok = getCondTok(top);
-                        Token* stepTok = getStepTok(top);
                         // The semicolon should belong to the initTok otherwise something went wrong, so just bail
                         if (tok->astOperand2() != condTok && !Token::simpleMatch(tok->astOperand2(), ";"))
                             return Break(Analyzer::Terminate::Bail);
+                        Token* endCond = top->link();
+                        Token* endBlock = endCond->linkAt(1);
+                        Token* stepTok = getStepTok(top);
                         if (updateLoop(end, endBlock, condTok, nullptr, stepTok) == Progress::Break)
                             return Break();
                     }
@@ -689,12 +689,12 @@ namespace {
                         }
                         return Break(Analyzer::Terminate::Bail);
                     }
-                    Token* endCond = tok->linkAt(1);
-                    Token* endBlock = endCond->linkAt(1);
-                    Token* condTok = getCondTok(tok);
                     Token* initTok = getInitTok(tok);
                     if (initTok && updateRecursive(initTok) == Progress::Break)
                         return Break();
+                    Token* endCond = tok->linkAt(1);
+                    Token* endBlock = endCond->linkAt(1);
+                    Token* condTok = getCondTok(tok);
                     if (Token::Match(tok, "for|while (")) {
                         // For-range loop
                         if (Token::simpleMatch(condTok, ":")) {
@@ -727,7 +727,6 @@ namespace {
                         std::tie(thenBranch.check, elseBranch.check) = evalCond(condTok);
                         if (!thenBranch.check && !elseBranch.check && stopOnCondition(condTok) && stopUpdates())
                             return Break(Analyzer::Terminate::Conditional);
-                        const bool hasElse = Token::simpleMatch(endBlock, "} else {");
                         bool bail = false;
 
                         // Traverse then block
@@ -742,6 +741,7 @@ namespace {
                                 bail = true;
                         }
                         // Traverse else block
+                        const bool hasElse = Token::simpleMatch(endBlock, "} else {");
                         if (hasElse) {
                             elseBranch.escape = isEscapeScope(endBlock->linkAt(2), elseBranch.escapeUnknown);
                             if (elseBranch.check) {
