@@ -1593,7 +1593,8 @@ static const Token* solveExprValue(const Token* expr, ValueFlow::Value& value)
             return {v->intvalue};
         return {};
     },
-        value);
+        value,
+        value.intvalue);
 }
 
 ValuePtr<Analyzer> makeAnalyzer(const Token* exprTok, ValueFlow::Value value, const Settings& settings)

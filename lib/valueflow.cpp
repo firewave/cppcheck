@@ -6317,7 +6317,8 @@ static const Token* parseBinaryIntOp(const Token* expr,
 
 const Token* ValueFlow::solveExprValue(const Token* expr,
                                        const std::function<std::vector<MathLib::bigint>(const Token*)>& eval,
-                                       ValueFlow::Value& value)
+                                       const ValueFlow::Value& value,
+                                       MathLib::bigint& intvalue_out)
 {
     if (!expr)
         return nullptr;
@@ -6334,25 +6335,25 @@ const Token* ValueFlow::solveExprValue(const Token* expr,
     if (binaryTok && expr->str().size() == 1) {
         switch (expr->str()[0]) {
         case '+': {
-            value.intvalue -= intval;
-            return ValueFlow::solveExprValue(binaryTok, eval, value);
+            intvalue_out -= intval;
+            return ValueFlow::solveExprValue(binaryTok, eval, value, intvalue_out);
         }
         case '-': {
             if (rhs)
-                value.intvalue = intval - value.intvalue;
+                intvalue_out = intval - intvalue_out;
             else
-                value.intvalue += intval;
-            return ValueFlow::solveExprValue(binaryTok, eval, value);
+                intvalue_out += intval;
+            return ValueFlow::solveExprValue(binaryTok, eval, value, intvalue_out);
         }
         case '*': {
             if (intval == 0)
                 break;
-            value.intvalue /= intval;
-            return ValueFlow::solveExprValue(binaryTok, eval, value);
+            intvalue_out /= intval;
+            return ValueFlow::solveExprValue(binaryTok, eval, value, intvalue_out);
         }
         case '^': {
-            value.intvalue ^= intval;
-            return ValueFlow::solveExprValue(binaryTok, eval, value);
+            intvalue_out ^= intval;
+            return ValueFlow::solveExprValue(binaryTok, eval, value, intvalue_out);
         }
         }
     }

@@ -115,7 +115,8 @@ namespace ValueFlow {
 
     const Token* solveExprValue(const Token* expr,
                                 const std::function<std::vector<MathLib::bigint>(const Token*)>& eval,
-                                Value& value);
+                                const Value& value,
+                                MathLib::bigint& intvalue_out);
 
     std::vector<LifetimeToken> getLifetimeTokens(const Token* tok,
                                                  const Settings& settings,

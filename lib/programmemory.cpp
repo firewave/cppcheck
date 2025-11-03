@@ -69,7 +69,7 @@ void ProgramMemory::setValue(const Token* expr, const ValueFlow::Value& value) {
 
     copyOnWrite();
 
-    ValueFlow::Value subvalue = value;
+    MathLib::bigint subintvalue = value.intvalue;
     const Token* subexpr = solveExprValue(
         expr,
         [&](const Token* tok) -> std::vector<MathLib::bigint> {
@@ -80,11 +80,15 @@ void ProgramMemory::setValue(const Token* expr, const ValueFlow::Value& value) {
             return {result};
         return {};
     },
-        subvalue);
+        value,
+        subintvalue);
     if (expr != subexpr)
         (*mValues)[expr] = value;
-    if (subexpr)
+    if (subexpr) {
+        ValueFlow::Value subvalue = value;
+        subvalue.intvalue = subintvalue;
         (*mValues)[subexpr] = std::move(subvalue);
+    }
 }
 
 const ValueFlow::Value* ProgramMemory::getValue(nonneg int exprid, bool impossible) const
