@@ -1797,7 +1797,8 @@ void Tokenizer::simplifyTypedefCpp()
 
                 // check for typedef that can be substituted
                 else if ((tok2->isNameOnly() || (tok2->isName() && (tok2->isExpandedMacro() || tok2->isInline() || tok2->isExternC()))) &&
-                         (Token::simpleMatch(tok2, pattern.c_str(), pattern.size()) ||
+                         ((isCPP() && Token::simpleMatch(tok2, pattern.c_str(), pattern.size())) ||
+                          (isC() && tok2->str() == pattern) ||
                           (inMemberFunc && tok2->str() == typeName->str()))) {
                     // member function class variables don't need qualification
                     if (!(inMemberFunc && tok2->str() == typeName->str()) && pattern.find("::") != std::string::npos) { // has a "something ::"
