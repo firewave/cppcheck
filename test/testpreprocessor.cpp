@@ -56,7 +56,9 @@ private:
         simplecpp::TokenList tokens1 = simplecpp::TokenList(code, files, "file.cpp", &outputList);
         (void)Preprocessor::reportOutput(settingsDefault, errorLogger, outputList, true);
         Preprocessor p(tokens1, settingsDefault, errorLogger, Path::identify(tokens1.getFiles()[0], false));
-        simplecpp::TokenList tokens2 = p.preprocess("", files, true);
+        simplecpp::OutputList outputList_pp;
+        simplecpp::TokenList tokens2 = p.preprocess("", files, outputList_pp);
+        Preprocessor::throwFirstError(outputList_pp);
         return tokens2.stringify();
     }
 

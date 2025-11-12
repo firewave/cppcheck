@@ -767,19 +767,21 @@ bool Preprocessor::hasErrors(const simplecpp::Output &output)
     return false;
 }
 
-bool Preprocessor::handleErrors(const simplecpp::OutputList& outputList, bool throwError)
+bool Preprocessor::handleErrors(const simplecpp::OutputList& outputList)
 {
     const bool showerror = (!mSettings.userDefines.empty() && !mSettings.force);
     const bool hasError = reportOutput(mSettings, mErrorLogger, outputList, showerror);
-    if (throwError) {
-        const auto it = std::find_if(outputList.cbegin(), outputList.cend(), [](const simplecpp::Output &output){
-            return hasErrors(output);
-        });
-        if (it != outputList.cend()) {
-            throw *it;
-        }
-    }
     return hasError;
+}
+
+void Preprocessor::getFirstError(const simplecpp::OutputList& outputList)
+{
+    const auto it = std::find_if(outputList.cbegin(), outputList.cend(), [](const simplecpp::Output &output){
+        return hasErrors(output);
+    });
+    if (it != outputList.cend()) {
+        throw *it;
+    }
 }
 
 bool Preprocessor::loadFiles(std::vector<std::string> &files)
@@ -788,7 +790,7 @@ bool Preprocessor::loadFiles(std::vector<std::string> &files)
 
     simplecpp::OutputList outputList;
     mFileCache = simplecpp::load(mTokens, files, dui, &outputList);
-    return !handleErrors(outputList, false);
+    return !handleErrors(outputList);
 }
 
 void Preprocessor::removeComments()
@@ -819,11 +821,10 @@ void Preprocessor::setPlatformInfo()
     mTokens.sizeOfType["long double *"] = mSettings.platform.sizeof_pointer;
 }
 
-simplecpp::TokenList Preprocessor::preprocess(const std::string &cfg, std::vector<std::string> &files, bool throwError)
+simplecpp::TokenList Preprocessor::preprocess(const std::string &cfg, std::vector<std::string> &files, simplecpp::OutputList& outputList)
 {
     const simplecpp::DUI dui = createDUI(mSettings, cfg, mLang);
 
-    simplecpp::OutputList outputList;
     std::list<simplecpp::MacroUsage> macroUsage;
     std::list<simplecpp::IfCond> ifCond;
     simplecpp::TokenList tokens2(files);
@@ -831,7 +832,7 @@ simplecpp::TokenList Preprocessor::preprocess(const std::string &cfg, std::vecto
     mMacroUsage = std::move(macroUsage);
     mIfCond = std::move(ifCond);
 
-    (void)handleErrors(outputList, throwError);
+    (void)handleErrors(outputList);
 
     tokens2.removeComments();
 
@@ -840,7 +841,8 @@ simplecpp::TokenList Preprocessor::preprocess(const std::string &cfg, std::vecto
 
 std::string Preprocessor::getcode(const std::string &cfg, std::vector<std::string> &files, const bool writeLocations)
 {
-    simplecpp::TokenList tokens2 = preprocess(cfg, files, false);
+    simplecpp::OutputList outputList;
+    simplecpp::TokenList tokens2 = preprocess(cfg, files, outputList);
     unsigned int prevfile = 0;
     unsigned int line = 1;
     std::ostringstream ret;

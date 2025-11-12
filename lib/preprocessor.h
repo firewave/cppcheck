@@ -119,10 +119,10 @@ public:
 
     void setPlatformInfo();
 
-    /**
-     * @throws simplecpp::Output thrown in case of preprocessing error
-     */
-    simplecpp::TokenList preprocess(const std::string &cfg, std::vector<std::string> &files, bool throwError = false);
+    simplecpp::TokenList preprocess(const std::string &cfg, std::vector<std::string> &files, simplecpp::OutputList& outputList);
+
+    // used in tests only
+    static void throwFirstError(const simplecpp::OutputList& outputList);
 
     std::string getcode(const std::string &cfg, std::vector<std::string> &files, bool writeLocations);
 
@@ -148,10 +148,7 @@ public:
 private:
     static bool hasErrors(const simplecpp::Output &output);
 
-    /**
-     * @throws simplecpp::Output thrown in case of preprocessing error
-     */
-    bool handleErrors(const simplecpp::OutputList &outputList, bool throwError);
+    bool handleErrors(const simplecpp::OutputList &outputList);
 
     static void simplifyPragmaAsmPrivate(simplecpp::TokenList &tokenList);
 
