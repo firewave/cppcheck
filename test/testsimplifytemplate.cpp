@@ -319,6 +319,15 @@ private:
         TEST_CASE(dumpTemplateArgFrom);
     }
 
+    class TemplateSimplifierTest: public TemplateSimplifier
+    {
+        friend class TestSimplifyTemplate;
+    public:
+        TemplateSimplifierTest(Tokenizer &tokenizer)
+            : TemplateSimplifier(tokenizer)
+        {}
+    };
+
     struct CheckOptions
     {
         bool debugwarnings = false;
@@ -5638,7 +5647,7 @@ private:
         tokenizer.splitTemplateRightAngleBrackets(false);
 
         std::vector<const Token *> typeParametersInDeclaration;
-        TemplateSimplifier::getTemplateParametersInDeclaration(tokenizer.tokens()->tokAt(2), typeParametersInDeclaration);
+        TemplateSimplifierTest::getTemplateParametersInDeclaration(tokenizer.tokens()->tokAt(2), typeParametersInDeclaration);
 
         if (params.size() != typeParametersInDeclaration.size())
             return false;

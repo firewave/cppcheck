@@ -45,8 +45,6 @@ struct newInstantiation;
 
 /** @brief Simplify templates from the preprocessed and partially simplified code. */
 class CPPCHECKLIB TemplateSimplifier {
-    friend class TestSimplifyTemplate;
-
 public:
     explicit TemplateSimplifier(Tokenizer &tokenizer);
 
@@ -443,6 +441,7 @@ private:
                               const std::list<std::string> &typeStringsUsedInTemplateInstantiation,
                               const std::string &newName);
 
+protected:
     /**
      * @brief TemplateParametersInDeclaration
      * @param tok  template < typename T, typename S >
@@ -454,6 +453,7 @@ private:
         const Token * tok,
         std::vector<const Token *> & typeParametersInDeclaration);
 
+private:
     /**
      * Remove a specific "template < ..." template class/function
      */
