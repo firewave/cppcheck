@@ -424,6 +424,9 @@ static std::string detectPython(const CppCheck::ExecuteCmdFn &executeCommand)
     return "";
 }
 
+/**
+ * @throws InternalError thrown when Python execution failed
+ */
 static std::vector<picojson::value> executeAddon(const AddonInfo &addonInfo,
                                                  const std::string &defaultPythonExe,
                                                  const std::string &file,
@@ -1167,32 +1170,32 @@ unsigned int CppCheck::checkInternal(const FileWithDetails& file, const std::str
                 hasValidConfig = true;
 
                 Tokenizer tokenizer(std::move(tokenlist), mErrorLogger);
-                try {
-                    if (mSettings.showtime != ShowTime::NONE)
-                        tokenizer.setTimerResults(&s_timerResults);
-                    tokenizer.setDirectives(directives); // TODO: how to avoid repeated copies?
+                if (mSettings.showtime != ShowTime::NONE)
+                    tokenizer.setTimerResults(&s_timerResults);
+                tokenizer.setDirectives(directives); // TODO: how to avoid repeated copies?
 
-                    // locations macros
-                    mLogger->setLocationMacros(tokenizer.tokens(), files);
+                // locations macros
+                mLogger->setLocationMacros(tokenizer.tokens(), files);
 
-                    // If only errors are printed, print filename after the check
-                    if (!mSettings.quiet && (!currentConfig.empty() || checkCount > 1)) {
-                        std::string fixedpath = Path::toNativeSeparators(file.spath());
-                        mErrorLogger.reportOut("Checking " + fixedpath + ": " + currentConfig + "...", Color::FgGreen);
-                    }
+                // If only errors are printed, print filename after the check
+                if (!mSettings.quiet && (!currentConfig.empty() || checkCount > 1)) {
+                    std::string fixedpath = Path::toNativeSeparators(file.spath());
+                    mErrorLogger.reportOut("Checking " + fixedpath + ": " + currentConfig + "...", Color::FgGreen);
+                }
 
-                    if (!tokenizer.tokens())
-                        continue;
+                if (!tokenizer.tokens())
+                    continue;
 
-                    // skip rest of iteration if just checking configuration
-                    if (mSettings.checkConfiguration)
-                        continue;
+                // skip rest of iteration if just checking configuration
+                if (mSettings.checkConfiguration)
+                    continue;
 
 #ifdef HAVE_RULES
-                    // Execute rules for "raw" code
-                    executeRules("raw", tokenizer.list);
+                // Execute rules for "raw" code
+                executeRules("raw", tokenizer.list);
 #endif
 
+                try {
                     // Simplify tokens into normal form, skip rest of iteration if failed
                     if (!tokenizer.simplifyTokens1(currentConfig, fileIndex))
                         continue;
