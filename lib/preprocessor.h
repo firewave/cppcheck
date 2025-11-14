@@ -119,6 +119,9 @@ public:
 
     void setPlatformInfo();
 
+    /**
+     * @throws simplecpp::Output thrown in case of preprocessing error
+     */
     simplecpp::TokenList preprocess(const std::string &cfg, std::vector<std::string> &files, bool throwError = false);
 
     std::string getcode(const std::string &cfg, std::vector<std::string> &files, bool writeLocations);

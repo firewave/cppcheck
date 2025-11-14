@@ -1152,11 +1152,35 @@ unsigned int CppCheck::checkInternal(const FileWithDetails& file, const std::str
             try {
                 TokenList tokenlist{mSettings, file.lang()};
 
-                // Create tokens, skip rest of iteration if failed
-                Timer::run("Tokenizer::createTokens", mSettings.showtime, &s_timerResults, [&]() {
-                    simplecpp::TokenList tokensP = preprocessor.preprocess(currentConfig, files, true);
-                    tokenlist.createTokens(std::move(tokensP));
-                });
+                try {
+                    // Create tokens, skip rest of iteration if failed
+                    Timer::run("Tokenizer::createTokens", mSettings.showtime, &s_timerResults, [&]() {
+                        simplecpp::TokenList tokensP = preprocessor.preprocess(currentConfig, files, true);
+                        tokenlist.createTokens(std::move(tokensP));
+                    });
+                } catch (const simplecpp::Output &o) {
+                     // #error etc during preprocessing
+                     configurationError.push_back((currentConfig.empty() ? "\'\'" : currentConfig) + " : [" + o.location.file() + ':' + std::to_string(o.location.line) + "] " + o.msg);
+                     --checkCount; // don't count invalid configurations
+
+                     if (!hasValidConfig && currCfg == *configurations.rbegin()) {
+                         // If there is no valid configuration then report error..
+                         std::string locfile = Path::fromNativeSeparators(o.location.file());
+                         if (mSettings.relativePaths)
+                             locfile = Path::getRelativePath(locfile, mSettings.basePaths);
+
+                         ErrorMessage::FileLocation loc1(locfile, o.location.line, o.location.col);
+
+                         ErrorMessage errmsg({std::move(loc1)},
+                                             file.spath(),
+                                             Severity::error,
+                                             o.msg,
+                                             "preprocessorErrorDirective",
+                                             Certainty::normal);
+                         mErrorLogger.reportErr(errmsg);
+                     }
+                     continue;
+                }
                 hasValidConfig = true;
 
                 Tokenizer tokenizer(std::move(tokenlist), mErrorLogger);
@@ -1225,29 +1249,6 @@ unsigned int CppCheck::checkInternal(const FileWithDetails& file, const std::str
                     ErrorMessage errmsg = ErrorMessage::fromInternalError(e, &tokenizer.list, file.spath());
                     mErrorLogger.reportErr(errmsg);
                 }
-            } catch (const simplecpp::Output &o) {
-                // #error etc during preprocessing
-                configurationError.push_back((currentConfig.empty() ? "\'\'" : currentConfig) + " : [" + o.location.file() + ':' + std::to_string(o.location.line) + "] " + o.msg);
-                --checkCount; // don't count invalid configurations
-
-                if (!hasValidConfig && currCfg == *configurations.rbegin()) {
-                    // If there is no valid configuration then report error..
-                    std::string locfile = Path::fromNativeSeparators(o.location.file());
-                    if (mSettings.relativePaths)
-                        locfile = Path::getRelativePath(locfile, mSettings.basePaths);
-
-                    ErrorMessage::FileLocation loc1(locfile, o.location.line, o.location.col);
-
-                    ErrorMessage errmsg({std::move(loc1)},
-                                        file.spath(),
-                                        Severity::error,
-                                        o.msg,
-                                        "preprocessorErrorDirective",
-                                        Certainty::normal);
-                    mErrorLogger.reportErr(errmsg);
-                }
-                continue;
-
             } catch (const TerminateException &) {
                 // Analysis is terminated
                 if (analyzerInformation)
