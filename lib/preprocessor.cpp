@@ -921,6 +921,11 @@ static std::string simplecppErrToId(simplecpp::Output::Type type)
 
 void Preprocessor::error(const std::string &filename, unsigned int linenr, unsigned int col, const std::string &msg, simplecpp::Output::Type type)
 {
+    error(filename, linenr, col, msg, simplecppErrToId(type));
+}
+
+void Preprocessor::error(const std::string &filename, unsigned int linenr, unsigned int col, const std::string &msg, const std::string& id)
+{
     std::list<ErrorMessage::FileLocation> locationList;
     if (!filename.empty()) {
         std::string file = Path::fromNativeSeparators(filename);
@@ -933,7 +938,7 @@ void Preprocessor::error(const std::string &filename, unsigned int linenr, unsig
                                         mFile0,
                                         Severity::error,
                                         msg,
-                                        simplecppErrToId(type),
+                                        id,
                                         Certainty::normal));
 }
 
@@ -945,6 +950,7 @@ void Preprocessor::missingInclude(const std::string &filename, unsigned int line
 
     std::list<ErrorMessage::FileLocation> locationList;
     if (!filename.empty()) {
+        // TODO: add relative path handling?
         locationList.emplace_back(filename, linenr, col);
     }
     ErrorMessage errmsg(std::move(locationList), mFile0, Severity::information,
