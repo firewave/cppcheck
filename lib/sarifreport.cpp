@@ -17,13 +17,16 @@
  */
 
 #include "sarifreport.h"
+
 #include "errorlogger.h"
 #include "errortypes.h"
-#include "settings.h"
 #include "cppcheck.h"
+#include "settings.h"
 
+#include <cstdint>
 #include <set>
 #include <sstream>
+#include <utility>
 
 void SarifReport::addFinding(ErrorMessage msg)
 {
