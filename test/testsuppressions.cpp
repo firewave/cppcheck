@@ -716,6 +716,31 @@ private:
                       "[test.cpp:4:0]: (error) Failed to add suppression. Invalid id \":id3\" [preprocessorErrorDirective]\n"
                       "[test.cpp:5:0]: (information) Unmatched suppression: id2 [unmatchedSuppression]\n", errout_str()); // TODO: should we report the location of the suppression instead?
 
+        ASSERT_EQUALS(1, (this->*check)("// cppcheck-suppress: id\n"
+                                        "// cppcheck-suppress-unknown id\n"
+                                        "// cppcheck-suppress-begin-unknown id\n"
+                                        "void f() {}\n",
+                                        ""));
+        ASSERT_EQUALS("[test.cpp:1:0]: (error) unknown suppression type 'cppcheck-suppress:' [preprocessorErrorDirective]\n"
+                      "[test.cpp:2:0]: (error) unknown suppression type 'cppcheck-suppress-unknown' [preprocessorErrorDirective]\n"
+                      "[test.cpp:3:0]: (error) unknown suppression type 'cppcheck-suppress-begin-unknown' [preprocessorErrorDirective]\n", errout_str());
+
+        /*
+        ASSERT_EQUALS(1, (this->*check)("// cppcheck-suppress:\n"
+                                        "// cppcheck-suppress-unknown\n"
+                                        "// cppcheck-suppress-begin-unknown\n"
+                                        "void f() {}\n",
+                                        ""));
+        ASSERT_EQUALS("[test.cpp:1:0]: (error) unknown suppression type 'cppcheck-suppress:' [preprocessorErrorDirective]\n"
+                      "[test.cpp:2:0]: (error) unknown suppression type 'cppcheck-suppress-unknown' [preprocessorErrorDirective]\n"
+                      "[test.cpp:3:0]: (error) unknown suppression type 'cppcheck-suppress-begin-unknown' [preprocessorErrorDirective]\n", errout_str());
+
+        ASSERT_EQUALS(1, (this->*check)("// cppcheck-suppress\n"
+                                        "void f() {}\n",
+                                        ""));
+        ASSERT_EQUALS("", errout_str());
+        */
+
         ASSERT_EQUALS(1, (this->*check)("void f() {\n"
                                         "    int a;\n"
                                         "    // cppcheck-suppress-begin uninitvar\n"
