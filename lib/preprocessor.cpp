@@ -184,6 +184,15 @@ static std::string getRelativeFilename(const simplecpp::Token* tok, const Settin
     return Path::simplifyPath(std::move(relativeFilename));
 }
 
+static void addInlineSuppression(SuppressionList::Suppression suppr, SuppressionList &suppressions, std::list<BadInlineSuppression> &bad)
+{
+    const std::string file = suppr.fileName;
+    const int line = suppr.lineNumber;
+    const std::string errmsg = suppressions.addSuppression(std::move(suppr));
+    if (!errmsg.empty())
+        bad.emplace_back(file, line, errmsg);
+}
+
 static void addInlineSuppressions(const simplecpp::TokenList &tokens, const Settings &settings, SuppressionList &suppressions, std::list<BadInlineSuppression> &bad)
 {
     std::list<SuppressionList::Suppression> inlineSuppressionsBlockBegin;
@@ -262,7 +271,7 @@ static void addInlineSuppressions(const simplecpp::TokenList &tokens, const Sett
                             suppr.lineNumber = supprBegin->lineNumber;
                             suppr.type = SuppressionList::Type::block;
                             inlineSuppressionsBlockBegin.erase(supprBegin);
-                            suppressions.addSuppression(std::move(suppr)); // TODO: check result
+                            addInlineSuppression(std::move(suppr), suppressions, bad);
                             throwError = false;
                             break;
                         }
@@ -287,10 +296,10 @@ static void addInlineSuppressions(const simplecpp::TokenList &tokens, const Sett
                 suppr.thisAndNextLine = thisAndNextLine;
                 suppr.lineNumber = tok->location.line;
                 suppr.macroName = macroName;
-                suppressions.addSuppression(std::move(suppr)); // TODO: check result
+                addInlineSuppression(std::move(suppr), suppressions, bad);
             } else if (SuppressionList::Type::file == suppr.type) {
                 if (onlyComments)
-                    suppressions.addSuppression(std::move(suppr)); // TODO: check result
+                    addInlineSuppression(std::move(suppr), suppressions, bad);
                 else
                     bad.emplace_back(suppr.fileName, suppr.lineNumber, "File suppression should be at the top of the file");
             }
