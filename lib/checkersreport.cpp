@@ -137,10 +137,12 @@ void CheckersReport::countCheckers()
             ++mActiveCheckersCount;
         ++mAllCheckersCount;
     }
-    for (const auto& checkReq: checkers::premiumCheckers) {
-        if (mActiveCheckers.count(checkReq.first) > 0)
-            ++mActiveCheckersCount;
-        ++mAllCheckersCount;
+    if (isCppcheckPremium(mSettings)) {
+        for (const auto& checkReq: checkers::premiumCheckers) {
+            if (mActiveCheckers.count(checkReq.first) > 0)
+                ++mActiveCheckersCount;
+            ++mAllCheckersCount;
+        }
     }
     if (mSettings.premiumArgs.find("misra-c-") != std::string::npos || mSettings.addons.count("misra")) {
         // TODO: process checkers::misraC2012Directives?
