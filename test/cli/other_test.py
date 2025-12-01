@@ -4032,7 +4032,7 @@ def __test_active_checkers(tmp_path, active_cnt, total_cnt, use_misra=False, use
 
 
 def test_active_checkers(tmp_path):
-    __test_active_checkers(tmp_path, 40, 966)
+    __test_active_checkers(tmp_path, 40, 185)
 
 
 def test_active_checkers_builddir(tmp_path):
@@ -4078,14 +4078,14 @@ def test_active_checkers_builddir(tmp_path):
         'CheckVaarg::va_list_usage',
         'CheckVaarg::va_start_argument',
     ]
-    __test_active_checkers(tmp_path, 40, 966, checkers_exp=checkers_exp)
+    __test_active_checkers(tmp_path, 40, 185, checkers_exp=checkers_exp)
 
 
 def test_active_checkers_misra(tmp_path):
-    __test_active_checkers(tmp_path, 166, 1166, use_misra=True)
+    __test_active_checkers(tmp_path, 40, 385, use_misra=True)
 
 
-@pytest.mark.xfail(strict=True)  # TODO: 4 more checkers in checkers.txt than in count
+@pytest.mark.xfail(strict=True)
 def test_active_checkers_misra_builddir(tmp_path):
     checkers_exp = [
         'CheckAutoVariables::autoVariables',
@@ -4259,12 +4259,12 @@ def test_active_checkers_misra_builddir(tmp_path):
         'Misra C: 9.4',
         'Misra C: 9.5'
     ]
-    __test_active_checkers(tmp_path, 166, 1166, use_misra=True, checkers_exp=checkers_exp)
+    __test_active_checkers(tmp_path, 40, 385, use_misra=True, checkers_exp=checkers_exp)
 
 
 def test_active_unusedfunction_only(tmp_path):
     # TODO: should only report a single active check
-    __test_active_checkers(tmp_path, 4, 966, use_unusedfunction_only=True)
+    __test_active_checkers(tmp_path, 4, 185, use_unusedfunction_only=True)
 
 
 def test_active_unusedfunction_only_builddir(tmp_path):
@@ -4276,15 +4276,15 @@ def test_active_unusedfunction_only_builddir(tmp_path):
         'CheckNullPointer::analyseWholeProgram',
         'CheckUninitVar::analyseWholeProgram',
     ]
-    __test_active_checkers(tmp_path, 4, 966, use_unusedfunction_only=True, checkers_exp=checkers_exp)
+    __test_active_checkers(tmp_path, 4, 185, use_unusedfunction_only=True, checkers_exp=checkers_exp)
 
 
 def test_active_unusedfunction_only_misra(tmp_path):
     # TODO: should only report a single active check
-    __test_active_checkers(tmp_path, 130, 1166, use_unusedfunction_only=True, use_misra=True)
+    __test_active_checkers(tmp_path, 4, 385, use_unusedfunction_only=True, use_misra=True)
 
 
-@pytest.mark.xfail(strict=True)  # TODO: 4 more checkers in checkers.txt than in count
+@pytest.mark.xfail(strict=True)
 def test_active_unusedfunction_only_misra_builddir(tmp_path):
     # TODO: should only report a single active check
     checkers_exp = [
@@ -4423,5 +4423,7 @@ def test_active_unusedfunction_only_misra_builddir(tmp_path):
         'Misra C: 9.4',
         'Misra C: 9.5'
     ]
-    __test_active_checkers(tmp_path, 130, 1166, use_unusedfunction_only=True, use_misra=True, checkers_exp=checkers_exp)
+    __test_active_checkers(tmp_path, 4, 385, use_unusedfunction_only=True, use_misra=True, checkers_exp=checkers_exp)
 
+
+# TODO: test active count with premium
