@@ -143,13 +143,15 @@ void CheckersReport::countCheckers()
         ++mAllCheckersCount;
     }
     if (mSettings.premiumArgs.find("misra-c-") != std::string::npos || mSettings.addons.count("misra")) {
+        // TODO: process checkers::misraC2012Directives?
         for (const checkers::MisraInfo& info: checkers::misraC2012Rules) {
-            const std::string rule = std::to_string(info.a) + "." + std::to_string(info.b);
+            const std::string rule = "Misra C: " + std::to_string(info.a) + "." + std::to_string(info.b);
             const bool active = isMisraRuleActive(mActiveCheckers, rule);
             if (active)
                 ++mActiveCheckersCount;
             ++mAllCheckersCount;
         }
+        // TODO: process remaining checkers::misraC*?
     }
 }
 
@@ -270,7 +272,7 @@ std::string CheckersReport::getReport(const std::string& criticalErrors) const
             fout << '\n';
         }
         for (const checkers::MisraInfo& info: checkers::misraC2012Rules) {
-            const std::string rule = std::to_string(info.a) + "." + std::to_string(info.b);
+            const std::string rule = "Misra C: " + std::to_string(info.a) + "." + std::to_string(info.b); // TODO: handle misraCVersion
             const bool active = isMisraRuleActive(mActiveCheckers, rule);
             fout << (active ? "Yes  " : "No   ") << "Misra C " << misraCVersion << ": " << rule;
             std::string extra;
@@ -285,6 +287,7 @@ std::string CheckersReport::getReport(const std::string& criticalErrors) const
                 fout << std::string(10 - rule.size(), ' ') << extra;
             fout << '\n';
         }
+        // TODO: process remaining checkers::misraC*?
     }
 
     reportSection("Misra C++ 2008", mSettings, mActiveCheckers, checkers::premiumCheckers, "Misra C++ 2008: ");
