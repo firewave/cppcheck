@@ -1823,9 +1823,14 @@ bool CppCheck::analyseWholeProgram()
 
 unsigned int CppCheck::analyseWholeProgram(const std::string &buildDir, const std::list<FileWithDetails> &files, const std::list<FileSettings>& fileSettings, const std::string& ctuInfo)
 {
-    executeAddonsWholeProgram(files, fileSettings, ctuInfo);
-    if (mSettings.checks.isEnabled(Checks::unusedFunction))
+    if (mUnusedFunctionsCheck) {
         CheckUnusedFunctions::analyseWholeProgram(mSettings, mErrorLogger, buildDir);
+        mUnusedFunctionsCheck->check(mSettings, mErrorLogger);
+        if (Settings::unusedFunctionOnly())
+            return mLogger->exitcode();
+    }
+
+    executeAddonsWholeProgram(files, fileSettings, ctuInfo);
     std::list<Check::FileInfo*> fileInfoList;
     CTU::FileInfo ctuFileInfo;
 
@@ -1875,9 +1880,6 @@ unsigned int CppCheck::analyseWholeProgram(const std::string &buildDir, const st
     // cppcheck-suppress shadowFunction - TODO: fix this
     for (Check *check : Check::instances())
         check->analyseWholeProgram(ctuFileInfo, fileInfoList, mSettings, mErrorLogger);
-
-    if (mUnusedFunctionsCheck)
-        mUnusedFunctionsCheck->check(mSettings, mErrorLogger);
 
     for (Check::FileInfo *fi : fileInfoList)
         delete fi;
