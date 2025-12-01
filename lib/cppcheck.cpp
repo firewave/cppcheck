@@ -1486,7 +1486,7 @@ void CppCheck::executeAddons(const std::string& dumpFile, const FileWithDetails&
 
 void CppCheck::executeAddons(const std::vector<std::string>& files, const std::string& file0)
 {
-    if (mSettings.addons.empty() || files.empty())
+    if (mSettings.addons.empty() || files.empty() || Settings::unusedFunctionOnly())
         return;
 
     const bool isCtuInfo = endsWith(files[0], ".ctu-info");
@@ -1798,6 +1798,13 @@ void CppCheck::analyseClangTidy(const FileSettings &fileSettings)
 bool CppCheck::analyseWholeProgram()
 {
     bool errors = false;
+
+    if (mUnusedFunctionsCheck) {
+        errors |= mUnusedFunctionsCheck->check(mSettings, mErrorLogger);
+        if (Settings::unusedFunctionOnly())
+            return errors && (mLogger->exitcode() > 0);
+    }
+
     // Analyse the tokens
     CTU::FileInfo ctu;
     if (mSettings.useSingleJob() || !mSettings.buildDir.empty())
@@ -1814,9 +1821,6 @@ bool CppCheck::analyseWholeProgram()
     // cppcheck-suppress shadowFunction - TODO: fix this
     for (Check *check : Check::instances())
         errors |= check->analyseWholeProgram(ctu, mFileInfo, mSettings, mErrorLogger);  // TODO: ctu
-
-    if (mUnusedFunctionsCheck)
-        errors |= mUnusedFunctionsCheck->check(mSettings, mErrorLogger);
 
     return errors && (mLogger->exitcode() > 0);
 }
