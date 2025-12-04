@@ -1829,44 +1829,55 @@ unsigned int CppCheck::analyseWholeProgram(const std::string &buildDir, const st
     std::list<Check::FileInfo*> fileInfoList;
     CTU::FileInfo ctuFileInfo;
 
-    // Load all analyzer info data..
-    const std::string filesTxt(buildDir + "/files.txt");
-    std::ifstream fin(filesTxt);
-    std::string filesTxtLine;
-    while (std::getline(fin, filesTxtLine)) {
-        AnalyzerInformation::Info filesTxtInfo;
-        if (!filesTxtInfo.parse(filesTxtLine))
-            continue;
-
-        const std::string xmlfile = buildDir + '/' + filesTxtInfo.afile;
-
-        tinyxml2::XMLDocument doc;
-        const tinyxml2::XMLError error = doc.LoadFile(xmlfile.c_str());
-        if (error != tinyxml2::XML_SUCCESS)
-            continue;
-
-        const tinyxml2::XMLElement * const rootNode = doc.FirstChildElement();
-        if (rootNode == nullptr)
-            continue;
-
-        for (const tinyxml2::XMLElement *e = rootNode->FirstChildElement(); e; e = e->NextSiblingElement()) {
-            if (std::strcmp(e->Name(), "FileInfo") != 0)
+    if (!buildDir.empty()) {
+        // Load all analyzer info data..
+        const std::string filesTxt(buildDir + "/files.txt");
+        std::ifstream fin(filesTxt);
+        std::string filesTxtLine;
+        while (std::getline(fin, filesTxtLine)) {
+            AnalyzerInformation::Info filesTxtInfo;
+            if (!filesTxtInfo.parse(filesTxtLine))
                 continue;
-            const char *checkClassAttr = e->Attribute("check");
-            if (!checkClassAttr)
+
+            const std::string xmlfile = buildDir + '/' + filesTxtInfo.afile;
+
+            tinyxml2::XMLDocument doc;
+            const tinyxml2::XMLError error = doc.LoadFile(xmlfile.c_str());
+            if (error != tinyxml2::XML_SUCCESS)
                 continue;
-            if (std::strcmp(checkClassAttr, "ctu") == 0) {
-                ctuFileInfo.loadFromXml(e);
+
+            const tinyxml2::XMLElement * const rootNode = doc.FirstChildElement();
+            if (rootNode == nullptr)
                 continue;
-            }
-            // cppcheck-suppress shadowFunction - TODO: fix this
-            for (const Check *check : Check::instances()) {
-                if (checkClassAttr == check->name()) {
-                    if (Check::FileInfo* fi = check->loadFileInfoFromXml(e)) {
-                        fi->file0 = filesTxtInfo.sourceFile;
-                        fileInfoList.push_back(fi);
+
+            for (const tinyxml2::XMLElement *e = rootNode->FirstChildElement(); e; e = e->NextSiblingElement()) {
+                if (std::strcmp(e->Name(), "FileInfo") != 0)
+                    continue;
+                const char *checkClassAttr = e->Attribute("check");
+                if (!checkClassAttr)
+                    continue;
+                if (std::strcmp(checkClassAttr, "ctu") == 0) {
+                    ctuFileInfo.loadFromXml(e);
+                    continue;
+                }
+                // cppcheck-suppress shadowFunction - TODO: fix this
+                for (const Check *check : Check::instances()) {
+                    if (checkClassAttr == check->name()) {
+                        if (Check::FileInfo* fi = check->loadFileInfoFromXml(e)) {
+                            fi->file0 = filesTxtInfo.sourceFile;
+                            fileInfoList.push_back(fi);
+                        }
                     }
                 }
+            }
+        }
+    }
+    else if (mSettings.useSingleJob()) {
+        for (const Check::FileInfo *fi : mFileInfo) {
+            const auto *fi2 = dynamic_cast<const CTU::FileInfo *>(fi);
+            if (fi2) {
+                ctuFileInfo.functionCalls.insert(ctuFileInfo.functionCalls.end(), fi2->functionCalls.cbegin(), fi2->functionCalls.cend());
+                ctuFileInfo.nestedCalls.insert(ctuFileInfo.nestedCalls.end(), fi2->nestedCalls.cbegin(), fi2->nestedCalls.cend());
             }
         }
     }

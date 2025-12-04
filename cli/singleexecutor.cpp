@@ -67,8 +67,8 @@ unsigned int SingleExecutor::check()
             reportStatus(c, mFileSettings.size(), c, mFileSettings.size());
     }
 
-    if (mCppcheck.analyseWholeProgram())
-        result++;
+    //if (mCppcheck.analyseWholeProgram())
+    //    result++;
 
     if (mSettings.showtime == ShowTime::SUMMARY || mSettings.showtime == ShowTime::TOP5_SUMMARY)
         CppCheck::printTimerResults(mSettings.showtime);
