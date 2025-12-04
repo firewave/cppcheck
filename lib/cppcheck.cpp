@@ -1829,7 +1829,16 @@ unsigned int CppCheck::analyseWholeProgram(const std::string &buildDir, const st
     std::list<Check::FileInfo*> fileInfoList;
     CTU::FileInfo ctuFileInfo;
 
-    if (!buildDir.empty()) {
+    if (mSettings.useSingleJob()) {
+        for (const Check::FileInfo *fi : mFileInfo) {
+            const auto *fi2 = dynamic_cast<const CTU::FileInfo *>(fi);
+            if (fi2) {
+                ctuFileInfo.functionCalls.insert(ctuFileInfo.functionCalls.end(), fi2->functionCalls.cbegin(), fi2->functionCalls.cend());
+                ctuFileInfo.nestedCalls.insert(ctuFileInfo.nestedCalls.end(), fi2->nestedCalls.cbegin(), fi2->nestedCalls.cend());
+            }
+        }
+    }
+    else if (!buildDir.empty()) {
         // Load all analyzer info data..
         const std::string filesTxt(buildDir + "/files.txt");
         std::ifstream fin(filesTxt);
@@ -1869,15 +1878,6 @@ unsigned int CppCheck::analyseWholeProgram(const std::string &buildDir, const st
                         }
                     }
                 }
-            }
-        }
-    }
-    else if (mSettings.useSingleJob()) {
-        for (const Check::FileInfo *fi : mFileInfo) {
-            const auto *fi2 = dynamic_cast<const CTU::FileInfo *>(fi);
-            if (fi2) {
-                ctuFileInfo.functionCalls.insert(ctuFileInfo.functionCalls.end(), fi2->functionCalls.cbegin(), fi2->functionCalls.cend());
-                ctuFileInfo.nestedCalls.insert(ctuFileInfo.nestedCalls.end(), fi2->nestedCalls.cbegin(), fi2->nestedCalls.cend());
             }
         }
     }
