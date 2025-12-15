@@ -91,7 +91,7 @@ public:
 
     void stop();
 
-    template<class TFunc>
+    template<class TFunc, REQUIRES("TFunc must be a function which returns void", std::is_convertible<decltype(std::declval<TFunc>()()), void> )>
     static void run(std::string str, ShowTime showtimeMode, TimerResultsIntf* timerResults, const TFunc& f) {
         Timer t(std::move(str), showtimeMode, timerResults);
         f();
