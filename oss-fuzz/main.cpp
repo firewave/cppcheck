@@ -78,11 +78,12 @@ static const Settings s_settings = create_settings();
 static DummyErrorLogger s_errorLogger;
 static const FileWithDetails s_file("test.cpp", Standards::Language::C, 0);
 
-static void doCheck(const uint8_t *data, size_t dataSize)
+static int doCheck(const uint8_t *data, size_t dataSize)
 {
     Suppressions supprs;
     CppCheck cppcheck(s_settings, supprs, s_errorLogger, nullptr, false, nullptr);
     cppcheck.checkBuffer(s_file, reinterpret_cast<const char*>(data), dataSize);
+    return 0;
 }
 
 #ifndef NO_FUZZ
@@ -91,8 +92,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t dataSize);
 int LLVMFuzzerTestOneInput(const uint8_t *data, size_t dataSize)
 {
     const std::string code = std::string(reinterpret_cast<const char*>(data), dataSize);
-    doCheck(reinterpret_cast<const unsigned char*>(code.data()), code.size());
-    return 0;
+    return doCheck(reinterpret_cast<const unsigned char*>(code.data()), code.size());
 }
 #else
 int main(int argc, char * argv[])
