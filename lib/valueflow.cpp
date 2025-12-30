@@ -3850,6 +3850,9 @@ static void valueFlowForwardConst(Token* start,
     }
 }
 
+/**
+ * @throws InternalError thrown if start token precedes end token
+ */
 static void valueFlowForwardConst(Token* start,
                                   const Token* end,
                                   const Variable* var,
@@ -3899,6 +3902,9 @@ static bool isInitialVarAssign(const Token* tok)
     return tok->varId() == prev->varId() && tok->variable()->nameToken() == prev;
 }
 
+/**
+ * @throws InternalError thrown if start token precedes end token
+ */
 static void valueFlowForwardAssign(Token* const tok,
                                    const Token* expr,
                                    std::vector<const Variable*> vars,
@@ -4009,6 +4015,9 @@ static void valueFlowForwardAssign(Token* const tok,
     valueFlowForward(nextExpression, endOfVarScope, expr, std::move(values), tokenlist, errorLogger, settings);
 }
 
+/**
+ * @throws InternalError thrown if start token precedes end token
+ */
 static void valueFlowForwardAssign(Token* const tok,
                                    const Variable* const var,
                                    const std::list<ValueFlow::Value>& values,
@@ -4102,6 +4111,9 @@ static bool intersects(const C1& c1, const C2& c2)
     return false;
 }
 
+/**
+ * @throws InternalError thrown if start token precedes end token
+ */
 static void valueFlowAfterAssign(TokenList &tokenlist,
                                  const SymbolDatabase& symboldatabase,
                                  ErrorLogger &errorLogger,
@@ -4244,6 +4256,9 @@ static std::vector<const Variable*> getVariables(const Token* tok)
     return result;
 }
 
+/**
+ * @throws InternalError thrown if start token precedes end token
+ */
 static void valueFlowAfterSwap(const TokenList& tokenlist,
                                const SymbolDatabase& symboldatabase,
                                ErrorLogger& errorLogger,
@@ -6243,6 +6258,9 @@ static bool isContainerSizeChanged(const Token* expr,
     return false;
 }
 
+/**
+ * @throws InternalError thrown if start token precedes end token
+ */
 static void valueFlowSmartPointer(TokenList &tokenlist, ErrorLogger & errorLogger, const Settings &settings)
 {
     for (Token *tok = tokenlist.front(); tok; tok = tok->next()) {
@@ -6562,6 +6580,9 @@ static std::vector<ValueFlow::Value> getContainerSizeFromConstructor(const Token
     return getContainerSizeFromConstructorArgs(args, valueType->container, known);
 }
 
+/**
+ * @throws InternalError thrown if start token precedes end token
+ */
 static void valueFlowContainerSetTokValue(const TokenList& tokenlist, ErrorLogger& errorLogger, const Settings& settings, const Token* tok, Token* initList)
 {
     ValueFlow::Value value;
@@ -6585,6 +6606,9 @@ static const Scope* getFunctionScope(const Scope* scope) {
     return scope;
 }
 
+/**
+ * @throws InternalError thrown if start token precedes end token
+ */
 static void valueFlowContainerSize(const TokenList& tokenlist,
                                    const SymbolDatabase& symboldatabase,
                                    ErrorLogger& errorLogger,

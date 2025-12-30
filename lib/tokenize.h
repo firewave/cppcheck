@@ -75,6 +75,9 @@ public:
      */
     bool isScopeNoReturn(const Token *endScopeToken, bool *unknown = nullptr) const;
 
+    /**
+     * @throws InternalError thrown if start token precedes end token
+     */
     bool simplifyTokens1(const std::string &configuration, int fileIndex=0);
 
     bool isVarUsedInTemplate(nonneg int id) const {

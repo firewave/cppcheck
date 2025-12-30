@@ -52,7 +52,9 @@ namespace ValueFlow {
     /// Constant folding of expression. This can be used before the full ValueFlow has been executed (ValueFlow::setValues).
     const Value * valueFlowConstantFoldAST(Token *expr, const Settings &settings);
 
-    /// Perform valueflow analysis.
+    /** Perform valueflow analysis.
+     * @throws InternalError thrown if start token precedes end token
+     */
     void setValues(TokenList& tokenlist,
                    SymbolDatabase& symboldatabase,
                    ErrorLogger& errorLogger,
