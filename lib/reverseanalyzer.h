@@ -27,6 +27,9 @@ class TokenList;
 template<class T>
 class ValuePtr;
 
+/**
+ * @throws InternalError thrown on cyclic analysis
+ */
 void valueFlowGenericReverse(Token* start, const Token* end, const ValuePtr<Analyzer>& a, const TokenList& tokenlist, ErrorLogger& errorLogger, const Settings& settings);
 
 #endif
