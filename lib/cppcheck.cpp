@@ -1239,43 +1239,10 @@ unsigned int CppCheck::checkInternal(const FileWithDetails& file, const std::str
                     ErrorMessage errmsg = ErrorMessage::fromInternalError(e, &tokenizer.list, file.spath());
                     mErrorLogger.reportErr(errmsg);
                 }
-            } catch (const TerminateException &) {
-                // Analysis is terminated
-                if (analyzerInformation)
-                    mLogger->setAnalyzerInfo(nullptr);
-                return mLogger->exitcode();
             } catch (const InternalError &e) {
-                ErrorMessage errmsg = ErrorMessage::fromInternalError(e, nullptr, file.spath());
-                mErrorLogger.reportErr(errmsg);
+                throw 0;
             }
         }
-
-        if (!hasValidConfig && configurations.size() > 1 && mSettings.severity.isEnabled(Severity::information)) {
-            std::string msg;
-            msg = "This file is not analyzed. Cppcheck failed to extract a valid configuration. Use -v for more details.";
-            msg += "\nThis file is not analyzed. Cppcheck failed to extract a valid configuration. The tested configurations have these preprocessor errors:";
-            for (const std::string &s : configurationError)
-                msg += '\n' + s;
-
-            std::string locFile = Path::toNativeSeparators(file.spath());
-            ErrorMessage::FileLocation loc(locFile, 0, 0);
-            ErrorMessage errmsg({std::move(loc)},
-                                std::move(locFile),
-                                Severity::information,
-                                msg,
-                                "noValidConfiguration",
-                                Certainty::normal);
-            mErrorLogger.reportErr(errmsg);
-        }
-
-        // TODO: will not be closed if we encountered an exception
-        // dumped all configs, close root </dumps> element now
-        if (fdump.is_open()) {
-            fdump << "</dumps>" << std::endl;
-            fdump.close();
-        }
-
-        executeAddons(dumpFile, file);
     } catch (const TerminateException &) {
         // Analysis is terminated
         if (analyzerInformation)
