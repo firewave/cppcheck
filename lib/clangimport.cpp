@@ -338,6 +338,9 @@ namespace clangimport {
         void setLocations(TokenList &tokenList, int file, int line, int col);
 
         void dumpAst(int num = 0, int indent = 0) const;
+        /**
+         * @throws InternalError thrown if AST location is invalid
+         */
         void createTokens1(TokenList &tokenList) {
             //dumpAst(); // TODO: reactivate or remove
             if (isPrologueTypedefDecl())
