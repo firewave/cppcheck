@@ -50,7 +50,7 @@ struct TokensFrontBack {
 
 class CPPCHECKLIB TokenList {
 public:
-    explicit TokenList(const Settings& settings, Standards::Language lang) noexcept;
+    explicit TokenList(const Settings& settings, Standards::Language lang);
     ~TokenList();
 
     TokenList(const TokenList &) = delete;
@@ -109,7 +109,7 @@ public:
         return createTokensFromBuffer(data, size-1);
     }
 
-    void createTokens(simplecpp::TokenList&& tokenList) noexcept;
+    void createTokens(simplecpp::TokenList&& tokenList);
 
     /** Deallocate list */
     void deallocateTokens();
