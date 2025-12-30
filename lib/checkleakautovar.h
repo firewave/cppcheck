@@ -116,7 +116,9 @@ private:
 
     void runChecks(const Tokenizer &tokenizer, ErrorLogger *errorLogger) override;
 
-    /** check for leaks in all scopes */
+    /** check for leaks in all scopes
+     * @throws InternalError thrown if start token precedes end token
+     */
     void check();
 
     /** check for leaks in a function scope
