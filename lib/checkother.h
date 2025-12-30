@@ -69,7 +69,9 @@ private:
         : Check(myName(), tokenizer, settings, errorLogger) {}
 
 
-    /** @brief Run checks against the normal token list */
+    /** @brief Run checks against the normal token list
+     * @throws InternalError thrown if largest union member could not be found
+     */
     void runChecks(const Tokenizer &tokenizer, ErrorLogger *errorLogger) override;
 
     /** @brief Clarify calculation for ".. a * b ? .." */
