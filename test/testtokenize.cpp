@@ -512,7 +512,7 @@ private:
         TEST_CASE(simplifyEnum2);
     }
 
-    class TokenizerTest : public Tokenizer
+    class TokenizerTest final : public Tokenizer
     {
         friend class TestTokenizer;
     public:

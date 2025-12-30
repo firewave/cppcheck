@@ -319,12 +319,12 @@ private:
         TEST_CASE(dumpTemplateArgFrom);
     }
 
-    class TemplateSimplifierTest : public TemplateSimplifier
+    class TemplateSimplifierTest final : public TemplateSimplifier
     {
         friend class TestSimplifyTemplate;
     };
 
-    class TokenizerTest : public Tokenizer
+    class TokenizerTest final : public Tokenizer
     {
         friend class TestSimplifyTemplate;
     public:
