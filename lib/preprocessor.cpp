@@ -768,7 +768,7 @@ static simplecpp::DUI createDUI(const Settings &mSettings, const std::string &cf
     return dui;
 }
 
-const simplecpp::Output* Preprocessor::handleErrors(const simplecpp::OutputList& outputList)
+const simplecpp::Output* Preprocessor::handleErrors(const simplecpp::OutputList& outputList) noexcept
 {
     const bool showerror = (!mSettings.userDefines.empty() && !mSettings.force);
     return reportOutput(outputList, showerror);
@@ -811,7 +811,7 @@ void Preprocessor::setPlatformInfo()
     mTokens.sizeOfType["long double *"] = mSettings.platform.sizeof_pointer;
 }
 
-simplecpp::TokenList Preprocessor::preprocess(const std::string &cfg, std::vector<std::string> &files, simplecpp::OutputList& outputList)
+simplecpp::TokenList Preprocessor::preprocess(const std::string &cfg, std::vector<std::string> &files, simplecpp::OutputList& outputList) noexcept
 {
     const simplecpp::DUI dui = createDUI(mSettings, cfg, mLang);
 

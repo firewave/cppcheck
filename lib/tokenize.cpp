@@ -115,7 +115,7 @@ static bool isClassStructUnionEnumStart(const Token * tok)
 
 //---------------------------------------------------------------------------
 
-Tokenizer::Tokenizer(TokenList tokenList, ErrorLogger &errorLogger) :
+Tokenizer::Tokenizer(TokenList tokenList, ErrorLogger &errorLogger) noexcept :
     list(std::move(tokenList)),
     mSettings(list.getSettings()),
     mErrorLogger(errorLogger),

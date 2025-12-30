@@ -118,7 +118,7 @@ public:
 
     void setPlatformInfo();
 
-    simplecpp::TokenList preprocess(const std::string &cfg, std::vector<std::string> &files, simplecpp::OutputList& outputList);
+    simplecpp::TokenList preprocess(const std::string &cfg, std::vector<std::string> &files, simplecpp::OutputList& outputList) noexcept;
 
     std::string getcode(const std::string &cfg, std::vector<std::string> &files, bool writeLocations);
 
@@ -143,7 +143,7 @@ public:
 
     void error(const std::string &filename, unsigned int linenr, unsigned int col, const std::string &msg, simplecpp::Output::Type type);
 
-    const simplecpp::Output* handleErrors(const simplecpp::OutputList &outputList);
+    const simplecpp::Output* handleErrors(const simplecpp::OutputList &outputList) noexcept;
 
 private:
     static void simplifyPragmaAsmPrivate(simplecpp::TokenList &tokenList);

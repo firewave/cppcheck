@@ -52,7 +52,7 @@
 static constexpr int AST_MAX_DEPTH = 150;
 
 
-TokenList::TokenList(const Settings& settings, Standards::Language lang)
+TokenList::TokenList(const Settings& settings, Standards::Language lang) noexcept
     : mTokensFrontBack(new TokensFrontBack)
     , mSettings(settings)
 {
@@ -343,7 +343,7 @@ bool TokenList::createTokensFromBufferInternal(const char* data, size_t size, co
 //---------------------------------------------------------------------------
 
 // NOLINTNEXTLINE(cppcoreguidelines-rvalue-reference-param-not-moved)
-void TokenList::createTokens(simplecpp::TokenList&& tokenList)
+void TokenList::createTokens(simplecpp::TokenList&& tokenList) noexcept
 {
     // TODO: what to do if the list has been filled already? clear mTokensFrontBack?
 
