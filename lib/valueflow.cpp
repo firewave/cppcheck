@@ -1351,6 +1351,9 @@ static Analyzer::Result valueFlowForwardRecursive(Token* top,
     return result;
 }
 
+/**
+ * @throws InternalError thrown on cyclic analysis
+ */
 static void valueFlowReverse(Token* tok,
                              const Token* const endToken,
                              const Token* const varToken,
@@ -1373,6 +1376,9 @@ static void valueFlowReverse(Token* tok,
 }
 
 // Deprecated
+/**
+ * @throws InternalError thrown on cyclic analysis
+ */
 static void valueFlowReverse(const TokenList& tokenlist,
                              Token* tok,
                              const Token* const varToken,
@@ -4422,6 +4428,9 @@ struct ConditionHandler {
         return valueFlowForwardRecursive(top, exprTok, values, tokenlist, errorLogger, settings, loc);
     }
 
+    /**
+     * @throws InternalError thrown on cyclic analysis
+     */
     virtual void reverse(Token* start,
                          const Token* endToken,
                          const Token* exprTok,
@@ -4469,6 +4478,9 @@ struct ConditionHandler {
         }
     }
 
+    /**
+     * @throws InternalError thrown on cyclic analysis
+     */
     void beforeCondition(TokenList& tokenlist,
                          const SymbolDatabase& symboldatabase,
                          ErrorLogger& errorLogger,
@@ -5526,6 +5538,9 @@ static void valueFlowInjectParameter(const TokenList& tokenlist,
                      settings);
 }
 
+/**
+ * @throws InternalError thrown on cyclic analysis
+ */
 static void valueFlowSwitchVariable(const TokenList& tokenlist,
                                     const SymbolDatabase& symboldatabase,
                                     ErrorLogger& errorLogger,
