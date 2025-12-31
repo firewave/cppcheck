@@ -354,7 +354,7 @@ CmdLineParser::Result CmdLineParser::parseFromArgs(int argc, const char* const a
         return Result::Fail;
 
     if (argc <= 1) {
-        printHelp(mSettings.premium);
+        printHelp();
         return Result::Exit;
     }
 
@@ -389,7 +389,7 @@ CmdLineParser::Result CmdLineParser::parseFromArgs(int argc, const char* const a
 
         // Print help
         if (std::strcmp(argv[i], "-h") == 0 || std::strcmp(argv[i], "--help") == 0) {
-            printHelp(mSettings.premium);
+            printHelp();
             return Result::Exit;
         }
 
@@ -1701,10 +1701,10 @@ CmdLineParser::Result CmdLineParser::parseFromArgs(int argc, const char* const a
     return Result::Success;
 }
 
-void CmdLineParser::printHelp(bool premium) const
+void CmdLineParser::printHelp() const
 {
     // TODO: fetch URL from config like product name?
-    const std::string manualUrl(premium ?
+    const std::string manualUrl(mSettings.premium ?
                                 "https://files.cppchecksolutions.com/manual.pdf" :
                                 "https://cppcheck.sourceforge.io/manual.pdf");
 
@@ -1907,7 +1907,7 @@ void CmdLineParser::printHelp(bool premium) const
         "    --plist-output=<path>\n"
         "                         Generate Clang-plist output files in folder.\n";
 
-    if (premium) {
+    if (mSettings.premium) {
         oss <<
             "    --premium=<option>\n"
             "                         Coding standards:\n"
