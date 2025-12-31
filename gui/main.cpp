@@ -122,6 +122,7 @@ static void ShowUsage()
 #endif
 }
 
+// TODO: proper name and version
 static void ShowVersion()
 {
 // TODO: should only *not* show a dialog when we are on a commnd-line
