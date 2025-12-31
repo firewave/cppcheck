@@ -49,10 +49,10 @@ int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
 
-    QCoreApplication::setOrganizationName("Cppcheck");
-    QCoreApplication::setApplicationName("Cppcheck-GUI");
+    QCoreApplication::setOrganizationName("Cppcheck"); // TODO: name
+    QCoreApplication::setApplicationName("Cppcheck-GUI"); // TODO: name
 
-    auto* settings = new QSettings("Cppcheck", "Cppcheck-GUI", &app);
+    auto* settings = new QSettings("Cppcheck", "Cppcheck-GUI", &app); // TODO: name
 
     // Set data dir..
     const QStringList args = QApplication::arguments();
@@ -98,7 +98,7 @@ static bool CheckArgs(const QStringList &args)
 static void ShowUsage()
 {
     QString helpMessage = MainWindow::tr(
-        "Cppcheck GUI.\n\n"
+        "Cppcheck GUI.\n\n" // TODO: name
         "Syntax:\n"
         "    cppcheck-gui [OPTIONS] [files or paths]\n\n"
         "Options:\n"
@@ -112,7 +112,7 @@ static void ShowUsage()
         "                            is used.");
 #if defined(_WIN32)
     QMessageBox msgBox(QMessageBox::Information,
-                       MainWindow::tr("Cppcheck GUI - Command line parameters"),
+                       MainWindow::tr("Cppcheck GUI - Command line parameters"), // TODO: name
                        helpMessage,
                        QMessageBox::Ok
                        );
