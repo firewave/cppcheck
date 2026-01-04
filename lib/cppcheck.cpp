@@ -951,7 +951,8 @@ unsigned int CppCheck::checkInternal(const FileWithDetails& file, const std::str
             // TODO: if an exception occurs in this block it will continue in an unexpected code path
             if (!mSettings.buildDir.empty())
             {
-                analyzerInformation.reset(new AnalyzerInformation);
+                // XML can be closed because no further analysis is performed on markup files
+                analyzerInformation.reset(new AnalyzerInformation(true));
                 mLogger->setAnalyzerInfo(analyzerInformation.get());
             }
 
@@ -1012,7 +1013,9 @@ unsigned int CppCheck::checkInternal(const FileWithDetails& file, const std::str
         preprocessor.removeComments();
 
         if (!mSettings.buildDir.empty()) {
-            analyzerInformation.reset(new AnalyzerInformation);
+            // FIXME: this is a horrible hack to leave the XML open so we can add unmatchedSuppression entries in CppCheckExecutor
+            const bool close_xml = !mSettings.severity.isEnabled(Severity::information) && !mSettings.checkConfiguration;
+            analyzerInformation.reset(new AnalyzerInformation(close_xml));
             mLogger->setAnalyzerInfo(analyzerInformation.get());
         }
 

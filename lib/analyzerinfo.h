@@ -55,6 +55,7 @@ namespace tinyxml2 {
  */
 class CPPCHECKLIB AnalyzerInformation {
 public:
+    explicit AnalyzerInformation(bool close_xml);
     ~AnalyzerInformation();
 
     static void writeFilesTxt(const std::string &buildDir, const std::list<std::string> &sourcefiles, const std::string &userDefines, const std::list<FileSettings> &fileSettings);
@@ -89,6 +90,7 @@ protected:
 private:
     std::ofstream mOutputStream;
     std::string mAnalyzerInfoFile;
+    bool mCloseXml;
 };
 
 /// @}
