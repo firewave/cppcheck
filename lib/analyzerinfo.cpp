@@ -210,3 +210,31 @@ bool AnalyzerInformation::Info::parse(const std::string& filesTxtLine) {
     return true;
 }
 
+void AnalyzerInformation::Info::process(const std::string& buildDir, const std::string &filesTxtLine, std::function<void(const char* checkattr, const tinyxml2::XMLElement* e)> handler)
+{
+    AnalyzerInformation::Info filesTxtInfo;
+    if (!filesTxtInfo.parse(filesTxtLine)) {
+        return;
+    }
+
+    const std::string xmlfile = buildDir + '/' + filesTxtInfo.afile;
+
+    tinyxml2::XMLDocument doc;
+    const tinyxml2::XMLError error = doc.LoadFile(xmlfile.c_str());
+    if (error != tinyxml2::XML_SUCCESS)
+        return;
+
+    const tinyxml2::XMLElement * const rootNode = doc.FirstChildElement();
+    if (rootNode == nullptr)
+        return;
+
+    for (const tinyxml2::XMLElement *e = rootNode->FirstChildElement(); e; e = e->NextSiblingElement()) {
+        if (std::strcmp(e->Name(), "FileInfo") != 0)
+            continue;
+        const char *checkattr = e->Attribute("check");
+        if (checkattr == nullptr)
+            continue;
+        handler(checkattr, e);
+    }
+}
+

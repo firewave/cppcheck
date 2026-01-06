@@ -71,6 +71,7 @@ public:
 
     class CPPCHECKLIB Info {
     public:
+        static void process(const std::string& buildDir, const std::string& filesTxtLine, std::function<void(const char* checkattr, const tinyxml2::XMLElement* e)> handler);
         bool parse(const std::string& filesTxtLine);
         std::string afile;
         std::string cfg;
