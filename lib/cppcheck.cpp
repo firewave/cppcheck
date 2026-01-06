@@ -1854,32 +1854,45 @@ unsigned int CppCheck::analyseWholeProgram(const std::string &buildDir, const st
     std::list<Check::FileInfo*> fileInfoList;
     CTU::FileInfo ctuFileInfo;
 
+    // TODO: how to report errors properly?
+
     // Load all analyzer info data..
     const std::string filesTxt(buildDir + "/files.txt");
     std::ifstream fin(filesTxt);
     std::string filesTxtLine;
     while (std::getline(fin, filesTxtLine)) {
         AnalyzerInformation::Info filesTxtInfo;
-        if (!filesTxtInfo.parse(filesTxtLine))
+        if (!filesTxtInfo.parse(filesTxtLine)) {
+            std::cerr << "failed to parse '" + filesTxtLine + "' from '" + filesTxt + "'";
             continue;
+        }
 
         const std::string xmlfile = buildDir + '/' + filesTxtInfo.afile;
 
         tinyxml2::XMLDocument doc;
         const tinyxml2::XMLError error = doc.LoadFile(xmlfile.c_str());
-        if (error != tinyxml2::XML_SUCCESS)
+        if (error == tinyxml2::XML_ERROR_FILE_NOT_FOUND)
             continue;
 
-        const tinyxml2::XMLElement * const rootNode = doc.FirstChildElement();
-        if (rootNode == nullptr)
+        if (error != tinyxml2::XML_SUCCESS) {
+            std::cerr << "failed to load '" + xmlfile + "' from '" + filesTxt + "'";
             continue;
+        }
+
+        const tinyxml2::XMLElement * const rootNode = doc.FirstChildElement();
+        if (rootNode == nullptr) {
+            std::cerr << "no root node found in '" + xmlfile + "' from '" + filesTxt + "'";
+            continue;
+        }
 
         for (const tinyxml2::XMLElement *e = rootNode->FirstChildElement(); e; e = e->NextSiblingElement()) {
             if (std::strcmp(e->Name(), "FileInfo") != 0)
                 continue;
             const char *checkClassAttr = e->Attribute("check");
-            if (!checkClassAttr)
+            if (!checkClassAttr) {
+                std::cerr << "'check' attribute missing in 'FileInfo' in '" + xmlfile + "' from '" + filesTxt + "'";
                 continue;
+            }
             if (std::strcmp(checkClassAttr, "ctu") == 0) {
                 ctuFileInfo.loadFromXml(e);
                 continue;

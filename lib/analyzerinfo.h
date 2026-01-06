@@ -59,6 +59,9 @@ public:
 
     /** Close current TU.analyzerinfo file */
     void close();
+    /**
+     * @throws std::runtime_error thrown if the output file is already open, the existing XML is invalid or the output file cannot be opened
+     */
     bool analyzeFile(const std::string &buildDir, const std::string &sourcefile, const std::string &cfg, int fileIndex, std::size_t hash, std::list<ErrorMessage> &errors);
     void reportErr(const ErrorMessage &msg);
     void setFileInfo(const std::string &check, const std::string &fileInfo);
@@ -84,7 +87,6 @@ protected:
 
 private:
     std::ofstream mOutputStream;
-    std::string mAnalyzerInfoFile;
 };
 
 /// @}
