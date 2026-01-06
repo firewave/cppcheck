@@ -430,8 +430,13 @@ int CppCheckExecutor::check_internal(const Settings& settings, Suppressions& sup
     // TODO: is this run again instead of using previously cached results?
     returnValue |= cppcheck.analyseWholeProgram(settings.buildDir, mFiles, mFileSettings, stdLogger.getCtuInfo());
 
-    if (settings.severity.isEnabled(Severity::information) || settings.checkConfiguration) {
-        AnalyzerInformation analyzerInfo(true);
+    if ((settings.severity.isEnabled(Severity::information) || settings.checkConfiguration) && !supprs.nomsg.getSuppressions().empty()) {
+        AnalyzerInformation analyzerInfo;
+        // FIXME: this is a horrible hack
+        // we need to "re-open" the file so we can add the unmatchedSuppression findings.
+        // we cannot keep it open conditionally because the whole program analysis read the XML.
+        // re-ordering is also not an option because the unmatched suppression reporting needs to be run after all other checks.
+        analyzerInfo.reopen();
         const bool err = reportUnmatchedSuppressions(settings, supprs.nomsg, mFiles, mFileSettings, stdLogger, &analyzerInfo);
         analyzerInfo.close();
         if (err && returnValue == 0)
