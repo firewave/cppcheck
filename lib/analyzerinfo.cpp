@@ -78,7 +78,6 @@ std::string AnalyzerInformation::getFilesTxt(const std::list<std::string> &sourc
 
 void AnalyzerInformation::close()
 {
-    mAnalyzerInfoFile.clear();
     if (mOutputStream.is_open()) {
         mOutputStream << "</analyzerinfo>\n";
         mOutputStream.close();
@@ -148,24 +147,26 @@ std::string AnalyzerInformation::getAnalyzerInfoFile(const std::string &buildDir
 
 bool AnalyzerInformation::analyzeFile(const std::string &buildDir, const std::string &sourcefile, const std::string &cfg, int fileIndex, std::size_t hash, std::list<ErrorMessage> &errors)
 {
+    if (mOutputStream.is_open())
+        throw std::runtime_error("analyzer information file is already open");
+
     if (buildDir.empty() || sourcefile.empty())
         return true;
-    close();
 
-    mAnalyzerInfoFile = AnalyzerInformation::getAnalyzerInfoFile(buildDir,sourcefile,cfg,fileIndex);
+    const std::string analyzerInfoFile = AnalyzerInformation::getAnalyzerInfoFile(buildDir,sourcefile,cfg,fileIndex);
 
     tinyxml2::XMLDocument analyzerInfoDoc;
-    const tinyxml2::XMLError xmlError = analyzerInfoDoc.LoadFile(mAnalyzerInfoFile.c_str());
-    if (xmlError == tinyxml2::XML_SUCCESS && skipAnalysis(analyzerInfoDoc, hash, errors))
+    const tinyxml2::XMLError xmlError = analyzerInfoDoc.LoadFile(analyzerInfoFile.c_str());
+    if (xmlError != tinyxml2::XML_SUCCESS && xmlError != tinyxml2::XML_ERROR_FILE_NOT_FOUND)
+        throw std::runtime_error("failed to load '" + analyzerInfoFile + "' - " + tinyxml2::XMLDocument::ErrorIDToName(xmlError));
+    if (skipAnalysis(analyzerInfoDoc, hash, errors))
         return false;
 
-    mOutputStream.open(mAnalyzerInfoFile);
-    if (mOutputStream.is_open()) {
-        mOutputStream << "<?xml version=\"1.0\"?>\n";
-        mOutputStream << "<analyzerinfo hash=\"" << hash << "\">\n";
-    } else {
-        mAnalyzerInfoFile.clear();
-    }
+    mOutputStream.open(analyzerInfoFile);
+    if (!mOutputStream.is_open())
+        throw std::runtime_error("failed to open '" + analyzerInfoFile + "'");
+    mOutputStream << "<?xml version=\"1.0\"?>\n";
+    mOutputStream << "<analyzerinfo hash=\"" << hash << "\">\n";
 
     return true;
 }
@@ -209,6 +210,9 @@ bool AnalyzerInformation::Info::parse(const std::string& filesTxtLine) {
     return true;
 }
 
+#include <iostream>
+
+// TODO: how to report errors properly?
 // TODO: bail out on unexpected data
 void AnalyzerInformation::processFilesTxt(const std::string& buildDir, const std::function<void(const char* checkattr, const tinyxml2::XMLElement* e, const Info& filesTxtInfo)>& handler)
 {
@@ -218,6 +222,7 @@ void AnalyzerInformation::processFilesTxt(const std::string& buildDir, const std
     while (std::getline(fin, filesTxtLine)) {
         AnalyzerInformation::Info filesTxtInfo;
         if (!filesTxtInfo.parse(filesTxtLine)) {
+            std::cerr << "failed to parse '" + filesTxtLine + "' from '" + filesTxt + "'";
             return;
         }
 
@@ -225,21 +230,32 @@ void AnalyzerInformation::processFilesTxt(const std::string& buildDir, const std
 
         tinyxml2::XMLDocument doc;
         const tinyxml2::XMLError error = doc.LoadFile(xmlfile.c_str());
-        if (error != tinyxml2::XML_SUCCESS)
+        if (error == tinyxml2::XML_ERROR_FILE_NOT_FOUND)
             return;
 
-        const tinyxml2::XMLElement * const rootNode = doc.FirstChildElement();
-        if (rootNode == nullptr)
+        if (error != tinyxml2::XML_SUCCESS) {
+            std::cerr << "failed to load '" + xmlfile + "' from '" + filesTxt + "'";
             return;
+        }
+
+        const tinyxml2::XMLElement * const rootNode = doc.FirstChildElement();
+        if (rootNode == nullptr) {
+            std::cerr << "no root node found in '" + xmlfile + "' from '" + filesTxt + "'";
+            continue;
+        }
 
         for (const tinyxml2::XMLElement *e = rootNode->FirstChildElement(); e; e = e->NextSiblingElement()) {
             if (std::strcmp(e->Name(), "FileInfo") != 0)
                 continue;
             const char *checkattr = e->Attribute("check");
-            if (checkattr == nullptr)
+            if (checkattr == nullptr) {
+                std::cerr << "'check' attribute missing in 'FileInfo' in '" + xmlfile + "' from '" + filesTxt + "'";
                 continue;
+            }
             handler(checkattr, e, filesTxtInfo);
         }
     }
+
+    // TODO: error on empty file?
 }
 
