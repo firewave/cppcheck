@@ -84,29 +84,50 @@ void AnalyzerInformation::close()
     }
 }
 
+#include <iostream>
+
 bool AnalyzerInformation::skipAnalysis(const tinyxml2::XMLDocument &analyzerInfoDoc, std::size_t hash, std::list<ErrorMessage> &errors)
 {
     const tinyxml2::XMLElement * const rootNode = analyzerInfoDoc.FirstChildElement();
-    if (rootNode == nullptr)
+    if (rootNode == nullptr) {
+        std::cout << "discarding cached result - no root node found" << std::endl;
         return false;
+    }
 
     const char *attr = rootNode->Attribute("hash");
-    if (!attr || attr != std::to_string(hash))
+    if (!attr) {
+        std::cout << "discarding cached result - no 'hash' node found" << std::endl;
         return false;
-
-    // Check for invalid license error or internal error, in which case we should retry analysis
-    for (const tinyxml2::XMLElement *e = rootNode->FirstChildElement(); e; e = e->NextSiblingElement()) {
-        if (std::strcmp(e->Name(), "error") == 0 &&
-            (e->Attribute("id", "premium-invalidLicense") ||
-             e->Attribute("id", "premium-internalError") ||
-             e->Attribute("id", "internalError")
-            ))
-            return false;
+    }
+    if (attr != std::to_string(hash)) {
+        std::cout << "discarding cached result - hash mismatch" << std::endl;
+        return false;
     }
 
     for (const tinyxml2::XMLElement *e = rootNode->FirstChildElement(); e; e = e->NextSiblingElement()) {
-        if (std::strcmp(e->Name(), "error") == 0)
-            errors.emplace_back(e);
+        if (std::strcmp(e->Name(), "error") != 0)
+            continue;
+
+        // Check for invalid license error or internal error, in which case we should retry analysis
+        if (e->Attribute("id", "premium-invalidLicense")) {
+            std::cout << "discarding cached result - 'premium-invalidLicense' encountered" << std::endl;
+            errors.clear();
+            return false;
+        }
+
+        if (e->Attribute("id", "premium-internalError")) {
+            std::cout << "discarding cached result - 'premium-internalError' encountered" << std::endl;
+            errors.clear();
+            return false;
+        }
+
+        if (e->Attribute("id", "internalError")) {
+            std::cout << "discarding cached result - 'internalError' encountered" << std::endl;
+            errors.clear();
+            return false;
+        }
+
+        errors.emplace_back(e);
     }
 
     return true;
@@ -155,12 +176,14 @@ bool AnalyzerInformation::analyzeFile(const std::string &buildDir, const std::st
 
     const std::string analyzerInfoFile = AnalyzerInformation::getAnalyzerInfoFile(buildDir,sourcefile,cfg,fileIndex);
 
-    tinyxml2::XMLDocument analyzerInfoDoc;
-    const tinyxml2::XMLError xmlError = analyzerInfoDoc.LoadFile(analyzerInfoFile.c_str());
-    if (xmlError != tinyxml2::XML_SUCCESS && xmlError != tinyxml2::XML_ERROR_FILE_NOT_FOUND)
-        throw std::runtime_error("failed to load '" + analyzerInfoFile + "' - " + tinyxml2::XMLDocument::ErrorIDToName(xmlError));
-    if (skipAnalysis(analyzerInfoDoc, hash, errors))
-        return false;
+    {
+        tinyxml2::XMLDocument analyzerInfoDoc;
+        const tinyxml2::XMLError xmlError = analyzerInfoDoc.LoadFile(analyzerInfoFile.c_str());
+        if (xmlError == tinyxml2::XML_SUCCESS && skipAnalysis(analyzerInfoDoc, hash, errors))
+            return false;
+        if (xmlError != tinyxml2::XML_ERROR_FILE_NOT_FOUND)
+            throw std::runtime_error("failed to load '" + analyzerInfoFile + "' - " + tinyxml2::XMLDocument::ErrorIDToName(xmlError));
+    }
 
     mOutputStream.open(analyzerInfoFile);
     if (!mOutputStream.is_open())
