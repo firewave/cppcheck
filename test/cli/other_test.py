@@ -4119,3 +4119,36 @@ def test_active_unusedfunction_only_misra_builddir(tmp_path):
         'CheckUnusedFunctions::check'
     ]
     __test_active_checkers(tmp_path, 1, 1175, use_unusedfunction_only=True, use_misra=True, checkers_exp=checkers_exp)
+
+
+def test_builddir_(tmp_path):
+    test_file = tmp_path / 'test.c'
+    with open(test_file, "w") as f:
+        f.write(
+"""void f()
+{
+    (void)(*((int*)0));
+}
+""")
+
+    build_dir = tmp_path / 'b1'
+    os.makedirs(build_dir)
+
+    args = [
+        '-q',
+        '--template=simple',
+        '--cppcheck-build-dir={}'.format(build_dir),
+        str(test_file)
+    ]
+
+    cppcheck(args)
+
+    files_txt = build_dir / 'files.txt'
+    a_a1_file = build_dir / 'a.a1'
+    with open(a_a1_file, 'a') as f:
+        f.write('.')
+
+    exitcode, stdout, stderr = cppcheck(args)
+    assert exitcode == 0, stdout
+    assert stdout.splitlines() == []
+    assert stderr.splitlines() == []
