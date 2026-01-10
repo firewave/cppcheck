@@ -182,7 +182,7 @@ private:
      * @param cfgname  cfg name
      * @return number of errors found
      */
-    unsigned int checkFile(const FileWithDetails& file, const std::string &cfgname, int fsFileId);
+    unsigned int checkFile(const FileWithDetails& file, const std::string &cfgname);
 
     void checkPlistOutput(const FileWithDetails& file, const std::vector<std::string>& files);
 
@@ -194,7 +194,7 @@ private:
      * @param size the size of the data to be read
      * @return number of errors found
      */
-    unsigned int checkBuffer(const FileWithDetails& file, const std::string &cfgname, int fsFileId, const char* data, std::size_t size);
+    unsigned int checkBuffer(const FileWithDetails& file, const std::string &cfgname, const char* data, std::size_t size);
 
     // TODO: should use simplecpp::OutputList
     using CreateTokenListFn = std::function<simplecpp::TokenList (std::vector<std::string>&, std::list<simplecpp::Output>*)>;
@@ -206,7 +206,7 @@ private:
      * @param createTokenList a function to create the simplecpp::TokenList with
      * @return number of errors found
      */
-    unsigned int checkInternal(const FileWithDetails& file, const std::string &cfgname, int fsFileId, const CreateTokenListFn& createTokenList);
+    unsigned int checkInternal(const FileWithDetails& file, const std::string &cfgname, const CreateTokenListFn& createTokenList);
 
     /**
      * @brief Check normal tokens
@@ -235,7 +235,7 @@ private:
     void executeRules(const std::string &tokenlist, const TokenList &list);
 #endif
 
-    unsigned int checkClang(const FileWithDetails &file, int fsFileId);
+    unsigned int checkClang(const FileWithDetails &file);
 
     const Settings& mSettings;
     Suppressions& mSuppressions;
