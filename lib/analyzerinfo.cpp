@@ -69,7 +69,7 @@ std::string AnalyzerInformation::getFilesTxt(const std::list<std::string> &sourc
 
     for (const FileSettings &fs : fileSettings) {
         const std::string afile = getFilename(fs.filename());
-        const std::string id = fs.fileIndex > 0 ? std::to_string(fs.fileIndex) : "";
+        const std::string id = fs.fsFileId > 0 ? std::to_string(fs.fsFileId) : "";
         ret << afile << ".a" << (++fileCount[afile]) << sep << fs.cfg << sep << id << sep << Path::simplifyPath(fs.filename()) << std::endl;
     }
 
@@ -128,11 +128,11 @@ std::string AnalyzerInformation::getAnalyzerInfoFileFromFilesTxt(std::istream& f
     return "";
 }
 
-std::string AnalyzerInformation::getAnalyzerInfoFile(const std::string &buildDir, const std::string &sourcefile, const std::string &cfg, int fileIndex)
+std::string AnalyzerInformation::getAnalyzerInfoFile(const std::string &buildDir, const std::string &sourcefile, const std::string &cfg, int fsFileId)
 {
     std::ifstream fin(Path::join(buildDir, "files.txt"));
     if (fin.is_open()) {
-        const std::string& ret = getAnalyzerInfoFileFromFilesTxt(fin, sourcefile, cfg, fileIndex);
+        const std::string& ret = getAnalyzerInfoFileFromFilesTxt(fin, sourcefile, cfg, fsFileId);
         if (!ret.empty())
             return Path::join(buildDir, ret);
     }
@@ -146,13 +146,13 @@ std::string AnalyzerInformation::getAnalyzerInfoFile(const std::string &buildDir
     return Path::join(buildDir, std::move(filename)) + ".analyzerinfo";
 }
 
-bool AnalyzerInformation::analyzeFile(const std::string &buildDir, const std::string &sourcefile, const std::string &cfg, int fileIndex, std::size_t hash, std::list<ErrorMessage> &errors)
+bool AnalyzerInformation::analyzeFile(const std::string &buildDir, const std::string &sourcefile, const std::string &cfg, int fsFileId, std::size_t hash, std::list<ErrorMessage> &errors)
 {
     if (buildDir.empty() || sourcefile.empty())
         return true;
     close();
 
-    mAnalyzerInfoFile = AnalyzerInformation::getAnalyzerInfoFile(buildDir,sourcefile,cfg,fileIndex);
+    mAnalyzerInfoFile = AnalyzerInformation::getAnalyzerInfoFile(buildDir,sourcefile,cfg,fsFileId);
 
     tinyxml2::XMLDocument analyzerInfoDoc;
     const tinyxml2::XMLError xmlError = analyzerInfoDoc.LoadFile(mAnalyzerInfoFile.c_str());
@@ -194,10 +194,10 @@ bool AnalyzerInformation::Info::parse(const std::string& filesTxtLine) {
         return false;
 
     if (sep3 == sep2 + 1)
-        fileIndex = 0;
+        fsFileId = 0;
     else {
         try {
-            fileIndex = std::stoi(filesTxtLine.substr(sep2+1, sep3-sep2-1));
+            fsFileId = std::stoi(filesTxtLine.substr(sep2+1, sep3-sep2-1));
         } catch (const std::exception&) {
             return false;
         }
