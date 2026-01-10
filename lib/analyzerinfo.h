@@ -66,7 +66,7 @@ public:
     void setFileInfo(const std::string &check, const std::string &fileInfo);
     static std::string getAnalyzerInfoFile(const std::string &buildDir, const std::string &sourcefile, const std::string &cfg, int fileIndex);
 
-    void reopen();
+    void reopen(const std::string &buildDir, const std::string &sourcefile, const std::string &cfg, int fileIndex);
 
     static const char sep = ':';
 

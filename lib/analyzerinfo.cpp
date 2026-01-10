@@ -245,6 +245,20 @@ void AnalyzerInformation::processFilesTxt(const std::string& buildDir, const std
     }
 }
 
-void AnalyzerInformation::reopen()
+void AnalyzerInformation::reopen(const std::string &buildDir, const std::string &sourcefile, const std::string &cfg, int fileIndex)
 {
+    if (buildDir.empty() || sourcefile.empty())
+        return;
+
+    const std::string analyzerInfoFile = AnalyzerInformation::getAnalyzerInfoFile(buildDir,sourcefile,cfg,fileIndex);
+    std::ifstream ifs(analyzerInfoFile);
+    if (!ifs.is_open())
+        return;
+
+    std::ostringstream iss;
+    iss << ifs.rdbuf();
+    ifs.close();
+
+    mOutputStream.open(analyzerInfoFile);
+    mOutputStream << iss.str();
 }
