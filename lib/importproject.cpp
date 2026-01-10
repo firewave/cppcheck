@@ -430,7 +430,7 @@ bool ImportProject::importCompileCommands(std::istream &istr)
         fsSetIncludePaths(fs, directory, fs.includePaths, variables);
         // Assign a unique index to each file path. If the file path already exists in the map,
         // increment the index to handle duplicate file entries.
-        fs.fsFileId = fsFileIndex[path]++;
+        fs.file.setFsFileId(fsFileIndex[path]++);
         fileSettings.push_back(std::move(fs));
     }
 

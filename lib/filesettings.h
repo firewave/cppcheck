@@ -68,11 +68,22 @@ public:
     {
         return mLang;
     }
+
+    int fsFileId() const
+    {
+        return mFsFileId;
+    }
+
+    void setFsFileId(int fsFileId)
+    {
+        mFsFileId = fsFileId;
+    }
 private:
     std::string mPath;
     std::string mPathSimplified;
     Standards::Language mLang = Standards::Language::None;
     std::size_t mSize;
+    int mFsFileId;
 };
 
 /** File settings. Multiple configurations for a file is allowed. */
@@ -81,7 +92,6 @@ struct CPPCHECKLIB FileSettings {
         : file(std::move(path), lang, size)
     {}
 
-    int fsFileId = 0;
     std::string cfg;
     FileWithDetails file;
     const std::string& filename() const
