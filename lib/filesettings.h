@@ -34,6 +34,9 @@
 class FileWithDetails
 {
 public:
+    /**
+     * @throws std::runtime_error thrown if given path is empty
+     */
     FileWithDetails(std::string path, Standards::Language lang, std::size_t size)
         : mPath(std::move(path))
         , mPathSimplified(Path::simplifyPath(mPath))
