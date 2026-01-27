@@ -5780,7 +5780,7 @@ static bool hasEmptyCaptureList(const Token* tok) {
 
 bool Scope::hasInlineOrLambdaFunction(const Token** tokStart, bool onlyInline) const
 {
-    return std::any_of(nestedList.begin(), nestedList.end(), [&](const Scope* s) {
+    return std::any_of(nestedList.cbegin(), nestedList.cend(), [&](const Scope* s) {
         // Inline function
         if (s->type == ScopeType::eUnconditional && Token::simpleMatch(s->bodyStart->previous(), ") {")) {
             if (tokStart)
@@ -6227,16 +6227,16 @@ const Function* Scope::findFunction(const Token *tok, bool requireConst, Referen
     }
 
     // remove pure virtual function if there is an overrider
-    auto itPure = std::find_if(matches.begin(), matches.end(), [](const Function* m) {
+    auto itPure = std::find_if(matches.cbegin(), matches.cend(), [](const Function* m) {
         return m->isPure();
     });
-    if (itPure != matches.end() && std::any_of(matches.begin(), matches.end(), [&](const Function* m) {
+    if (itPure != matches.end() && std::any_of(matches.cbegin(), matches.cend(), [&](const Function* m) {
         return m->isImplicitlyVirtual() && m != *itPure;
     }))
         matches.erase(itPure);
 
     // Only one candidate left
-    if (matches.size() == 1 && std::none_of(functionList.begin(), functionList.end(), [tok](const Function& f) {
+    if (matches.size() == 1 && std::none_of(functionList.cbegin(), functionList.cend(), [tok](const Function& f) {
         return startsWith(f.name(), tok->str() + " <");
     }))
         return matches[0];
@@ -6515,10 +6515,10 @@ const Scope *Scope::findInNestedListRecursive(const std::string & name) const
     auto it = std::find_if(nestedList.cbegin(), nestedList.cend(), [&](const Scope* s) {
         return s->className == name;
     });
-    if (it != nestedList.end())
+    if (it != nestedList.cend())
         return *it;
 
-    for (Scope* scope: nestedList) {
+    for (const Scope* scope: nestedList) {
         const Scope *child = scope->findInNestedListRecursive(name);
         if (child)
             return child;
