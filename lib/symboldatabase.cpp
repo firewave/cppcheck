@@ -5778,7 +5778,7 @@ static bool hasEmptyCaptureList(const Token* tok) {
 
 bool Scope::hasInlineOrLambdaFunction(const Token** tokStart, bool onlyInline) const
 {
-    return std::any_of(nestedList.begin(), nestedList.end(), [&](const Scope* s) {
+    return std::any_of(nestedList.cbegin(), nestedList.cend(), [&](const Scope* s) {
         // Inline function
         if (s->type == ScopeType::eUnconditional && Token::simpleMatch(s->bodyStart->previous(), ") {")) {
             if (tokStart)
@@ -6513,10 +6513,10 @@ const Scope *Scope::findInNestedListRecursive(const std::string & name) const
     auto it = std::find_if(nestedList.cbegin(), nestedList.cend(), [&](const Scope* s) {
         return s->className == name;
     });
-    if (it != nestedList.end())
+    if (it != nestedList.cend())
         return *it;
 
-    for (Scope* scope: nestedList) {
+    for (const Scope* scope: nestedList) {
         const Scope *child = scope->findInNestedListRecursive(name);
         if (child)
             return child;
