@@ -2160,7 +2160,7 @@ namespace {
     {
         if (const Scope* scope = var->nameToken()->scope()) {
             auto it = std::find_if(scope->functionList.begin(), scope->functionList.end(), [&](const Function& function) {
-                for (nonneg int arg = 0; arg < function.argCount(); ++arg) {
+                for (std::size_t arg = 0; arg < function.argCount(); ++arg) {
                     if (var == function.getArgumentVar(arg))
                         return true;
                 }
@@ -4514,7 +4514,7 @@ void SymbolDatabase::printXml(std::ostream &out) const
                         outs += "/>\n";
                     else {
                         outs += ">\n";
-                        for (unsigned int argnr = 0; argnr < function->argCount(); ++argnr) {
+                        for (std::size_t argnr = 0; argnr < function->argCount(); ++argnr) {
                             const Variable *arg = function->getArgumentVar(argnr);
                             outs += "          <arg nr=\"";
                             outs += std::to_string(argnr+1);
@@ -4936,7 +4936,7 @@ const Function * Function::getOverriddenFunctionRecursive(const ::Type* baseType
     return nullptr;
 }
 
-const Variable* Function::getArgumentVar(nonneg int num) const
+const Variable* Function::getArgumentVar(std::size_t num) const
 {
     if (num < argumentList.size()) {
         auto it = argumentList.begin();

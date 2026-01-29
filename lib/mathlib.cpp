@@ -398,7 +398,7 @@ MathLib::bigint MathLib::toBigNumber(const std::string & str, const Token * cons
     if (isOct(str)) {
         try {
             const biguint ret = std::stoull(str, nullptr, 8);
-            return ret;
+            return static_cast<bigint>(ret);
         } catch (const std::out_of_range& /*e*/) {
             throw InternalError(tok, "Internal Error. MathLib::toBigNumber: out_of_range: " + str);
         } catch (const std::invalid_argument& /*e*/) {
@@ -449,7 +449,7 @@ MathLib::bigint MathLib::toBigNumber(const std::string & str, const Token * cons
             if (!isValidIntegerSuffix(s, true))
                 throw InternalError(tok, "Internal Error. MathLib::toBigNumber: input was not completely consumed: " + str);
         }
-        return ret;
+        return static_cast<bigint>(ret);
     } catch (const std::out_of_range& /*e*/) {
         throw InternalError(tok, "Internal Error. MathLib::toBigNumber: out_of_range: " + str);
     } catch (const std::invalid_argument& /*e*/) {

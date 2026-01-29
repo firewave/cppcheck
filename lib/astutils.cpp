@@ -136,7 +136,7 @@ std::vector<Token*> astFlatten(Token* tok, const char* op)
     return result;
 }
 
-nonneg int astCount(const Token* tok, const char* op, int depth)
+std::size_t astCount(const Token* tok, const char* op, int depth)
 {
     --depth;
     if (!tok || depth < 0)
@@ -2433,7 +2433,7 @@ std::vector<const Variable*> getArgumentVars(const Token* tok, int argnr)
             return {&*it};
         }
         std::vector<const Variable*> result;
-        const int argCount = numberOfArguments(tok);
+        const std::size_t argCount = numberOfArguments(tok);
         const bool constructor = tokIsBrace || (tok->variable() && tok->variable()->nameToken() == tok);
         for (const Function &function : typeScope->functionList) {
             if (function.argCount() < argCount)
@@ -3177,7 +3177,7 @@ const Token* getArgumentStart(const Token* ftok)
     return startTok;
 }
 
-int numberOfArguments(const Token* ftok) {
+std::size_t numberOfArguments(const Token* ftok) {
     return astCount(getArgumentStart(ftok), ",");
 }
 

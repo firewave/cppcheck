@@ -427,7 +427,7 @@ CTU::FileInfo *CTU::getFileInfo(const Tokenizer &tokenizer)
         }
 
         // Nested function calls
-        for (int argnr = 0; argnr < scopeFunction->argCount(); ++argnr) {
+        for (std::size_t argnr = 0; argnr < scopeFunction->argCount(); ++argnr) {
             const Token *tok;
             const int argnr2 = isCallFunction(&scope, argnr, tok);
             if (argnr2 > 0) {
@@ -487,7 +487,7 @@ std::list<CTU::FileInfo::UnsafeUsage> CTU::getUnsafeUsage(const Tokenizer &token
         const Function *const function = scope.function;
 
         // "Unsafe" functions unconditionally reads data before it is written..
-        for (int argnr = 0; argnr < function->argCount(); ++argnr) {
+        for (std::size_t argnr = 0; argnr < function->argCount(); ++argnr) {
             for (const std::pair<const Token *, CTU::FileInfo::Value> &v : getUnsafeFunction(settings, &scope, argnr, isUnsafeUsage)) {
                 const Token *tok = v.first;
                 const MathLib::bigint val = v.second.value;

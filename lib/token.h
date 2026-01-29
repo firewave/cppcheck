@@ -88,9 +88,9 @@ public:
 private:
     struct Impl {
         nonneg int mVarId{};
-        nonneg int mFileIndex{};
-        nonneg int mLineNumber{};
-        nonneg int mColumn{};
+        nonneg int mFileIndex{}; // TODO: needs to be unsigned
+        nonneg int mLineNumber{}; // TODO: needs to be unsigned
+        nonneg int mColumn{}; // TODO: needs to be unsigned
         nonneg int mExprId{};
 
         // original template argument location
@@ -102,7 +102,7 @@ private:
          * A value from 0-100 that provides a rough idea about where in the token
          * list this token is located.
          */
-        nonneg int mProgressValue{};
+        std::size_t mProgressValue{};
 
         /**
          * Token index. Position in token list
@@ -1312,7 +1312,7 @@ public:
     static void move(Token *srcStart, Token *srcEnd, Token *newLocation);
 
     /** Get progressValue (0 - 100) */
-    nonneg int progressValue() const {
+    std::size_t progressValue() const {
         return mImpl->mProgressValue;
     }
 

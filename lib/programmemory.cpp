@@ -1386,7 +1386,7 @@ namespace {
                 return unknown();
             }
 
-            nonneg int n = astCount(expr, expr->str().c_str());
+            std::size_t n = astCount(expr, expr->str().c_str());
             if (n > 50)
                 return unknown();
             std::vector<const Token*> conditions1 = flattenConditions(expr);

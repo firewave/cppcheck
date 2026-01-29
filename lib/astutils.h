@@ -127,7 +127,7 @@ const Token* findEscapeStatement(const Scope* scope, const Library& library);
 std::vector<const Token*> astFlatten(const Token* tok, const char* op);
 std::vector<Token*> astFlatten(Token* tok, const char* op);
 
-nonneg int astCount(const Token* tok, const char* op, int depth = 100);
+std::size_t astCount(const Token* tok, const char* op, int depth = 100);
 
 bool astHasToken(const Token* root, const Token * tok);
 
@@ -392,7 +392,7 @@ const Token* getArgumentStart(const Token* ftok);
  * @param ftok start token which is supposed to be the function/macro name.
  * @return Number of arguments
  */
-int numberOfArguments(const Token* ftok);
+std::size_t numberOfArguments(const Token* ftok);
 
 /// Get number of arguments without using AST
 int numberOfArgumentsWithoutAst(const Token* start);

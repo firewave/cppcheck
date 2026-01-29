@@ -454,7 +454,7 @@ Library::Error Library::load(const tinyxml2::XMLDocument &doc)
                     }
 
                     if (memorynodename == "realloc")
-                        temp.reallocArg = memorynode->IntAttribute("realloc-arg", 1);
+                        temp.reallocArg = memorynode->UnsignedAttribute("realloc-arg", 1);
 
                     auto& map = (memorynodename == "realloc") ? mData->mRealloc : mData->mAlloc;
                     for (const auto& n : names)

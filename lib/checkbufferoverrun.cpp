@@ -844,7 +844,7 @@ void CheckBufferOverrun::argumentSize()
             // If argument is '%type% a[num]' then check bounds against num
             const Function *callfunc = tok->function();
             const std::vector<const Token *> callargs = getArguments(tok);
-            for (nonneg int paramIndex = 0; paramIndex < callargs.size() && paramIndex < callfunc->argCount(); ++paramIndex) {
+            for (std::size_t paramIndex = 0; paramIndex < callargs.size() && paramIndex < callfunc->argCount(); ++paramIndex) {
                 const Variable* const argument = callfunc->getArgumentVar(paramIndex);
                 if (!argument || !argument->nameToken() || !argument->isArray())
                     continue;

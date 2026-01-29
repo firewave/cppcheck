@@ -87,7 +87,7 @@ public:
         BufferSize bufferSize{BufferSize::none};
         int bufferSizeArg1{};
         int bufferSizeArg2{};
-        int reallocArg{};
+        std::size_t reallocArg{};
         bool initData{};
         bool noFail{};
     };
