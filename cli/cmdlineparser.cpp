@@ -1599,14 +1599,12 @@ CmdLineParser::Result CmdLineParser::parseFromArgs(int argc, const char* const a
     }
 
     if (mSettings.jobs > 1 && mSettings.buildDir.empty()) {
-        // TODO: bail out instead?
         if (mSettings.checks.isEnabled(Checks::unusedFunction))
         {
-            mLogger.printMessage("unusedFunction check requires --cppcheck-build-dir to be active with -j.");
-            mSettings.checks.disable(Checks::unusedFunction);
-            // TODO: is there some later logic to remove?
+            mLogger.printError("unusedFunction check requires --cppcheck-build-dir to work with -j.");
+            return Result::Fail;
         }
-        // TODO: enable
+        // TODO: add flag to disable whole program analysis and enable
         //mLogger.printMessage("whole program analysis requires --cppcheck-build-dir to be active with -j.");
     }
 
