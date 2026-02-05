@@ -8,6 +8,7 @@ target_dll_compile_definitions(tinyxml2 EXPORT TINYXML2_EXPORT IMPORT TINYXML2_I
 if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
     target_compile_options(tinyxml2 PRIVATE -Wno-suggest-attribute=format)
     target_compile_options(tinyxml2 PRIVATE -Wno-useless-cast)
+    target_compile_options(tinyxml2 PRIVATE -Wimplicit-fallthrough)
 endif()
 if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
     target_compile_options_safe(tinyxml2 -Wno-implicit-fallthrough)

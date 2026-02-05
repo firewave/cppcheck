@@ -537,6 +537,7 @@ static const Token* doAssignment(Variables &variables, const Token *tok, bool de
                                 if (var1->_assignments.find(scope) == var1->_assignments.end() ||
                                     scope->type == ScopeType::eSwitch) {
                                     // nothing to replace
+                                    SUPPRESS_WARNING_GCC_PUSH("-Wduplicated-branches")
                                     // cppcheck-suppress duplicateBranch - remove when TODO below is address
                                     if (var1->_assignments.empty())
                                         replace = false;
@@ -546,6 +547,7 @@ static const Token* doAssignment(Variables &variables, const Token *tok, bool de
                                         // TODO: determine if existing aliases should be replaced or merged
                                         replace = false;
                                     }
+                                    SUPPRESS_WARNING_GCC_POP
                                 }
 
                                 // assignment in this scope
