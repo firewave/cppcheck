@@ -11087,6 +11087,7 @@ void Tokenizer::simplifyNamespaceAliases()
                             continue;
                         }
                         // conflicting declaration (syntax error)
+                        SUPPRESS_WARNING_GCC_PUSH("-Wduplicated-branches")
                         // cppcheck-suppress duplicateBranch - remove when TODO below is addressed
                         if (endScope == scope) {
                             // delete conflicting declaration
@@ -11098,6 +11099,7 @@ void Tokenizer::simplifyNamespaceAliases()
                             // TODO: use the new alias in this scope
                             tok2 = deleteAlias(tok2->previous());
                         }
+                        SUPPRESS_WARNING_GCC_POP
                         continue;
                     }
 

@@ -67,46 +67,47 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
     add_compile_options(-Wcast-qual)                # Cast for removing type qualifiers
     add_compile_options(-Wfloat-equal)              # Floating values used in equality comparisons
     add_compile_options(-Wmissing-declarations)     # If a global function is defined without a previous declaration
-    add_compile_options(-Wmissing-format-attribute) #
-    add_compile_options(-Wno-long-long)
-    add_compile_options(-Wpacked)                   #
+    add_compile_options(-Wmissing-format-attribute)
+    add_compile_options(-Wpacked)
     add_compile_options(-Wredundant-decls)          # if anything is declared more than once in the same scope
     add_compile_options(-Wundef)
+    add_compile_options(-Woverloaded-virtual)       # when a function declaration hides virtual functions from a base class
+    add_compile_options(-Wno-long-long)
     add_compile_options(-Wno-sign-compare)
     add_compile_options(-Wno-multichar)
-    add_compile_options(-Woverloaded-virtual)       # when a function declaration hides virtual functions from a base class
 
     # TODO: evaluate
     #add_compile_options(-Wconversion)  # danmar: gives fp. for instance: unsigned int sizeof_pointer = sizeof(void *);
-    #add_compile_options(-Wlogical-op) # doesn't work on older GCC
     #add_compile_options(-Wsign-conversion) # too many warnings
     #add_compile_options(-Wunreachable-code) # some GCC versions report lots of warnings
-    #add_compile_options(-Wsign-promo)
+    #add_compile_options(-Wsign-promo) # reports warnings with std::to_string()
 
     # use pipes instead of temporary files - greatly reduces I/O usage
     add_compile_options(-pipe)
 
+    add_compile_options(-Wuseless-cast)
+    add_compile_options(-Wformat=2)
+    add_compile_options(-Wformat-signedness)
+    add_compile_options(-Wmissing-include-dirs)
+    add_compile_options(-Wuninitialized)
+    add_compile_options(-Wpedantic)
+    add_compile_options(-Wlogical-op)
     add_compile_options(-Wsuggest-attribute=noreturn)
-    add_compile_options_safe(-Wuseless-cast)
-    # add_compile_options_safe(-Wsuggest-attribute=returns_nonnull) # reports the warning even if the attribute is set
+    add_compile_options(-Wsuggest-attribute=pure)
+    add_compile_options(-Wsuggest-attribute=const)
+
+    add_compile_options_safe(-Wduplicated-branches)
+    add_compile_options_safe(-Wduplicated-cond)
+    add_compile_options_safe(-Wformat-overflow=2)
+    add_compile_options_safe(-Wnull-dereference)
+    add_compile_options_safe(-Wimplicit-fallthrough=5)
+    add_compile_options_safe(-Wsuggest-attribute=returns_nonnull)
 
     # TODO: evaluate
-    #add_compile_options_safe(-Wduplicated-branches)
-    #add_compile_options_safe(-Wduplicated-cond)
-    #add_compile_options_safe(-Wformat=2)
-    #add_compile_options_safe(-Wformat-overflow=2)
-    #add_compile_options_safe(-Wformat-signedness)
-    #add_compile_options_safe(-Wnull-dereference)
     #add_compile_options_safe(-Wnrvo)
-    #add_compile_options_safe(-Wimplicit-fallthrough=5)
-    #add_compile_options_safe(-Wmissing-include-dirs)
-    #add_compile_options_safe(-Wunused)
+    #add_compile_options(-Wunused)
     #add_compile_options_safe(-Wunused-const-variable)
-    #add_compile_options_safe(-Wuninitialized)
-    #add_compile_options_safe(-Wsuggest-attribute=pure)
-    #add_compile_options_safe(-Wsuggest-attribute=const)
     #add_compile_options_safe(-Wunused-macros)
-    #add_compile_options_safe(-Wpedantic)
 elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
     if(CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 14)
         # TODO: verify this regression still exists in clang-15
