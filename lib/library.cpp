@@ -1383,8 +1383,8 @@ const std::unordered_map<std::string, Library::Container>& Library::containers()
 
 enum DetectContainer : std::uint8_t { ContainerOnly, IteratorOnly, Both };
 
-template<DetectContainer detect>
-static const Library::Container* detectContainerInternal(const std::unordered_map<std::string, Library::Container>& containers, const Token* const typeStart, bool* isIterator = nullptr, bool withoutStd = false)
+template<DetectContainer detect, bool withoutStd = false>
+static const Library::Container* detectContainerInternal(const std::unordered_map<std::string, Library::Container>& containers, const Token* const typeStart, bool* isIterator = nullptr)
 {
     if (!typeStart)
         return nullptr;
@@ -1456,7 +1456,11 @@ const Library::Container* Library::detectIterator(const Token* typeStart) const
 const Library::Container* Library::detectContainerOrIterator(const Token* typeStart, bool* isIterator, bool withoutStd) const
 {
     bool res;
-    const Library::Container* c = detectContainerInternal<Both>(mData->mContainers, typeStart, &res, withoutStd);
+    const Library::Container* c;
+    if (withoutStd)
+        c = detectContainerInternal<Both, true>(mData->mContainers, typeStart, &res);
+    else
+        c = detectContainerInternal<Both, false>(mData->mContainers, typeStart, &res);
     if (c && isIterator)
         *isIterator = res;
     return c;
