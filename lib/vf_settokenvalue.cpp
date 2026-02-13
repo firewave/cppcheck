@@ -705,8 +705,8 @@ namespace ValueFlow
         // Calling std::size or std::empty on an array
         else if (value.isTokValue() && Token::simpleMatch(value.tokvalue, "{") && tok->variable() &&
                  tok->variable()->isArray() && Token::Match(parent->previous(), "%name% (") && astIsRHS(tok)) {
-            std::vector<const Token*> args = getArguments(value.tokvalue);
             if (const Library::Function* f = settings.library.getFunction(parent->previous())) {
+                std::vector<const Token*> args = getArguments(value.tokvalue);
                 if (f->containerYield == Library::Container::Yield::SIZE) {
                     value.valueType = Value::ValueType::INT;
                     value.intvalue = args.size();
