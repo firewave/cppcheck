@@ -3668,13 +3668,13 @@ static void valueFlowSymbolicOperators(const SymbolDatabase& symboldatabase, con
                     continue;
                 const ValueFlow::Value* constant = nullptr;
                 const Token* vartok = nullptr;
-                if (const ValueFlow::Value* v = tok->astOperand1()->getKnownValue(ValueFlow::Value::ValueType::INT)) {
-                    constant = v;
-                    vartok = tok->astOperand2();
-                }
                 if (const ValueFlow::Value* v = tok->astOperand2()->getKnownValue(ValueFlow::Value::ValueType::INT)) {
                     constant = v;
                     vartok = tok->astOperand1();
+                }
+                else if (const ValueFlow::Value* v = tok->astOperand1()->getKnownValue(ValueFlow::Value::ValueType::INT)) {
+                    constant = v;
+                    vartok = tok->astOperand2();
                 }
                 if (!constant)
                     continue;
