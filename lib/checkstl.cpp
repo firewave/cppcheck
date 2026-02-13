@@ -1132,12 +1132,12 @@ void CheckStl::invalidContainer()
     for (const Scope * scope : symbolDatabase->functionScopes) {
         for (const Token* tok = scope->bodyStart->next(); tok != scope->bodyEnd; tok = tok->next()) {
             if (const Token* contTok = getLoopContainer(tok)) {
-                const Token* blockStart = tok->linkAt(1)->next();
-                const Token* blockEnd = blockStart->link();
                 if (contTok->exprId() == 0)
                     continue;
                 if (!astIsContainer(contTok))
                     continue;
+                const Token* blockStart = tok->linkAt(1)->next();
+                const Token* blockEnd = blockStart->link();
                 for (const Token* tok2 = blockStart; tok2 != blockEnd; tok2 = tok2->next()) {
                     bool bail = false;
                     for (const InvalidContainerAnalyzer::Info::Reference& r : analyzer.invalidatesContainer(tok2)) {
