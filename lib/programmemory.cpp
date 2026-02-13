@@ -653,9 +653,9 @@ static bool isIntegralValue(const ValueFlow::Value& value)
 
 static ValueFlow::Value evaluate(const std::string& op, const ValueFlow::Value& lhs, const ValueFlow::Value& rhs)
 {
-    ValueFlow::Value result;
     if (lhs.isImpossible() && rhs.isImpossible())
         return ValueFlow::Value::unknown();
+    ValueFlow::Value result;
     if (lhs.isImpossible() || rhs.isImpossible()) {
         // noninvertible
         if (contains({"%", "/", "&", "|"}, op))
