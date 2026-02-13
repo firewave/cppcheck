@@ -163,8 +163,7 @@ namespace ValueFlow
 
     static bool isComputableValue(const Token* parent, const Value& value)
     {
-        const bool noninvertible = isNonInvertibleOperation(parent);
-        if (noninvertible && value.isImpossible())
+        if (value.isImpossible() && isNonInvertibleOperation(parent))
             return false;
         if (!value.isIntValue() && !value.isFloatValue() && !value.isTokValue() && !value.isIteratorValue())
             return false;
@@ -449,10 +448,8 @@ namespace ValueFlow
                   (parent->tokType() == Token::eLogicalOp)) &&
                  parent->astOperand1() && parent->astOperand2()) {
 
-            const bool noninvertible = isNonInvertibleOperation(parent);
-
             // Skip operators with impossible values that are not invertible
-            if (noninvertible && value.isImpossible())
+            if (value.isImpossible() && isNonInvertibleOperation(parent))
                 return;
 
             if (!value.isImpossible() && value.isIntValue() &&
