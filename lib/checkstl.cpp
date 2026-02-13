@@ -742,8 +742,8 @@ static std::vector<ValueFlow::Value> pruneLifetimes(std::vector<ValueFlow::Value
 
 static ValueFlow::Value getLifetimeIteratorValue(const Token* tok, MathLib::bigint path = 0)
 {
-    auto findIterVal = [](const std::vector<ValueFlow::Value>& values, const std::vector<ValueFlow::Value>::const_iterator beg) {
-        return std::find_if(beg, values.cend(), [](const ValueFlow::Value& v) {
+    auto findIterVal = [](std::vector<ValueFlow::Value>& values, const std::vector<ValueFlow::Value>::iterator beg) {
+        return std::find_if(beg, values.end(), [](const ValueFlow::Value& v) {
             return v.lifetimeKind == ValueFlow::Value::LifetimeKind::Iterator;
         });
     };
@@ -752,10 +752,10 @@ static ValueFlow::Value getLifetimeIteratorValue(const Token* tok, MathLib::bigi
     if (it != values.end()) {
         auto it2 = findIterVal(values, it + 1);
         if (it2 == values.cend())
-            return *it;
+            return std::move(*it);
     }
     if (values.size() == 1)
-        return values.front();
+        return std::move(values.front());
     return ValueFlow::Value{};
 }
 
