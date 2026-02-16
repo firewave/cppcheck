@@ -583,7 +583,6 @@ namespace {
                 return Break(Analyzer::Terminate::Bail);
             std::size_t i = 0;
             for (Token* tok = start; precedes(tok, end); tok = tok->next()) {
-                Token* next = nullptr;
                 if (tok->index() <= i)
                     throw InternalError(tok, "Cyclic forward analysis.");
                 i = tok->index();
@@ -857,6 +856,7 @@ namespace {
                     if (!tok)
                         return Break();
                 } else {
+                    Token* next = nullptr;
                     if (updateTok(tok, &next) == Progress::Break)
                         return Break();
                     if (next) {
