@@ -307,6 +307,7 @@ static bool reportUnmatchedSuppressions(const std::list<SuppressionList::Suppres
         // check if this unmatched suppression is suppressed
         bool suppressed = false;
         for (const SuppressionList::Suppression &s2 : unmatched) {
+            // TODO: handle polyspace
             if (s2.errorId == "unmatchedSuppression") {
                 if ((s2.fileName.empty() || s2.fileName == "*" || s2.fileName == s.fileName) &&
                     (s2.lineNumber == SuppressionList::Suppression::NO_LINE || s2.lineNumber == s.lineNumber)) {
@@ -343,7 +344,8 @@ bool CppCheckExecutor::reportUnmatchedSuppressions(const Settings &settings, con
     // bail out if there is a suppression of unmatchedSuppression which matches any file
     auto suppr = suppressions.getSuppressions();
     if (std::any_of(suppr.cbegin(), suppr.cend(), [](const SuppressionList::Suppression& s) {
-        return s.errorId == "unmatchedSuppression" && (s.fileName.empty() || s.fileName == "*") && s.lineNumber == SuppressionList::Suppression::NO_LINE;
+        // TODO: handle polyspace
+        return (s.errorId == "unmatchedSuppression") && (s.fileName.empty() || s.fileName == "*") && s.lineNumber == SuppressionList::Suppression::NO_LINE;
     }))
         return false;
 
