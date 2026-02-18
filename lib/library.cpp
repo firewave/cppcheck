@@ -123,8 +123,8 @@ struct Library::LibraryData
     std::map<std::string, AllocFunc> mDealloc; // deallocation functions
     std::map<std::string, AllocFunc> mRealloc; // reallocation functions
     std::unordered_map<std::string, FalseTrueMaybe> mNoReturn; // is function noreturn?
-    std::map<std::string, std::string> mReturnValue;
-    std::map<std::string, std::string> mReturnValueType;
+    std::unordered_map<std::string, std::string> mReturnValue;
+    std::unordered_map<std::string, std::string> mReturnValueType;
     std::map<std::string, int> mReturnValueContainer;
     std::map<std::string, std::vector<MathLib::bigint>> mUnknownReturnValues;
     std::map<std::string, bool> mReportErrors;
@@ -856,6 +856,15 @@ Library::Error Library::load(const tinyxml2::XMLDocument &doc)
     return Error(ErrorCode::OK);
 }
 
+
+template<typename T>
+static void emplace_or_replace(T& c, const typename T::key_type& k, typename T::mapped_type v)
+{
+    const auto res = c.emplace(k, v);
+    if (!res.second)
+        res.first->second = v;
+}
+
 Library::Error Library::loadFunction(const tinyxml2::XMLElement * const node, const std::string &name, std::set<std::string> &unknown_elements)
 {
     if (name.empty())
@@ -896,12 +905,12 @@ Library::Error Library::loadFunction(const tinyxml2::XMLElement * const node, co
                     func.useretval = Library::UseRetValType::ERROR_CODE;
         } else if (functionnodename == "returnValue") {
             if (const char *expr = functionnode->GetText())
-                mData->mReturnValue[name] = expr;
+                emplace_or_replace(mData->mReturnValue, name, expr);
             for (const auto* attr = functionnode->FirstAttribute(); attr; attr = attr->Next())
             {
                 const char* const attr_n = attr->Name();
                 if (strcmp(attr_n, "type") == 0)
-                    mData->mReturnValueType[name] = attr->Value();
+                    emplace_or_replace(mData->mReturnValueType, name, attr->Value());
                 else if (strcmp(attr_n, "container") == 0)
                     mData->mReturnValueContainer[name] = strToInt<int>(attr->Value()); // TODO: use IntValue()?
                 else if (strcmp(attr_n, "unknownValues") == 0) {
