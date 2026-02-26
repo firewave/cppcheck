@@ -51,7 +51,7 @@ SuppressionList::ErrorMessage SuppressionList::ErrorMessage::fromErrorMessage(co
         ret.lineNumber = msg.callStack.back().line;
     } else {
         ret.setFileName(msg.file0);
-        ret.lineNumber = SuppressionList::Suppression::NO_LINE;
+        ret.lineNumber = 0;
     }
     ret.certainty = msg.certainty;
     ret.symbolNames = msg.symbolNames();
@@ -235,17 +235,10 @@ SuppressionList::Suppression SuppressionList::parseLine(const std::string &line)
             // if a colon is found and there is no dot after it..
             if (pos != std::string::npos &&
                 suppression.fileName.find('.', pos) == std::string::npos) {
-                // Try to parse out the line number
-                try {
-                    std::istringstream istr1(suppression.fileName.substr(pos+1));
-                    istr1 >> suppression.lineNumber;
-                } catch (...) {
-                    suppression.lineNumber = SuppressionList::Suppression::NO_LINE;
-                }
-
-                if (suppression.lineNumber != SuppressionList::Suppression::NO_LINE) {
-                    suppression.fileName.erase(pos);
-                }
+                // parse out the line number
+                std::istringstream istr1(suppression.fileName.substr(pos+1));
+                istr1 >> suppression.lineNumber;
+                suppression.fileName.erase(pos);
             }
 
             // when parsing string generated internally by toString() there can be newline
@@ -403,7 +396,7 @@ SuppressionList::Suppression::Result SuppressionList::Suppression::isSuppressed(
         if (!errorId.empty() && !matchglob(errorId, errmsg.errorId))
             return Result::Checked;
     } else {
-        if ((SuppressionList::Type::unique == type) && (lineNumber != NO_LINE) && (lineNumber != errmsg.lineNumber)) {
+        if ((SuppressionList::Type::unique == type) && (lineNumber != 0) && (lineNumber != errmsg.lineNumber)) {
             if (!thisAndNextLine || lineNumber + 1 != errmsg.lineNumber)
                 return Result::None;
         }
@@ -511,15 +504,15 @@ void SuppressionList::dump(std::ostream & out, const std::string& filePath) cons
         out << " errorId=\"" << ErrorLogger::toxml(suppression.errorId) << '"';
         if (!suppression.fileName.empty())
             out << " fileName=\"" << ErrorLogger::toxml(suppression.fileName) << '"';
-        if (suppression.lineNumber != Suppression::NO_LINE)
+        if (suppression.lineNumber != 0)
             out << " lineNumber=\"" << suppression.lineNumber << '"';
         if (!suppression.symbolName.empty())
             out << " symbolName=\"" << ErrorLogger::toxml(suppression.symbolName) << '\"';
         if (suppression.hash > 0)
             out << " hash=\"" << suppression.hash << '\"';
-        if (suppression.lineBegin != Suppression::NO_LINE)
+        if (suppression.lineBegin != 0)
             out << " lineBegin=\"" << suppression.lineBegin << '"';
-        if (suppression.lineEnd != Suppression::NO_LINE)
+        if (suppression.lineEnd != 0)
             out << " lineEnd=\"" << suppression.lineEnd << '"';
         if (suppression.type == SuppressionList::Type::file)
             out << " type=\"file\"";
@@ -552,7 +545,7 @@ std::list<SuppressionList::Suppression> SuppressionList::getUnmatchedLocalSuppre
             continue;
         if (s.matched)
             continue;
-        if ((s.lineNumber != Suppression::NO_LINE) && !s.checked)
+        if ((s.lineNumber != 0) && !s.checked)
             continue;
         if (s.type == SuppressionList::Type::macro)
             continue;
@@ -648,7 +641,7 @@ std::string SuppressionList::Suppression::toString() const
     if (!fileName.empty()) {
         s += ':';
         s += fileName;
-        if (lineNumber != -1) {
+        if (lineNumber != 0) {
             s += ':';
             s += std::to_string(lineNumber);
         }
