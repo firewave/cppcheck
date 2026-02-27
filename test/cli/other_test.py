@@ -4234,3 +4234,32 @@ def test_analyzerinfo(tmp_path):
     # TODO:
     # - invalid error
     # - internalError
+
+
+def test_unmatched_suppress_inline_block_cached(tmp_path):  # #14372
+    test_file = tmp_path / 'test.c'
+    with open(test_file, 'wt') as f:
+        f.write("""
+// cppcheck-suppress-begin [zerodiv]
+x = 10 / 0;
+// cppcheck-suppress-end [zerodiv]
+""")
+
+    build_dir = tmp_path / 'b1'
+    os.mkdir(build_dir)
+
+    args = [
+        '--enable=information',
+        '--inline-suppr',
+        '--cppcheck-build-dir={}'.format(build_dir),  # TODO: remove (and rename test) if re-run with injected builddir
+        '--template=simple',
+        str(test_file)
+    ]
+
+    exitcode, stdout, stderr = cppcheck(args)
+    assert exitcode == 0, stdout
+    assert stderr == ''
+
+    exitcode, stdout, stderr = cppcheck(args)
+    assert exitcode == 0, stdout
+    assert stderr == ''
