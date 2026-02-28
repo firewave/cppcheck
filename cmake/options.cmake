@@ -56,7 +56,7 @@ option(BUILD_CORE_DLL       "Build lib as cppcheck-core.dll with Visual Studio" 
 if(BUILD_CORE_DLL AND NOT MSVC)
     message(FATAL_ERROR "Building of lib as DLL is only supported with Visual Studio")
 endif()
-option(BUILD_TESTS          "Build tests"                                                   OFF)
+# need to check before the option() specifying it or it will be defined
 if(DEFINED BUILD_TESTS)
     message(WARNING "BUILD_TESTS has been deprecated and will be removed in Cppcheck 2.22 - please use BUILD_TESTING instead")
     if(DEFINED BUILD_TESTING)
@@ -68,6 +68,7 @@ elseif(NOT DEFINED BUILD_TESTING)
     # disable tests by default - TODO: remove this
     set(BUILD_TESTING OFF)
 endif()
+option(BUILD_TESTS          "Build tests"                                                   OFF)
 option(REGISTER_TESTS       "Register tests in CTest"                                       ON)
 option(ENABLE_CHECK_INTERNAL "Enable internal checks"                                       OFF)
 option(DISABLE_DMAKE        "Disable run-dmake dependencies"                                OFF)
