@@ -5,6 +5,7 @@ import sys
 from bisect_common import *
 
 MAX_RT_FACTOR = 1.3
+MAX_RT_DIFF = 3
 
 # TODO: detect missing file
 def run(cppcheck_path, options, elapsed_time=None):
@@ -73,13 +74,24 @@ if not elapsed_time:
 if run_res is None:
     sys.exit(EC_SKIP)  # error occurred
 
-if not run_res:
-    sys.exit(EC_BAD if not invert else EC_GOOD)  # timeout occurred
+time_exceeded = False
 
-print('run_time: {}'.format(run_time))
-run_time_factor = run_time / elapsed_time
-print('run_time_factor: {}'.format(run_time_factor))
-if run_time_factor >= MAX_RT_FACTOR:
-    sys.exit(EC_BAD if not invert else EC_GOOD)  # factor exceeded
+if not run_res:
+    time_exceeded = True
+else:
+    print('run_time: {}'.format(run_time))
+
+    run_time_factor = run_time / elapsed_time
+    print('run_time_factor: {}'.format(run_time_factor))
+    if run_time_factor >= MAX_RT_FACTOR:
+        time_exceeded = True
+    else:
+        run_time_diff = run_time - elapsed_time
+        print('run_time_diff: {}'.format(run_time_diff))
+        if run_time_diff >= MAX_RT_DIFF:
+            time_exceeded = True
+
+if time_exceeded:
+    sys.exit(EC_BAD if not invert else EC_GOOD)  # timeout occurred
 
 sys.exit(EC_GOOD if not invert else EC_BAD)  # no timeout
