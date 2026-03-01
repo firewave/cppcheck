@@ -4,6 +4,8 @@ import sys
 
 from bisect_common import *
 
+MAX_RT_FACTOR = 1.3
+
 # TODO: detect missing file
 def run(cppcheck_path, options, elapsed_time=None):
     timeout = None
@@ -11,7 +13,7 @@ def run(cppcheck_path, options, elapsed_time=None):
         timeout = elapsed_time * 2
     cmd = options.split()
     cmd.insert(0, cppcheck_path)
-    print('running {}'.format(cppcheck_path))
+    print('running (timeout: {}) {}'.format(timeout, cppcheck_path))
     with subprocess.Popen(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL) as p:
         try:
             p.communicate(timeout=timeout)
@@ -56,7 +58,7 @@ if not elapsed_time:
     elapsed_time = time.perf_counter() - t
     print('elapsed_time: {}'.format(elapsed_time))
     # TODO: write to stdout and redirect all all printing to stderr
-    sys.exit(round(elapsed_time + .5))  # return the time
+    sys.exit(max(round(elapsed_time - .5), 1))  # return the time
 
 t = time.perf_counter()
 run_res = run(cppcheck_path, options, elapsed_time)
@@ -66,7 +68,7 @@ if not elapsed_time:
     # TODO: handle error result
     print('elapsed_time: {}'.format(run_time))
     # TODO: write to stdout and redirect all printing to stderr
-    sys.exit(round(run_time + .5))  # return the time
+    sys.exit(max(round(run_time - .5), 1))  # return the time
 
 if run_res is None:
     sys.exit(EC_SKIP)  # error occurred
@@ -75,5 +77,9 @@ if not run_res:
     sys.exit(EC_BAD if not invert else EC_GOOD)  # timeout occurred
 
 print('run_time: {}'.format(run_time))
+run_time_factor = run_time / elapsed_time
+print('run_time_factor: {}'.format(run_time_factor))
+if run_time_factor >= MAX_RT_FACTOR:
+    sys.exit(EC_BAD if not invert else EC_GOOD)  # factor exceeded
 
 sys.exit(EC_GOOD if not invert else EC_BAD)  # no timeout
