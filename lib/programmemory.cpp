@@ -1675,7 +1675,7 @@ namespace {
                                     arg_map[argn] = v;
                                 argn++;
                             }
-                            return evaluateLibraryFunction(arg_map, returnValue, settings, ftok->isCpp());
+                            return evaluateLibraryFunction(arg_map, returnValue, settings, ftok->isCpp(), ftok->isHeader());
                         }
                     }
                 }

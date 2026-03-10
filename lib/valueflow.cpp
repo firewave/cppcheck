@@ -5607,7 +5607,7 @@ static void valueFlowLibraryFunction(Token* tok, const std::string& returnValue,
     if (returnValue.find("arg") != std::string::npos && argValues.empty())
         return;
     productParams(settings, argValues, [&](const std::unordered_map<nonneg int, ValueFlow::Value>& arg) {
-        ValueFlow::Value value = evaluateLibraryFunction(arg, returnValue, settings, tok->isCpp());
+        ValueFlow::Value value = evaluateLibraryFunction(arg, returnValue, settings, tok->isCpp(), tok->isHeader());
         if (value.isUninitValue())
             return;
         ValueFlow::Value::ValueKind kind = ValueFlow::Value::ValueKind::Known;

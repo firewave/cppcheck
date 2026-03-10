@@ -41,16 +41,16 @@ namespace tinyxml2 {
 // TODO: make Tokenizer private
 class SimpleTokenizer : public Tokenizer {
 public:
-    explicit SimpleTokenizer(ErrorLogger& errorlogger, bool cpp = true)
-        : Tokenizer{TokenList{s_settings, cpp ? Standards::Language::CPP : Standards::Language::C}, errorlogger}
+    explicit SimpleTokenizer(ErrorLogger& errorlogger, bool cpp = true, bool header = false)
+        : Tokenizer{TokenList{s_settings, cpp ? Standards::Language::CPP : Standards::Language::C, header}, errorlogger}
     {}
 
-    SimpleTokenizer(const Settings& settings, ErrorLogger& errorlogger, bool cpp = true)
-        : Tokenizer{TokenList{settings, cpp ? Standards::Language::CPP : Standards::Language::C}, errorlogger}
+    SimpleTokenizer(const Settings& settings, ErrorLogger& errorlogger, bool cpp = true, bool header = false)
+        : Tokenizer{TokenList{settings, cpp ? Standards::Language::CPP : Standards::Language::C, header}, errorlogger}
     {}
 
     SimpleTokenizer(const Settings& settings, ErrorLogger& errorlogger, const std::string& filename)
-        : Tokenizer{TokenList{settings, Path::identify(filename, false)}, errorlogger}
+        : Tokenizer{TokenList{settings, Path::identify(filename, false), /*TODO*/false}, errorlogger}
     {
         list.appendFileIfNew(filename);
     }
