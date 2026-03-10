@@ -730,7 +730,7 @@ unsigned int CppCheck::checkClang(const FileWithDetails &file)
     }
 
     try {
-        TokenList tokenlist{mSettings, file.lang()};
+        TokenList tokenlist{mSettings, file.lang(), file.header()};
         tokenlist.appendFileIfNew(file.spath());
         Tokenizer tokenizer(std::move(tokenlist), mErrorLogger);
         std::istringstream ast(output2);
@@ -957,7 +957,7 @@ unsigned int CppCheck::checkInternal(const FileWithDetails& file, const std::str
             if (mUnusedFunctionsCheck && (mSettings.useSingleJob() || analyzerInformation)) {
                 std::size_t hash = 0;
                 // markup files are special and do not adhere to the enforced language
-                TokenList tokenlist{mSettings, Standards::Language::C};
+                TokenList tokenlist{mSettings, Standards::Language::C, false};
                 std::vector<std::string> files;
                 simplecpp::TokenList tokens = createTokenList(files, nullptr);
                 if (analyzerInformation) {
@@ -1065,7 +1065,7 @@ unsigned int CppCheck::checkInternal(const FileWithDetails& file, const std::str
                 if (startsWith(dir.str,"#define ") || startsWith(dir.str,"#include "))
                     code += "#line " + std::to_string(dir.linenr) + " \"" + dir.file + "\"\n" + dir.str + '\n';
             }
-            TokenList tokenlist(mSettings, file.lang());
+            TokenList tokenlist(mSettings, file.lang(), file.header());
             tokenlist.createTokensFromBuffer(code.data(), code.size()); // TODO: check result?
             executeRules("define", tokenlist);
         }
@@ -1142,7 +1142,7 @@ unsigned int CppCheck::checkInternal(const FileWithDetails& file, const std::str
                 continue;
             }
 
-            TokenList tokenlist{mSettings, file.lang()};
+            TokenList tokenlist{mSettings, file.lang(), file.header()};
 
             {
                 bool skipCfg = false;

@@ -52,9 +52,10 @@
 static constexpr int AST_MAX_DEPTH = 150;
 
 
-TokenList::TokenList(const Settings& settings, Standards::Language lang)
+TokenList::TokenList(const Settings& settings, Standards::Language lang, bool header)
     : mTokensFrontBack(new TokensFrontBack)
     , mSettings(settings)
+    , mHeader(header)
 {
     assert(lang != Standards::Language::None);
     mLang = lang;

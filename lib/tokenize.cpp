@@ -11161,7 +11161,7 @@ bool Tokenizer::isPacked(const Token * bodyStart) const
 
 void Tokenizer::getErrorMessages(ErrorLogger& errorLogger, const Settings& settings)
 {
-    TokenList tokenlist{settings, Standards::Language::C};
+    TokenList tokenlist{settings, Standards::Language::C, false};
     Tokenizer tokenizer(std::move(tokenlist), errorLogger);
     tokenizer.invalidConstFunctionTypeError(nullptr);
     // checkLibraryNoReturn

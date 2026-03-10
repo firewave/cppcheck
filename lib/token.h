@@ -1555,6 +1555,7 @@ private:
     // cppcheck-suppress premium-misra-cpp-2023-12.2.1
     bool mIsC : 1;
     bool mIsCpp : 1;
+    bool mIsHeader : 1;
 
 public:
     void astOperand1(Token *tok);
@@ -1689,6 +1690,11 @@ public:
     bool isC() const
     {
         return mIsC;
+    }
+
+    bool isHeader() const
+    {
+        return mIsHeader;
     }
 };
 

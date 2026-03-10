@@ -50,7 +50,7 @@ struct TokensFrontBack {
 
 class CPPCHECKLIB TokenList {
 public:
-    explicit TokenList(const Settings& settings, Standards::Language lang);
+    explicit TokenList(const Settings& settings, Standards::Language lang, bool header);
     ~TokenList();
 
     TokenList(const TokenList &) = delete;
@@ -232,6 +232,8 @@ private:
 
     /** File is known to be C/C++ code */
     Standards::Language mLang{Standards::Language::None};
+
+    bool mHeader : 1;
 };
 
 /// @}

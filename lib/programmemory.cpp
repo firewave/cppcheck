@@ -1833,9 +1833,10 @@ std::vector<ValueFlow::Value> execute(const Scope* scope, ProgramMemory& pm, con
 static std::shared_ptr<Token> createTokenFromExpression(const std::string& returnValue,
                                                         const Settings& settings,
                                                         bool cpp,
+                                                        bool header,
                                                         std::unordered_map<nonneg int, const Token*>& lookupVarId)
 {
-    std::shared_ptr<TokenList> tokenList = std::make_shared<TokenList>(settings, cpp ? Standards::Language::CPP : Standards::Language::C);
+    std::shared_ptr<TokenList> tokenList = std::make_shared<TokenList>(settings, cpp ? Standards::Language::CPP : Standards::Language::C, header);
     {
         const std::string code = "return " + returnValue + ";";
         if (!tokenList->createTokensFromBuffer(code.data(), code.size()))
@@ -1880,7 +1881,8 @@ static std::shared_ptr<Token> createTokenFromExpression(const std::string& retur
 ValueFlow::Value evaluateLibraryFunction(const std::unordered_map<nonneg int, ValueFlow::Value>& args,
                                          const std::string& returnValue,
                                          const Settings& settings,
-                                         bool cpp)
+                                         bool cpp,
+                                         bool header)
 {
     thread_local static std::unordered_map<std::string,
                                            std::function<ValueFlow::Value(const std::unordered_map<nonneg int, ValueFlow::Value>&, const Settings&)>>
@@ -1888,7 +1890,7 @@ ValueFlow::Value evaluateLibraryFunction(const std::unordered_map<nonneg int, Va
     if (functions.count(returnValue) == 0) {
 
         std::unordered_map<nonneg int, const Token*> lookupVarId;
-        std::shared_ptr<Token> expr = createTokenFromExpression(returnValue, settings, cpp, lookupVarId);
+        std::shared_ptr<Token> expr = createTokenFromExpression(returnValue, settings, cpp, header, lookupVarId);
 
         functions[returnValue] =
             [lookupVarId, expr](const std::unordered_map<nonneg int, ValueFlow::Value>& xargs, const Settings& settings) {

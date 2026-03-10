@@ -24,7 +24,6 @@
 #include "errortypes.h"
 #include "fwdanalysis.h"
 #include "library.h"
-#include "path.h"
 #include "settings.h"
 #include "symboldatabase.h"
 #include "token.h"
@@ -1670,10 +1669,8 @@ void CheckUnusedVar::checkStructMemberUsage()
                     break;
                 }
             }
-            // TODO: do not use Path::isHeader() - find a different way to propagate it is a header
-            // TODO: report it unconditionally for definitions with private visibility
-            // do not report unused struct members in headers
-            if (!use && !Path::isHeader(var.nameToken()->fileName())) {
+            // TODO: do not report unused struct members in headers
+            if (!use) {
                 std::string prefix = "struct";
                 if (scope.type == ScopeType::eClass)
                     prefix = "class";

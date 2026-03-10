@@ -1809,19 +1809,19 @@ static bool isNotEqual(std::pair<const Token*, const Token*> x, std::pair<const 
     start2 = skipCVRefs(start2, y.second);
     return !(start1 == x.second && start2 == y.second);
 }
-static bool isNotEqual(std::pair<const Token*, const Token*> x, const std::string& y, bool cpp, const Settings& settings)
+static bool isNotEqual(std::pair<const Token*, const Token*> x, const std::string& y, bool cpp, bool header, const Settings& settings)
 {
-    TokenList tokenList(settings, cpp ? Standards::Language::CPP : Standards::Language::C);
+    TokenList tokenList(settings, cpp ? Standards::Language::CPP : Standards::Language::C, header);
     tokenList.createTokensFromBuffer(y.data(), y.size()); // TODO: check result?
     return isNotEqual(x, std::make_pair(tokenList.front(), tokenList.back()));
 }
-static bool isNotEqual(std::pair<const Token*, const Token*> x, const ValueType* y, bool cpp, const Settings& settings)
+static bool isNotEqual(std::pair<const Token*, const Token*> x, const ValueType* y, bool cpp, bool header, const Settings& settings)
 {
     if (y == nullptr)
         return false;
     if (y->originalTypeName.empty())
         return false;
-    return isNotEqual(x, y->originalTypeName, cpp, settings);
+    return isNotEqual(x, y->originalTypeName, cpp, header, settings);
 }
 
 static bool isDifferentType(const Token* src, const Token* dst, const Settings& settings)
@@ -1835,11 +1835,12 @@ static bool isDifferentType(const Token* src, const Token* dst, const Settings& 
         std::pair<const Token*, const Token*> decl = Token::typeDecl(src);
         std::pair<const Token*, const Token*> parentdecl = Token::typeDecl(dst);
         const bool isCpp = (src && src->isCpp()) || (dst && dst->isCpp());
+        const bool isHeader = (src && src->isHeader()) || (dst && dst->isHeader());
         if (isNotEqual(decl, parentdecl) && !(isCpp && (Token::simpleMatch(decl.first, "auto") || Token::simpleMatch(parentdecl.first, "auto"))))
             return true;
-        if (isNotEqual(decl, dst->valueType(), isCpp, settings))
+        if (isNotEqual(decl, dst->valueType(), isCpp, isHeader, settings))
             return true;
-        if (isNotEqual(parentdecl, src->valueType(), isCpp, settings))
+        if (isNotEqual(parentdecl, src->valueType(), isCpp, isHeader, settings))
             return true;
     }
     return false;
@@ -6973,10 +6974,11 @@ static void valueFlowDynamicBufferSize(const TokenList& tokenlist, const SymbolD
 static bool getMinMaxValues(const std::string& typestr,
                             const Settings& settings,
                             bool cpp,
+                            bool header,
                             MathLib::bigint& minvalue,
                             MathLib::bigint& maxvalue)
 {
-    TokenList typeTokens(settings, cpp ? Standards::Language::CPP : Standards::Language::C);
+    TokenList typeTokens(settings, cpp ? Standards::Language::CPP : Standards::Language::C, header);
     const std::string str(typestr + ";");
     if (!typeTokens.createTokensFromBuffer(str.data(), str.size()))
         return false;
@@ -7118,7 +7120,7 @@ static void valueFlowUnknownFunctionReturn(TokenList& tokenlist, const Settings&
         // Get min/max values for return type
         const std::string& typestr = settings.library.returnValueType(tok->previous());
         MathLib::bigint minvalue, maxvalue;
-        if (!getMinMaxValues(typestr, settings, tok->isCpp(), minvalue, maxvalue))
+        if (!getMinMaxValues(typestr, settings, tok->isCpp(), tok->isHeader(), minvalue, maxvalue))
             continue;
 
         for (MathLib::bigint value : unknownValues) {

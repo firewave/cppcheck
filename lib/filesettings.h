@@ -95,6 +95,11 @@ public:
     {
         mFsFileId = fsFileId;
     }
+
+    bool header() const
+    {
+        return mHeader;
+    }
 private:
     std::string mPath;
     std::string mPathSimplified;
@@ -102,6 +107,7 @@ private:
     Standards::Language mLang = Standards::Language::None;
     std::size_t mSize;
     std::size_t mFsFileId{0};
+    bool mHeader : 1;
 };
 
 /** File settings. Multiple configurations for a file is allowed. */
