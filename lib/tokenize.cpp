@@ -2982,10 +2982,6 @@ bool Tokenizer::simplifyUsing()
                 Token::Match(tok->linkAt(2), "] ] = ::| %name%")))))
             continue;
 
-        const std::string& name = tok->strAt(1);
-        const Token *nameToken = tok->next();
-        std::string scope = currentScope->fullName;
-        Token *usingStart = tok;
         Token *start;
         if (tok->strAt(2) == "=") {
             if (currentScope->type == ScopeInfo3::Record && tok->tokAt(2)->isSimplifiedTypedef())  // don't simplify within class definition
@@ -2997,6 +2993,10 @@ bool Tokenizer::simplifyUsing()
         Token *usingEnd = findSemicolon(start);
         if (!usingEnd)
             continue;
+
+        Token *usingStart = tok;
+        const std::string& name = tok->strAt(1);
+        const Token *nameToken = tok->next();
 
         // Move struct defined in using out of using.
         // using T = struct t { }; => struct t { }; using T = struct t;
@@ -3102,6 +3102,7 @@ bool Tokenizer::simplifyUsing()
 
         bool isTypedefInfoAdded = false; // TODO should we add a separate mUsingInfo?
 
+        std::string scope = currentScope->fullName;
         std::string scope1 = currentScope1->fullName;
         bool skip = false; // don't erase type aliases we can't parse
         Token *enumOpenBrace = nullptr;
