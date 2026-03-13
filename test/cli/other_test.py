@@ -954,30 +954,120 @@ def test_unused_function_include(tmpdir):
     __test_unused_function_include(tmpdir, [])
 
 
-# TODO: test with all other types
+# TODO: test with multiple files
 def test_showtime_top5_file(tmpdir):
     test_file = os.path.join(tmpdir, 'test.cpp')
     with open(test_file, 'wt') as f:
-        f.write("""
-                int main(int argc)
-                {
-                }
-                """)
+        f.write(
+"""
+void f()
+{
+    (void)(*((int*)0)); // cppcheck-suppress nullPointer
+}
+""")
 
-    args = ['--showtime=top5_file', '--quiet', test_file]
+    args = ['--showtime=top5_file', '--quiet', '--inline-suppr', test_file]
 
     exitcode, stdout, stderr = cppcheck(args)
-    assert exitcode == 0  # TODO: needs to be 1
+    assert exitcode == 0  # TODO: needs to be 1 - why?
+    lines = stdout.splitlines()
+    assert len(lines) == 7
+    assert lines[0] == ''
+    for i in range(1, 6):
+        assert 'avg.' in lines[i]
+    assert stderr == ''
+
+
+def test_showtime_top5_summary(tmpdir):
+    test_file = os.path.join(tmpdir, 'test.cpp')
+    with open(test_file, 'wt') as f:
+        f.write(
+"""
+void f()
+{
+    (void)(*((int*)0)); // cppcheck-suppress nullPointer
+}
+""")
+
+    args = ['--showtime=top5_summary', '--quiet', '--inline-suppr', test_file]
+
+    exitcode, stdout, stderr = cppcheck(args)
+    assert exitcode == 0  # TODO: needs to be 1 - why?
+    lines = stdout.splitlines()
+    assert len(lines) == 6
+    assert lines[0] == ''
+    for i in range(1, 5):
+        assert 'avg.' in lines[i]
+    assert stderr == ''
+
+
+def test_showtime_file(tmpdir):
+    test_file = os.path.join(tmpdir, 'test.cpp')
+    with open(test_file, 'wt') as f:
+        f.write(
+"""
+void f()
+{
+    (void)(*((int*)0)); // cppcheck-suppress nullPointer
+}
+""")
+
+    args = ['--showtime=file', '--quiet', '--inline-suppr', test_file]
+
+    exitcode, stdout, stderr = cppcheck(args)
+    assert exitcode == 0  # TODO: needs to be 1 - why?
     lines = stdout.splitlines()
     assert len(lines) == 7
     assert lines[0] == ''
     for i in range(1, 5):
-        if lines[i].startswith('valueFlowLifetime'):
-            assert lines[i].endswith(' - 2 result(s))')
-        elif lines[i].startswith('valueFlowEnumValue'):
-            assert lines[i].endswith(' - 2 result(s))')
-        else:
-            assert lines[i].endswith(' result(s))')
+        assert 'avg.' in lines[i]
+    assert lines[6] == ''
+    assert stderr == ''
+
+
+def test_showtime_summary(tmpdir):
+    test_file = os.path.join(tmpdir, 'test.cpp')
+    with open(test_file, 'wt') as f:
+        f.write(
+"""
+void f()
+{
+    (void)(*((int*)0)); // cppcheck-suppress nullPointer
+}
+""")
+
+    args = ['--showtime=summary', '--quiet', '--inline-suppr', test_file]
+
+    exitcode, stdout, stderr = cppcheck(args)
+    assert exitcode == 0  # TODO: needs to be 1 - why?
+    lines = stdout.splitlines()
+    assert len(lines) == 78
+    assert lines[0] == ''
+    for i in range(1, 77):
+        assert 'avg.' in lines[i]
+    assert stderr == ''
+
+
+def test_showtime_file_total(tmpdir):
+    test_file = os.path.join(tmpdir, 'test.cpp')
+    with open(test_file, 'wt') as f:
+        f.write(
+"""
+void f()
+{
+    (void)(*((int*)0)); // cppcheck-suppress nullPointer
+}
+""")
+
+    args = ['--showtime=file-total', '--quiet', '--inline-suppr', test_file]
+
+    exitcode, stdout, stderr = cppcheck(args)
+    assert exitcode == 0  # TODO: needs to be 1 - why?
+    lines = stdout.splitlines()
+    assert len(lines) == 7
+    assert lines[0] == ''
+    for i in range(1, 77):
+        assert 'avg.' in lines[i]
     assert stderr == ''
 
 

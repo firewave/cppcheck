@@ -68,7 +68,7 @@ enum class Color : std::uint8_t;
 using std::memset;
 
 
-ProcessExecutor::ProcessExecutor(const std::list<FileWithDetails> &files, const std::list<FileSettings>& fileSettings, const Settings &settings, Suppressions &suppressions, ErrorLogger &errorLogger, TimerResults* timerResults, CppCheck::ExecuteCmdFn executeCommand)
+ProcessExecutor::ProcessExecutor(const std::list<FileWithDetails> &files, const std::list<FileSettings>& fileSettings, const Settings &settings, Suppressions &suppressions, ErrorLogger &errorLogger, TimerResultsIntf* timerResults, CppCheck::ExecuteCmdFn executeCommand)
     : Executor(files, fileSettings, settings, suppressions, errorLogger, timerResults)
     , mExecuteCommand(std::move(executeCommand))
 {
@@ -354,6 +354,10 @@ unsigned int ProcessExecutor::check()
                     resultOfCheck = fileChecker.check(*iFile);
                 }
 
+                // TODO
+                //if (mTimerResults && (mSettings.showtime == ShowTime::FILE || mSettings.showtime == ShowTime::TOP5_FILE))
+                //    mTimerResults->showResults(mSettings.showtime);
+
                 pipewriter.writeSuppr(mSuppressions.nomsg);
 
                 pipewriter.writeEnd(std::to_string(resultOfCheck));
@@ -449,9 +453,7 @@ unsigned int ProcessExecutor::check()
         }
     }
 
-    // TODO: wee need to get the timing information from the subprocess
-    if (mTimerResults && (mSettings.showtime == ShowTime::SUMMARY || mSettings.showtime == ShowTime::TOP5_SUMMARY))
-        mTimerResults->showResults(mSettings.showtime);
+    // TODO: we need to get the timing information from the subprocess
 
     return result;
 }

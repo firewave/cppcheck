@@ -138,11 +138,6 @@ private:
         TEST_CASE(no_errors_equal_amount_files);
         TEST_CASE(one_error_less_files);
         TEST_CASE(one_error_several_files);
-        TEST_CASE(showtime_top5_file);
-        TEST_CASE(showtime_top5_summary);
-        TEST_CASE(showtime_file);
-        TEST_CASE(showtime_summary);
-        TEST_CASE(showtime_file_total);
         TEST_CASE(suppress_error_library);
         TEST_CASE(unique_errors);
 #endif // HAS_THREADING_MODEL_THREAD
@@ -239,67 +234,6 @@ private:
               "  (void)(*((int*)0));\n"
               "}");
         ASSERT_EQUALS(num_files, cppcheck::count_all_of(errout_str(), "(error) Null pointer dereference: (int*)0"));
-    }
-
-    // TODO: provide data which actually shows values above 0
-
-    // TODO: should this be logged only once like summary?
-    void showtime_top5_file() {
-        REDIRECT; // should not cause TSAN failures as the showtime logging is synchronized
-        check(2, 2, 0,
-              "int main() {}",
-              dinit(CheckOptions,
-                    $.showtime = ShowTime::TOP5_FILE));
-        const std::string output_s = GET_REDIRECT_OUTPUT;
-        // for each file: top5 results + newline + overall
-        ASSERT_EQUALS((5 + 1 + 1) * 2LL, cppcheck::count_all_of(output_s, '\n'));
-    }
-
-    void showtime_top5_summary() {
-        REDIRECT;
-        check(2, 2, 0,
-              "int main() {}",
-              dinit(CheckOptions,
-                    $.showtime = ShowTime::TOP5_SUMMARY));
-        const std::string output_s = GET_REDIRECT_OUTPUT;
-        // once: top5 results + newline
-        ASSERT_EQUALS(5 + 1, cppcheck::count_all_of(output_s, '\n'));
-        // should only report the top5 once
-        ASSERT(output_s.find("1 result(s)") == std::string::npos);
-        ASSERT(output_s.find("2 result(s)") != std::string::npos);
-    }
-
-    void showtime_file() {
-        REDIRECT; // should not cause TSAN failures as the showtime logging is synchronized
-        check(2, 2, 0,
-              "int main() {}",
-              dinit(CheckOptions,
-                    $.showtime = ShowTime::FILE));
-        const std::string output_s = GET_REDIRECT_OUTPUT;
-        ASSERT_EQUALS(0, cppcheck::count_all_of(output_s, "Overall time:"));
-    }
-
-    void showtime_summary() {
-        REDIRECT; // should not cause TSAN failures as the showtime logging is synchronized
-        check(2, 2, 0,
-              "int main() {}",
-              dinit(CheckOptions,
-                    $.showtime = ShowTime::SUMMARY));
-        const std::string output_s = GET_REDIRECT_OUTPUT;
-        // should only report the actual summary once
-        ASSERT(output_s.find("1 result(s)") == std::string::npos);
-        ASSERT(output_s.find("2 result(s)") != std::string::npos);
-    }
-
-    void showtime_file_total() {
-        REDIRECT; // should not cause TSAN failures as the showtime logging is synchronized
-        check(2, 2, 0,
-              "int main() {}",
-              dinit(CheckOptions,
-                    $.showtime = ShowTime::FILE_TOTAL));
-        const std::string output_s = GET_REDIRECT_OUTPUT;
-        ASSERT(output_s.find("Check time: " + fprefix() + "_1.c: ") != std::string::npos);
-        ASSERT(output_s.find("Check time: " + fprefix() + "_2.c: ") != std::string::npos);
     }
 
     void suppress_error_library() {

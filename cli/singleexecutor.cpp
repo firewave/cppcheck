@@ -30,7 +30,7 @@
 
 class ErrorLogger;
 
-SingleExecutor::SingleExecutor(CppCheck &cppcheck, const std::list<FileWithDetails> &files, const std::list<FileSettings>& fileSettings, const Settings &settings, Suppressions &suppressions, ErrorLogger &errorLogger, TimerResults* timerResults)
+SingleExecutor::SingleExecutor(CppCheck &cppcheck, const std::list<FileWithDetails> &files, const std::list<FileSettings>& fileSettings, const Settings &settings, Suppressions &suppressions, ErrorLogger &errorLogger, TimerResultsIntf* timerResults)
     : Executor(files, fileSettings, settings, suppressions, errorLogger, timerResults)
     , mCppcheck(cppcheck)
 {
@@ -51,6 +51,9 @@ unsigned int SingleExecutor::check()
 
     for (auto i = mFiles.cbegin(); i != mFiles.cend(); ++i) {
         result += mCppcheck.check(*i);
+        // TODO
+        //if (mTimerResults && (mSettings.showtime == ShowTime::FILE || mSettings.showtime == ShowTime::TOP5_FILE))
+        //    mTimerResults->showResults(mSettings.showtime);
         processedsize += i->size();
         ++c;
         if (!mSettings.quiet)
@@ -62,17 +65,18 @@ unsigned int SingleExecutor::check()
     // check all files of the project
     for (const FileSettings &fs : mFileSettings) {
         result += mCppcheck.check(fs);
+        // TODO
+        //if (mTimerResults && (mSettings.showtime == ShowTime::FILE || mSettings.showtime == ShowTime::TOP5_FILE))
+        //    mTimerResults->showResults(mSettings.showtime);
         ++c;
         if (!mSettings.quiet)
             reportStatus(c, mFileSettings.size(), c, mFileSettings.size());
     }
 
+    // TODO: show time after the whole program analysis
     // TODO: CppCheckExecutor::check_internal() is also invoking the whole program analysis - is it run twice?
     if (mCppcheck.analyseWholeProgram())
         result++;
-
-    if (mTimerResults && (mSettings.showtime == ShowTime::SUMMARY || mSettings.showtime == ShowTime::TOP5_SUMMARY))
-        mTimerResults->showResults(mSettings.showtime);
 
     return result;
 }

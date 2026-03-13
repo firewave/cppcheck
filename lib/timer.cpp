@@ -83,7 +83,7 @@ void TimerResults::reset()
 
 Timer::Timer(std::string str, ShowTime showtimeMode, TimerResultsIntf* timerResults, Type type)
     : mName(std::move(str))
-    , mMode(showtimeMode)
+    , mMode(showtimeMode) // TODO: get from results
     , mType(type)
     , mStart(Clock::now())
     , mResults(timerResults)
@@ -109,8 +109,9 @@ void Timer::stop()
     if (mStart != TimePoint{}) {
         auto diff = std::chrono::duration_cast<std::chrono::milliseconds>(Clock::now() - mStart);
         if (!mResults) {
-            std::lock_guard<std::mutex> l(stdCoutLock);
-            std::cout << (mType == Type::OVERALL ? "Overall time: " : "Check time: " + mName + ": ") << TimerResultsData::durationToString(diff) << std::endl;
+            // TODO: do not print implicitly
+            //std::lock_guard<std::mutex> l(stdCoutLock);
+            //std::cout << (mType == Type::OVERALL ? "Overall time: " : "Check time: " + mName + ": ") << TimerResultsData::durationToString(diff) << std::endl;
         } else {
             mResults->addResults(mName, diff);
         }

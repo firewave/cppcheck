@@ -40,7 +40,7 @@
 #include <utility>
 #include <vector>
 
-ThreadExecutor::ThreadExecutor(const std::list<FileWithDetails> &files, const std::list<FileSettings>& fileSettings, const Settings &settings, Suppressions &suppressions, ErrorLogger &errorLogger, TimerResults* timerResults, CppCheck::ExecuteCmdFn executeCommand)
+ThreadExecutor::ThreadExecutor(const std::list<FileWithDetails> &files, const std::list<FileSettings>& fileSettings, const Settings &settings, Suppressions &suppressions, ErrorLogger &errorLogger, TimerResultsIntf* timerResults, CppCheck::ExecuteCmdFn executeCommand)
     : Executor(files, fileSettings, settings, suppressions, errorLogger, timerResults)
     , mExecuteCommand(std::move(executeCommand))
 {
@@ -87,7 +87,7 @@ private:
 class ThreadData
 {
 public:
-    ThreadData(ThreadExecutor &threadExecutor, ErrorLogger &errorLogger, TimerResults *timerResults, const Settings &settings, Suppressions& supprs, const std::list<FileWithDetails> &files, const std::list<FileSettings> &fileSettings, CppCheck::ExecuteCmdFn executeCommand)
+    ThreadData(ThreadExecutor &threadExecutor, ErrorLogger &errorLogger, TimerResultsIntf *timerResults, const Settings &settings, Suppressions& supprs, const std::list<FileWithDetails> &files, const std::list<FileSettings> &fileSettings, CppCheck::ExecuteCmdFn executeCommand)
         : mFiles(files), mFileSettings(fileSettings), mTimerResults(timerResults), mSettings(settings), mSuppressions(supprs), mExecuteCommand(std::move(executeCommand)), mLogForwarder(threadExecutor, errorLogger)
     {
         mItNextFile = mFiles.begin();
@@ -130,6 +130,9 @@ public:
             // Read file from a file
             result = fileChecker.check(*file);
         }
+        // TODO
+        //if (mTimerResults && (mSettings.showtime == ShowTime::FILE || mSettings.showtime == ShowTime::TOP5_FILE))
+        //    mTimerResults->showResults(mSettings.showtime);
         for (const auto& suppr : mSuppressions.nomsg.getSuppressions()) {
             // need to transfer all inline suppressions because these are used later on
             if (suppr.isInline) {
@@ -170,7 +173,7 @@ private:
     std::size_t mTotalFileSize{};
 
     std::mutex mFileSync;
-    TimerResults *mTimerResults;
+    TimerResultsIntf *mTimerResults;
     const Settings &mSettings;
     Suppressions &mSuppressions;
     CppCheck::ExecuteCmdFn mExecuteCommand;
@@ -215,9 +218,6 @@ unsigned int ThreadExecutor::check()
     unsigned int result = std::accumulate(threadFutures.begin(), threadFutures.end(), 0U, [](unsigned int v, std::future<unsigned int>& f) {
         return v + f.get();
     });
-
-    if (mTimerResults && (mSettings.showtime == ShowTime::SUMMARY || mSettings.showtime == ShowTime::TOP5_SUMMARY))
-        mTimerResults->showResults(mSettings.showtime);
 
     return result;
 }

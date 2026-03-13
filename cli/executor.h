@@ -31,7 +31,7 @@ class ErrorMessage;
 struct Suppressions;
 struct FileSettings;
 class FileWithDetails;
-class TimerResults;
+class TimerResultsIntf;
 
 /// @addtogroup CLI
 /// @{
@@ -42,7 +42,7 @@ class TimerResults;
  */
 class Executor {
 public:
-    Executor(const std::list<FileWithDetails> &files, const std::list<FileSettings>& fileSettings, const Settings &settings, Suppressions &suppressions, ErrorLogger &errorLogger, TimerResults* timerResults);
+    Executor(const std::list<FileWithDetails> &files, const std::list<FileSettings>& fileSettings, const Settings &settings, Suppressions &suppressions, ErrorLogger &errorLogger, TimerResultsIntf* timerResults);
     virtual ~Executor() = default;
 
     Executor(const Executor &) = delete;
@@ -73,7 +73,7 @@ protected:
     const Settings &mSettings;
     Suppressions &mSuppressions;
     ErrorLogger &mErrorLogger;
-    TimerResults *mTimerResults;
+    TimerResultsIntf *mTimerResults;
 
 private:
     std::mutex mErrorListSync;

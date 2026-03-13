@@ -458,9 +458,14 @@ int CppCheckExecutor::check_internal(const Settings& settings, Suppressions& sup
         if (settings.executor == Settings::ExecutorType::Process) {
             ProcessExecutor executor(mFiles, mFileSettings, settings, supprs, stdLogger, &timerResults, CppCheckExecutor::executeCommand);
             returnValue = executor.check();
+            // TODO: we need to get the timing information from the subprocess
         }
 #endif
     }
+
+    // TODO: show time *after* the whole program analysis
+    if (settings.showtime == ShowTime::SUMMARY || settings.showtime == ShowTime::TOP5_SUMMARY)
+        timerResults.showResults(settings.showtime);
 
     // TODO: is this run again instead of using previously cached results?
     returnValue |= cppcheck.analyseWholeProgram(settings.buildDir, mFiles, mFileSettings, stdLogger.getCtuInfo());

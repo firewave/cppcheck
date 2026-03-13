@@ -35,7 +35,7 @@ class ErrorLogger;
 struct Suppressions;
 struct FileSettings;
 class FileWithDetails;
-class TimerResults;
+class TimerResultsIntf;
 
 /// @addtogroup CLI
 /// @{
@@ -46,7 +46,7 @@ class TimerResults;
  */
 class ProcessExecutor : public Executor {
 public:
-    ProcessExecutor(const std::list<FileWithDetails> &files, const std::list<FileSettings>& fileSettings, const Settings &settings, Suppressions &suppressions, ErrorLogger &errorLogger, TimerResults* timerResults, CppCheck::ExecuteCmdFn executeCommand);
+    ProcessExecutor(const std::list<FileWithDetails> &files, const std::list<FileSettings>& fileSettings, const Settings &settings, Suppressions &suppressions, ErrorLogger &errorLogger, TimerResultsIntf* timerResults, CppCheck::ExecuteCmdFn executeCommand);
     ProcessExecutor(const ProcessExecutor &) = delete;
     ProcessExecutor& operator=(const ProcessExecutor &) = delete;
 
