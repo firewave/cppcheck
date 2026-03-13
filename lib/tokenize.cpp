@@ -2512,7 +2512,7 @@ namespace {
         }
     };
 
-    void setScopeInfo(Token *tok, ScopeInfo3 *&scopeInfo, bool debug=false)
+    void setScopeInfo(const Token *tok, ScopeInfo3 *&scopeInfo, bool debug=false)
     {
         if (!tok)
             return;
@@ -2550,7 +2550,7 @@ namespace {
             // check for member function
             else if (tok->str() == "{") {
                 bool added = false;
-                Token *tok1 = tok;
+                const Token *tok1 = tok;
                 while (Token::Match(tok1->previous(), "const|volatile|final|override|&|&&|noexcept"))
                     tok1 = tok1->previous();
                 if (tok1->previous() && (tok1->strAt(-1) == ")" || tok->strAt(-1) == "}")) {
