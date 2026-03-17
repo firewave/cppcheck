@@ -130,6 +130,8 @@ public:
             // Read file from a file
             result = fileChecker.check(*file);
         }
+        if (mTimerResults && (mSettings.showtime == ShowTime::FILE || mSettings.showtime == ShowTime::TOP5_FILE))
+            mTimerResults->showResults(mSettings.showtime);
         for (const auto& suppr : mSuppressions.nomsg.getSuppressions()) {
             // need to transfer all inline suppressions because these are used later on
             if (suppr.isInline) {

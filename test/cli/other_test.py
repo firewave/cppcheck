@@ -954,6 +954,7 @@ def test_unused_function_include(tmpdir):
     __test_unused_function_include(tmpdir, [])
 
 
+# TODO: test with FileSettings
 # TODO: test with multiple files
 def __test_showtime(tmp_path, showtime, exp_len, exp_last, extra_args=None):
     test_file = tmp_path / 'test.cpp'

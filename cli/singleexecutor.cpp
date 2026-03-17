@@ -51,6 +51,8 @@ unsigned int SingleExecutor::check()
 
     for (auto i = mFiles.cbegin(); i != mFiles.cend(); ++i) {
         result += mCppcheck.check(*i);
+        if (mTimerResults && (mSettings.showtime == ShowTime::FILE || mSettings.showtime == ShowTime::TOP5_FILE))
+            mTimerResults->showResults(mSettings.showtime);
         processedsize += i->size();
         ++c;
         if (!mSettings.quiet)
@@ -62,6 +64,8 @@ unsigned int SingleExecutor::check()
     // check all files of the project
     for (const FileSettings &fs : mFileSettings) {
         result += mCppcheck.check(fs);
+        if (mTimerResults && (mSettings.showtime == ShowTime::FILE || mSettings.showtime == ShowTime::TOP5_FILE))
+            mTimerResults->showResults(mSettings.showtime);
         ++c;
         if (!mSettings.quiet)
             reportStatus(c, mFileSettings.size(), c, mFileSettings.size());
