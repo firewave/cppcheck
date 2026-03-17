@@ -107,12 +107,8 @@ void Timer::stop()
         return;
     }
     if (mStart != TimePoint{}) {
-        auto diff = std::chrono::duration_cast<std::chrono::milliseconds>(Clock::now() - mStart);
-        if (!mResults) {
-            // TODO: do not print implicitly
-            std::lock_guard<std::mutex> l(stdCoutLock);
-            std::cout << (mType == Type::OVERALL ? "Overall time: " : "Check time: " + mName + ": ") << TimerResultsData::durationToString(diff) << std::endl;
-        } else {
+        if (mResults) {
+            const auto diff = std::chrono::duration_cast<std::chrono::milliseconds>(Clock::now() - mStart);
             mResults->addResults(mName, diff);
         }
     }
