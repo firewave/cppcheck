@@ -39,22 +39,25 @@ namespace MatchCompiler {
         StringRef _s;
     };
 
-    template<unsigned int n>
-    inline bool equalN(const char s1[], const char s2[])
+    namespace detail
     {
-        return (*s1 == *s2) && equalN<n-1>(s1+1, s2+1);
-    }
+        template<unsigned int n>
+        inline bool equalN(const char s1[], const char s2[])
+        {
+            return (*s1 == *s2) && equalN<n - 1>(s1 + 1, s2 + 1);
+        }
 
-    template<>
-    inline bool equalN<0>(const char /*s1*/[], const char /*s2*/[])
-    {
-        return true;
+        template<>
+        inline bool equalN<0>(const char /*s1*/[], const char /*s2*/[])
+        {
+            return true;
+        }
     }
 
     template<unsigned int n>
     inline bool operator==(const std::string & s1, ConstString<n> const & s2)
     {
-        return equalN<n>(s1.c_str(), s2);
+        return detail::equalN<n>(s1.c_str(), s2);
     }
 
     template<unsigned int n>
