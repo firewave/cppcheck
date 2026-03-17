@@ -29,7 +29,6 @@
 #include "utils.h"
 #include "vfvalue.h"
 
-#include <algorithm>
 #include <cassert>
 #include <cstdint>
 #include <cstddef>
@@ -155,12 +154,7 @@ private:
 
         // alignas expressions
         std::unique_ptr<std::vector<std::string>> mAttributeAlignas;
-        void addAttributeAlignas(const std::string& a) {
-            if (!mAttributeAlignas)
-                mAttributeAlignas = std::unique_ptr<std::vector<std::string>>(new std::vector<std::string>());
-            if (std::find(mAttributeAlignas->cbegin(), mAttributeAlignas->cend(), a) == mAttributeAlignas->cend())
-                mAttributeAlignas->push_back(a);
-        }
+        void addAttributeAlignas(const std::string& a);
 
         std::string mAttributeCleanup;
 

@@ -2664,6 +2664,14 @@ Token::Impl::~Impl()
     }
 }
 
+void Token::Impl::addAttributeAlignas(const std::string& a)
+{
+    if (!mAttributeAlignas)
+        mAttributeAlignas = std::unique_ptr<std::vector<std::string>>(new std::vector<std::string>());
+    if (std::find(mAttributeAlignas->cbegin(), mAttributeAlignas->cend(), a) == mAttributeAlignas->cend())
+        mAttributeAlignas->push_back(a);
+}
+
 void Token::Impl::setCppcheckAttribute(CppcheckAttributesType type, MathLib::bigint value)
 {
     CppcheckAttributes *attr = mCppcheckAttributes;
