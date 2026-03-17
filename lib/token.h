@@ -780,11 +780,7 @@ public:
     std::set<TemplateSimplifier::TokenAndName*>* templateSimplifierPointers() {
         return mImpl->mTemplateSimplifierPointers;
     }
-    void templateSimplifierPointer(TemplateSimplifier::TokenAndName* tokenAndName) {
-        if (!mImpl->mTemplateSimplifierPointers)
-            mImpl->mTemplateSimplifierPointers = new std::set<TemplateSimplifier::TokenAndName*>;
-        mImpl->mTemplateSimplifierPointers->insert(tokenAndName);
-    }
+    void templateSimplifierPointer(TemplateSimplifier::TokenAndName* tokenAndName);
     bool setBits(const MathLib::bigint b) {
         const MathLib::bigint max = std::numeric_limits<short>::max();
         if (b > max) {

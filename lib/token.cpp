@@ -2760,3 +2760,9 @@ bool Token::isMutableExpr() const
         mImpl->mMutableExpr = isMutableExpression(this);
     return !!mImpl->mMutableExpr;
 }
+
+void Token::templateSimplifierPointer(TemplateSimplifier::TokenAndName* tokenAndName) {
+    if (!mImpl->mTemplateSimplifierPointers)
+        mImpl->mTemplateSimplifierPointers = new std::set<TemplateSimplifier::TokenAndName*>;
+    mImpl->mTemplateSimplifierPointers->insert(tokenAndName);
+}
