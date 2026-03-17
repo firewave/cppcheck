@@ -2774,3 +2774,27 @@ void Token::templateSimplifierPointer(TemplateSimplifier::TokenAndName* tokenAnd
         mImpl->mTemplateSimplifierPointers = new std::set<TemplateSimplifier::TokenAndName*>;
     mImpl->mTemplateSimplifierPointers->insert(tokenAndName);
 }
+
+bool Token::isUtf8() const {
+    return (((mTokType == eString) && isPrefixStringCharLiteral(mStr, '"', "u8")) ||
+            ((mTokType == eChar) && isPrefixStringCharLiteral(mStr, '\'', "u8")));
+}
+
+bool Token::isUtf16() const {
+    return (((mTokType == eString) && isPrefixStringCharLiteral(mStr, '"', "u")) ||
+            ((mTokType == eChar) && isPrefixStringCharLiteral(mStr, '\'', "u")));
+}
+
+bool Token::isUtf32() const {
+    return (((mTokType == eString) && isPrefixStringCharLiteral(mStr, '"', "U")) ||
+            ((mTokType == eChar) && isPrefixStringCharLiteral(mStr, '\'', "U")));
+}
+
+bool Token::isCChar() const {
+    return (((mTokType == eString) && isPrefixStringCharLiteral(mStr, '"', "")) ||
+            ((mTokType == eChar) && isPrefixStringCharLiteral(mStr, '\'', "") && (replaceEscapeSequences(getCharLiteral(mStr)).size() == 1)));
+}
+
+bool Token::isCMultiChar() const {
+    return (mTokType == eChar) && isPrefixStringCharLiteral(mStr, '\'', "") && (replaceEscapeSequences(getCharLiteral(mStr)).size() > 1);
+}

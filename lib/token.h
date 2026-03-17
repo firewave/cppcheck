@@ -26,7 +26,6 @@
 #include "mathlib.h"
 #include "smallvector.h"
 #include "templatesimplifier.h"
-#include "utils.h"
 #include "vfvalue.h"
 
 #include <cassert>
@@ -785,29 +784,15 @@ public:
         return true;
     }
 
-    bool isUtf8() const {
-        return (((mTokType == eString) && isPrefixStringCharLiteral(mStr, '"', "u8")) ||
-                ((mTokType == eChar) && isPrefixStringCharLiteral(mStr, '\'', "u8")));
-    }
+    bool isUtf8() const;
 
-    bool isUtf16() const {
-        return (((mTokType == eString) && isPrefixStringCharLiteral(mStr, '"', "u")) ||
-                ((mTokType == eChar) && isPrefixStringCharLiteral(mStr, '\'', "u")));
-    }
+    bool isUtf16() const;
 
-    bool isUtf32() const {
-        return (((mTokType == eString) && isPrefixStringCharLiteral(mStr, '"', "U")) ||
-                ((mTokType == eChar) && isPrefixStringCharLiteral(mStr, '\'', "U")));
-    }
+    bool isUtf32() const;
 
-    bool isCChar() const {
-        return (((mTokType == eString) && isPrefixStringCharLiteral(mStr, '"', "")) ||
-                ((mTokType == eChar) && isPrefixStringCharLiteral(mStr, '\'', "") && (replaceEscapeSequences(getCharLiteral(mStr)).size() == 1)));
-    }
+    bool isCChar() const;
 
-    bool isCMultiChar() const {
-        return (mTokType == eChar) && isPrefixStringCharLiteral(mStr, '\'', "") && (replaceEscapeSequences(getCharLiteral(mStr)).size() > 1);
-    }
+    bool isCMultiChar() const;
 
     /**
      * @brief Is current token a template argument?
