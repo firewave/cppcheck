@@ -354,6 +354,9 @@ unsigned int ProcessExecutor::check()
                     resultOfCheck = fileChecker.check(*iFile);
                 }
 
+                if (mTimerResults && (mSettings.showtime == ShowTime::FILE || mSettings.showtime == ShowTime::TOP5_FILE))
+                    mTimerResults->showResults(mSettings.showtime);
+
                 pipewriter.writeSuppr(mSuppressions.nomsg);
 
                 pipewriter.writeEnd(std::to_string(resultOfCheck));

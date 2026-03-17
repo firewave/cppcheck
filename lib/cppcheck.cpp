@@ -536,7 +536,7 @@ static std::string getDefinesFlags(const std::string &semicolonSeparatedString)
 CppCheck::CppCheck(const Settings& settings,
                    Suppressions& supprs,
                    ErrorLogger &errorLogger,
-                   TimerResults *timerResults,
+                   TimerResultsIntf *timerResults,
                    bool useGlobalSuppressions,
                    ExecuteCmdFn executeCommand)
     : mSettings(settings)
@@ -1291,9 +1291,6 @@ unsigned int CppCheck::checkInternal(const FileWithDetails& file, const std::str
 
     // TODO: clear earlier?
     mLogger->clear();
-
-    if (mTimerResults && (mSettings.showtime == ShowTime::FILE || mSettings.showtime == ShowTime::TOP5_FILE))
-        mTimerResults->showResults(mSettings.showtime);
 
     return mLogger->exitcode();
 }
