@@ -42,6 +42,8 @@
 
 class options;
 class Tokenizer;
+class Timer;
+class TimerResultsIntf;
 
 class TestFixture : public ErrorLogger {
 private:
@@ -60,6 +62,7 @@ protected:
     bool quiet_tests{};
     bool dry_run{};
     bool mNewTemplate{};
+    TimerResultsIntf* timerResults{};
 
     virtual void run() = 0;
 
@@ -283,6 +286,8 @@ private:
 
     std::ostringstream mOutput;
     std::ostringstream mErrout;
+
+    std::unique_ptr<Timer> mTimer;
 
     void reportOut(const std::string &outmsg, Color c = Color::Reset) override;
     void reportErr(const ErrorMessage &msg) override;
