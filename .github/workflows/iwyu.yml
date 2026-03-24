@@ -15,15 +15,15 @@ jobs:
 
     strategy:
       matrix:
-        # "opensuse/tumbleweed:latest" / "fedora:latest" / "debian:unstable" / "archlinux:latest"
+        # "opensuse/tumbleweed:latest" / "fedora:rawhide" / "debian:unstable" / "archlinux:latest"
         include:
           - os: ubuntu-22.04
-            image: "fedora:latest"
+            image: "fedora:rawhide"
             stdlib: libstdc++
             clang_inc: '-isystem/usr/lib/clang/20/include'
           # TODO: disable because it currently fails with "error: <cstddef> tried including <stddef.h> but didn't find libc++'s <stddef.h> header."
           #- os: ubuntu-22.04
-          #  image: "fedora:latest"
+          #  image: "fedora:rawhide"
           #  stdlib: libc++
           #  clang_inc: '-isystem/usr/lib/clang/20/include'
           - os: macos-26
