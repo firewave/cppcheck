@@ -20,12 +20,9 @@ jobs:
           - os: ubuntu-22.04
             image: "fedora:rawhide"
             stdlib: libstdc++
-            clang_inc: '-isystem/usr/lib/clang/20/include'
-          # TODO: disable because it currently fails with "error: <cstddef> tried including <stddef.h> but didn't find libc++'s <stddef.h> header."
-          #- os: ubuntu-22.04
-          #  image: "fedora:rawhide"
-          #  stdlib: libc++
-          #  clang_inc: '-isystem/usr/lib/clang/20/include'
+          - os: ubuntu-22.04
+            image: "fedora:rawhide"
+            stdlib: libc++
           - os: macos-26
             image: ""
             stdlib: libc++  # no libstdc++ on macOS
@@ -150,8 +147,7 @@ jobs:
 
       - name: iwyu_tool
         run: |
-          # TODO: remove -stdlib= - it should have been taken from the compilation database
-          iwyu_tool -p cmake.output -j $(nproc) -- -w -Xiwyu --max_line_length=1024 -Xiwyu --comment_style=long -Xiwyu --quoted_includes_first -Xiwyu --update_comments -stdlib=${{ matrix.stdlib }} ${{ matrix.mapping_file_opt }} ${{ matrix.clang_inc }} > iwyu.log
+          iwyu_tool -p cmake.output -j $(nproc) -- -w -Xiwyu --max_line_length=1024 -Xiwyu --comment_style=long -Xiwyu --quoted_includes_first -Xiwyu --update_comments ${{ matrix.mapping_file_opt }} ${{ matrix.clang_inc }} > iwyu.log
 
       # TODO: run with all configurations
       - name: test/cfg
