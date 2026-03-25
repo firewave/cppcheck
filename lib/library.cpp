@@ -49,7 +49,7 @@ struct Library::LibraryData
             const auto it = mPlatformTypes.find(name);
             return (it != mPlatformTypes.end()) ? &(it->second) : nullptr;
         }
-        std::map<std::string, PlatformType> mPlatformTypes;
+        std::unordered_map<std::string, PlatformType> mPlatformTypes;
     };
 
     class ExportedFunctions {
@@ -137,7 +137,7 @@ struct Library::LibraryData
     std::map<std::string, int> mReflection; // invocation of reflection
     std::unordered_map<std::string, struct PodType> mPodTypes; // pod types
     std::map<std::string, PlatformType> mPlatformTypes; // platform independent typedefs
-    std::map<std::string, Platform> mPlatforms; // platform dependent typedefs
+    std::unordered_map<std::string, Platform> mPlatforms; // platform dependent typedefs
     std::map<std::pair<std::string,std::string>, TypeCheck> mTypeChecks;
     std::unordered_map<std::string, NonOverlappingData> mNonOverlappingData;
     std::unordered_set<std::string> mEntrypoints;
