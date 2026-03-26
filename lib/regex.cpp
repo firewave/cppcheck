@@ -27,6 +27,9 @@
 #endif
 #include <pcre.h>
 
+#define PCRE2_CODE_UNIT_WIDTH 8
+#include <pcre2.h>
+
 namespace {
     class PcreRegex : public Regex
     {
@@ -248,6 +251,85 @@ namespace {
     }
 }
 
+namespace {
+    class Pcre2Regex : public Regex
+    {
+    public:
+        explicit Pcre2Regex(std::string pattern)
+            : mPattern(std::move(pattern))
+        {}
+
+        ~Pcre2Regex() override
+        {
+            if (mRe) {
+                pcre_free(mRe);
+                mRe = nullptr;
+            }
+        }
+
+        std::string compile();
+        std::string match(const std::string& str, const MatchFn& match) const override;
+
+    private:
+        std::string mPattern;
+        pcre2_code* mRe{};
+    };
+
+    std::string Pcre2Regex::compile()
+    {
+        if (mRe)
+            return "regular expression has already been compiled";
+
+        int errnumber = 0;
+        size_t erroffset = 0;
+        pcre2_code * const re = pcre2_compile(reinterpret_cast<PCRE2_SPTR8>(mPattern.c_str()), PCRE2_ZERO_TERMINATED, 0, &errnumber, &erroffset, nullptr);
+        if (!re) {
+            PCRE2_UCHAR buffer[256];
+            pcre2_get_error_message(errnumber, buffer, sizeof(buffer));
+            return reinterpret_cast<char*>(buffer);
+        }
+
+        mRe = re;
+
+        return "";
+    }
+
+    std::string Pcre2Regex::match(const std::string& str, const MatchFn& match) const
+    {
+        if (!mRe)
+            return "regular expression has not been compiled yet";
+
+        pcre2_match_data* match_data = pcre2_match_data_create_from_pattern(mRe, NULL);
+
+        int pos = 0;
+        while (pos < static_cast<int>(str.size())) {
+            const int pcreExecRet = pcre2_match(mRe, reinterpret_cast<PCRE2_SPTR8>(str.c_str()), static_cast<int>(str.size()), pos, 0, match_data, nullptr);
+            if (pcreExecRet == PCRE2_ERROR_NOMATCH)
+                return "";
+            if (pcreExecRet < 0) {
+                PCRE2_UCHAR errorMessageBuf[120];
+                const int res = pcre2_get_error_message(pcreExecRet, errorMessageBuf, sizeof(errorMessageBuf));
+                if (res < 0)
+                    return std::string("failed to get error message ") + std::to_string(res) + " (pos: " + std::to_string(pos) + ")";
+                return std::string(reinterpret_cast<char*>(errorMessageBuf)) + " (pos: " + std::to_string(pos) + ")";
+            }
+            PCRE2_SIZE* ovector = pcre2_get_ovector_pointer(match_data);
+            const uint32_t ovcount = pcre2_get_ovector_count(match_data);
+            if (ovcount != 1)
+                return "invalid ovector count";
+            const auto pos1 = static_cast<unsigned int>(ovector[0]);
+            const auto pos2 = static_cast<unsigned int>(ovector[1]);
+
+            match(pos1, pos2);
+
+            // jump to the end of the match for the next pcre_exec
+            pos = static_cast<int>(pos2);
+        }
+
+        return "";
+    }
+}
+
 template<typename T>
 static T* createAndCompileRegex(std::string pattern, std::string& err)
 {
@@ -261,6 +343,8 @@ std::shared_ptr<Regex> Regex::create(std::string pattern, Engine engine, std::st
     Regex* regex = nullptr;
     if (engine == Engine::Pcre)
         regex = createAndCompileRegex<PcreRegex>(std::move(pattern), err);
+    else if (engine == Engine::Pcre2)
+        regex = createAndCompileRegex<Pcre2Regex>(std::move(pattern), err);
     else {
         err = "unknown regular expression engine";
     }

@@ -21,3 +21,4 @@ Infrastructure & dependencies:
 
 Other:
 - Make it possible to specify the regular expression engine using the `engine` element in a rule XML.
+- Added support for PCRE2 (`pcre`) as the regular expression engine for rules.

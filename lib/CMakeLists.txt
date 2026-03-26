@@ -53,10 +53,10 @@ endif()
 target_dll_compile_definitions(cppcheck-core EXPORT CPPCHECKLIB_EXPORT IMPORT CPPCHECKLIB_IMPORT)
 
 target_include_directories(cppcheck-core PUBLIC .)
-target_link_libraries(cppcheck-core PRIVATE tinyxml2 simplecpp picojson ${PCRE_LIBRARY})
+target_link_libraries(cppcheck-core PRIVATE tinyxml2 simplecpp picojson ${PCRE_LIBRARY} ${PCRE2_LIBRARY})
 
 if (HAVE_RULES)
-    target_include_directories(cppcheck-core SYSTEM PRIVATE ${PCRE_INCLUDE})
+    target_include_directories(cppcheck-core SYSTEM PRIVATE ${PCRE_INCLUDE} ${PCRE2_INCLUDE})
 endif()
 if (Boost_FOUND)
     target_include_directories(cppcheck-core SYSTEM PUBLIC ${Boost_INCLUDE_DIRS})
