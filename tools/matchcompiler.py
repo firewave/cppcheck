@@ -159,7 +159,7 @@ class MatchCompiler:
 
     def _compileMatch(self, tok):
         if len(tok) == 1:
-            return '(tok->str().size() == 1U && tok->str()[0] == \'' + tok + '\')'
+            return '(tok->str()[0] == \'' + tok + '\' && tok->str()[1] == \'\\0\')'
         return '(tok->str() == ' + self._getConstStringId(tok) + ')'
 
     def _compileCmd(self, tok):
