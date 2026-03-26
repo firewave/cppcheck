@@ -28,7 +28,37 @@
 #include <pcre.h>
 
 namespace {
-    std::string pcreErrorCodeToString(const int pcreExecRet)
+    class PcreRegex : public Regex
+    {
+    public:
+        explicit PcreRegex(std::string pattern)
+            : mPattern(std::move(pattern))
+        {}
+
+        ~PcreRegex() override
+        {
+            if (mExtra) {
+                pcre_free_study(mExtra);
+                mExtra = nullptr;
+            }
+            if (mRe) {
+                pcre_free(mRe);
+                mRe = nullptr;
+            }
+        }
+
+        std::string compile();
+        std::string match(const std::string& str, const MatchFn& match) const override;
+
+    private:
+        static std::string pcreErrorCodeToString(int pcreExecRet);
+
+        std::string mPattern;
+        pcre* mRe{};
+        pcre_extra* mExtra{};
+    };
+
+    std::string PcreRegex::pcreErrorCodeToString(const int pcreExecRet)
     {
         switch (pcreExecRet) {
         case PCRE_ERROR_NULL:
@@ -156,34 +186,6 @@ namespace {
         }
         return "unknown PCRE error " + std::to_string(pcreExecRet);
     }
-
-    class PcreRegex : public Regex
-    {
-    public:
-        explicit PcreRegex(std::string pattern)
-            : mPattern(std::move(pattern))
-        {}
-
-        ~PcreRegex() override
-        {
-            if (mExtra) {
-                pcre_free_study(mExtra);
-                mExtra = nullptr;
-            }
-            if (mRe) {
-                pcre_free(mRe);
-                mRe = nullptr;
-            }
-        }
-
-        std::string compile();
-        std::string match(const std::string& str, const MatchFn& match) const override;
-
-    private:
-        std::string mPattern;
-        pcre* mRe{};
-        pcre_extra* mExtra{};
-    };
 
     std::string PcreRegex::compile()
     {
