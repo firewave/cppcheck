@@ -9,7 +9,7 @@ import json
 import subprocess
 import shutil
 
-from testutils import cppcheck, assert_cppcheck, cppcheck_ex, __lookup_cppcheck_exe
+from testutils import cppcheck, assert_cppcheck, cppcheck_ex, __lookup_cppcheck_exe, create_compile_commands
 from xml.etree import ElementTree
 
 
@@ -956,7 +956,7 @@ def test_unused_function_include(tmpdir):
 
 # TODO: test with FileSettings
 # TODO: test with multiple files
-def __test_showtime(tmp_path, showtime, exp_len, exp_last, extra_args=None):
+def __test_showtime(tmp_path, showtime, exp_len, exp_last, use_compdb, extra_args=None):
     test_file = tmp_path / 'test.cpp'
     with open(test_file, 'wt') as f:
         f.write(
@@ -970,9 +970,16 @@ void f()
     args = [
         f'--showtime={showtime}',
         '--quiet',
-        '--inline-suppr',
-        str(test_file)
+        '--inline-suppr'
     ]
+
+    if use_compdb:
+        compdb_file = tmp_path / 'compile_commands.json'
+        create_compile_commands(compdb_file, [test_file])
+
+        args.append(f'--project={compdb_file}')
+    else:
+        args.append( str(test_file))
 
     if extra_args:
         args += extra_args
@@ -992,8 +999,16 @@ void f()
     assert stderr == ''
 
 
+def __test_showtime_top5_file(tmp_path, use_compdb):
+    __test_showtime(tmp_path, 'top5_file', 7, 'Check time: ', use_compdb)
+
+
 def test_showtime_top5_file(tmp_path):
-    __test_showtime(tmp_path, 'top5_file', 7, 'Check time: ')
+    __test_showtime_top5_file(tmp_path, False)
+
+
+def test_showtime_top5_file_compdb(tmp_path):
+    __test_showtime_top5_file(tmp_path, True)
 
 
 # TODO: remove extra args when --executor=process works works
