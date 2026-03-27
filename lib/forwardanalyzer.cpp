@@ -60,6 +60,9 @@ namespace {
         std::vector<Token*> loopEnds;
         int branchCount = 0;
 
+        ForwardTraversal(ForwardTraversal&&) = default;
+        ForwardTraversal(const ForwardTraversal&) = delete;
+
         Progress Break(Analyzer::Terminate t = Analyzer::Terminate::None) {
             if ((!analyzeOnly || analyzeTerminate) && t != Analyzer::Terminate::None)
                 terminate = t;
@@ -322,7 +325,7 @@ namespace {
                 ft.analyzeTerminate = true;
             }
             ft.actions = Analyzer::Action::None;
-            return ft;
+            return std::move(ft);
         }
 
         std::vector<ForwardTraversal> tryForkScope(Token* endBlock, bool isModified = false) const {

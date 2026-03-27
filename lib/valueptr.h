@@ -49,13 +49,16 @@ public:
     // cppcheck-suppress noExplicitConstructor
     // NOLINTNEXTLINE(google-explicit-constructor)
     ValuePtr(const U& value) : mPtr(cloner<U>::apply(&value)), mClone(&cloner<U>::apply)
-    {}
+    {
+        static_assert(false, "err");
+    }
 
     template<class U>
     ValuePtr(U&& value) : mPtr(cloner<U>::move(&value)), mClone(&cloner<U>::apply)
     {}
 
     ValuePtr(const ValuePtr& rhs) : mPtr(nullptr), mClone(rhs.mClone) {
+        static_assert(false, "err");
         if (rhs) {
             mPtr.reset(mClone(rhs.get()));
         }
