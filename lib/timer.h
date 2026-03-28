@@ -28,6 +28,7 @@
 #include <mutex>
 #include <string>
 #include <utility>
+#include <vector>
 
 enum class ShowTime : std::uint8_t {
     NONE,
@@ -43,14 +44,18 @@ public:
     virtual ~TimerResultsIntf() = default;
 
     virtual void addResults(const std::string& timerName, std::chrono::milliseconds duation) = 0;
+
+    static std::chrono::duration<double> asSeconds(std::chrono::milliseconds ms) {
+        return std::chrono::duration_cast<std::chrono::duration<double>>(ms);
+    }
 };
 
 struct TimerResultsData {
     std::chrono::milliseconds mDuration;
-    long mNumberOfResults{};
+    std::vector<std::chrono::milliseconds> mResults;
 
     std::chrono::duration<double> getSeconds() const {
-        return std::chrono::duration_cast<std::chrono::duration<double>>(mDuration);
+        return TimerResultsIntf::asSeconds(mDuration);
     }
 
     static std::string durationToString(std::chrono::milliseconds duration);
