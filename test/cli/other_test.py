@@ -990,6 +990,7 @@ void f()
     for i in range(1, exp_res):
         assert 'avg.' in lines[i]
     assert lines[exp_len-1].startswith(exp_last)
+    assert not 'avg.' in lines[exp_len-1]
     assert stderr == ''
 
 

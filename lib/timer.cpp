@@ -19,6 +19,7 @@
 #include "timer.h"
 
 #include <algorithm>
+#include <cassert>
 #include <cstddef>
 #include <iostream>
 #include <utility>
@@ -37,9 +38,9 @@ namespace {
 
 // TODO: this does not include any file context when SHOWTIME_FILE thus rendering it useless - should we include the logging with the progress logging?
 // that could also get rid of the broader locking
-void TimerResults::showResults(ShowTime mode) const
+void TimerResults::showResults(ShowTime mode, bool metrics) const
 {
-    if (mode == ShowTime::NONE || mode == ShowTime::FILE_TOTAL)
+    if (mode == ShowTime::NONE)
         return;
     std::vector<dataElementType> data;
 
@@ -59,7 +60,10 @@ void TimerResults::showResults(ShowTime mode) const
         const double sec = iter->second.getSeconds().count();
         const double secAverage = sec / static_cast<double>(iter->second.mNumberOfResults);
         if ((mode != ShowTime::TOP5_FILE && mode != ShowTime::TOP5_SUMMARY) || (ordinal<=5)) {
-            std::cout << iter->first << ": " << sec << "s (avg. " << secAverage << "s - " << iter->second.mNumberOfResults  << " result(s))" << std::endl;
+            std::cout << iter->first << ": " << sec << "s";
+            if (metrics)
+                std::cout << " (avg. " << secAverage << "s - " << iter->second.mNumberOfResults  << " result(s))";
+            std::cout << std::endl;
         }
         ++ordinal;
     }
@@ -105,12 +109,11 @@ void Timer::stop()
         return;
     }
     if (mStart != TimePoint{}) {
-        auto diff = std::chrono::duration_cast<std::chrono::milliseconds>(Clock::now() - mStart);
         if (!mResults) {
-            // TODO: do not print implicitly
-            std::lock_guard<std::mutex> l(stdCoutLock);
-            std::cout << (mType == Type::OVERALL ? "Overall time: " : "Check time: " + mName + ": ") << TimerResultsData::durationToString(diff) << std::endl;
-        } else {
+            assert(false);
+        }
+        else {
+            auto diff = std::chrono::duration_cast<std::chrono::milliseconds>(Clock::now() - mStart);
             mResults->addResults(mName, diff);
         }
     }
