@@ -26,8 +26,10 @@
 #include <cstdint>
 #include <map>
 #include <mutex>
+#include <numeric>
 #include <string>
 #include <utility>
+#include <vector>
 
 enum class ShowTime : std::uint8_t {
     NONE,
@@ -42,15 +44,20 @@ class CPPCHECKLIB TimerResultsIntf {
 public:
     virtual ~TimerResultsIntf() = default;
 
-    virtual void addResults(const std::string& timerName, std::chrono::milliseconds duation) = 0;
+    virtual void addResults(const std::string& name, std::chrono::milliseconds duration) = 0;
+
+    static std::chrono::duration<double> asSeconds(std::chrono::milliseconds ms) {
+        return std::chrono::duration_cast<std::chrono::duration<double>>(ms);
+    }
 };
 
 struct TimerResultsData {
-    std::chrono::milliseconds mDuration;
-    long mNumberOfResults{};
+    std::vector<std::chrono::milliseconds> mResults;
 
     std::chrono::duration<double> getSeconds() const {
-        return std::chrono::duration_cast<std::chrono::duration<double>>(mDuration);
+        return std::accumulate(mResults.cbegin(), mResults.cend(), std::chrono::duration<double>{}, [](std::chrono::duration<double> secs, std::chrono::milliseconds duration) {
+            return secs + TimerResultsIntf::asSeconds(duration);
+        });
     }
 
     static std::string durationToString(std::chrono::milliseconds duration);
@@ -61,7 +68,7 @@ public:
     TimerResults() = default;
 
     void showResults(ShowTime mode) const;
-    void addResults(const std::string& str, std::chrono::milliseconds duration) override;
+    void addResults(const std::string& name, std::chrono::milliseconds duration) override;
 
     void reset();
 
