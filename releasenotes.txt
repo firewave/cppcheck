@@ -20,4 +20,5 @@ Infrastructure & dependencies:
 -
 
 Other:
+- Added CLI option `--exitcode-suppress` to suppress
 -
