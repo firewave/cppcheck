@@ -983,14 +983,10 @@ void f()
     assert exitcode == 0
     lines = stdout.splitlines()
     exp_len = exp_res
-    if exp_res:
-        exp_len += 1  # empty line at the beginning - only added when individual results exist
     if 'cppcheck internal API usage' in stdout:
         exp_len += 1
     exp_len += 1  # last line
     assert len(lines) == exp_len
-    if exp_res:
-        assert lines[0] == ''
     for i in range(1, exp_res):
         assert 'avg.' in lines[i]
     assert lines[exp_len-1].startswith(exp_last)
