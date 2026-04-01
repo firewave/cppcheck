@@ -155,7 +155,8 @@ else ifneq ($(HAVE_RULES),)
     $(error invalid HAVE_RULES value '$(HAVE_RULES)')
 endif
 
-HAVE_EXECINFO_H=$(shell echo -e "\x23include <execinfo.h>" | $(CXX) -c -xc - && echo "1" || echo "0")
+EXCECINFO_SRC="#include <execinfo.h>"
+HAVE_EXECINFO_H=$(shell echo "$(EXCECINFO_SRC)" | $(CXX) -c -xc - && echo "1" || echo "0")
 override CPPFLAGS += -DHAVE_EXECINFO_H=$(HAVE_EXECINFO_H)
 
 override CXXFLAGS += $(CXXOPTS)
