@@ -32,7 +32,6 @@ jobs:
 
       - name: run dmake
         run: |
-          make --version
           make -j3 CXXOPTS="-Werror" run-dmake
 
       - name: check diff
