@@ -773,7 +773,7 @@ int main(int argc, char **argv)
 
     // older make versions require the # to be escaped.
     // the # needs to be specified as hex because newer make version use it verbatim and thus break this command.
-    fout << "HAVE_EXECINFO_H=$(shell echo -e \"\\x23#include <execinfo.h>\" | $(CXX) -c -xc - 2> /dev/null && echo \"1\" || echo \"0\")\n"
+    fout << "HAVE_EXECINFO_H=$(shell echo -e \"\\x23include <execinfo.h>\" | $(CXX) -c -xc - 2> /dev/null && echo \"1\" || echo \"0\")\n"
          << "override CPPFLAGS += -DHAVE_EXECINFO_H=$(HAVE_EXECINFO_H)\n\n";
 
     fout << "override CXXFLAGS += $(CXXOPTS)\n";
