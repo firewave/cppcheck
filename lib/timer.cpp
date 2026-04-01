@@ -54,8 +54,6 @@ void TimerResults::showResults(ShowTime mode) const
     // lock the whole logging operation to avoid multiple threads printing their results at the same time
     std::lock_guard<std::mutex> l(stdCoutLock);
 
-    std::cout << std::endl;
-
     size_t ordinal = 1; // maybe it would be nice to have an ordinal in output later!
     for (auto iter=data.cbegin(); iter!=data.cend(); ++iter) {
         const double sec = iter->second.getSeconds().count();
