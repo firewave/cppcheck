@@ -1303,13 +1303,13 @@ private:
 
     void fileFilterPlus() {
         REDIRECT;
-        ScopedFile file("project.cppcheck",
+        ScopedFile file("filefilterplus.cppcheck",
                         "<project>\n"
                         "<paths>\n"
                         "<dir name=\"src\"/>\n"
                         "</paths>\n"
                         "</project>");
-        const char * const argv[] = {"cppcheck", "--project=project.cppcheck", "--file-filter=+", "src/file.cpp"};
+        const char * const argv[] = {"cppcheck", "--project=filefilterplus.cppcheck", "--file-filter=+", "src/file.cpp"};
         ASSERT_EQUALS_ENUM(CmdLineParser::Result::Success, parseFromArgs(argv));
         ASSERT_EQUALS("src/file.cpp", settings->fileFilters.front());
     }
