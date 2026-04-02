@@ -146,13 +146,34 @@ private:
 
 
     void parseLine() const {
+        ASSERT_EQUALS("bad", SuppressionList::parseLine("bad").toString());
+        ASSERT_EQUALS("bad:test.c", SuppressionList::parseLine("bad:test.c").toString());
         ASSERT_EQUALS("bad:test.c:1", SuppressionList::parseLine("bad:test.c:1").toString());
 
         // symbol
+        ASSERT_EQUALS("bad\nsymbol=x", SuppressionList::parseLine("bad\nsymbol=x").toString());
+        ASSERT_EQUALS("bad:test.c\nsymbol=x", SuppressionList::parseLine("bad:test.c\nsymbol=x").toString());
         ASSERT_EQUALS("bad:test.c:1\nsymbol=x", SuppressionList::parseLine("bad:test.c:1\nsymbol=x").toString());
 
+        // empty symbol
+        ASSERT_EQUALS("bad", SuppressionList::parseLine("bad\nsymbol=").toString());
+        ASSERT_EQUALS("bad:test.c", SuppressionList::parseLine("bad:test.c\nsymbol=").toString());
+        ASSERT_EQUALS("bad:test.c:1", SuppressionList::parseLine("bad:test.c:1\nsymbol=").toString());
+
         // polyspace
+        ASSERT_EQUALS("bad\npolyspace=1", SuppressionList::parseLine("bad\npolyspace=1").toString());
+        ASSERT_EQUALS("bad:test.c\npolyspace=1", SuppressionList::parseLine("bad:test.c\npolyspace=1").toString());
         ASSERT_EQUALS("bad:test.c:1\npolyspace=1", SuppressionList::parseLine("bad:test.c:1\npolyspace=1").toString());
+
+        // symbol + polyspace
+        ASSERT_EQUALS("bad\nsymbol=x\npolyspace=1", SuppressionList::parseLine("bad\nsymbol=x\npolyspace=1").toString());
+        ASSERT_EQUALS("bad:test.c\nsymbol=x\npolyspace=1", SuppressionList::parseLine("bad:test.c\nsymbol=x\npolyspace=1").toString());
+        ASSERT_EQUALS("bad:test.c:1\nsymbol=x\npolyspace=1", SuppressionList::parseLine("bad:test.c:1\nsymbol=x\npolyspace=1").toString());
+
+        // polyspace + symbol
+        ASSERT_EQUALS("bad\npolyspace=1\nsymbol=x", SuppressionList::parseLine("bad\npolyspace=1\nsymbol=x").toString());
+        ASSERT_EQUALS("bad:test.c\nsymbol=x\npolyspace=1", SuppressionList::parseLine("bad:test.c\npolyspace=1\nsymbol=x").toString());
+        ASSERT_EQUALS("bad:test.c:1\nsymbol=x\npolyspace=1", SuppressionList::parseLine("bad:test.c:1\npolyspace=1\nsymbol=x").toString());
     }
 
     void suppressionsBadId1() const {
