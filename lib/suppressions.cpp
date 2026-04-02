@@ -217,7 +217,7 @@ SuppressionList::Suppression SuppressionList::parseLine(std::string line)
         while (endpos > 0 && std::isspace(line[endpos-1])) {
             endpos--;
         }
-        line = line.substr(0, endpos);
+        line.resize(endpos);
     }
 
     const auto parts = splitString(line, '\n');
