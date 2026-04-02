@@ -196,8 +196,9 @@ public:
      * Create a Suppression object from a suppression line
      * @param line The line to parse.
      * @return a suppression object
+     * @throws std::runtime_error thrown if the given suppression is invalid
      */
-    static Suppression parseLine(const std::string &line);
+    static Suppression parseLine(std::string line);
 
     /**
      * @brief Don't show the given error.

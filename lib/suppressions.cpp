@@ -207,9 +207,8 @@ std::vector<SuppressionList::Suppression> SuppressionList::parseMultiSuppressCom
     return suppressions;
 }
 
-SuppressionList::Suppression SuppressionList::parseLine(const std::string &line)
+SuppressionList::Suppression SuppressionList::parseLine(std::string line)
 {
-    std::istringstream lineStream;
     SuppressionList::Suppression suppression;
 
     // Strip any end of line comments
@@ -218,13 +217,18 @@ SuppressionList::Suppression SuppressionList::parseLine(const std::string &line)
         while (endpos > 0 && std::isspace(line[endpos-1])) {
             endpos--;
         }
-        lineStream.str(line.substr(0, endpos));
-    } else {
-        lineStream.str(line);
+        line = line.substr(0, endpos);
     }
 
-    if (std::getline(lineStream, suppression.errorId, ':')) {
-        if (std::getline(lineStream, suppression.fileName)) {
+    const auto parts = splitString(line, '\n');
+    const std::string& suppr_l = parts[0];
+
+    const std::string::size_type first_sep = suppr_l.find(':');
+    suppression.errorId = suppr_l.substr(0, first_sep);
+    if (first_sep != std::string::npos) {
+        suppression.fileName = suppr_l.substr(first_sep+1);
+        if (!suppression.fileName.empty()) {
+            // TODO: this only works with files which have an extension
             // If there is not a dot after the last colon in "file" then
             // the colon is a separator and the contents after the colon
             // is a line number..
@@ -234,39 +238,48 @@ SuppressionList::Suppression SuppressionList::parseLine(const std::string &line)
 
             // if a colon is found and there is no dot after it..
             if (pos != std::string::npos &&
-                suppression.fileName.find('.', pos) == std::string::npos) {
-                // Try to parse out the line number
+                suppression.fileName.find('.', pos) == std::string::npos)
+            {
+                // parse out the line number
+                const std::string line_s = suppression.fileName.substr(pos+1);
+                suppression.fileName.erase(pos);
+
+                if (suppression.fileName.empty())
+                    throw std::runtime_error("filename is missing");
+
                 try {
-                    std::istringstream istr1(suppression.fileName.substr(pos+1));
-                    istr1 >> suppression.lineNumber;
-                } catch (...) {
-                    suppression.lineNumber = SuppressionList::Suppression::NO_LINE;
-                }
-
-                if (suppression.lineNumber != SuppressionList::Suppression::NO_LINE) {
-                    suppression.fileName.erase(pos);
+                    suppression.lineNumber = strToInt<int>(line_s);
+                } catch (const std::runtime_error& e) {
+                    throw std::runtime_error(std::string("invalid line number (") + e.what() + ")");
                 }
             }
-
-            // when parsing string generated internally by toString() there can be newline
-            std::string extra;
-            while (std::getline(lineStream, extra)) {
-                if (startsWith(extra, "symbol="))
-                    suppression.symbolName = extra.substr(7);
-                else if (extra == "polyspace=1")
-                    suppression.isPolyspace = true;
-            }
+            suppression.fileName = Path::simplifyPath(suppression.fileName);
+        } else {
+            throw std::runtime_error("filename is missing");
         }
     }
 
-    suppression.fileName = Path::simplifyPath(suppression.fileName);
+    // TODO: make this optional - do we even encounter this in production code?
+    // when parsing string generated internally by toString() there can be newline
+    for (std::size_t i = 1; i < parts.size(); ++i) {
+        if (startsWith(parts[i], "symbol="))
+            suppression.symbolName = parts[i].substr(7);
+        else if (parts[i] == "polyspace=1")
+            suppression.isPolyspace = true;
+        else
+            throw std::runtime_error("unexpected extra '" + parts[i] + "'");
+    }
 
     return suppression;
 }
 
 std::string SuppressionList::addSuppressionLine(const std::string &line)
 {
-    return addSuppression(parseLine(line));
+    try {
+        return addSuppression(parseLine(line));
+    } catch (const std::exception& e) {
+        return e.what();
+    }
 }
 
 std::string SuppressionList::addSuppression(SuppressionList::Suppression suppression)
