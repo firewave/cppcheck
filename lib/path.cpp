@@ -458,3 +458,8 @@ std::string Path::join(std::string path1, std::string path2)
         return path2;
     return ((path1.back() == '/') ? path1 : (path1 + "/")) + path2;
 }
+
+std::string Path::join(std::string path1, std::string path2, std::string path3)
+{
+    return Path::join(Path::join(std::move(path1), std::move(path2)), std::move(path3));
+}
