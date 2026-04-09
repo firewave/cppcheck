@@ -269,7 +269,20 @@ int CppCheckExecutor::check(int argc, const char* const argv[])
         return EXIT_SUCCESS;
     }
 
-    std::unique_ptr<TimerResults> overallTimerResults;
+    class SingleTimerResult : public TimerResultsIntf
+    {
+    private:
+        void addResults(const std::string &timerName, std::chrono::milliseconds duration) override
+        {
+            // TODO: do not directly use std::cout?
+            std::cout << timerName << ": " << TimerResultsData::durationToString(duration) << std::endl;
+        }
+    };
+
+    // TODO: use special timer results
+    std::unique_ptr<SingleTimerResult> overallTimerResults;
+    if (settings.showtime != ShowTime::NONE)
+        overallTimerResults.reset(new SingleTimerResult);
     Timer realTimeClock("Overall time", overallTimerResults.get());
 
     settings.loadSummaries();
@@ -278,9 +291,6 @@ int CppCheckExecutor::check(int argc, const char* const argv[])
     mFileSettings = parser.getFileSettings();
 
     const int ret = check_wrapper(settings, supprs);
-
-    realTimeClock.stop();
-    overallTimerResults->showResults(settings.showtime, false, true);
 
     return ret;
 }
