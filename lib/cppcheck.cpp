@@ -923,8 +923,8 @@ unsigned int CppCheck::checkInternal(const FileWithDetails& file, const std::str
     if (Settings::terminated())
         return mLogger->exitcode();
 
-    TimerResults checkTimeResults;
-    Timer fileTotalTimer{"Check time: " + file.spath(), mSettings.showtime, &checkTimeResults, Timer::Type::FILE};
+    std::unique_ptr<TimerResults> checkTimeResults;
+    Timer fileTotalTimer{"Check time: " + file.spath(), checkTimeResults.get()};
 
     if (!mSettings.quiet) {
         std::string fixedpath = Path::toNativeSeparators(file.spath());
@@ -1044,7 +1044,7 @@ unsigned int CppCheck::checkInternal(const FileWithDetails& file, const std::str
         // Get configurations..
         std::set<std::string> configurations;
         if (maxConfigs > 1) {
-            Timer::run("Preprocessor::getConfigs", mSettings.showtime, mTimerResults, [&]() {
+            Timer::run("Preprocessor::getConfigs", mTimerResults, [&]() {
                 configurations = preprocessor.getConfigs();
             });
         } else {
@@ -1129,7 +1129,7 @@ unsigned int CppCheck::checkInternal(const FileWithDetails& file, const std::str
 
             if (mSettings.preprocessOnly) {
                 std::string codeWithoutCfg;
-                Timer::run("Preprocessor::getcode", mSettings.showtime, mTimerResults, [&]() {
+                Timer::run("Preprocessor::getcode", mTimerResults, [&]() {
                     codeWithoutCfg = preprocessor.getcode(currentConfig, files, true);
                 });
 
@@ -1153,7 +1153,7 @@ unsigned int CppCheck::checkInternal(const FileWithDetails& file, const std::str
             {
                 bool skipCfg = false;
                 // Create tokens, skip rest of iteration if failed
-                Timer::run("Tokenizer::createTokens", mSettings.showtime, mTimerResults, [&]() {
+                Timer::run("Tokenizer::createTokens", mTimerResults, [&]() {
                     simplecpp::OutputList outputList_cfg;
                     simplecpp::TokenList tokensP = preprocessor.preprocess(currentConfig, files, outputList_cfg);
                     const simplecpp::Output* o = preprocessor.handleErrors(outputList_cfg);
@@ -1297,7 +1297,7 @@ unsigned int CppCheck::checkInternal(const FileWithDetails& file, const std::str
         mTimerResults->showResults(mSettings.showtime);
 
     fileTotalTimer.stop();
-    checkTimeResults.showResults(mSettings.showtime, false, true);
+    checkTimeResults->showResults(mSettings.showtime, false, true);
 
     return mLogger->exitcode();
 }
@@ -1356,7 +1356,7 @@ void CppCheck::checkNormalTokens(const Tokenizer &tokenizer, AnalyzerInformation
                 return;
             }
 
-            Timer::run(check->name() + "::runChecks", mSettings.showtime, mTimerResults, [&]() {
+            Timer::run(check->name() + "::runChecks", mTimerResults, [&]() {
                 check->runChecks(tokenizer, &mErrorLogger);
             });
         }
@@ -1491,7 +1491,7 @@ void CppCheck::executeAddons(const std::string& dumpFile, const FileWithDetails&
 {
     if (!dumpFile.empty()) {
         std::vector<std::string> f{dumpFile};
-        Timer::run("CppCheck::executeAddons", mSettings.showtime, mTimerResults, [&]() {
+        Timer::run("CppCheck::executeAddons", mTimerResults, [&]() {
             executeAddons(f, file.spath());
         });
     }

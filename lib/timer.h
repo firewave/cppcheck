@@ -75,13 +75,7 @@ public:
     using Clock = std::chrono::high_resolution_clock;
     using TimePoint = std::chrono::time_point<Clock>;
 
-    enum class Type : std::uint8_t {
-        FILE,
-        OVERALL,
-        OTHER
-    };
-
-    Timer(std::string str, ShowTime showtimeMode, TimerResultsIntf* timerResults = nullptr, Type type = Type::OTHER);
+    Timer(std::string str, TimerResultsIntf* timerResults = nullptr);
     ~Timer();
 
     Timer(const Timer&) = delete;
@@ -90,15 +84,13 @@ public:
     void stop();
 
     template<class TFunc>
-    static void run(std::string str, ShowTime showtimeMode, TimerResultsIntf* timerResults, const TFunc& f) {
-        Timer t(std::move(str), showtimeMode, timerResults);
+    static void run(std::string str, TimerResultsIntf* timerResults, const TFunc& f) {
+        Timer t(std::move(str), timerResults);
         f();
     }
 
 private:
     const std::string mName;
-    ShowTime mMode{};
-    Type mType{};
     TimePoint mStart;
     TimerResultsIntf* mResults{};
 };

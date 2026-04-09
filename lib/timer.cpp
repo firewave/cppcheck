@@ -87,10 +87,8 @@ void TimerResults::reset()
     mResults.clear();
 }
 
-Timer::Timer(std::string str, ShowTime showtimeMode, TimerResultsIntf* timerResults, Type type)
+Timer::Timer(std::string str, TimerResultsIntf* timerResults)
     : mName(std::move(str))
-    , mMode(showtimeMode)
-    , mType(type)
     , mStart(Clock::now())
     , mResults(timerResults)
 {}
@@ -102,26 +100,16 @@ Timer::~Timer()
 
 void Timer::stop()
 {
-    if (mMode == ShowTime::NONE)
-        return;
-    if (mType == Type::OVERALL && mMode != ShowTime::TOP5_SUMMARY && mMode != ShowTime::SUMMARY) {
-        mMode = ShowTime::NONE;
-        return;
+    if (!mResults) {
+        assert(false && "no results provided");
     }
-    if (mType == Type::FILE && mMode != ShowTime::TOP5_FILE && mMode != ShowTime::FILE && mMode != ShowTime::FILE_TOTAL) {
-        mMode = ShowTime::NONE;
-        return;
+    if (mStart == TimePoint{}) {
+        assert(false && "already stopped");
     }
-    if (mStart != TimePoint{}) {
-        if (!mResults) {
-            assert(false);
-        }
-        else {
-            auto diff = std::chrono::duration_cast<std::chrono::milliseconds>(Clock::now() - mStart);
-            mResults->addResults(mName, diff);
-        }
-    }
-    mMode = ShowTime::NONE; // prevent multiple stops
+
+    auto diff = std::chrono::duration_cast<std::chrono::milliseconds>(Clock::now() - mStart);
+    mResults->addResults(mName, diff);
+    mStart = TimePoint{};
 }
 
 std::string TimerResultsData::durationToString(std::chrono::milliseconds duration)
