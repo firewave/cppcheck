@@ -894,7 +894,7 @@ void MainWindow::analyzeDirectory()
     }
 }
 
-void MainWindow::addIncludeDirs(const QStringList &includeDirs, Settings &result)
+void MainWindow::addIncludeDirs(const QStringList &includeDirs, Settings &result) const
 {
     for (const QString& dir : includeDirs) {
         QString incdir;
@@ -910,7 +910,7 @@ void MainWindow::addIncludeDirs(const QStringList &includeDirs, Settings &result
     }
 }
 
-Library::Error MainWindow::loadLibrary(Library &library, const QString &filename)
+Library::Error MainWindow::loadLibrary(Library &library, const QString &filename) const
 {
     Library::Error ret;
 
@@ -1023,7 +1023,7 @@ bool MainWindow::tryLoadLibrary(Library &library, const QString& filename)
     return true;
 }
 
-QString MainWindow::loadAddon(Settings &settings, const QString &filesDir, const QString &pythonCmd, const QString& addon)
+QString MainWindow::loadAddon(Settings &settings, const QString &filesDir, const QString &pythonCmd, const QString& addon) const
 {
     const QString addonFilePath = fromNativePath(ProjectFile::getAddonFilePath(filesDir, addon));
 
