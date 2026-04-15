@@ -1037,21 +1037,38 @@ def test_addon_lookup_nofile(tmpdir):
 
 
 # make sure we bail out when we encounter an invalid file
-def test_addon_lookup_invalid(tmpdir):
+def test_addon_py_lookup_invalid(tmpdir):
     test_file = os.path.join(tmpdir, 'test.c')
     with open(test_file, 'wt'):
         pass
 
-    misra_py_file = os.path.join(tmpdir, 'misra.py')
-    with open(misra_py_file, 'wt') as f:
+    addon_py_file = os.path.join(tmpdir, 'invalid.py')
+    with open(addon_py_file, 'wt') as f:
         f.write('''<def/>''')
 
-    exitcode, stdout, stderr = cppcheck(['--debug-lookup=addon', '--addon=misra', test_file], cwd=tmpdir)
+    exitcode, stdout, stderr = cppcheck(['--debug-lookup=addon', '--addon=invalid.py', test_file], cwd=tmpdir)
     assert exitcode == 0, stdout if stdout else stderr
     lines = stdout.splitlines()
     assert lines == [
-        "looking for addon 'misra.py'",
+        "looking for addon 'invalid.py'",
         'Checking {} ...'.format(test_file)  # TODO: should bail out
+    ]
+
+
+def test_addon_json_lookup_invalid(tmpdir):
+    test_file = os.path.join(tmpdir, 'test.c')
+    with open(test_file, 'wt'):
+        pass
+
+    addon_json_file = os.path.join(tmpdir, 'invalid.json')
+    with open(addon_json_file, 'wt') as f:
+        f.write('''{''')
+
+    exitcode, stdout, stderr = cppcheck(['--debug-lookup=addon', '--addon=invalid.json', test_file], cwd=tmpdir)
+    assert exitcode == 1, stdout if stdout else stderr
+    lines = stdout.splitlines()
+    assert lines == [
+        "Loading invalid.json failed. syntax error at line 1 near: "
     ]
 
 
