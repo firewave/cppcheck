@@ -7756,9 +7756,6 @@ void SymbolDatabase::setValueTypeInTokenList(bool reportDebugWarnings, Token *to
     if (!tokens)
         tokens = mTokenizer.list.front();
 
-    for (Token *tok = tokens; tok; tok = tok->next())
-        tok->setValueType(nullptr);
-
     for (Token *tok = tokens; tok; tok = tok->next()) {
         if (tok->isNumber()) {
             if (MathLib::isFloat(tok->str())) {
@@ -7769,6 +7766,7 @@ void SymbolDatabase::setValueTypeInTokenList(bool reportDebugWarnings, Token *to
                 else if (suffix == 'L' || suffix == 'l')
                     type = ValueType::Type::LONGDOUBLE;
                 setValueType(tok, ValueType(ValueType::Sign::UNKNOWN_SIGN, type, 0U));
+                continue;
             } else if (MathLib::isInt(tok->str())) {
                 const std::string tokStr = MathLib::abs(tok->str());
                 const bool unsignedSuffix = (tokStr.find_last_of("uU") != std::string::npos);
@@ -7806,6 +7804,7 @@ void SymbolDatabase::setValueTypeInTokenList(bool reportDebugWarnings, Token *to
                 }
 
                 setValueType(tok, ValueType(sign, type, 0U));
+                continue;
             }
         } else if (tok->isComparisonOp() || tok->tokType() == Token::eLogicalOp) {
             if (tok->isCpp() && tok->isComparisonOp() && (getClassScope(tok->astOperand1()) || getClassScope(tok->astOperand2()))) {
@@ -7818,8 +7817,10 @@ void SymbolDatabase::setValueTypeInTokenList(bool reportDebugWarnings, Token *to
                 }
             }
             setValueType(tok, ValueType(ValueType::Sign::UNKNOWN_SIGN, ValueType::Type::BOOL, 0U));
+            continue;
         } else if (tok->isBoolean()) {
             setValueType(tok, ValueType(ValueType::Sign::UNKNOWN_SIGN, ValueType::Type::BOOL, 0U));
+            continue;
         } else if (tok->tokType() == Token::eChar || tok->tokType() == Token::eString) {
             nonneg int const pointer = tok->tokType() == Token::eChar ? 0 : 1;
             nonneg int const constness = tok->tokType() == Token::eChar ? 0 : 1;
@@ -7843,20 +7844,25 @@ void SymbolDatabase::setValueTypeInTokenList(bool reportDebugWarnings, Token *to
                 valuetype.sign = ValueType::Sign::SIGNED;
             }
             setValueType(tok, valuetype);
+            continue;
         } else if (tok->link() && Token::Match(tok, "(|{")) {
             const Token* start = tok->astOperand1() ? tok->astOperand1()->findExpressionStartEndTokens().first : nullptr;
             // cast
             if (tok->isCast() && !tok->astOperand2() && Token::Match(tok, "( %name%")) {
                 ValueType valuetype;
-                if (Token::simpleMatch(parsedecl(tok->next(), &valuetype, mDefaultSignedness, mSettings), ")"))
+                if (Token::simpleMatch(parsedecl(tok->next(), &valuetype, mDefaultSignedness, mSettings), ")")) {
                     setValueType(tok, valuetype);
+                    continue;
+                }
             }
 
             // C++ cast
             else if (tok->astOperand2() && Token::Match(tok->astOperand1(), "static_cast|const_cast|dynamic_cast|reinterpret_cast < %name%") && tok->astOperand1()->linkAt(1)) {
                 ValueType valuetype;
-                if (Token::simpleMatch(parsedecl(tok->astOperand1()->tokAt(2), &valuetype, mDefaultSignedness, mSettings), ">"))
+                if (Token::simpleMatch(parsedecl(tok->astOperand1()->tokAt(2), &valuetype, mDefaultSignedness, mSettings), ">")) {
                     setValueType(tok, valuetype);
+                    continue;
+                }
             }
 
             // Construct smart pointer
@@ -7865,6 +7871,7 @@ void SymbolDatabase::setValueTypeInTokenList(bool reportDebugWarnings, Token *to
                 if (parsedecl(start, &valuetype, mDefaultSignedness, mSettings)) {
                     setValueType(tok, valuetype);
                     setValueType(tok->astOperand1(), valuetype);
+                    continue;
                 }
 
             }
@@ -7872,8 +7879,10 @@ void SymbolDatabase::setValueTypeInTokenList(bool reportDebugWarnings, Token *to
             // function or lambda
             else if (const Function* f = getFunction(tok->previous())) {
                 ValueType valuetype;
-                if (parsedecl(f->retDef, &valuetype, mDefaultSignedness, mSettings))
+                if (parsedecl(f->retDef, &valuetype, mDefaultSignedness, mSettings)) {
                     setValueType(tok, valuetype);
+                    continue;
+                }
             }
 
             else if (Token::simpleMatch(tok->previous(), "sizeof (")) {
@@ -7891,6 +7900,7 @@ void SymbolDatabase::setValueTypeInTokenList(bool reportDebugWarnings, Token *to
                         setValueType(tok->next(), vt);
                     }
                 }
+                continue;
             }
 
             // functions from stdint.h
@@ -7914,6 +7924,7 @@ void SymbolDatabase::setValueTypeInTokenList(bool reportDebugWarnings, Token *to
                 else
                     valuetype.sign = ValueType::Sign::SIGNED;
                 setValueType(tok, valuetype);
+                continue;
             }
 
             // function style cast
@@ -7932,6 +7943,7 @@ void SymbolDatabase::setValueTypeInTokenList(bool reportDebugWarnings, Token *to
                 else if (valuetype.isIntegral() && valuetype.type != ValueType::UNKNOWN_INT)
                     valuetype.sign = (valuetype.type == ValueType::Type::CHAR) ? mDefaultSignedness : ValueType::Sign::SIGNED;
                 setValueType(tok, valuetype);
+                continue;
             }
 
             // constructor call
@@ -7940,11 +7952,13 @@ void SymbolDatabase::setValueTypeInTokenList(bool reportDebugWarnings, Token *to
                 valuetype.type = ValueType::RECORD;
                 valuetype.typeScope = tok->previous()->function()->tokenDef->scope();
                 setValueType(tok, valuetype);
+                continue;
             }
 
             else if (Token::simpleMatch(tok->previous(), "= {") && tok->tokAt(-2) && tok->tokAt(-2)->valueType()) {
                 ValueType vt = *tok->tokAt(-2)->valueType();
                 setValueType(tok, vt);
+                continue;
             }
 
             // library type/function
@@ -8045,6 +8059,7 @@ void SymbolDatabase::setValueTypeInTokenList(bool reportDebugWarnings, Token *to
                         if (!paramVariable ||
                             !paramVariable->valueType() ||
                             !paramVariable->valueType()->container) {
+                            tok->setValueType(nullptr);
                             continue;
                         }
 
@@ -8103,6 +8118,7 @@ void SymbolDatabase::setValueTypeInTokenList(bool reportDebugWarnings, Token *to
                     if (parsedecl(tokenList.front(), &vt, mDefaultSignedness, mSettings)) {
                         vt.originalTypeName = typestr;
                         setValueType(tok, vt);
+                        continue;
                     }
                 }
             }
@@ -8116,13 +8132,16 @@ void SymbolDatabase::setValueTypeInTokenList(bool reportDebugWarnings, Token *to
                 setValueType(tok, vt);
                 if (Token::simpleMatch(tok, "return {"))
                     setValueType(tok->next(), vt);
+                continue;
             }
         } else if (tok->variable()) {
             setValueType(tok, *tok->variable());
             if (!tok->variable()->valueType() && tok->valueType())
                 const_cast<Variable*>(tok->variable())->setValueType(*tok->valueType());
+            continue;
         } else if (tok->enumerator()) {
             setValueType(tok, *tok->enumerator());
+            continue;
         } else if (tok->isKeyword() && tok->str() == "new") {
             const Token *typeTok = tok->next();
             if (Token::Match(typeTok, "( std| ::| nothrow )"))
@@ -8141,8 +8160,10 @@ void SymbolDatabase::setValueTypeInTokenList(bool reportDebugWarnings, Token *to
                 typestr += typeTok->str() + "::";
                 typeTok = typeTok->tokAt(2);
             }
-            if (!Token::Match(typeTok, "%type% ;|[|("))
+            if (!Token::Match(typeTok, "%type% ;|[|(")) {
+                tok->setValueType(nullptr);
                 continue;
+            }
             typestr += typeTok->str();
             ValueType vt;
             vt.pointer = 1;
@@ -8153,8 +8174,10 @@ void SymbolDatabase::setValueTypeInTokenList(bool reportDebugWarnings, Token *to
                 vt.type = ValueType::typeFromString(typestr, typeTok->isLong());
                 if (vt.type == ValueType::Type::UNKNOWN_TYPE)
                     vt.fromLibraryType(typestr, mSettings);
-                if (vt.type == ValueType::Type::UNKNOWN_TYPE)
+                if (vt.type == ValueType::Type::UNKNOWN_TYPE) {
+                    tok->setValueType(nullptr);
                     continue;
+                }
                 if (typeTok->isUnsigned())
                     vt.sign = ValueType::Sign::UNSIGNED;
                 else if (typeTok->isSigned())
@@ -8167,6 +8190,7 @@ void SymbolDatabase::setValueTypeInTokenList(bool reportDebugWarnings, Token *to
                 vt.pointer--;
                 setValueType(tok->astOperand1(), vt);
             }
+            continue;
         } else if (tok->isKeyword() && tok->str() == "return" && tok->scope()) {
             const Scope* fscope = tok->scope();
             while (fscope && !fscope->function)
@@ -8175,6 +8199,7 @@ void SymbolDatabase::setValueTypeInTokenList(bool reportDebugWarnings, Token *to
                 ValueType vt;
                 parsedecl(fscope->function->retDef, &vt, mDefaultSignedness, mSettings);
                 setValueType(tok, vt);
+                continue;
             }
         } else if (tok->isKeyword() && tok->str() == "this" && tok->scope()->isExecutable()) {
             const Scope* fscope = tok->scope();
@@ -8189,8 +8214,11 @@ void SymbolDatabase::setValueTypeInTokenList(bool reportDebugWarnings, Token *to
                 if (fscope->function->isVolatile())
                     vt.volatileness = 1;
                 setValueType(tok, vt);
+                continue;
             }
         }
+
+        tok->setValueType(nullptr);
     }
 
     if (reportDebugWarnings && mSettings.debugwarnings) {
