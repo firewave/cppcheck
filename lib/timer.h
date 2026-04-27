@@ -65,6 +65,7 @@ struct TimerResultsData {
 class CPPCHECKLIB WARN_UNUSED TimerResults : public TimerResultsIntf {
 public:
     TimerResults() = default;
+    ~TimerResults() override;
 
     void showResults(ShowTime mode, bool metrics = true) const;
     void addResults(const std::string& name, std::chrono::milliseconds duration) override;

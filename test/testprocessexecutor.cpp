@@ -122,6 +122,7 @@ private:
 
         ProcessExecutor executor(filelist, fileSettings, s, supprs, *this, &timerResults, executeFn);
         ASSERT_EQUALS(result, executor.check());
+        timerResults.reset();
     }
 #endif // HAS_THREADING_MODEL_FORK
 

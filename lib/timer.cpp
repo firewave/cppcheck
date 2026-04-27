@@ -36,6 +36,12 @@ namespace {
     std::mutex stdCoutLock;
 }
 
+TimerResults::~TimerResults()
+{
+    if (!mResults.empty())
+        assert(false && "unconsumed results");
+}
+
 // TODO: this does not include any file context when SHOWTIME_FILE thus rendering it useless - should we include the logging with the progress logging?
 // that could also get rid of the broader locking
 void TimerResults::showResults(ShowTime mode, bool metrics) const

@@ -464,8 +464,10 @@ int CppCheckExecutor::check_internal(const Settings& settings, Suppressions& sup
     }
 
     // TODO: show time *after* the whole program analysis
-    if (settings.showtime == ShowTime::SUMMARY || settings.showtime == ShowTime::TOP5_SUMMARY)
+    if (settings.showtime == ShowTime::SUMMARY || settings.showtime == ShowTime::TOP5_SUMMARY) {
         timerResults.showResults(settings.showtime);
+        timerResults.reset();
+    }
 
     // TODO: is this run again instead of using previously cached results?
     returnValue |= cppcheck.analyseWholeProgram(settings.buildDir, mFiles, mFileSettings, stdLogger.getCtuInfo());

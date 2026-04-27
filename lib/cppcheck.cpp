@@ -1294,8 +1294,10 @@ unsigned int CppCheck::checkInternal(const FileWithDetails& file, const std::str
     // TODO: clear earlier?
     mLogger->clear();
 
-    if (mTimerResults && (mSettings.showtime == ShowTime::FILE || mSettings.showtime == ShowTime::TOP5_FILE))
+    if (mTimerResults && (mSettings.showtime == ShowTime::FILE || mSettings.showtime == ShowTime::TOP5_FILE)) {
         mTimerResults->showResults(mSettings.showtime);
+        mTimerResults->reset();
+    }
 
     return mLogger->exitcode();
 }
@@ -1842,16 +1844,24 @@ bool CppCheck::analyseWholeProgram()
 
 unsigned int CppCheck::analyseWholeProgram(const std::string &buildDir, const std::list<FileWithDetails> &files, const std::list<FileSettings>& fileSettings, const std::string& ctuInfo)
 {
-    if (mSettings.checks.isEnabled(Checks::unusedFunction))
-        CheckUnusedFunctions::analyseWholeProgram(mSettings, mErrorLogger, buildDir);
+    if (mSettings.checks.isEnabled(Checks::unusedFunction)) {
+        Timer::run("CheckUnusedFunctions::analyseWholeProgram", mSettings.showtime, mTimerResults, [&]() {
+            CheckUnusedFunctions::analyseWholeProgram(mSettings, mErrorLogger, buildDir);
+        });
+    }
 
-    if (mUnusedFunctionsCheck)
-        mUnusedFunctionsCheck->check(mSettings, mErrorLogger);
+    if (mUnusedFunctionsCheck) {
+        Timer::run("CheckUnusedFunctions::check", mSettings.showtime, mTimerResults, [&]() {
+            mUnusedFunctionsCheck->check(mSettings, mErrorLogger);
+        });
+    }
 
     if (Settings::unusedFunctionOnly())
         return mLogger->exitcode();
 
-    executeAddonsWholeProgram(files, fileSettings, ctuInfo);
+    Timer::run("CppCheck::executeAddonsWholeProgram", mSettings.showtime, mTimerResults, [&]() {
+        executeAddonsWholeProgram(files, fileSettings, ctuInfo);
+    });
 
     std::list<Check::FileInfo*> fileInfoList;
     CTU::FileInfo ctuFileInfo;

@@ -115,6 +115,7 @@ private:
 
         SingleExecutor executor(cppcheck, filelist, fileSettings, s, supprs, *this, &timerResults);
         ASSERT_EQUALS(result, executor.check());
+        timerResults.reset();
     }
 
     void run() override {
