@@ -536,7 +536,7 @@ static std::string getDefinesFlags(const std::string &semicolonSeparatedString)
 CppCheck::CppCheck(const Settings& settings,
                    Suppressions& supprs,
                    ErrorLogger &errorLogger,
-                   TimerResults *timerResults,
+                   TimerResultsIntf *timerResults,
                    bool useGlobalSuppressions,
                    ExecuteCmdFn executeCommand)
     : mSettings(settings)

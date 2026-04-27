@@ -28,6 +28,8 @@
 #include "suppressions.h"
 #include "timer.h"
 
+#include "frontend.h"
+
 #include <cassert>
 #include <cstdlib>
 #include <future>

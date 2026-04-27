@@ -47,6 +47,8 @@
 #include "processexecutor.h"
 #endif
 
+#include "frontend.h"
+
 #include <algorithm>
 #include <cassert>
 #include <cstdio>

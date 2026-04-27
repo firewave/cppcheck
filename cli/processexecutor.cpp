@@ -33,6 +33,8 @@
 #include "timer.h"
 #include "utils.h"
 
+#include "frontend.h"
+
 #include <algorithm>
 #include <numeric>
 #include <cassert>

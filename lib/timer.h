@@ -44,30 +44,6 @@ public:
     }
 };
 
-struct TimerResultsData {
-    std::vector<std::chrono::milliseconds> mResults;
-
-    std::chrono::duration<double> getSeconds() const {
-        return std::accumulate(mResults.cbegin(), mResults.cend(), std::chrono::duration<double>{}, [](std::chrono::duration<double> secs, std::chrono::milliseconds duration) {
-            return secs + TimerResultsIntf::asSeconds(duration);
-        });
-    }
-};
-
-class CPPCHECKLIB WARN_UNUSED TimerResults : public TimerResultsIntf {
-public:
-    TimerResults() = default;
-
-    void showResults(size_t max_results = std::numeric_limits<size_t>::max(), bool metrics = true) const;
-    void addResults(const std::string& name, std::chrono::milliseconds duration) override;
-
-    void reset();
-
-private:
-    std::map<std::string, TimerResultsData> mResults;
-    mutable std::mutex mResultsSync;
-};
-
 class CPPCHECKLIB Timer {
 public:
     using Clock = std::chrono::high_resolution_clock;

@@ -24,60 +24,8 @@
 #include <vector>
 
 namespace {
-    using dataElementType = std::pair<std::string, TimerResultsData>;
-    bool more_second_sec(const dataElementType& lhs, const dataElementType& rhs)
-    {
-        return lhs.second.getSeconds() > rhs.second.getSeconds();
-    }
-
     // TODO: remove and print through (synchronized) ErrorLogger instead
     std::mutex stdCoutLock;
-}
-
-// TODO: this does not include any file context when SHOWTIME_FILE thus rendering it useless - should we include the logging with the progress logging?
-// that could also get rid of the broader locking
-void TimerResults::showResults(size_t max_results, bool metrics) const
-{
-    std::vector<dataElementType> data;
-    {
-        std::lock_guard<std::mutex> l(mResultsSync);
-
-        data.reserve(mResults.size());
-        data.insert(data.begin(), mResults.cbegin(), mResults.cend());
-    }
-    std::sort(data.begin(), data.end(), more_second_sec);
-
-    // lock the whole logging operation to avoid multiple threads printing their results at the same time
-    std::lock_guard<std::mutex> l(stdCoutLock);
-
-    size_t ordinal = 1; // maybe it would be nice to have an ordinal in output later!
-    for (auto iter=data.cbegin(); iter!=data.cend(); ++iter) {
-        if (ordinal <= max_results) {
-            const double sec = iter->second.getSeconds().count();
-            std::cout << iter->first << ": " << sec << "s";
-            if (metrics) {
-                const double secAverage = sec / static_cast<double>(iter->second.mResults.size());
-                const double secMin = asSeconds(*std::min_element(iter->second.mResults.cbegin(), iter->second.mResults.cend())).count();
-                const double secMax = asSeconds(*std::max_element(iter->second.mResults.cbegin(), iter->second.mResults.cend())).count();
-                std::cout << " (avg. " << secAverage << "s / min " << secMin << "s / max " << secMax << "s - " << iter->second.mResults.size() << " result(s))";
-            }
-            std::cout << std::endl;
-        }
-        ++ordinal;
-    }
-}
-
-void TimerResults::addResults(const std::string& name, std::chrono::milliseconds duration)
-{
-    std::lock_guard<std::mutex> l(mResultsSync);
-
-    mResults[name].mResults.push_back(duration);
-}
-
-void TimerResults::reset()
-{
-    std::lock_guard<std::mutex> l(mResultsSync);
-    mResults.clear();
 }
 
 Timer::Timer(std::string str, TimerResultsIntf* timerResults)

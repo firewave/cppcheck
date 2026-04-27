@@ -41,7 +41,7 @@ class ErrorLogger;
 class Settings;
 struct Suppressions;
 class Preprocessor;
-class TimerResults;
+class TimerResultsIntf;
 
 namespace simplecpp {
     class TokenList;
@@ -70,7 +70,7 @@ public:
     CppCheck(const Settings& settings,
              Suppressions& supprs,
              ErrorLogger &errorLogger,
-             TimerResults* timerResults,
+             TimerResultsIntf* timerResults,
              bool useGlobalSuppressions,
              ExecuteCmdFn executeCommand);
 
@@ -243,7 +243,7 @@ private:
     ErrorLogger& mErrorLogger;
     /** the ErrorLogger provided to this instance */
     ErrorLogger& mErrorLoggerDirect;
-    TimerResults* mTimerResults;
+    TimerResultsIntf* mTimerResults;
 
     bool mUseGlobalSuppressions;
 
