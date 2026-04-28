@@ -118,6 +118,16 @@ static bool addPathsToSet(const std::string& fileName, std::set<std::string>& se
 namespace {
     class XMLErrorMessagesLogger : public ErrorLogger
     {
+    public:
+        XMLErrorMessagesLogger(int version) : mVersion(version) {}
+
+        void header(const std::string& productName) {
+            reportOut(ErrorMessage::getXMLHeader(productName, mVersion));
+        }
+        void footer() {
+            reportOut(ErrorMessage::getXMLFooter(mVersion));
+        }
+    private:
         void reportOut(const std::string & outmsg, Color /*c*/ = Color::Reset) override
         {
             std::cout << outmsg << std::endl;
@@ -136,6 +146,8 @@ namespace {
 
         void reportProgress(const std::string & /*filename*/, const char /*stage*/[], const std::size_t /*value*/) override
         {}
+
+        int mVersion;
     };
 }
 
@@ -374,10 +386,10 @@ CmdLineParser::Result CmdLineParser::parseFromArgs(int argc, const char* const a
         // print all possible error messages..
         if (std::strcmp(argv[i], "--errorlist") == 0) {
             {
-                XMLErrorMessagesLogger xmlLogger;
-                std::cout << ErrorMessage::getXMLHeader(mSettings.cppcheckCfgProductName, 2);
+                XMLErrorMessagesLogger xmlLogger(2);
+                xmlLogger.header(mSettings.cppcheckCfgProductName);
                 CppCheck::getErrorMessages(xmlLogger);
-                std::cout << ErrorMessage::getXMLFooter(2) << std::endl;
+                xmlLogger.footer();
             }
             return Result::Exit;
         }
