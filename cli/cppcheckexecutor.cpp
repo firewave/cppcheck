@@ -469,9 +469,9 @@ int CppCheckExecutor::check_internal(const Settings& settings, Suppressions& sup
     // TODO: show time *after* the whole program analysis
     if (timerResults) {
         if (settings.showtime == Settings::ShowTime::SUMMARY)
-            timerResults->showResults();
+            timerResults->showResults(stdLogger);
         else if (settings.showtime == Settings::ShowTime::TOP5_SUMMARY)
-            timerResults->showResults(5);
+            timerResults->showResults(stdLogger, 5);
     }
 
     // TODO: is this run again instead of using previously cached results?

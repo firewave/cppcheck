@@ -18,20 +18,20 @@
 
 #include "timer.h"
 
+#include "color.h"
+#include "errorlogger.h"
+
 #include <algorithm>
-#include <iostream>
 #include <numeric>
+#include <sstream>
 #include <utility>
 #include <vector>
 
-namespace {
-    // TODO: remove and print through (synchronized) ErrorLogger instead
-    std::mutex stdCoutLock;
-}
+std::mutex TimerResults::mOutputSync;
 
 // TODO: this does not include any file context when SHOWTIME_FILE thus rendering it useless - should we include the logging with the progress logging?
 // that could also get rid of the broader locking
-void TimerResults::showResults(size_t max_results, bool metrics) const
+void TimerResults::showResults(ErrorLogger& errorLogger, size_t max_results, bool metrics) const
 {
     using dataElementType = std::pair<std::string, std::vector<std::chrono::milliseconds>>;
 
@@ -58,20 +58,21 @@ void TimerResults::showResults(size_t max_results, bool metrics) const
     });
 
     // lock the whole logging operation to avoid multiple threads printing their results at the same time
-    std::lock_guard<std::mutex> l(stdCoutLock);
+    std::lock_guard<std::mutex> l(mOutputSync);
 
     size_t ordinal = 1; // maybe it would be nice to have an ordinal in output later!
     for (auto iter=data.cbegin(); iter!=data.cend(); ++iter) {
         if (ordinal <= max_results) {
+            std::stringstream sstr;
             const double sec = getSeconds(iter->second).count();
-            std::cout << iter->first << ": " << sec << "s";
+            sstr << iter->first << ": " << sec << "s";
             if (metrics) {
                 const double secAverage = sec / static_cast<double>(iter->second.size());
                 const double secMin = asSeconds(*std::min_element(iter->second.cbegin(), iter->second.cend())).count();
                 const double secMax = asSeconds(*std::max_element(iter->second.cbegin(), iter->second.cend())).count();
-                std::cout << " (avg. " << secAverage << "s / min " << secMin << "s / max " << secMax << "s - " << iter->second.size() << " result(s))";
+                sstr << " (avg. " << secAverage << "s / min " << secMin << "s / max " << secMax << "s - " << iter->second.size() << " result(s))";
             }
-            std::cout << std::endl;
+            errorLogger.reportOut(sstr.str(), Color::Reset);
         }
         ++ordinal;
     }
@@ -140,20 +141,21 @@ static std::string durationToString(std::chrono::milliseconds duration)
     return (ellapsedTime + secondsStr + "s");
 }
 
-OneShotTimer::OneShotTimer(std::string name)
+OneShotTimer::OneShotTimer(std::string name, ErrorLogger& errorLogger)
 {
     class MyResults : public TimerResultsIntf
     {
+    public:
+        explicit MyResults(ErrorLogger& errorLogger) : mErrorLogger(errorLogger) {}
     private:
         void addResults(const std::string &name, std::chrono::milliseconds duration) override
         {
-            std::lock_guard<std::mutex> l(stdCoutLock);
-
-            // TODO: do not use std::cout directly
-            std::cout << name << ": " << durationToString(duration) << std::endl;
+            mErrorLogger.reportOut(name + ": " + durationToString(duration), Color::Reset);
         }
+
+        ErrorLogger& mErrorLogger;
     };
 
-    mResults.reset(new MyResults);
+    mResults.reset(new MyResults(errorLogger));
     mTimer.reset(new Timer(std::move(name), mResults.get()));
 }

@@ -1296,9 +1296,9 @@ unsigned int CppCheck::checkInternal(const FileWithDetails& file, const std::str
 
     if (mTimerResults) {
         if (mSettings.showtime == Settings::ShowTime::FILE)
-            mTimerResults->showResults();
+            mTimerResults->showResults(mErrorLogger);
         else if (mSettings.showtime == Settings::ShowTime::TOP5_FILE)
-            mTimerResults->showResults(5);
+            mTimerResults->showResults(mErrorLogger, 5);
     }
 
     return mLogger->exitcode();
