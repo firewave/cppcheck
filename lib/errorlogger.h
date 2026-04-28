@@ -218,22 +218,25 @@ private:
     std::string mSymbolNames;
 };
 
-/**
- * @brief This is an interface, which the class responsible of error logging
- * should implement.
- */
-class CPPCHECKLIB ErrorLogger {
+class CPPCHECKLIB OutLogger {
 public:
-    ErrorLogger() = default;
-    virtual ~ErrorLogger() = default;
+    virtual ~OutLogger() = default;
 
     /**
-     * Information about progress is directed here.
-     * Override this to receive the progress messages.
+     * Non-error ID messages which are printed to the console are directed here.
      *
      * @param outmsg Message to show e.g. "Checking main.cpp..."
      */
     virtual void reportOut(const std::string &outmsg, Color c) = 0;
+};
+
+/**
+ * @brief This is an interface, which the class responsible of error logging
+ * should implement.
+ */
+class CPPCHECKLIB ErrorLogger : public OutLogger {
+public:
+    virtual ~ErrorLogger() override = default;
 
     /**
      * Information about found errors and warnings is directed

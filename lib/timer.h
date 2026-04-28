@@ -32,7 +32,7 @@
 #include <utility>
 #include <vector>
 
-class ErrorLogger;
+class OutLogger;
 
 class CPPCHECKLIB TimerResultsIntf {
 public:
@@ -45,7 +45,7 @@ class CPPCHECKLIB WARN_UNUSED TimerResults : public TimerResultsIntf {
 public:
     TimerResults() = default;
 
-    void showResults(ErrorLogger& errorLogger, size_t max_results = std::numeric_limits<size_t>::max(), bool metrics = true) const;
+    void showResults(OutLogger& outLogger, size_t max_results = std::numeric_limits<size_t>::max(), bool metrics = true) const;
     void addResults(const std::string& name, std::chrono::milliseconds duration) override;
 
     void reset();
@@ -84,7 +84,7 @@ private:
 class CPPCHECKLIB OneShotTimer
 {
 public:
-    explicit OneShotTimer(std::string name, ErrorLogger& errorLogger);
+    explicit OneShotTimer(std::string name, OutLogger& outLogger);
 private:
     std::unique_ptr<TimerResultsIntf> mResults;
     std::unique_ptr<Timer> mTimer;

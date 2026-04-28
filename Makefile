@@ -668,7 +668,7 @@ $(libcppdir)/suppressions.o: lib/suppressions.cpp externals/tinyxml2/tinyxml2.h 
 $(libcppdir)/templatesimplifier.o: lib/templatesimplifier.cpp lib/addoninfo.h lib/checkers.h lib/config.h lib/errorlogger.h lib/errortypes.h lib/library.h lib/mathlib.h lib/platform.h lib/regex.h lib/settings.h lib/smallvector.h lib/standards.h lib/templatesimplifier.h lib/token.h lib/tokenize.h lib/tokenlist.h lib/utils.h lib/vfvalue.h
 	$(CXX) ${INCLUDE_FOR_LIB} $(CPPFLAGS) $(CXXFLAGS) -c -o $@ $(libcppdir)/templatesimplifier.cpp
 
-$(libcppdir)/timer.o: lib/timer.cpp lib/config.h lib/timer.h
+$(libcppdir)/timer.o: lib/timer.cpp lib/color.h lib/config.h lib/errorlogger.h lib/errortypes.h lib/timer.h
 	$(CXX) ${INCLUDE_FOR_LIB} $(CPPFLAGS) $(CXXFLAGS) -c -o $@ $(libcppdir)/timer.cpp
 
 $(libcppdir)/token.o: lib/token.cpp externals/simplecpp/simplecpp.h lib/addoninfo.h lib/astutils.h lib/checkers.h lib/config.h lib/errortypes.h lib/library.h lib/mathlib.h lib/platform.h lib/regex.h lib/settings.h lib/smallvector.h lib/sourcelocation.h lib/standards.h lib/symboldatabase.h lib/templatesimplifier.h lib/token.h lib/tokenlist.h lib/tokenrange.h lib/utils.h lib/valueflow.h lib/vfvalue.h

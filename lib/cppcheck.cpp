@@ -923,9 +923,11 @@ unsigned int CppCheck::checkInternal(const FileWithDetails& file, const std::str
     if (Settings::terminated())
         return mLogger->exitcode();
 
+    OutLogger* outLogger;
+
     std::unique_ptr<OneShotTimer> checkTimeTimer;
     if (mSettings.showtime == Settings::ShowTime::FILE || mSettings.showtime == Settings::ShowTime::FILE_TOTAL || mSettings.showtime == Settings::ShowTime::TOP5_FILE)
-        checkTimeTimer.reset(new OneShotTimer("Check time: " + file.spath()));
+        checkTimeTimer.reset(new OneShotTimer("Check time: " + file.spath(), *outLogger));
 
     if (!mSettings.quiet) {
         std::string fixedpath = Path::toNativeSeparators(file.spath());

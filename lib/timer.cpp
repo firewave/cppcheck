@@ -31,7 +31,7 @@ std::mutex TimerResults::mOutputSync;
 
 // TODO: this does not include any file context when SHOWTIME_FILE thus rendering it useless - should we include the logging with the progress logging?
 // that could also get rid of the broader locking
-void TimerResults::showResults(ErrorLogger& errorLogger, size_t max_results, bool metrics) const
+void TimerResults::showResults(OutLogger& outLogger, size_t max_results, bool metrics) const
 {
     using dataElementType = std::pair<std::string, std::vector<std::chrono::milliseconds>>;
 
@@ -72,7 +72,7 @@ void TimerResults::showResults(ErrorLogger& errorLogger, size_t max_results, boo
                 const double secMax = asSeconds(*std::max_element(iter->second.cbegin(), iter->second.cend())).count();
                 sstr << " (avg. " << secAverage << "s / min " << secMin << "s / max " << secMax << "s - " << iter->second.size() << " result(s))";
             }
-            errorLogger.reportOut(sstr.str(), Color::Reset);
+            outLogger.reportOut(sstr.str(), Color::Reset);
         }
         ++ordinal;
     }
@@ -141,21 +141,21 @@ static std::string durationToString(std::chrono::milliseconds duration)
     return (ellapsedTime + secondsStr + "s");
 }
 
-OneShotTimer::OneShotTimer(std::string name, ErrorLogger& errorLogger)
+OneShotTimer::OneShotTimer(std::string name, OutLogger& outLogger)
 {
     class MyResults : public TimerResultsIntf
     {
     public:
-        explicit MyResults(ErrorLogger& errorLogger) : mErrorLogger(errorLogger) {}
+        explicit MyResults(OutLogger& outLogger) : mOutLogger(outLogger) {}
     private:
         void addResults(const std::string &name, std::chrono::milliseconds duration) override
         {
-            mErrorLogger.reportOut(name + ": " + durationToString(duration), Color::Reset);
+            mOutLogger.reportOut(name + ": " + durationToString(duration), Color::Reset);
         }
 
-        ErrorLogger& mErrorLogger;
+        OutLogger& mOutLogger;
     };
 
-    mResults.reset(new MyResults(errorLogger));
+    mResults.reset(new MyResults(outLogger));
     mTimer.reset(new Timer(std::move(name), mResults.get()));
 }

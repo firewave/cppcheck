@@ -258,6 +258,7 @@ namespace {
 int CppCheckExecutor::check(int argc, const char* const argv[])
 {
     Settings settings;
+    OutLogger* outLogger;
     CmdLineLoggerStd logger;
     Suppressions supprs;
     CmdLineParser parser(logger, settings, supprs);
@@ -270,7 +271,7 @@ int CppCheckExecutor::check(int argc, const char* const argv[])
 
     std::unique_ptr<OneShotTimer> overallTimer;
     if (settings.showtime == Settings::ShowTime::SUMMARY || settings.showtime == Settings::ShowTime::TOP5_SUMMARY)
-        overallTimer.reset(new OneShotTimer("Overall time"));
+        overallTimer.reset(new OneShotTimer("Overall time", *outLogger));
 
     settings.loadSummaries();
 
