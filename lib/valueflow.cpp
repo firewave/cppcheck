@@ -2520,7 +2520,7 @@ static void valueFlowLifetimeFunction(Token *tok, const TokenList &tokenlist, Er
             if (returnTok == tok)
                 continue;
             const Variable *returnVar = ValueFlow::getLifetimeVariable(returnTok, settings);
-            if (returnVar && returnVar->isArgument() && (returnVar->isConst() || !isVariableChanged(returnVar, settings))) {
+            if (returnVar && returnVar->isArgument() && (returnVar->isConst() || !isVariableChanged(returnVar, settings.library))) {
                 LifetimeStore ls = LifetimeStore::fromFunctionArg(f, tok, returnVar, tokenlist, settings, errorLogger);
                 ls.inconclusive = inconclusive;
                 ls.forward = false;
@@ -3883,7 +3883,7 @@ static ValueFlow::Value::Bound findVarBound(const Variable* var,
     ValueFlow::Value::Bound result = ValueFlow::Value::Bound::Point;
     const Token* next = start;
     while ((next = findExpressionChangedSkipDeadCode(
-                var->nameToken(), next->next(), end, settings, &evaluateKnownValues))) {
+                var->nameToken(), next->next(), end, settings.library, &evaluateKnownValues))) {
         ValueFlow::Value::Bound b = ValueFlow::Value::Bound::Point;
         if (next->varId() != var->declarationId())
             return ValueFlow::Value::Bound::Point;
@@ -4537,7 +4537,7 @@ struct ConditionHandler {
                 if (Token::simpleMatch(top->previous(), "for (")) {
                     if (top->astOperand2() && top->astOperand2()->astOperand2() &&
                         findExpressionChanged(
-                            cond.vartok, top->astOperand2()->astOperand2(), top->link(), settings)) {
+                            cond.vartok, top->astOperand2()->astOperand2(), top->link(), settings.library)) {
                         if (settings.debugwarnings)
                             bailout(tokenlist,
                                     errorLogger,
@@ -4552,7 +4552,7 @@ struct ConditionHandler {
                 const Token* const block = top->link()->next();
                 const Token* const end = block->link();
 
-                if (findExpressionChanged(cond.vartok, start, end, settings)) {
+                if (findExpressionChanged(cond.vartok, start, end, settings.library)) {
                     // If its reassigned in loop then analyze from the end
                     if (!Token::Match(tok, "%assign%|++|--") &&
                         findExpression(cond.vartok->exprId(), start, end, [&](const Token* tok2) {
@@ -4775,7 +4775,7 @@ struct ConditionHandler {
                                       startBlock->link(),
                                       cond.vartok->varId(),
                                       cond.vartok->variable()->isGlobal(),
-                                      settings))
+                                      settings.library))
                     return;
                 // Check if condition in for loop is always false
                 const Token* initTok = getInitTok(top);
@@ -5231,7 +5231,7 @@ static void valueFlowForLoopSimplify(Token* const bodyStart,
     const Token * const bodyEnd = bodyStart->link();
 
     // Is variable modified inside for loop
-    if (isVariableChanged(bodyStart, bodyEnd, expr->varId(), globalvar, settings))
+    if (isVariableChanged(bodyStart, bodyEnd, expr->varId(), globalvar, settings.library))
         return;
 
     if (const Token* escape = findEscapeStatement(bodyStart->scope(), settings.library)) {
@@ -6136,7 +6136,7 @@ static bool isContainerSizeChangedByFunction(const Token* tok,
     }
 
     bool inconclusive = false;
-    const bool isChanged = isVariableChangedByFunctionCall(tok, indirect, settings, &inconclusive);
+    const bool isChanged = isVariableChangedByFunctionCall(tok, indirect, settings.library, &inconclusive);
     return (isChanged || inconclusive);
 }
 
@@ -6662,7 +6662,7 @@ static void valueFlowContainerSize(const TokenList& tokenlist,
                 continue;
         }
         if (Token::Match(nameToken->astTop()->previous(), "for|while"))
-            known = !isVariableChanged(var, settings);
+            known = !isVariableChanged(var, settings.library);
         std::vector<ValueFlow::Value> values{ValueFlow::Value{size}};
         values.back().valueType = ValueFlow::Value::ValueType::CONTAINER_SIZE;
         if (known)
@@ -6801,17 +6801,17 @@ static void valueFlowContainerSize(const TokenList& tokenlist,
             } else if (tok->str() == "+=" && astIsContainer(tok->astOperand1())) {
                 const Token* containerTok = tok->astOperand1();
                 const Token* valueTok = tok->astOperand2();
-                const MathLib::bigint size = ValueFlow::valueFlowGetStrLength(valueTok, settings);
+                const MathLib::bigint size = ValueFlow::valueFlowGetStrLength(valueTok, settings.library);
                 forwardMinimumContainerSize(size, tok, containerTok);
 
             } else if (tok->str() == "=" && Token::simpleMatch(tok->astOperand2(), "+") && astIsContainerString(tok)) {
                 const Token* tok2 = tok->astOperand2();
                 MathLib::bigint size = 0;
                 while (Token::simpleMatch(tok2, "+") && tok2->astOperand2()) {
-                    size += ValueFlow::valueFlowGetStrLength(tok2->astOperand2(), settings);
+                    size += ValueFlow::valueFlowGetStrLength(tok2->astOperand2(), settings.library);
                     tok2 = tok2->astOperand1();
                 }
-                size += ValueFlow::valueFlowGetStrLength(tok2, settings);
+                size += ValueFlow::valueFlowGetStrLength(tok2, settings.library);
                 forwardMinimumContainerSize(size, tok, tok->astOperand1());
             }
         }

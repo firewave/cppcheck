@@ -222,11 +222,11 @@ struct ValueFlowAnalyzer : Analyzer {
                 return Action::Read;
         }
         bool inconclusive = false;
-        if (isVariableChangedByFunctionCall(tok, getIndirect(tok), getSettings(), &inconclusive))
+        if (isVariableChangedByFunctionCall(tok, getIndirect(tok), getSettings().library, &inconclusive))
             return Action::Read | Action::Invalid;
         if (inconclusive)
             return Action::Read | Action::Inconclusive;
-        if (isVariableChanged(tok, getIndirect(tok), getSettings())) {
+        if (isVariableChanged(tok, getIndirect(tok), getSettings().library)) {
             if (Token::Match(tok->astParent(), "*|[|.|++|--"))
                 return Action::Read | Action::Invalid;
             // Check if its assigned to the same value
@@ -261,13 +261,13 @@ struct ValueFlowAnalyzer : Analyzer {
             }
         }
         for (int i = 0; i <= indirect; ++i)
-            if (isVariableChanged(tok, i, getSettings()))
+            if (isVariableChanged(tok, i, getSettings().library))
                 return Action::Invalid;
         return Action::None;
     }
 
     virtual Action isThisModified(const Token* tok) const {
-        if (isThisChanged(tok, 0, getSettings()))
+        if (isThisChanged(tok, 0, getSettings().library))
             return Action::Invalid;
         return Action::None;
     }
@@ -812,7 +812,7 @@ static bool bifurcateVariableChanged(const Variable* var,
     bool result = false;
     const Token* tok = start;
     while ((tok = findVariableChanged(
-                tok->next(), end, var->isPointer(), var->declarationId(), var->isGlobal(), settings))) {
+                tok->next(), end, var->isPointer(), var->declarationId(), var->isGlobal(), settings.library))) {
         if (Token::Match(tok->astParent(), "%assign%")) {
             if (!bifurcate(tok->astParent()->astOperand2(), varids, settings, depth - 1))
                 return true;
@@ -1261,7 +1261,7 @@ struct ExpressionAnalyzer : SingleValueFlowAnalyzer {
             setupExprVarIds(value.tokvalue);
         }
         uniqueExprId =
-            expr->isUniqueExprId() && (Token::Match(expr, "%cop%") || !isVariableChanged(expr, 0, s));
+            expr->isUniqueExprId() && (Token::Match(expr, "%cop%") || !isVariableChanged(expr, 0, s.library));
     }
 
     static bool nonLocal(const Variable* var, bool deref) {
@@ -1547,7 +1547,7 @@ struct ContainerExpressionAnalyzer : ExpressionAnalyzer {
             case Library::Container::Action::APPEND: {
                 std::vector<const Token*> args = getArguments(tok->astParent()->tokAt(2));
                 if (args.size() == 1) // TODO: handle overloads
-                    n = ValueFlow::valueFlowGetStrLength(tok->astParent()->tokAt(3), settings);
+                    n = ValueFlow::valueFlowGetStrLength(tok->astParent()->tokAt(3), settings.library);
                 if (n == 0) // TODO: handle known empty append
                     val->setPossible();
                 break;

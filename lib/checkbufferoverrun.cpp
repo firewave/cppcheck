@@ -140,7 +140,7 @@ static int getMinFormatStringOutputLength(const std::vector<const Token*> &param
             case 's':
                 parameterLength = 0;
                 if (inputArgNr < parameters.size())
-                    parameterLength = ValueFlow::valueFlowGetStrLength(parameters[inputArgNr], settings);
+                    parameterLength = ValueFlow::valueFlowGetStrLength(parameters[inputArgNr], settings.library);
 
                 handleNextParameter = true;
                 break;
@@ -338,7 +338,7 @@ void CheckBufferOverrun::arrayIndex()
             const Token* changeTok = var->scope()->bodyStart;
             bool isChanged = false;
             while ((changeTok = findVariableChanged(changeTok->next(), var->scope()->bodyEnd, /*indirect*/ 0, var->declarationId(),
-                                                    /*globalvar*/ false, *mSettings))) {
+                                                    /*globalvar*/ false, mSettings->library))) {
                 if (!Token::simpleMatch(changeTok->astParent(), "[")) {
                     isChanged = true;
                     break;

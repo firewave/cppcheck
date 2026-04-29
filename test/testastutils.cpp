@@ -225,7 +225,7 @@ private:
         ASSERT_LOC(tokenizer.tokenize(code), file, line);
         const Token * const tok1 = Token::findsimplematch(tokenizer.tokens(), startPattern, strlen(startPattern));
         const Token * const tok2 = Token::findsimplematch(tokenizer.tokens(), endPattern, strlen(endPattern));
-        return (isVariableChanged)(tok1, tok2, 1, false, settingsDefault);
+        return (isVariableChanged)(tok1, tok2, 1, false, settingsDefault.library);
     }
 
     void isVariableChangedTest() {
@@ -259,7 +259,7 @@ private:
         const Token * const argtok = Token::findmatch(tokenizer.tokens(), pattern);
         ASSERT_LOC(argtok, file, line);
         int indirect = (argtok->variable() && argtok->variable()->isArray());
-        return (isVariableChangedByFunctionCall)(argtok, indirect, settingsDefault, inconclusive);
+        return (isVariableChangedByFunctionCall)(argtok, indirect, settingsDefault.library, inconclusive);
     }
 
     void isVariableChangedByFunctionCallTest() {
@@ -426,7 +426,7 @@ private:
         const Token* const start = Token::findsimplematch(tokenizer.tokens(), startPattern, strlen(startPattern));
         const Token* const end = Token::findsimplematch(start, endPattern, strlen(endPattern));
         const Token* const expr = Token::findsimplematch(tokenizer.tokens(), var, strlen(var));
-        return (findExpressionChanged)(expr, start, end, settings);
+        return (findExpressionChanged)(expr, start, end, settings.library);
     }
 
     void isExpressionChangedTest()

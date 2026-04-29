@@ -683,7 +683,7 @@ void CheckAutoVariables::checkVarLifetimeScope(const Token * start, const Token 
                                            var->valueType() ? var->valueType()->pointer : 0,
                                            var->declarationId(),
                                            var->isGlobal(),
-                                           *mSettings)) {
+                                           mSettings->library)) {
                         if (!diag(tok2))
                             errorDanglngLifetime(tok2, &val, var->isLocal());
                         break;

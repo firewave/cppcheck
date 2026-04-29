@@ -2663,9 +2663,9 @@ static const Token *singleAssignInScope(const Token *start, nonneg int varid, bo
     if (!Token::Match(start->next(), "%var% %assign%"))
         return nullptr;
     const Token *assignTok = start->tokAt(2);
-    if (isVariableChanged(assignTok->next(), endStatement, assignTok->astOperand1()->varId(), /*globalvar*/ false, settings))
+    if (isVariableChanged(assignTok->next(), endStatement, assignTok->astOperand1()->varId(), /*globalvar*/ false, settings.library))
         return nullptr;
-    if (isVariableChanged(assignTok->next(), endStatement, varid, /*globalvar*/ false, settings))
+    if (isVariableChanged(assignTok->next(), endStatement, varid, /*globalvar*/ false, settings.library))
         return nullptr;
     input = Token::findmatch(assignTok->next(), "%varid%", endStatement, varid) || !Token::Match(start->next(), "%var% =");
     hasBreak = Token::simpleMatch(endStatement->previous(), "break");
@@ -2706,7 +2706,7 @@ static const Token *singleMemberCallInScope(const Token *start, nonneg int varid
     if (!Token::findmatch(dotTok->tokAt(2), "%varid%", endStatement, varid))
         return nullptr;
     input = Token::Match(start->next(), "%var% . %name% ( %varid% )", varid);
-    if (isVariableChanged(dotTok->next(), endStatement, dotTok->astOperand1()->varId(), /*globalvar*/ false, settings))
+    if (isVariableChanged(dotTok->next(), endStatement, dotTok->astOperand1()->varId(), /*globalvar*/ false, settings.library))
         return nullptr;
     return dotTok;
 }
@@ -2743,7 +2743,7 @@ static const Token *singleConditionalInScope(const Token *start, nonneg int vari
         return nullptr;
     if (!Token::findmatch(start, "%varid%", bodyTok, varid))
         return nullptr;
-    if (isVariableChanged(start, bodyTok, varid, /*globalvar*/ false, settings))
+    if (isVariableChanged(start, bodyTok, varid, /*globalvar*/ false, settings.library))
         return nullptr;
     if (loopType == LoopType::INDEX) { // check for container access
         nonneg int containerId{};
@@ -2900,11 +2900,11 @@ namespace {
             int n = 1 + (astIsPointer(tok) ? 1 : 0);
             for (int i = 0; i < n; i++) {
                 bool inconclusive = false;
-                if (isVariableChangedByFunctionCall(tok, i, *settings, &inconclusive))
+                if (isVariableChangedByFunctionCall(tok, i, settings->library, &inconclusive))
                     return true;
                 if (inconclusive)
                     return true;
-                if (isVariableChanged(tok, i, *settings))
+                if (isVariableChanged(tok, i, settings->library))
                     return true;
             }
             return false;

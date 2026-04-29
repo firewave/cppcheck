@@ -209,7 +209,7 @@ bool CheckCondition::assignIfParseScope(const Token * const assignTok,
                 // is variable changed in loop?
                 const Token *bodyStart = tok2->linkAt(1)->next();
                 const Token *bodyEnd   = bodyStart ? bodyStart->link() : nullptr;
-                if (!bodyEnd || bodyEnd->str() != "}" || isVariableChanged(bodyStart, bodyEnd, varid, !islocal, *mSettings))
+                if (!bodyEnd || bodyEnd->str() != "}" || isVariableChanged(bodyStart, bodyEnd, varid, !islocal, mSettings->library))
                     continue;
             }
 
@@ -514,7 +514,7 @@ void CheckCondition::duplicateCondition()
             continue;
 
         ErrorPath errorPath;
-        if (!findExpressionChanged(cond1, scope.classDef->next(), cond2, *mSettings) &&
+        if (!findExpressionChanged(cond1, scope.classDef->next(), cond2, mSettings->library) &&
             isSameExpression(true, cond1, cond2, *mSettings, true, true, &errorPath))
             duplicateConditionError(cond1, cond2, std::move(errorPath));
     }
@@ -564,11 +564,11 @@ void CheckCondition::multiCondition()
             if (tok2->astOperand2()) {
                 ErrorPath errorPath;
                 if (isOverlappingCond(cond1, tok2->astOperand2(), true) &&
-                    !findExpressionChanged(cond1, cond1, tok2->astOperand2(), *mSettings))
+                    !findExpressionChanged(cond1, cond1, tok2->astOperand2(), mSettings->library))
                     overlappingElseIfConditionError(tok2->astOperand2(), cond1->linenr());
                 else if (isOppositeCond(
                              true, cond1, tok2->astOperand2(), *mSettings, true, true, &errorPath) &&
-                         !findExpressionChanged(cond1, cond1, tok2->astOperand2(), *mSettings))
+                         !findExpressionChanged(cond1, cond1, tok2->astOperand2(), mSettings->library))
                     oppositeElseIfConditionError(cond1, tok2->astOperand2(), std::move(errorPath));
             }
         }
@@ -730,13 +730,13 @@ void CheckCondition::multiCondition2()
             for (; tok && tok != endToken; tok = tok->next()) {
                 if (isNestedInLambda(tok->scope(), cond1->scope()))
                     continue;
-                if (isExpressionChangedAt(cond1, tok, 0, false, *mSettings))
+                if (isExpressionChangedAt(cond1, tok, 0, false, mSettings->library))
                     break;
                 if (Token::Match(tok, "if|return")) {
                     const Token * condStartToken = tok->str() == "if" ? tok->next() : tok;
                     const Token * condEndToken = tok->str() == "if" ? condStartToken->link() : Token::findsimplematch(condStartToken, ";");
                     // Does condition modify tracked variables?
-                    if (findExpressionChanged(cond1, condStartToken, condEndToken, *mSettings))
+                    if (findExpressionChanged(cond1, condStartToken, condEndToken, mSettings->library))
                         break;
 
                     // Condition..
@@ -782,7 +782,7 @@ void CheckCondition::multiCondition2()
                     }
                 }
                 if (Token::Match(tok, "%name% (") &&
-                    isVariablesChanged(tok, tok->linkAt(1), 0, varsInCond, *mSettings)) {
+                    isVariablesChanged(tok, tok->linkAt(1), 0, varsInCond, mSettings->library)) {
                     break;
                 }
                 if (Token::Match(tok, "%type% (") && nonlocal && isNonConstFunctionCall(tok, mSettings->library)) // non const function call -> bailout if there are nonlocal variables
@@ -811,7 +811,7 @@ void CheckCondition::multiCondition2()
                         break;
                     }
                     const bool changed = std::any_of(vars.cbegin(), vars.cend(), [&](int varid) {
-                        return isVariableChanged(tok1, tok2, varid, nonlocal, *mSettings);
+                        return isVariableChanged(tok1, tok2, varid, nonlocal, mSettings->library);
                     });
                     if (changed)
                         break;

@@ -1383,7 +1383,7 @@ void CheckUnusedVar::checkFunctionVariableUsage()
                         reportLibraryCfgError(tok, bailoutTypeName);
                     continue;
                 }
-                if (isTrivialInit && findExpressionChanged(expr, start, scopeEnd, *mSettings))
+                if (isTrivialInit && findExpressionChanged(expr, start, scopeEnd, mSettings->library))
                     continue;
 
                 // warn

@@ -44,7 +44,7 @@ public:
     // Parse current tokens and determine..
     // * Check what functions are used
     // * What functions are declared
-    void parseTokens(const Tokenizer &tokenizer, const Settings &settings);
+    void parseTokens(const Tokenizer &tokenizer, const Library &library);
 
     std::string analyzerInfo(const Tokenizer &tokenizer) const;
 
@@ -56,7 +56,7 @@ public:
     }
 
     // Return true if an error is reported.
-    bool check(const Settings& settings, ErrorLogger& errorLogger) const;
+    bool check(const Library& library, ErrorLogger& errorLogger) const;
 
     void updateFunctionData(const CheckUnusedFunctions& check);
 

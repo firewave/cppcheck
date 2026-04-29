@@ -361,7 +361,7 @@ static void programMemoryParseCondition(ProgramMemory& pm, const Token* tok, con
             return;
         if (!truevalue.isIntValue())
             return;
-        if (endTok && findExpressionChanged(vartok, tok->next(), endTok, settings))
+        if (endTok && findExpressionChanged(vartok, tok->next(), endTok, settings.library))
             return;
         const bool impossible = (tok->str() == "==" && !then) || (tok->str() == "!=" && then);
         const ValueFlow::Value& v = then ? truevalue : falsevalue;
@@ -389,7 +389,7 @@ static void programMemoryParseCondition(ProgramMemory& pm, const Token* tok, con
                 pm.setIntValue(tok, 0, then);
         }
     } else if (tok && tok->exprId() > 0) {
-        if (endTok && findExpressionChanged(tok, tok->next(), endTok, settings))
+        if (endTok && findExpressionChanged(tok, tok->next(), endTok, settings.library))
             return;
         pm.setIntValue(tok, 0, then);
         const Token* containerTok = settings.library.getContainerFromYield(tok, Library::Container::Yield::EMPTY);
@@ -457,7 +457,7 @@ static void fillProgramMemoryFromAssignments(ProgramMemory& pm, const Token* tok
             }
             tok2 = tok2->link()->previous();
         } else if (tok2->exprId() > 0 && Token::Match(tok2, ".|(|[|*|%var%") && !pm.hasValue(tok2->exprId()) &&
-                   isVariableChanged(tok2, 0, settings)) {
+                   isVariableChanged(tok2, 0, settings.library)) {
             pm.setUnknown(tok2);
         }
 
@@ -497,7 +497,7 @@ static void fillProgramMemoryFromAssignments(ProgramMemory& pm, const Token* tok
 static void removeModifiedVars(ProgramMemory& pm, const Token* tok, const Token* origin, const Settings& settings)
 {
     pm.erase_if([&](const ExprIdToken& e) {
-        return isVariableChanged(origin, tok, e.getExpressionId(), false, settings);
+        return isVariableChanged(origin, tok, e.getExpressionId(), false, settings.library);
     });
 }
 
@@ -580,7 +580,7 @@ void ProgramMemoryState::removeModifiedVars(const Token* tok)
     state.erase_if([&](const ExprIdToken& e) {
         const Token* start = origins[e.getExpressionId()];
         const Token* expr = e.tok;
-        if (!expr || findExpressionChangedSkipDeadCode(expr, start, tok, settings, eval)) {
+        if (!expr || findExpressionChangedSkipDeadCode(expr, start, tok, settings.library, eval)) {
             origins.erase(e.getExpressionId());
             return true;
         }
@@ -1687,7 +1687,7 @@ namespace {
                             if (ValueFlow::isContainerSizeChanged(child, v.indirect, settings))
                                 v = unknown();
                         } else if (v.valueType != ValueFlow::Value::ValueType::UNINIT) {
-                            if (isVariableChanged(child, v.indirect, settings))
+                            if (isVariableChanged(child, v.indirect, settings.library))
                                 v = unknown();
                         }
                     }

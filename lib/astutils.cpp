@@ -1184,7 +1184,7 @@ bool isStructuredBindingVariable(const Variable* var)
 /// This takes a token that refers to a variable and it will return the token
 /// to the expression that the variable is assigned to. If its not valid to
 /// make such substitution then it will return the original token.
-static const Token * followVariableExpression(const Settings& settings, const Token * tok, const Token * end = nullptr)
+static const Token * followVariableExpression(const Library& library, const Token * tok, const Token * end = nullptr)
 {
     if (!tok)
         return tok;
@@ -1225,7 +1225,7 @@ static const Token * followVariableExpression(const Settings& settings, const To
     // If this is in a loop then check if variables are modified in the entire scope
     const Token * endToken = (isInLoopCondition(tok) || isInLoopCondition(varTok) || var->scope() != tok->scope()) ? var->scope()->bodyEnd : lastTok;
     const int indirect = var->isArray() ? var->dimensions().size() : 0;
-    if (!var->isConst() && (!precedes(varTok, endToken) || isVariableChanged(varTok, endToken, indirect, tok->varId(), false, settings)))
+    if (!var->isConst() && (!precedes(varTok, endToken) || isVariableChanged(varTok, endToken, indirect, tok->varId(), false, library)))
         return tok;
     if (precedes(varTok, endToken) && isAliased(varTok, endToken, tok->varId()))
         return tok;
@@ -1237,7 +1237,7 @@ static const Token * followVariableExpression(const Settings& settings, const To
             return tok;
     } else if (!precedes(startToken, endToken)) {
         return tok;
-    } else if (findExpressionChanged(varTok, startToken, endToken, settings)) {
+    } else if (findExpressionChanged(varTok, startToken, endToken, library)) {
         return tok;
     }
     return varTok;
@@ -1630,12 +1630,12 @@ bool isSameExpression(bool macro, const Token *tok1, const Token *tok2, const Se
 
     // Follow variable
     if (followVar && !tok_str_eq && (followTok1->varId() || followTok2->varId() || followTok1->enumerator() || followTok2->enumerator())) {
-        const Token * varTok1 = followVariableExpression(settings, followTok1, followTok2);
+        const Token * varTok1 = followVariableExpression(settings.library, followTok1, followTok2);
         if ((varTok1->str() == followTok2->str()) || isSameConstantValue(macro, varTok1, followTok2)) {
             followVariableExpressionError(followTok1, varTok1, errors);
             return isSameExpression(macro, varTok1, followTok2, settings, true, followVar, errors);
         }
-        const Token * varTok2 = followVariableExpression(settings, followTok2, followTok1);
+        const Token * varTok2 = followVariableExpression(settings.library, followTok2, followTok1);
         if ((followTok1->str() == varTok2->str()) || isSameConstantValue(macro, followTok1, varTok2)) {
             followVariableExpressionError(followTok2, varTok2, errors);
             return isSameExpression(macro, followTok1, varTok2, settings, true, followVar, errors);
@@ -1655,7 +1655,7 @@ bool isSameExpression(bool macro, const Token *tok1, const Token *tok2, const Se
                 const Token *start = refTok1, *end = refTok2;
                 if (!precedes(start, end))
                     std::swap(start, end);
-                if (findExpressionChanged(start, start, end, settings))
+                if (findExpressionChanged(start, start, end, settings.library))
                     return false;
             }
             return isSameExpression(macro, refTok1, refTok2, settings, pure, followVar, errors);
@@ -2336,14 +2336,14 @@ bool isWithinScope(const Token* tok, const Variable* var, ScopeType type)
     return false;
 }
 
-bool isVariableChangedByFunctionCall(const Token *tok, int indirect, nonneg int varid, const Settings &settings, bool *inconclusive)
+bool isVariableChangedByFunctionCall(const Token *tok, int indirect, nonneg int varid, const Library &library, bool *inconclusive)
 {
     if (!tok)
         return false;
     if (tok->varId() == varid)
-        return isVariableChangedByFunctionCall(tok, indirect, settings, inconclusive);
-    return isVariableChangedByFunctionCall(tok->astOperand1(), indirect, varid, settings, inconclusive) ||
-           isVariableChangedByFunctionCall(tok->astOperand2(), indirect, varid, settings, inconclusive);
+        return isVariableChangedByFunctionCall(tok, indirect, library, inconclusive);
+    return isVariableChangedByFunctionCall(tok->astOperand1(), indirect, varid, library, inconclusive) ||
+           isVariableChangedByFunctionCall(tok->astOperand2(), indirect, varid, library, inconclusive);
 }
 
 bool isScopeBracket(const Token* tok)
@@ -2524,7 +2524,7 @@ bool isMutableExpression(const Token* tok)
     return true;
 }
 
-bool isVariableChangedByFunctionCall(const Token *tok, int indirect, const Settings &settings, bool *inconclusive)
+bool isVariableChangedByFunctionCall(const Token *tok, int indirect, const Library &library, bool *inconclusive)
 {
     if (!tok)
         return false;
@@ -2564,13 +2564,13 @@ bool isVariableChangedByFunctionCall(const Token *tok, int indirect, const Setti
 
     if (!tok->function() && !tok->variable() && tok->isName()) {
         // Check if direction (in, out, inout) is specified in the library configuration and use that
-        const Library::ArgumentChecks::Direction argDirection = settings.library.getArgDirection(tok, 1 + argnr, indirect);
+        const Library::ArgumentChecks::Direction argDirection = library.getArgDirection(tok, 1 + argnr, indirect);
         if (argDirection == Library::ArgumentChecks::Direction::DIR_IN)
             return false;
         if (argDirection == Library::ArgumentChecks::Direction::DIR_OUT || argDirection == Library::ArgumentChecks::Direction::DIR_INOUT)
             return true;
 
-        const bool requireNonNull = settings.library.isnullargbad(tok, 1 + argnr);
+        const bool requireNonNull = library.isnullargbad(tok, 1 + argnr);
         if (Token::simpleMatch(tok->tokAt(-2), "std :: tie"))
             return true;
         // if the library says 0 is invalid
@@ -2633,7 +2633,7 @@ static bool hasOverloadedMemberAccess(const Token* tok)
     return !varTok || !varTok->variable() || !varTok->variable()->valueType() || varTok->variable()->valueType()->pointer == 0;
 }
 
-bool isVariableChanged(const Token *tok, int indirect, const Settings &settings, int depth)
+bool isVariableChanged(const Token *tok, int indirect, const Library &library, int depth)
 {
     if (!tok)
         return false;
@@ -2693,7 +2693,7 @@ bool isVariableChanged(const Token *tok, int indirect, const Settings &settings,
         const Variable * var = getLHSVariable(tok2->astParent());
         if (var && var->isReference() && !var->isConst() && var->nameToken() &&
             var->nameToken()->next() == tok2->astParent()) {
-            if (!var->isLocal() || isVariableChanged(var, settings, depth - 1))
+            if (!var->isLocal() || isVariableChanged(var, library, depth - 1))
                 return true;
         }
     }
@@ -2702,7 +2702,7 @@ bool isVariableChanged(const Token *tok, int indirect, const Settings &settings,
 
     // Check addressof
     if (tok2->astParent() && tok2->astParent()->isUnaryOp("&")) {
-        if (isVariableChanged(tok2->astParent(), indirect + 1, settings, depth - 1))
+        if (isVariableChanged(tok2->astParent(), indirect + 1, library, depth - 1))
             return true;
     } else {
         // If its already const then it can't be modified
@@ -2744,14 +2744,14 @@ bool isVariableChanged(const Token *tok, int indirect, const Settings &settings,
             const Library::Container::Yield yield = c->getYield(ftok->str());
             // If accessing element check if the element is changed
             if (contains({Library::Container::Yield::ITEM, Library::Container::Yield::AT_INDEX}, yield))
-                return isVariableChanged(ftok->next(), indirect, settings, depth - 1);
+                return isVariableChanged(ftok->next(), indirect, library, depth - 1);
 
             if (contains({Library::Container::Yield::BUFFER,
                           Library::Container::Yield::BUFFER_NT,
                           Library::Container::Yield::START_ITERATOR,
                           Library::Container::Yield::ITERATOR},
                          yield)) {
-                return isVariableChanged(ftok->next(), indirect + 1, settings, depth - 1);
+                return isVariableChanged(ftok->next(), indirect + 1, library, depth - 1);
             }
             if (contains({Library::Container::Yield::SIZE,
                           Library::Container::Yield::EMPTY,
@@ -2760,7 +2760,7 @@ bool isVariableChanged(const Token *tok, int indirect, const Settings &settings,
                 return false;
             }
         }
-        if (settings.library.isFunctionConst(ftok) || (astIsSmartPointer(tok) && ftok->str() == "get")) // TODO: replace with action/yield?
+        if (library.isFunctionConst(ftok) || (astIsSmartPointer(tok) && ftok->str() == "get")) // TODO: replace with action/yield?
             return false;
 
         const Function * fun = ftok->function();
@@ -2796,7 +2796,7 @@ bool isVariableChanged(const Token *tok, int indirect, const Settings &settings,
         if (indirect == 0 && astIsLHS(tok2) && Token::Match(ptok, ". %var%") && astIsPointer(ptok->next()))
             pindirect = 1;
         bool inconclusive = false;
-        bool isChanged = isVariableChangedByFunctionCall(ptok, pindirect, settings, &inconclusive);
+        bool isChanged = isVariableChangedByFunctionCall(ptok, pindirect, library, &inconclusive);
         isChanged |= inconclusive;
         if (isChanged)
             return true;
@@ -2834,7 +2834,7 @@ bool isVariableChanged(const Token *tok, int indirect, const Settings &settings,
         const Variable * loopVar = varTok->variable();
         if (!loopVar)
             return false;
-        if (!loopVar->isConst() && loopVar->isReference() && isVariableChanged(loopVar, settings, depth - 1))
+        if (!loopVar->isConst() && loopVar->isReference() && isVariableChanged(loopVar, library, depth - 1))
             return true;
         return false;
     }
@@ -2856,14 +2856,14 @@ bool isVariableChanged(const Token *tok, int indirect, const Settings &settings,
     return false;
 }
 
-bool isVariableChanged(const Token *start, const Token *end, const nonneg int exprid, bool globalvar, const Settings &settings, int depth)
+bool isVariableChanged(const Token *start, const Token *end, const nonneg int exprid, bool globalvar, const Library &library, int depth)
 {
-    return findVariableChanged(start, end, 0, exprid, globalvar, settings, depth) != nullptr;
+    return findVariableChanged(start, end, 0, exprid, globalvar, library, depth) != nullptr;
 }
 
-bool isVariableChanged(const Token *start, const Token *end, int indirect, const nonneg int exprid, bool globalvar, const Settings &settings, int depth)
+bool isVariableChanged(const Token *start, const Token *end, int indirect, const nonneg int exprid, bool globalvar, const Library &library, int depth)
 {
-    return findVariableChanged(start, end, indirect, exprid, globalvar, settings, depth) != nullptr;
+    return findVariableChanged(start, end, indirect, exprid, globalvar, library, depth) != nullptr;
 }
 
 const Token* findExpression(const Token* start, const nonneg int exprid)
@@ -2925,7 +2925,7 @@ static bool isExpressionChangedAt(const F& getExprTok,
                                   int indirect,
                                   const nonneg int exprid,
                                   bool globalvar,
-                                  const Settings& settings,
+                                  const Library& library,
                                   int depth)
 {
     if (depth < 0)
@@ -2939,7 +2939,7 @@ static bool isExpressionChangedAt(const F& getExprTok,
             (!(tok->function() && (tok->function()->isAttributePure() || tok->function()->isAttributeConst())))) {
             if (!Token::simpleMatch(tok->astParent(), "."))
                 return true;
-            const auto yield = astContainerYield(tok->astParent()->astOperand1(), settings.library);
+            const auto yield = astContainerYield(tok->astParent()->astOperand1(), library);
             if (yield != Library::Container::Yield::SIZE && yield != Library::Container::Yield::EMPTY &&
                 yield != Library::Container::Yield::BUFFER && yield != Library::Container::Yield::BUFFER_NT)
                 // TODO: Is global variable really changed by function call?
@@ -2961,29 +2961,29 @@ static bool isExpressionChangedAt(const F& getExprTok,
         i += indirect;
         if (tok->valueType() && tok->valueType()->pointer)
             i = std::min(i, tok->valueType()->pointer);
-        if (isVariableChanged(tok, i, settings, depth))
+        if (isVariableChanged(tok, i, library, depth))
             return true;
         // TODO: Try to traverse the lambda function
         if (Token::Match(tok, "%var% ("))
             return true;
         return false;
     }
-    return (isVariableChanged(tok, indirect, settings, depth));
+    return (isVariableChanged(tok, indirect, library, depth));
 }
 
 bool isExpressionChangedAt(const Token* expr,
                            const Token* tok,
                            int indirect,
                            bool globalvar,
-                           const Settings& settings,
+                           const Library& library,
                            int depth)
 {
     return isExpressionChangedAt([&] {
         return expr;
-    }, tok, indirect, expr->exprId(), globalvar, settings, depth);
+    }, tok, indirect, expr->exprId(), globalvar, library, depth);
 }
 
-Token* findVariableChanged(Token *start, const Token *end, int indirect, const nonneg int exprid, bool globalvar, const Settings &settings, int depth)
+Token* findVariableChanged(Token *start, const Token *end, int indirect, const nonneg int exprid, bool globalvar, const Library &library, int depth)
 {
     if (!precedes(start, end))
         return nullptr;
@@ -2993,18 +2993,18 @@ Token* findVariableChanged(Token *start, const Token *end, int indirect, const n
         return findExpression(start, exprid);
     });
     for (Token *tok = start; tok != end; tok = tok->next()) {
-        if (isExpressionChangedAt(getExprTok, tok, indirect, exprid, globalvar, settings, depth))
+        if (isExpressionChangedAt(getExprTok, tok, indirect, exprid, globalvar, library, depth))
             return tok;
     }
     return nullptr;
 }
 
-const Token* findVariableChanged(const Token *start, const Token *end, int indirect, const nonneg int exprid, bool globalvar, const Settings &settings, int depth)
+const Token* findVariableChanged(const Token *start, const Token *end, int indirect, const nonneg int exprid, bool globalvar, const Library &library, int depth)
 {
-    return findVariableChanged(const_cast<Token*>(start), end, indirect, exprid, globalvar, settings, depth);
+    return findVariableChanged(const_cast<Token*>(start), end, indirect, exprid, globalvar, library, depth);
 }
 
-bool isVariableChanged(const Variable * var, const Settings &settings, int depth)
+bool isVariableChanged(const Variable * var, const Library &library, int depth)
 {
     if (!var)
         return false;
@@ -3020,14 +3020,14 @@ bool isVariableChanged(const Variable * var, const Settings &settings, int depth
         if (next)
             start = next;
     }
-    return findExpressionChanged(var->nameToken(), start->next(), var->scope()->bodyEnd, settings, depth);
+    return findExpressionChanged(var->nameToken(), start->next(), var->scope()->bodyEnd, library, depth);
 }
 
 bool isVariablesChanged(const Token* start,
                         const Token* end,
                         int indirect,
                         const std::vector<const Variable*> &vars,
-                        const Settings& settings)
+                        const Library& library)
 {
     std::set<int> varids;
     std::transform(vars.cbegin(), vars.cend(), std::inserter(varids, varids.begin()), [](const Variable* var) {
@@ -3043,13 +3043,13 @@ bool isVariablesChanged(const Token* start,
                 return true;
             continue;
         }
-        if (isVariableChanged(tok, indirect, settings))
+        if (isVariableChanged(tok, indirect, library))
             return true;
     }
     return false;
 }
 
-bool isThisChanged(const Token* tok, int indirect, const Settings& settings)
+bool isThisChanged(const Token* tok, int indirect, const Library& library)
 {
     if ((Token::Match(tok->previous(), "%name% (") && !Token::simpleMatch(tok->astOperand1(), ".")) ||
         Token::Match(tok->tokAt(-3), "this . %name% (")) {
@@ -3060,19 +3060,19 @@ bool isThisChanged(const Token* tok, int indirect, const Settings& settings)
             return true;
         }
     }
-    if (isVariableChanged(tok, indirect, settings))
+    if (isVariableChanged(tok, indirect, library))
         return true;
     return false;
 }
 
-static const Token* findThisChanged(const Token* start, const Token* end, int indirect, const Settings& settings)
+static const Token* findThisChanged(const Token* start, const Token* end, int indirect, const Library& library)
 {
     if (!precedes(start, end))
         return nullptr;
     for (const Token* tok = start; tok != end; tok = tok->next()) {
         if (!exprDependsOnThis(tok))
             continue;
-        if (isThisChanged(tok, indirect, settings))
+        if (isThisChanged(tok, indirect, library))
             return tok;
     }
     return nullptr;
@@ -3082,7 +3082,7 @@ template<class Find>
 static const Token* findExpressionChangedImpl(const Token* expr,
                                               const Token* start,
                                               const Token* end,
-                                              const Settings& settings,
+                                              const Library& library,
                                               int depth,
                                               Find find)
 {
@@ -3093,7 +3093,7 @@ static const Token* findExpressionChangedImpl(const Token* expr,
     const Token* result = nullptr;
     findAstNode(expr, [&](const Token* tok) {
         if (exprDependsOnThis(tok)) {
-            result = findThisChanged(start, end, /*indirect*/ 0, settings);
+            result = findThisChanged(start, end, /*indirect*/ 0, library);
             if (result)
                 return true;
         }
@@ -3113,7 +3113,7 @@ static const Token* findExpressionChangedImpl(const Token* expr,
                         ++indirect;
                 }
                 for (int i = 0; i <= indirect; ++i) {
-                    if (isExpressionChangedAt(tok, tok2, i, global, settings, depth))
+                    if (isExpressionChangedAt(tok, tok2, i, global, library, depth))
                         return true;
                 }
                 return false;
@@ -3155,21 +3155,21 @@ namespace {
 const Token* findExpressionChanged(const Token* expr,
                                    const Token* start,
                                    const Token* end,
-                                   const Settings& settings,
+                                   const Library& library,
                                    int depth)
 {
-    return findExpressionChangedImpl(expr, start, end, settings, depth, ExpressionChangedSimpleFind{});
+    return findExpressionChangedImpl(expr, start, end, library, depth, ExpressionChangedSimpleFind{});
 }
 
 const Token* findExpressionChangedSkipDeadCode(const Token* expr,
                                                const Token* start,
                                                const Token* end,
-                                               const Settings& settings,
+                                               const Library& library,
                                                const std::function<std::vector<MathLib::bigint>(const Token* tok)>& evaluate,
                                                int depth)
 {
     return findExpressionChangedImpl(
-        expr, start, end, settings, depth, ExpressionChangedSkipDeadCode{settings.library, evaluate});
+        expr, start, end, library, depth, ExpressionChangedSkipDeadCode{library, evaluate});
 }
 
 const Token* getArgumentStart(const Token* ftok)
@@ -3419,7 +3419,7 @@ bool isConstVarExpression(const Token *tok, const std::function<bool(const Token
     return false;
 }
 
-static ExprUsage getFunctionUsage(const Token* tok, int indirect, const Settings& settings)
+static ExprUsage getFunctionUsage(const Token* tok, int indirect, const Library& library)
 {
     const bool addressOf = tok->astParent() && tok->astParent()->isUnaryOp("&");
 
@@ -3481,14 +3481,14 @@ static ExprUsage getFunctionUsage(const Token* tok, int indirect, const Settings
     } else if (ftok->str() == "{") {
         return indirect == 0 ? ExprUsage::Used : ExprUsage::Inconclusive;
     } else {
-        const bool isnullbad = settings.library.isnullargbad(ftok, argnr + 1);
+        const bool isnullbad = library.isnullargbad(ftok, argnr + 1);
         if (indirect == 0 && astIsPointer(tok) && !addressOf && isnullbad)
             return ExprUsage::Used;
         bool hasIndirect = false;
-        const bool isuninitbad = settings.library.isuninitargbad(ftok, argnr + 1, indirect, &hasIndirect);
+        const bool isuninitbad = library.isuninitargbad(ftok, argnr + 1, indirect, &hasIndirect);
         if (isuninitbad && (!addressOf || isnullbad))
             return ExprUsage::Used;
-        const Library::ArgumentChecks::Direction argDirection = settings.library.getArgDirection(ftok, argnr + 1, indirect);
+        const Library::ArgumentChecks::Direction argDirection = library.getArgDirection(ftok, argnr + 1, indirect);
         if (argDirection == Library::ArgumentChecks::Direction::DIR_IN) // TODO: DIR_INOUT?
             return ExprUsage::Used;
         if (argDirection == Library::ArgumentChecks::Direction::DIR_OUT)
@@ -3558,7 +3558,7 @@ ExprUsage getExprUsage(const Token* tok, int indirect, const Settings& settings)
             (astIsLHS(tok) || Token::simpleMatch(parent, "( )")))
             return ExprUsage::Used;
     }
-    return getFunctionUsage(tok, indirect, settings);
+    return getFunctionUsage(tok, indirect, settings.library);
 }
 
 static void getLHSVariablesRecursive(std::vector<const Variable*>& vars, const Token* tok)

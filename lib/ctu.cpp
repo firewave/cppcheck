@@ -456,7 +456,7 @@ static std::vector<std::pair<const Token *, CTU::FileInfo::Value>> getUnsafeFunc
             int indirect = 0;
             if (argvar->valueType())
                 indirect = argvar->valueType()->pointer;
-            if (isVariableChanged(tok2->link(), tok2, indirect, argvar->declarationId(), false, settings))
+            if (isVariableChanged(tok2->link(), tok2, indirect, argvar->declarationId(), false, settings.library))
                 return ret;
         }
         if (Token::Match(tok2, "%oror%|&&|?")) {

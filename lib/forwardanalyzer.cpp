@@ -419,13 +419,13 @@ namespace {
                 std::pair<const Token*, const Token*> exprToks = stepTok->findExpressionStartEndTokens();
                 if (exprToks.first != nullptr && exprToks.second != nullptr)
                     stepChangesCond |=
-                        findExpressionChanged(condTok, exprToks.first, exprToks.second->next(), settings) != nullptr;
+                        findExpressionChanged(condTok, exprToks.first, exprToks.second->next(), settings.library) != nullptr;
             }
-            const bool bodyChangesCond = findExpressionChanged(condTok, endBlock->link(), endBlock, settings);
+            const bool bodyChangesCond = findExpressionChanged(condTok, endBlock->link(), endBlock, settings.library);
             // Check for mutation in the condition
             const bool condChanged =
                 nullptr != findAstNode(condTok, [&](const Token* tok) {
-                return isVariableChanged(tok, 0, settings);
+                return isVariableChanged(tok, 0, settings.library);
             });
             const bool changed = stepChangesCond || bodyChangesCond || condChanged;
             if (!changed)

@@ -327,50 +327,50 @@ bool isMutableExpression(const Token* tok);
  *
  * @param tok           ast tree
  * @param varid         Variable Id
- * @param settings      program settings
+ * @param library       library configuration
  * @param inconclusive  pointer to output variable which indicates that the answer of the question is inconclusive
  */
-bool isVariableChangedByFunctionCall(const Token *tok, int indirect, nonneg int varid, const Settings &settings, bool *inconclusive);
+bool isVariableChangedByFunctionCall(const Token *tok, int indirect, nonneg int varid, const Library &library, bool *inconclusive);
 
 /** Is variable changed by function call?
  * In case the answer of the question is inconclusive, e.g. because the function declaration is not known
  * the return value is false and the output parameter inconclusive is set to true
  *
  * @param tok           token of variable in function call
- * @param settings      program settings
- * @param inconclusive pointer to output variable which indicates that the answer of the question is inconclusive
+ * @param library       library configurations
+ * @param inconclusive  pointer to output variable which indicates that the answer of the question is inconclusive
  */
-CPPCHECKLIB bool isVariableChangedByFunctionCall(const Token *tok, int indirect, const Settings &settings, bool *inconclusive);
+CPPCHECKLIB bool isVariableChangedByFunctionCall(const Token *tok, int indirect, const Library &library, bool *inconclusive);
 
 /** Is variable changed in block of code? */
-CPPCHECKLIB bool isVariableChanged(const Token *start, const Token *end, nonneg int exprid, bool globalvar, const Settings &settings, int depth = 20);
-bool isVariableChanged(const Token *start, const Token *end, int indirect, nonneg int exprid, bool globalvar, const Settings &settings, int depth = 20);
+CPPCHECKLIB bool isVariableChanged(const Token *start, const Token *end, nonneg int exprid, bool globalvar, const Library &library, int depth = 20);
+bool isVariableChanged(const Token *start, const Token *end, int indirect, nonneg int exprid, bool globalvar, const Library &library, int depth = 20);
 
-bool isVariableChanged(const Token *tok, int indirect, const Settings &settings, int depth = 20);
+bool isVariableChanged(const Token *tok, int indirect, const Library &library, int depth = 20);
 
-bool isVariableChanged(const Variable * var, const Settings &settings, int depth = 20);
+bool isVariableChanged(const Variable * var, const Library &library, int depth = 20);
 
 bool isVariablesChanged(const Token* start,
                         const Token* end,
                         int indirect,
                         const std::vector<const Variable*> &vars,
-                        const Settings& settings);
+                        const Library& library);
 
-bool isThisChanged(const Token* tok, int indirect, const Settings& settings);
+bool isThisChanged(const Token* tok, int indirect, const Library& library);
 
-const Token* findVariableChanged(const Token *start, const Token *end, int indirect, nonneg int exprid, bool globalvar, const Settings &settings, int depth = 20);
-Token* findVariableChanged(Token *start, const Token *end, int indirect, nonneg int exprid, bool globalvar, const Settings &settings, int depth = 20);
+const Token* findVariableChanged(const Token *start, const Token *end, int indirect, nonneg int exprid, bool globalvar, const Library &library, int depth = 20);
+Token* findVariableChanged(Token *start, const Token *end, int indirect, nonneg int exprid, bool globalvar, const Library &library, int depth = 20);
 
 CPPCHECKLIB const Token* findExpressionChanged(const Token* expr,
                                                const Token* start,
                                                const Token* end,
-                                               const Settings& settings,
+                                               const Library& library,
                                                int depth = 20);
 
 const Token* findExpressionChangedSkipDeadCode(const Token* expr,
                                                const Token* start,
                                                const Token* end,
-                                               const Settings& settings,
+                                               const Library& library,
                                                const std::function<std::vector<MathLib::bigint>(const Token* tok)>& evaluate,
                                                int depth = 20);
 
@@ -378,7 +378,7 @@ bool isExpressionChangedAt(const Token* expr,
                            const Token* tok,
                            int indirect,
                            bool globalvar,
-                           const Settings& settings,
+                           const Library& library,
                            int depth = 20);
 
 /// If token is an alias if another variable

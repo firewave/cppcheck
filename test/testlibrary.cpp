@@ -1159,6 +1159,7 @@ private:
     }
 
     void loadLibCombinations() const {
+        // TODO: no need for having Settings
         {
             const Settings s = settingsBuilder().library("std.cfg").library("gnu.cfg").library("bsd.cfg").build();
             ASSERT_EQUALS(s.library.defines().empty(), false);
@@ -1174,6 +1175,7 @@ private:
     }
 
     void smartpointer() const {
+        // TODO: no need for having settings
         const Settings s = settingsBuilder().library("std.cfg").build();
         const Library& library = s.library;
 

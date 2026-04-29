@@ -2239,7 +2239,7 @@ bool SymbolDatabase::isFunctionWithoutSideEffects(const Function& func, const To
             // check if global variable is changed
             if (bodyVariable->isGlobal() || (pointersToGlobals.find(bodyVariable) != pointersToGlobals.end())) {
                 const int indirect = bodyVariable->isArray() ? bodyVariable->dimensions().size() : bodyVariable->isPointer();
-                if (isVariableChanged(bodyToken, indirect, mSettings)) {
+                if (isVariableChanged(bodyToken, indirect, mSettings.library)) {
                     return false;
                 }
                 // check if pointer to global variable assigned to another variable (another_var = &global_var)

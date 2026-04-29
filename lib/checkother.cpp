@@ -1182,7 +1182,7 @@ static bool isSimpleExpr(const Token* tok, const Variable* var, const Settings& 
             tok = tok->astOperand2();
         }
     }
-    return (needsCheck && !findExpressionChanged(tok, tok->astParent(), var->scope()->bodyEnd, settings));
+    return (needsCheck && !findExpressionChanged(tok, tok->astParent(), var->scope()->bodyEnd, settings.library));
 }
 
 //---------------------------------------------------------------------------
@@ -1616,7 +1616,7 @@ void CheckOther::checkPassByReference()
         if (!isRangeBasedFor && (!var->scope() || var->scope()->function->isImplicitlyVirtual()))
             continue;
 
-        if (!isVariableChanged(var, *mSettings)) {
+        if (!isVariableChanged(var, mSettings->library)) {
             passedByValueError(var, inconclusive, isRangeBasedFor);
         }
     }
@@ -1737,7 +1737,7 @@ void CheckOther::checkConstVariable()
             continue;
         if (isCastToVoid(var))
             continue;
-        if (isVariableChanged(var, *mSettings))
+        if (isVariableChanged(var, mSettings->library))
             continue;
         const bool hasFunction = function != nullptr;
         if (!hasFunction) {
@@ -1792,7 +1792,7 @@ void CheckOther::checkConstVariable()
                             continue;
                     } else if (const Token* ftok = getTokenArgumentFunction(tok, argn)) {
                         bool inconclusive{};
-                        if (var->valueType() && !isVariableChangedByFunctionCall(ftok, var->valueType()->pointer, var->declarationId(), *mSettings, &inconclusive) && !inconclusive)
+                        if (var->valueType() && !isVariableChangedByFunctionCall(ftok, var->valueType()->pointer, var->declarationId(), mSettings->library, &inconclusive) && !inconclusive)
                             continue;
                     }
                     usedInAssignment = true;
@@ -1824,12 +1824,12 @@ static const Token* getVariableChangedStart(const Variable* p)
     return start;
 }
 
-static bool isConstPointerVariable(const Variable* p, const Settings& settings)
+static bool isConstPointerVariable(const Variable* p, const Library& library)
 {
     const int indirect = p->isArray() ? p->dimensions().size() : 1;
     const Token* start = getVariableChangedStart(p);
     while (const Token* tok =
-               findVariableChanged(start, p->scope()->bodyEnd, indirect, p->declarationId(), false, settings)) {
+               findVariableChanged(start, p->scope()->bodyEnd, indirect, p->declarationId(), false, library)) {
         if (p->isReference())
             return false;
         // Assigning a pointer through another pointer may still be const
@@ -1983,7 +1983,7 @@ void CheckOther::checkConstPointer()
                 continue;
             else if (const Token* ftok = getTokenArgumentFunction(parent, argn)) {
                 bool inconclusive{};
-                if (!isVariableChangedByFunctionCall(ftok->next(), vt->pointer, var->declarationId(), *mSettings, &inconclusive) && !inconclusive)
+                if (!isVariableChangedByFunctionCall(ftok->next(), vt->pointer, var->declarationId(), mSettings->library, &inconclusive) && !inconclusive)
                     continue;
             }
         } else {
@@ -2008,7 +2008,7 @@ void CheckOther::checkConstPointer()
                         const Variable* argVar = ftok->function()->getArgumentVar(argn);
                         if (argVar && argVar->valueType() && argVar->valueType()->isConst(vt->pointer)) {
                             bool inconclusive{};
-                            if (!isVariableChangedByFunctionCall(ftok, vt->pointer, var->declarationId(), *mSettings, &inconclusive) && !inconclusive)
+                            if (!isVariableChangedByFunctionCall(ftok, vt->pointer, var->declarationId(), mSettings->library, &inconclusive) && !inconclusive)
                                 continue;
                         }
                     }
@@ -2041,7 +2041,7 @@ void CheckOther::checkConstPointer()
             // const int indirect = p->isArray() ? p->dimensions().size() : 1;
             // if (isVariableChanged(start, p->scope()->bodyEnd, indirect, p->declarationId(), false, *mSettings))
             //     continue;
-            if (!isConstPointerVariable(p, *mSettings))
+            if (!isConstPointerVariable(p, mSettings->library))
                 continue;
             if (p->typeStartToken() && p->typeStartToken()->isSimplifiedTypedef() && !(Token::simpleMatch(p->typeEndToken(), "*") && !p->typeEndToken()->isSimplifiedTypedef()))
                 continue;
@@ -2987,7 +2987,7 @@ void CheckOther::checkDuplicateExpression()
                     if (isWithoutSideEffects(tok->astOperand1())) {
                         const Token* loopTok = isInLoopCondition(tok);
                         if (!loopTok ||
-                            !findExpressionChanged(tok, tok, loopTok->link()->linkAt(1), *mSettings)) {
+                            !findExpressionChanged(tok, tok, loopTok->link()->linkAt(1), mSettings->library)) {
                             const bool isEnum = tok->scope()->type == ScopeType::eEnum;
                             const bool assignment = !isEnum && tok->str() == "=";
                             if (assignment)
@@ -3059,7 +3059,7 @@ void CheckOther::checkDuplicateExpression()
                     duplicateExpressionTernaryError(tok, std::move(errorPath));
 
                 else if (!tok->astOperand1()->values().empty() && !tok->astOperand2()->values().empty() && isEqualKnownValue(tok->astOperand1(), tok->astOperand2()) &&
-                         !isVariableChanged(tok->astParent(), /*indirect*/ 0, *mSettings) &&
+                         !isVariableChanged(tok->astParent(), /*indirect*/ 0, mSettings->library) &&
                          isConstStatement(tok->astOperand1(), mSettings->library, true) && isConstStatement(tok->astOperand2(), mSettings->library, true))
                     duplicateValueTernaryError(tok);
             }
@@ -3344,7 +3344,7 @@ static bool checkFunctionReturnsRef(const Token* tok, const Settings& settings)
     if (Token::simpleMatch(dot, ".")) {
         const Token* varTok = dot->astOperand1();
         const int indirect = varTok->valueType() ? varTok->valueType()->pointer : 0;
-        if (isVariableChanged(tok, tok->scope()->bodyEnd, indirect, varTok->varId(), /*globalvar*/ true, settings))
+        if (isVariableChanged(tok, tok->scope()->bodyEnd, indirect, varTok->varId(), /*globalvar*/ true, settings.library))
             return false;
         if (isTemporary(dot, &settings.library, /*unknown*/ true))
             return false;
@@ -3372,7 +3372,7 @@ static bool checkVariableAssignment(const Token* tok, const ValueType* vtLhs, co
         return false;
     if (!vtLhs || !vtLhs->isTypeEqual(var->valueType()))
         return false;
-    if (findVariableChanged(tok->tokAt(2), tok->scope()->bodyEnd, /*indirect*/ 0, var->declarationId(), /*globalvar*/ false, settings))
+    if (findVariableChanged(tok->tokAt(2), tok->scope()->bodyEnd, /*indirect*/ 0, var->declarationId(), /*globalvar*/ false, settings.library))
         return false;
     if (var->isLocal() || (var->isArgument() && !var->isReference()))
         return true;
@@ -3394,7 +3394,7 @@ void CheckOther::checkRedundantCopy()
     for (const Variable* var : symbolDatabase->variableList()) {
         if (!var || var->isReference() || var->isPointer() ||
             (!var->type() && !var->isStlType() && !(var->valueType() && var->valueType()->container)) || // bailout if var is of standard type, if it is a pointer or non-const
-            (!var->isConst() && isVariableChanged(var, *mSettings)))
+            (!var->isConst() && isVariableChanged(var, mSettings->library)))
             continue;
 
         const Token* startTok = var->nameToken();
@@ -3967,7 +3967,7 @@ void CheckOther::checkAccessOfMovedVariable()
                 if (usage == ExprUsage::Used)
                     accessOfMoved = true;
                 if (usage == ExprUsage::PassedByReference)
-                    accessOfMoved = !isVariableChangedByFunctionCall(tok, 0, *mSettings, &inconclusive);
+                    accessOfMoved = !isVariableChangedByFunctionCall(tok, 0, mSettings->library, &inconclusive);
                 else if (usage == ExprUsage::Inconclusive)
                     inconclusive = true;
             }
