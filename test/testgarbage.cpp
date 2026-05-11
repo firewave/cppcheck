@@ -17,6 +17,7 @@
  */
 
 #include "check.h"
+#include "checks.h"
 #include "errortypes.h"
 #include "fixture.h"
 #include "helpers.h"
@@ -285,7 +286,8 @@ private:
         ASSERT_LOC(tokenizer.tokenize(code), file, line);
 
         // call all "runChecks" in all registered Check classes
-        for (auto it = Check::instances().cbegin(); it != Check::instances().cend(); ++it) {
+        const auto& checks = CheckInstances::get();
+        for (auto it = checks.cbegin(); it != checks.cend(); ++it) {
             (*it)->runChecks(tokenizer, this);
         }
 

@@ -21,6 +21,7 @@
 #include "addoninfo.h"
 #include "analyzerinfo.h"
 #include "check.h"
+#include "checks.h"
 #include "checkunusedfunctions.h"
 #include "clangimport.h"
 #include "color.h"
@@ -1338,8 +1339,7 @@ void CppCheck::checkNormalTokens(const Tokenizer &tokenizer, AnalyzerInformation
         const std::time_t maxTime = mSettings.checksMaxTime > 0 ? std::time(nullptr) + mSettings.checksMaxTime : 0;
 
         // call all "runChecks" in all registered Check classes
-        // cppcheck-suppress shadowFunction - TODO: fix this
-        for (Check *check : Check::instances()) {
+        for (Check *c : CheckInstances::get()) {
             if (Settings::terminated())
                 return;
 
@@ -1357,8 +1357,8 @@ void CppCheck::checkNormalTokens(const Tokenizer &tokenizer, AnalyzerInformation
                 return;
             }
 
-            Timer::run(check->name() + "::runChecks", mTimerResults, [&]() {
-                check->runChecks(tokenizer, &mErrorLogger);
+            Timer::run(c->name() + "::runChecks", mTimerResults, [&]() {
+                c->runChecks(tokenizer, &mErrorLogger);
             });
         }
     }
@@ -1388,11 +1388,10 @@ void CppCheck::checkNormalTokens(const Tokenizer &tokenizer, AnalyzerInformation
         }
 
         if (!doUnusedFunctionOnly) {
-            // cppcheck-suppress shadowFunction - TODO: fix this
-            for (const Check *check : Check::instances()) {
-                if (Check::FileInfo * const fi = check->getFileInfo(tokenizer, mSettings, currentConfig)) {
+            for (const Check *c : CheckInstances::get()) {
+                if (Check::FileInfo * const fi = c->getFileInfo(tokenizer, mSettings, currentConfig)) {
                     if (analyzerInformation)
-                        analyzerInformation->setFileInfo(check->name(), fi->toString());
+                        analyzerInformation->setFileInfo(c->name(), fi->toString());
                     if (mSettings.useSingleJob())
                         mFileInfo.push_back(fi);
                     else
@@ -1713,9 +1712,11 @@ void CppCheck::getErrorMessages(ErrorLogger &errorlogger)
     Settings s;
     s.addEnabled("all");
 
+    const auto& checks = CheckInstances::get();
+
     // call all "getErrorMessages" in all registered Check classes
-    for (auto it = Check::instances().cbegin(); it != Check::instances().cend(); ++it)
-        (*it)->getErrorMessages(&errorlogger, &s);
+    for (auto *c : checks)
+        c->getErrorMessages(&errorlogger, &s);
 
     CheckUnusedFunctions::getErrorMessages(errorlogger);
     Preprocessor::getErrorMessages(errorlogger, s);
@@ -1832,9 +1833,8 @@ bool CppCheck::analyseWholeProgram()
             }
         }
 
-        // cppcheck-suppress shadowFunction - TODO: fix this
-        for (Check *check : Check::instances())
-            errors |= check->analyseWholeProgram(ctu, mFileInfo, mSettings, mErrorLogger);  // TODO: ctu
+        for (Check *c : CheckInstances::get())
+            errors |= c->analyseWholeProgram(ctu, mFileInfo, mSettings, mErrorLogger);  // TODO: ctu
     }
 
     if (mUnusedFunctionsCheck)
@@ -1864,7 +1864,7 @@ unsigned int CppCheck::analyseWholeProgram(const std::string &buildDir, const st
             ctuFileInfo.loadFromXml(e);
             return;
         }
-        for (const Check *check : Check::instances()) {
+        for (const Check *check : CheckInstances::get()) {
             if (checkattr == check->name()) {
                 if (Check::FileInfo* fi = check->loadFileInfoFromXml(e)) {
                     fi->file0 = filesTxtInfo.sourceFile;
@@ -1881,9 +1881,8 @@ unsigned int CppCheck::analyseWholeProgram(const std::string &buildDir, const st
     }
     else {
         // Analyse the tokens
-        // cppcheck-suppress shadowFunction - TODO: fix this
-        for (Check *check : Check::instances())
-            check->analyseWholeProgram(ctuFileInfo, fileInfoList, mSettings, mErrorLogger);
+        for (Check *c : CheckInstances::get())
+            c->analyseWholeProgram(ctuFileInfo, fileInfoList, mSettings, mErrorLogger);
     }
 
     for (Check::FileInfo *fi : fileInfoList)

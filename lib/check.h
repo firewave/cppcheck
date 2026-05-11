@@ -59,7 +59,7 @@ class Tokenizer;
 class CPPCHECKLIB Check {
 public:
     /** This constructor is used when registering the CheckClass */
-    explicit Check(const std::string &aname);
+    explicit Check(std::string aname);
 
 protected:
     /** This constructor is used when running checks. */
@@ -67,16 +67,10 @@ protected:
         : mTokenizer(tokenizer), mSettings(settings), mErrorLogger(errorLogger), mName(std::move(aname)) {}
 
 public:
-    virtual ~Check() {
-        if (!mTokenizer)
-            instances().remove(this);
-    }
+    virtual ~Check() = default;
 
     Check(const Check &) = delete;
     Check& operator=(const Check &) = delete;
-
-    /** List of registered check classes. This is used by Cppcheck to run checks and generate documentation */
-    static std::list<Check *> &instances();
 
     /** run checks, the token list is not simplified */
     virtual void runChecks(const Tokenizer &, ErrorLogger *) = 0;
