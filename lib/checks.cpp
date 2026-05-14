@@ -42,7 +42,7 @@
 #include "checkunusedvar.h"
 #include "checkvaarg.h"
 
-const std::list<Check *>& CheckInstances::get()
+CheckInstances::Range CheckInstances::get()
 {
     static std::list<Check *> s_checks{
         new Check64BitPortability,
@@ -72,8 +72,9 @@ const std::list<Check *>& CheckInstances::get()
         new CheckType,
         new CheckUninitVar,
         new CheckUnusedVar,
-        new CheckVaarg
+        new CheckVaarg,
+        nullptr
     };
 
-    return s_checks;
+    return {*s_checks.cbegin(), *s_checks.cend()};
 }

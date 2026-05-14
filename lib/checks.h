@@ -19,12 +19,20 @@
 #ifndef checksH
 #define checksH
 
+#include "tokenrange.h"
+
 #include <list>
 
 class Check;
 
-namespace CheckInstances {
-    const std::list<Check *>& get();
+namespace CheckInstances
+{
+    class Range : public RangeBase<Check> {
+    public:
+        Range(Check* front, Check* back) : RangeBase<Check>(front, back) {}
+    };
+
+    Range get();
 }
 
 #endif // checksH
