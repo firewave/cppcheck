@@ -26,6 +26,7 @@
 #include "mathlib.h"
 #include "smallvector.h"
 #include "templatesimplifier.h"
+#include "tokenrange.h"
 #include "utils.h"
 #include "vfvalue.h"
 
@@ -51,7 +52,6 @@ class Settings;
 class Type;
 class ValueType;
 class Variable;
-class ConstTokenRange;
 class Token;
 struct TokensFrontBack;
 class TokenList;
@@ -208,6 +208,11 @@ public:
     // for usage in CheckIO::ArgumentInfo only
     explicit Token(const Token *tok);
     ~Token();
+
+    class ConstTokenRange : public RangeBase<const Token> {
+    public:
+        ConstTokenRange(const Token* front, const Token* back) :RangeBase<const Token>(front, back) {}
+    };
 
     ConstTokenRange until(const Token * t) const;
 

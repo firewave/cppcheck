@@ -87,7 +87,7 @@ Token::~Token()
  * note t can be nullptr to iterate all the way to the end.
  */
 // cppcheck-suppress unusedFunction // only used in testtokenrange.cpp
-ConstTokenRange Token::until(const Token* t) const
+Token::ConstTokenRange Token::until(const Token* t) const
 {
     return ConstTokenRange(this, t);
 }

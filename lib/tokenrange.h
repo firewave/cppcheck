@@ -27,57 +27,45 @@
 #include <iterator>
 #include <type_traits>
 
-class Token;
-
-template<typename T, REQUIRES("T must be a Token class", std::is_convertible<T*, const Token*> )>
-class TokenRangeBase {
+template<typename T>
+class RangeBase {
     T* mFront;
     T* mBack;
 
 public:
-    TokenRangeBase(T* front, T* back) : mFront(front), mBack(back) {}
+    RangeBase(T* front, T* back) : mFront(front), mBack(back) {}
 
-    struct TokenIterator {
+    struct Iterator {
         using iterator_category = std::forward_iterator_tag;
         using value_type = T*;
         using difference_type = std::ptrdiff_t;
         using pointer = void;
         using reference = T*;
 
-        T* mt;
-        TokenIterator() : mt(nullptr) {}
-        explicit TokenIterator(T* t) : mt(t) {}
-        TokenIterator& operator++() {
-            mt = mt->next();
+        explicit Iterator(T* t) : mt(t) {}
+        Iterator& operator++() {
+            //mt = mt->next();
             return *this;
         }
-        bool operator==(const TokenIterator& b) const {
+        bool operator==(const Iterator& b) const {
             return mt == b.mt;
         }
-        bool operator!=(const TokenIterator& b) const {
+        bool operator!=(const Iterator& b) const {
             return mt != b.mt;
         }
         T* operator*() const {
             return mt;
         }
+    protected:
+        T* mt;
     };
 
-    TokenIterator begin() const {
-        return TokenIterator(mFront);
+    Iterator begin() const {
+        return Iterator(mFront);
     }
-    TokenIterator end() const {
-        return TokenIterator(mBack);
+    Iterator end() const {
+        return Iterator(mBack);
     }
-};
-
-class TokenRange : public TokenRangeBase<Token> {
-public:
-    TokenRange(Token* front, Token* back) : TokenRangeBase<Token>(front, back) {}
-};
-
-class ConstTokenRange : public TokenRangeBase<const Token> {
-public:
-    ConstTokenRange(const Token* front, const Token* back) : TokenRangeBase<const Token>(front, back) {}
 };
 
 #endif // tokenrangeH
