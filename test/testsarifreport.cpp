@@ -602,7 +602,7 @@ private:
         const std::string version = driver.at("semanticVersion").get<std::string>();
 
         // Version should not contain spaces (they should be stripped)
-        ASSERT(version.find(' ') == std::string::npos);
+        ASSERT_EQUALS(std::string::npos, version.find(' '));
     }
 
     void securitySeverityMapping()
@@ -690,7 +690,7 @@ private:
 
         const std::string& version = driver.at("semanticVersion").get<std::string>();
         // Version should not contain any spaces
-        ASSERT(version.find(' ') == std::string::npos);
+        ASSERT_EQUALS(std::string::npos, version.find(' '));
     }
 
     void customProductNameAndVersion()
@@ -752,8 +752,8 @@ private:
         int column0 = static_cast<int>(region0.at("startColumn").get<double>());
 
         // 0 values should be normalized to 1
-        ASSERT(line0 == 1);
-        ASSERT(column0 == 1);
+        ASSERT_EQUALS(1, line0);
+        ASSERT_EQUALS(1, column0);
 
         // Check second result with positive values
         const picojson::object& res1      = results[1].get<picojson::object>();

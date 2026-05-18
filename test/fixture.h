@@ -328,6 +328,7 @@ protected:
 #define ASSERT_MSG( CONDITION, MSG ) assert_(__FILE__, __LINE__, (CONDITION), MSG)
 #define ASSERT_LOC( CONDITION, FILE_, LINE_ ) assert_(FILE_, LINE_, (CONDITION))
 #define ASSERT_LOC_MSG( CONDITION, MSG, FILE_, LINE_ ) assert_(FILE_, LINE_, (CONDITION), MSG)
+#define ASSERT_NULL( CONDITION ) assert_(__FILE__, __LINE__, (CONDITION) == nullptr)
 // *INDENT-OFF*
 #define ASSERT_EQUALS( EXPECTED, ACTUAL ) do { try { assertEquals(__FILE__, __LINE__, (EXPECTED), (ACTUAL)); } catch(const AssertFailedError&) { throw; } catch (...) { assertNoThrowFail(__FILE__, __LINE__, true); } } while (false)
 // *INDENT-ON*

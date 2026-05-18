@@ -3541,7 +3541,7 @@ private:
             const char code[] = "a = f(x%x<--a==x>x);";
             SimpleTokenizer tokenizer(settingsDefault, *this);
             ASSERT(tokenizer.tokenize(code));
-            ASSERT(nullptr == Token::findsimplematch(tokenizer.tokens(), "<")->link());
+            ASSERT_NULL(Token::findsimplematch(tokenizer.tokens(), "<")->link());
         }
 
         {

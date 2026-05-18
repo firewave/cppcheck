@@ -61,7 +61,7 @@ private:
 
     void findLambdaEndTokenTest() {
         const Token* nullTok = nullptr;
-        ASSERT(nullptr == (::findLambdaEndToken)(nullTok));
+        ASSERT_NULL((::findLambdaEndToken)(nullTok));
         ASSERT_EQUALS(false, findLambdaEndToken("void f() { }"));
         ASSERT_EQUALS(true, findLambdaEndToken("[]{ }"));
         ASSERT_EQUALS(true, findLambdaEndToken("[]{ return 0; }"));
@@ -97,7 +97,7 @@ private:
     }
 
     void findLambdaStartTokenTest() {
-        ASSERT(nullptr == (::findLambdaStartToken)(nullptr));
+        ASSERT_NULL((::findLambdaStartToken)(nullptr));
         ASSERT_EQUALS(false, findLambdaStartToken("void f() { }"));
         ASSERT_EQUALS(true, findLambdaStartToken("[]{ }"));
         ASSERT_EQUALS(true, findLambdaStartToken("[]{ return 0; }"));
@@ -486,37 +486,37 @@ private:
     }
 
     void isUsedAsBool() {
-        ASSERT(Result::True == isUsedAsBool("void f() { bool b = true; }", "b"));
-        ASSERT(Result::False ==isUsedAsBool("void f() { int i = true; }", "i"));
-        ASSERT(Result::True == isUsedAsBool("void f() { int i; if (i) {} }", "i )"));
-        ASSERT(Result::True == isUsedAsBool("void f() { int i; while (i) {} }", "i )"));
-        ASSERT(Result::True == isUsedAsBool("void f() { int i; for (;i;) {} }", "i ; )"));
-        ASSERT(Result::False == isUsedAsBool("void f() { int i; for (;;i) {} }", "i )"));
-        ASSERT(Result::False == isUsedAsBool("void f() { int i; for (i;;) {} }", "i ; ; )"));
-        ASSERT(Result::True == isUsedAsBool("void f() { int i; for (int j=0; i; ++j) {} }", "i ; ++"));
-        ASSERT(Result::False == isUsedAsBool("void f() { int i; if (i == 2) {} }", "i =="));
-        ASSERT(Result::False == isUsedAsBool("void f() { int i; if (i == true) {} }", "i =="));
-        ASSERT(Result::False == isUsedAsBool("void f() { int i,j; if (i == (j&&f())) {} }", "i =="));
-        ASSERT(Result::True == isUsedAsBool("void f() { int i; if (!i == 0) {} }", "i =="));
-        ASSERT(Result::True == isUsedAsBool("void f() { int i; if (!i) {} }", "i )"));
-        ASSERT(Result::True == isUsedAsBool("void f() { int i; if (!!i) {} }", "i )"));
-        ASSERT(Result::True == isUsedAsBool("void f() { int i; if (i && f()) {} }", "i &&"));
-        ASSERT(Result::True == isUsedAsBool("void f() { int i; int j = i && f(); }", "i &&"));
-        ASSERT(Result::False == isUsedAsBool("void f() { int i; if (i & f()) {} }", "i &"));
-        ASSERT(Result::True == isUsedAsBool("void f() { int i; if (static_cast<bool>(i)) {} }", "i )"));
-        ASSERT(Result::True == isUsedAsBool("void f() { int i; if ((bool)i) {} }", "i )"));
-        ASSERT(Result::True == isUsedAsBool("void f() { int i; if (1+static_cast<bool>(i)) {} }", "i )"));
-        ASSERT(Result::True == isUsedAsBool("void f() { int i; if (1+(bool)i) {} }", "i )"));
-        ASSERT(Result::False == isUsedAsBool("void f() { int i; if (1+static_cast<int>(i)) {} }", "i )"));
-        ASSERT(Result::True == isUsedAsBool("void f() { int i; if (1+!static_cast<int>(i)) {} }", "i )"));
-        ASSERT(Result::False == isUsedAsBool("void f() { int i; if (1+(int)i) {} }", "i )"));
-        ASSERT(Result::False == isUsedAsBool("void f() { int i; if (i + 2) {} }", "i +"));
-        ASSERT(Result::True == isUsedAsBool("void f() { int i; bool b = i; }", "i ; }"));
-        ASSERT(Result::True == isUsedAsBool("void f(bool b); void f() { int i; f(i); }","i )"));
-        ASSERT(Result::False == isUsedAsBool("void f() { int *i; if (*i) {} }", "i )"));
-        ASSERT(Result::True == isUsedAsBool("void f() { int *i; if (*i) {} }", "* i )"));
-        ASSERT(Result::True == isUsedAsBool("int g(); void h(bool); void f() { h(g()); }", "( ) )"));
-        ASSERT(Result::True == isUsedAsBool("int g(int); void h(bool); void f() { h(g(0)); }", "( 0 ) )"));
+        ASSERT_EQUALS_ENUM(Result::True, isUsedAsBool("void f() { bool b = true; }", "b"));
+        ASSERT_EQUALS_ENUM(Result::False, isUsedAsBool("void f() { int i = true; }", "i"));
+        ASSERT_EQUALS_ENUM(Result::True, isUsedAsBool("void f() { int i; if (i) {} }", "i )"));
+        ASSERT_EQUALS_ENUM(Result::True, isUsedAsBool("void f() { int i; while (i) {} }", "i )"));
+        ASSERT_EQUALS_ENUM(Result::True, isUsedAsBool("void f() { int i; for (;i;) {} }", "i ; )"));
+        ASSERT_EQUALS_ENUM(Result::False, isUsedAsBool("void f() { int i; for (;;i) {} }", "i )"));
+        ASSERT_EQUALS_ENUM(Result::False, isUsedAsBool("void f() { int i; for (i;;) {} }", "i ; ; )"));
+        ASSERT_EQUALS_ENUM(Result::True, isUsedAsBool("void f() { int i; for (int j=0; i; ++j) {} }", "i ; ++"));
+        ASSERT_EQUALS_ENUM(Result::False, isUsedAsBool("void f() { int i; if (i == 2) {} }", "i =="));
+        ASSERT_EQUALS_ENUM(Result::False, isUsedAsBool("void f() { int i; if (i == true) {} }", "i =="));
+        ASSERT_EQUALS_ENUM(Result::False, isUsedAsBool("void f() { int i,j; if (i == (j&&f())) {} }", "i =="));
+        ASSERT_EQUALS_ENUM(Result::True, isUsedAsBool("void f() { int i; if (!i == 0) {} }", "i =="));
+        ASSERT_EQUALS_ENUM(Result::True, isUsedAsBool("void f() { int i; if (!i) {} }", "i )"));
+        ASSERT_EQUALS_ENUM(Result::True, isUsedAsBool("void f() { int i; if (!!i) {} }", "i )"));
+        ASSERT_EQUALS_ENUM(Result::True, isUsedAsBool("void f() { int i; if (i && f()) {} }", "i &&"));
+        ASSERT_EQUALS_ENUM(Result::True, isUsedAsBool("void f() { int i; int j = i && f(); }", "i &&"));
+        ASSERT_EQUALS_ENUM(Result::False, isUsedAsBool("void f() { int i; if (i & f()) {} }", "i &"));
+        ASSERT_EQUALS_ENUM(Result::True, isUsedAsBool("void f() { int i; if (static_cast<bool>(i)) {} }", "i )"));
+        ASSERT_EQUALS_ENUM(Result::True, isUsedAsBool("void f() { int i; if ((bool)i) {} }", "i )"));
+        ASSERT_EQUALS_ENUM(Result::True, isUsedAsBool("void f() { int i; if (1+static_cast<bool>(i)) {} }", "i )"));
+        ASSERT_EQUALS_ENUM(Result::True, isUsedAsBool("void f() { int i; if (1+(bool)i) {} }", "i )"));
+        ASSERT_EQUALS_ENUM(Result::False, isUsedAsBool("void f() { int i; if (1+static_cast<int>(i)) {} }", "i )"));
+        ASSERT_EQUALS_ENUM(Result::True, isUsedAsBool("void f() { int i; if (1+!static_cast<int>(i)) {} }", "i )"));
+        ASSERT_EQUALS_ENUM(Result::False, isUsedAsBool("void f() { int i; if (1+(int)i) {} }", "i )"));
+        ASSERT_EQUALS_ENUM(Result::False, isUsedAsBool("void f() { int i; if (i + 2) {} }", "i +"));
+        ASSERT_EQUALS_ENUM(Result::True, isUsedAsBool("void f() { int i; bool b = i; }", "i ; }"));
+        ASSERT_EQUALS_ENUM(Result::True, isUsedAsBool("void f(bool b); void f() { int i; f(i); }","i )"));
+        ASSERT_EQUALS_ENUM(Result::False, isUsedAsBool("void f() { int *i; if (*i) {} }", "i )"));
+        ASSERT_EQUALS_ENUM(Result::True, isUsedAsBool("void f() { int *i; if (*i) {} }", "* i )"));
+        ASSERT_EQUALS_ENUM(Result::True, isUsedAsBool("int g(); void h(bool); void f() { h(g()); }", "( ) )"));
+        ASSERT_EQUALS_ENUM(Result::True, isUsedAsBool("int g(int); void h(bool); void f() { h(g(0)); }", "( 0 ) )"));
     }
 };
 

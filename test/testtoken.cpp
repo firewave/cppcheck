@@ -1035,19 +1035,19 @@ private:
         Token tok(list, std::move(tokensFrontBack));
 
         tok.str("\"foo\"");
-        ASSERT(tok.tokType() == Token::eString);
+        ASSERT_EQUALS_ENUM(Token::eString, tok.tokType());
         tok.str("\"\"");
-        ASSERT(tok.tokType() == Token::eString);
+        ASSERT_EQUALS_ENUM(Token::eString, tok.tokType());
         tok.str("'f'");
-        ASSERT(tok.tokType() == Token::eChar);
+        ASSERT_EQUALS_ENUM(Token::eChar, tok.tokType());
         tok.str("12345");
-        ASSERT(tok.tokType() == Token::eNumber);
+        ASSERT_EQUALS_ENUM(Token::eNumber, tok.tokType());
         tok.str("-55");
-        ASSERT(tok.tokType() == Token::eNumber);
+        ASSERT_EQUALS_ENUM(Token::eNumber, tok.tokType());
         tok.str("true");
-        ASSERT(tok.tokType() == Token::eBoolean);
+        ASSERT_EQUALS_ENUM(Token::eBoolean, tok.tokType());
         tok.str("false");
-        ASSERT(tok.tokType() == Token::eBoolean);
+        ASSERT_EQUALS_ENUM(Token::eBoolean, tok.tokType());
     }
 
     void isStandardType() const {
@@ -1148,7 +1148,7 @@ private:
         ASSERT(var.tokenize("std::deque<std::set<int> > intsets;"));
 
         const Token* const t = var.tokens()->findClosingBracket();
-        ASSERT(t == nullptr);
+        ASSERT_NULL(t);
     }
 
     void canFindMatchingBracketsInnerPair() {
@@ -1186,7 +1186,7 @@ private:
         ASSERT(t != nullptr && t->str() == ">");
 
         t = var.tokens()->tokAt(4)->findClosingBracket();
-        ASSERT(t == nullptr);
+        ASSERT_NULL(t);
     }
 
     void findClosingBracket() {

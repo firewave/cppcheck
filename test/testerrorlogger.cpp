@@ -490,7 +490,7 @@ private:
                                "  <location origfile=\"proj/foo.cpp\" file=\"foo.cpp\" line=\"5\" column=\"2\"/>\n"
                                "</error>";
         tinyxml2::XMLDocument doc;
-        ASSERT(doc.Parse(xmldata, sizeof(xmldata)) == tinyxml2::XML_SUCCESS);
+        ASSERT_EQUALS_ENUM(tinyxml2::XML_SUCCESS, doc.Parse(xmldata, sizeof(xmldata)));
         const auto * const rootnode = doc.FirstChildElement();
         ASSERT(rootnode);
         ErrorMessage msg(doc.FirstChildElement());

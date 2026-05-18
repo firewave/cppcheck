@@ -313,10 +313,10 @@ private:
         SimpleTokenList tokenList(code);
         tokenList.front()->next()->astOperand1(tokenList.front());
 
-        ASSERT(Library::ArgumentChecks::Direction::DIR_IN == library.getArgDirection(tokenList.front(), 1));
-        ASSERT(Library::ArgumentChecks::Direction::DIR_OUT == library.getArgDirection(tokenList.front(), 2));
-        ASSERT(Library::ArgumentChecks::Direction::DIR_INOUT == library.getArgDirection(tokenList.front(), 3));
-        ASSERT(Library::ArgumentChecks::Direction::DIR_UNKNOWN == library.getArgDirection(tokenList.front(), 4));
+        ASSERT_EQUALS_ENUM(Library::ArgumentChecks::Direction::DIR_IN, library.getArgDirection(tokenList.front(), 1));
+        ASSERT_EQUALS_ENUM(Library::ArgumentChecks::Direction::DIR_OUT, library.getArgDirection(tokenList.front(), 2));
+        ASSERT_EQUALS_ENUM(Library::ArgumentChecks::Direction::DIR_INOUT, library.getArgDirection(tokenList.front(), 3));
+        ASSERT_EQUALS_ENUM(Library::ArgumentChecks::Direction::DIR_UNKNOWN, library.getArgDirection(tokenList.front(), 4));
     }
 
     void function_arg_valid() const {
@@ -511,7 +511,7 @@ private:
         ASSERT_EQUALS(1U, minsizes ? minsizes->size() : 1U);
         if (minsizes && minsizes->size() == 1U) {
             const Library::ArgumentChecks::MinSize &m = minsizes->front();
-            ASSERT(Library::ArgumentChecks::MinSize::Type::VALUE == m.type);
+            ASSERT_EQUALS_ENUM(Library::ArgumentChecks::MinSize::Type::VALUE, m.type);
             ASSERT_EQUALS(500, m.value);
             ASSERT_EQUALS("", m.baseType);
         }
@@ -522,7 +522,7 @@ private:
         ASSERT_EQUALS(1U, minsizes ? minsizes->size() : 1U);
         if (minsizes && minsizes->size() == 1U) {
             const Library::ArgumentChecks::MinSize& m = minsizes->front();
-            ASSERT(Library::ArgumentChecks::MinSize::Type::VALUE == m.type);
+            ASSERT_EQUALS_ENUM(Library::ArgumentChecks::MinSize::Type::VALUE, m.type);
             ASSERT_EQUALS(4, m.value);
             ASSERT_EQUALS("int", m.baseType);
         }

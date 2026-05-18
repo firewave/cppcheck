@@ -642,7 +642,7 @@ private:
         REDIRECT;
         const char * const argv[] = {"cppcheck", "--version"};
         ASSERT_EQUALS_ENUM(CmdLineParser::Result::Exit, parseFromArgs(argv));
-        ASSERT(logger->str().compare(0, 11, "Cppcheck 2.") == 0);
+        ASSERT_EQUALS(0, logger->str().compare(0, 11, "Cppcheck 2."));
     }
 
     void versionWithCfg() {
@@ -664,7 +664,7 @@ private:
         REDIRECT;
         const char * const argv[] = {"cppcheck", "--library=missing", "--version"};
         ASSERT_EQUALS_ENUM(CmdLineParser::Result::Exit, parseFromArgs(argv));
-        ASSERT(logger->str().compare(0, 11, "Cppcheck 2.") == 0);
+        ASSERT_EQUALS(0, logger->str().compare(0, 11, "Cppcheck 2."));
     }
 
     void checkVersionCorrect() {
@@ -1708,37 +1708,35 @@ private:
         REDIRECT;
         const char * const argv[] = {"cppcheck", "--std=c99", "file.cpp"};
         ASSERT_EQUALS_ENUM(CmdLineParser::Result::Success, parseFromArgs(argv));
-        ASSERT(settings->standards.c == Standards::C99);
+        ASSERT_EQUALS_ENUM(Standards::C99, settings->standards.c);
     }
 
     void stdgnu17() {
         REDIRECT;
         const char * const argv[] = {"cppcheck", "--std=gnu17", "file.cpp"};
         ASSERT_EQUALS_ENUM(CmdLineParser::Result::Success, parseFromArgs(argv));
-        ASSERT(settings->standards.c == Standards::C17);
+        ASSERT_EQUALS_ENUM(Standards::C17, settings->standards.c);
     }
 
     void stdiso9899_1999() {
         REDIRECT;
         const char * const argv[] = {"cppcheck", "--std=iso9899:1999", "file.cpp"};
         ASSERT_EQUALS_ENUM(CmdLineParser::Result::Success, parseFromArgs(argv));
-        ASSERT(settings->standards.c == Standards::C99);
+        ASSERT_EQUALS_ENUM(Standards::C99, settings->standards.c);
     }
 
     void stdcpp11() {
         REDIRECT;
         const char * const argv[] = {"cppcheck", "--std=c++11", "file.cpp"};
-        settings->standards.cpp = Standards::CPP03;
         ASSERT_EQUALS_ENUM(CmdLineParser::Result::Success, parseFromArgs(argv));
-        ASSERT(settings->standards.cpp == Standards::CPP11);
+        ASSERT_EQUALS_ENUM(Standards::CPP11, settings->standards.cpp);
     }
 
     void stdgnupp23() {
         REDIRECT;
         const char * const argv[] = {"cppcheck", "--std=gnu++23", "file.cpp"};
-        settings->standards.cpp = Standards::CPP03;
         ASSERT_EQUALS_ENUM(CmdLineParser::Result::Success, parseFromArgs(argv));
-        ASSERT(settings->standards.cpp == Standards::CPP23);
+        ASSERT_EQUALS_ENUM(Standards::CPP23, settings->standards.cpp);
     }
 
     void stdunknown1() {
@@ -1908,7 +1906,7 @@ private:
         REDIRECT;
         const char * const argv[] = {"cppcheck", "--plist-output=", "file.cpp"};
         ASSERT_EQUALS_ENUM(CmdLineParser::Result::Success, parseFromArgs(argv));
-        ASSERT(settings->plistOutput == "./");
+        ASSERT_EQUALS("./", settings->plistOutput);
     }
 
     void plistDoesNotExist() {

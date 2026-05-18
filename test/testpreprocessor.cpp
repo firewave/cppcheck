@@ -388,7 +388,7 @@ private:
         if (arg && std::strncmp(arg,"-U",2)==0)
             settings.userUndefs.insert(arg+2);
         if (library)
-            ASSERT(settings.library.load("", library, false).errorcode == Library::ErrorCode::OK);
+            ASSERT_EQUALS_ENUM(Library::ErrorCode::OK, settings.library.load("", library, false).errorcode);
         std::vector<std::string> files;
         simplecpp::OutputList outputList;
         simplecpp::TokenList tokens(code,files,"test.c",&outputList);

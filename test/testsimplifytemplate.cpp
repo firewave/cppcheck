@@ -6736,7 +6736,7 @@ private:
         ASSERT(templateArgPos2 > strpos2 && templateArgPos2 < endpos2);
 
         // Assert there is no further unexpected templateArg location info
-        ASSERT(d.find(" templateArg", endpos2) == std::string::npos);
+        ASSERT_EQUALS(std::string::npos, d.find(" templateArg", endpos2));
     }
 };
 
