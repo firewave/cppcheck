@@ -139,7 +139,7 @@ private:
 class CheckOtherImpl : public CheckImpl {
 public:
     /** @brief This constructor is used when running checks. */
-    CheckOtherImpl(const Tokenizer *tokenizer, const Settings *settings, ErrorLogger *errorLogger)
+    CheckOtherImpl(const Tokenizer *tokenizer, const Settings &settings, ErrorLogger *errorLogger)
         : CheckImpl(tokenizer, settings, errorLogger) {}
 
     /** @brief Clarify calculation for ".. a * b ? .." */

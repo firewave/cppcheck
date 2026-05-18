@@ -35,7 +35,7 @@ class CheckImpl
 {
 public:
     /** This constructor is used when running checks. */
-    CheckImpl(const Tokenizer *tokenizer, const Settings *settings, ErrorLogger *errorLogger)
+    CheckImpl(const Tokenizer *tokenizer, const Settings &settings, ErrorLogger *errorLogger)
         : mTokenizer(tokenizer), mSettings(settings), mErrorLogger(errorLogger) {}
 
     CheckImpl(const CheckImpl &) = delete;
@@ -43,7 +43,7 @@ public:
 
 protected:
     const Tokenizer* const mTokenizer{};
-    const Settings* const mSettings{};
+    const Settings& mSettings;
     ErrorLogger* const mErrorLogger{};
 
     /** report an error */

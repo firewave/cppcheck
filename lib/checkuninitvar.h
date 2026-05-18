@@ -93,7 +93,7 @@ private:
 class CheckUninitVarImpl : public CheckImpl {
 public:
     /** @brief This constructor is used when running checks. */
-    CheckUninitVarImpl(const Tokenizer *tokenizer, const Settings *settings, ErrorLogger *errorLogger)
+    CheckUninitVarImpl(const Tokenizer *tokenizer, const Settings &settings, ErrorLogger *errorLogger)
         : CheckImpl(tokenizer, settings, errorLogger) {}
 
     bool diag(const Token* tok);
