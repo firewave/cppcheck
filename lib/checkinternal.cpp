@@ -33,7 +33,7 @@
 
 void CheckInternalImpl::checkTokenMatchPatterns()
 {
-    const SymbolDatabase *symbolDatabase = mTokenizer->getSymbolDatabase();
+    const SymbolDatabase *symbolDatabase = mTokenizer.getSymbolDatabase();
     for (const Scope *scope : symbolDatabase->functionScopes) {
         for (const Token* tok = scope->bodyStart->next(); tok != scope->bodyEnd; tok = tok->next()) {
             if (!Token::simpleMatch(tok, "Token :: Match (") && !Token::simpleMatch(tok, "Token :: findmatch ("))
@@ -84,7 +84,7 @@ void CheckInternalImpl::checkTokenMatchPatterns()
 
 void CheckInternalImpl::checkRedundantTokCheck()
 {
-    for (const Token *tok = mTokenizer->tokens(); tok; tok = tok->next()) {
+    for (const Token *tok = mTokenizer.tokens(); tok; tok = tok->next()) {
         if (Token::Match(tok, "&& Token :: simpleMatch|Match|findsimplematch|findmatch (")) {
             // in code like
             // if (tok->previous() && Token::match(tok->previous(), "bla")) {}
@@ -125,7 +125,7 @@ void CheckInternalImpl::checkRedundantTokCheckError(const Token* tok)
 
 void CheckInternalImpl::checkTokenSimpleMatchPatterns()
 {
-    const SymbolDatabase *symbolDatabase = mTokenizer->getSymbolDatabase();
+    const SymbolDatabase *symbolDatabase = mTokenizer.getSymbolDatabase();
     for (const Scope* scope : symbolDatabase->functionScopes) {
         for (const Token* tok = scope->bodyStart->next(); tok != scope->bodyEnd; tok = tok->next()) {
             if (!Token::simpleMatch(tok, "Token :: simpleMatch (") && !Token::simpleMatch(tok, "Token :: findsimplematch ("))
@@ -209,7 +209,7 @@ namespace {
 
 void CheckInternalImpl::checkMissingPercentCharacter()
 {
-    const SymbolDatabase *symbolDatabase = mTokenizer->getSymbolDatabase();
+    const SymbolDatabase *symbolDatabase = mTokenizer.getSymbolDatabase();
     for (const Scope* scope : symbolDatabase->functionScopes) {
         for (const Token* tok = scope->bodyStart->next(); tok != scope->bodyEnd; tok = tok->next()) {
             if (!Token::simpleMatch(tok, "Token :: Match (") && !Token::simpleMatch(tok, "Token :: findmatch ("))
@@ -250,7 +250,7 @@ void CheckInternalImpl::checkMissingPercentCharacter()
 
 void CheckInternalImpl::checkUnknownPattern()
 {
-    const SymbolDatabase *symbolDatabase = mTokenizer->getSymbolDatabase();
+    const SymbolDatabase *symbolDatabase = mTokenizer.getSymbolDatabase();
     for (const Scope* scope : symbolDatabase->functionScopes) {
         for (const Token* tok = scope->bodyStart->next(); tok != scope->bodyEnd; tok = tok->next()) {
             if (!Token::simpleMatch(tok, "Token :: Match (") && !Token::simpleMatch(tok, "Token :: findmatch ("))
@@ -284,7 +284,7 @@ void CheckInternalImpl::checkUnknownPattern()
 
 void CheckInternalImpl::checkRedundantNextPrevious()
 {
-    const SymbolDatabase *symbolDatabase = mTokenizer->getSymbolDatabase();
+    const SymbolDatabase *symbolDatabase = mTokenizer.getSymbolDatabase();
     for (const Scope* scope : symbolDatabase->functionScopes) {
         for (const Token* tok = scope->bodyStart->next(); tok != scope->bodyEnd; tok = tok->next()) {
             if (tok->str() != ".")
@@ -307,7 +307,7 @@ void CheckInternalImpl::checkRedundantNextPrevious()
 
 void CheckInternalImpl::checkExtraWhitespace()
 {
-    const SymbolDatabase *symbolDatabase = mTokenizer->getSymbolDatabase();
+    const SymbolDatabase *symbolDatabase = mTokenizer.getSymbolDatabase();
     for (const Scope* scope : symbolDatabase->functionScopes) {
         for (const Token* tok = scope->bodyStart->next(); tok != scope->bodyEnd; tok = tok->next()) {
             if (!Token::Match(tok, "Token :: simpleMatch|findsimplematch|Match|findmatch ("))
@@ -382,7 +382,7 @@ void CheckInternal::runChecks(const Tokenizer &tokenizer, ErrorLogger *errorLogg
     if (!tokenizer.getSettings().checks.isEnabled(Checks::internalCheck))
         return;
 
-    CheckInternalImpl checkInternal(&tokenizer, tokenizer.getSettings(), errorLogger);
+    CheckInternalImpl checkInternal(tokenizer, tokenizer.getSettings(), errorLogger);
 
     checkInternal.checkTokenMatchPatterns();
     checkInternal.checkTokenSimpleMatchPatterns();
@@ -395,7 +395,10 @@ void CheckInternal::runChecks(const Tokenizer &tokenizer, ErrorLogger *errorLogg
 
 void CheckInternal::getErrorMessages(ErrorLogger *errorLogger, const Settings &settings) const
 {
-    CheckInternalImpl c(nullptr, settings, errorLogger);
+    TokenList tokenList(settings, Standards::Language::C);
+    Tokenizer tokenizer(std::move(tokenList), *errorLogger);
+
+    CheckInternalImpl c(tokenizer, settings, errorLogger);
     c.simplePatternError(nullptr, "class {", "Match");
     c.complexPatternError(nullptr, "%type% ( )", "Match");
     c.missingPercentCharacterError(nullptr, "%num", "Match");

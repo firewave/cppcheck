@@ -263,7 +263,7 @@ void CheckNullPointerImpl::nullPointerByDeRefAndCheck()
 {
     const bool printInconclusive = (mSettings.certainty.isEnabled(Certainty::inconclusive));
 
-    const SymbolDatabase *symbolDatabase = mTokenizer->getSymbolDatabase();
+    const SymbolDatabase *symbolDatabase = mTokenizer.getSymbolDatabase();
     for (const Scope * scope : symbolDatabase->functionScopes) {
         auto pred = [printInconclusive](const Token* tok) -> bool {
             if (!tok)
@@ -322,7 +322,7 @@ void CheckNullPointerImpl::nullConstantDereference()
 {
     logChecker("CheckNullPointer::nullConstantDereference");
 
-    const SymbolDatabase *symbolDatabase = mTokenizer->getSymbolDatabase();
+    const SymbolDatabase *symbolDatabase = mTokenizer.getSymbolDatabase();
 
     for (const Scope * scope : symbolDatabase->functionScopes) {
         if (scope->function == nullptr || !scope->function->hasBody()) // We only look for functions with a body
@@ -475,7 +475,7 @@ void CheckNullPointerImpl::nullPointerError(const Token *tok, const std::string 
 void CheckNullPointerImpl::arithmetic()
 {
     logChecker("CheckNullPointer::arithmetic");
-    const SymbolDatabase *symbolDatabase = mTokenizer->getSymbolDatabase();
+    const SymbolDatabase *symbolDatabase = mTokenizer.getSymbolDatabase();
     for (const Scope * scope : symbolDatabase->functionScopes) {
         for (const Token* tok = scope->bodyStart->next(); tok != scope->bodyEnd; tok = tok->next()) {
             if (!Token::Match(tok, "-|+|+=|-=|++|--"))
@@ -625,7 +625,10 @@ bool CheckNullPointer::analyseWholeProgram(const CTU::FileInfo &ctu, const std::
 {
     (void)settings;
 
-    CheckNullPointerImpl dummy(nullptr, settings, &errorLogger);
+    // TODO: find a better way to do this
+    TokenList tokenList(settings, Standards::Language::C);
+    Tokenizer tokenizer(std::move(tokenList), errorLogger);
+    CheckNullPointerImpl dummy(tokenizer, settings, &errorLogger);
     //dummy.logChecker("CheckNullPointer::analyseWholeProgram"); // TODO
 
     if (fileInfo.empty())
@@ -686,7 +689,7 @@ bool CheckNullPointer::analyseWholeProgram(const CTU::FileInfo &ctu, const std::
 
 void CheckNullPointer::runChecks(const Tokenizer &tokenizer, ErrorLogger *errorLogger)
 {
-    CheckNullPointerImpl checkNullPointer(&tokenizer, tokenizer.getSettings(), errorLogger);
+    CheckNullPointerImpl checkNullPointer(tokenizer, tokenizer.getSettings(), errorLogger);
     checkNullPointer.nullPointer();
     checkNullPointer.arithmetic();
     checkNullPointer.nullConstantDereference();
@@ -694,7 +697,10 @@ void CheckNullPointer::runChecks(const Tokenizer &tokenizer, ErrorLogger *errorL
 
 void CheckNullPointer::getErrorMessages(ErrorLogger *errorLogger, const Settings &settings) const
 {
-    CheckNullPointerImpl c(nullptr, settings, errorLogger);
+    TokenList tokenList(settings, Standards::Language::C);
+    Tokenizer tokenizer(std::move(tokenList), *errorLogger);
+
+    CheckNullPointerImpl c(tokenizer, settings, errorLogger);
     c.nullPointerError(nullptr, "pointer", nullptr, false);
     c.pointerArithmeticError(nullptr, nullptr, false);
     // TODO: nullPointerArithmeticOutOfMemory

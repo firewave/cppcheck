@@ -285,7 +285,7 @@ void CheckMemoryLeakImpl::reportErr(const Token *tok, Severity severity, const s
 
 void CheckMemoryLeakImpl::reportErr(const std::list<const Token *> &callstack, Severity severity, const std::string &id, const std::string &msg, const CWE &cwe) const
 {
-    const ErrorMessage errmsg(callstack, mTokenizer ? &mTokenizer->list : nullptr, severity, id, msg, cwe, Certainty::normal);
+    const ErrorMessage errmsg(callstack, &mTokenizer.list, severity, id, msg, cwe, Certainty::normal);
     if (mErrorLogger)
         mErrorLogger->reportErr(errmsg);
     else
@@ -423,7 +423,7 @@ void CheckMemoryLeakInFunctionImpl::checkReallocUsage()
     logChecker("CheckMemoryLeakInFunction::checkReallocUsage");
 
     // only check functions
-    const SymbolDatabase *symbolDatabase = mTokenizer->getSymbolDatabase();
+    const SymbolDatabase *symbolDatabase = mTokenizer.getSymbolDatabase();
     for (const Scope * scope : symbolDatabase->functionScopes) {
 
         // Search for the "var = realloc(var, 100" pattern within this function
@@ -480,7 +480,7 @@ void CheckMemoryLeakInFunctionImpl::checkReallocUsage()
                 if (Token::simpleMatch(tokEndRealloc->next(), "; if (") &&
                     notvar(tokEndRealloc->tokAt(3)->astOperand2(), tok->varId())) {
                     const Token* tokEndBrace = tokEndRealloc->linkAt(3)->linkAt(1);
-                    if (tokEndBrace && mTokenizer->isScopeNoReturn(tokEndBrace))
+                    if (tokEndBrace && mTokenizer.isScopeNoReturn(tokEndBrace))
                         continue;
                 }
 
@@ -491,13 +491,16 @@ void CheckMemoryLeakInFunctionImpl::checkReallocUsage()
 }
 
 void CheckMemoryLeakInFunction::runChecks(const Tokenizer &tokenizer, ErrorLogger *errorLogger) {
-    CheckMemoryLeakInFunctionImpl checkMemoryLeak(&tokenizer, tokenizer.getSettings(), errorLogger);
+    CheckMemoryLeakInFunctionImpl checkMemoryLeak(tokenizer, tokenizer.getSettings(), errorLogger);
     checkMemoryLeak.checkReallocUsage();
 }
 
 /** Report all possible errors (for the --errorlist) */
 void CheckMemoryLeakInFunction::getErrorMessages(ErrorLogger *e, const Settings &settings) const {
-    CheckMemoryLeakInFunctionImpl c(nullptr, settings, e);
+    TokenList tokenList(settings, Standards::Language::C);
+    Tokenizer tokenizer(std::move(tokenList), *e);
+
+    CheckMemoryLeakInFunctionImpl c(tokenizer, settings, e);
     c.memleakError(nullptr, "varname");
     c.resourceLeakError(nullptr, "varname");
     c.deallocuseError(nullptr, "varname");
@@ -514,7 +517,7 @@ void CheckMemoryLeakInClassImpl::check()
 {
     logChecker("CheckMemoryLeakInClass::check");
 
-    const SymbolDatabase *symbolDatabase = mTokenizer->getSymbolDatabase();
+    const SymbolDatabase *symbolDatabase = mTokenizer.getSymbolDatabase();
 
     // only check classes and structures
     for (const Scope * scope : symbolDatabase->classAndStructScopes) {
@@ -695,13 +698,16 @@ void CheckMemoryLeakInClass::runChecks(const Tokenizer &tokenizer, ErrorLogger *
     if (!tokenizer.isCPP())
         return;
 
-    CheckMemoryLeakInClassImpl checkMemoryLeak(&tokenizer, tokenizer.getSettings(), errorLogger);
+    CheckMemoryLeakInClassImpl checkMemoryLeak(tokenizer, tokenizer.getSettings(), errorLogger);
     checkMemoryLeak.check();
 }
 
 void CheckMemoryLeakInClass::getErrorMessages(ErrorLogger *e, const Settings &settings) const
 {
-    CheckMemoryLeakInClassImpl c(nullptr, settings, e);
+    TokenList tokenList(settings, Standards::Language::C);
+    Tokenizer tokenizer(std::move(tokenList), *e);
+
+    CheckMemoryLeakInClassImpl c(tokenizer, settings, e);
     c.publicAllocationError(nullptr, "varname");
     c.unsafeClassError(nullptr, "class", "class::varname");
 }
@@ -713,7 +719,7 @@ void CheckMemoryLeakStructMemberImpl::check()
 
     logChecker("CheckMemoryLeakStructMember::check");
 
-    const SymbolDatabase* symbolDatabase = mTokenizer->getSymbolDatabase();
+    const SymbolDatabase* symbolDatabase = mTokenizer.getSymbolDatabase();
     for (const Variable* var : symbolDatabase->variableList()) {
         if (!var || (!var->isLocal() && !(var->isArgument() && var->scope())) || var->isStatic())
             continue;
@@ -756,7 +762,7 @@ void CheckMemoryLeakStructMemberImpl::checkStructVariable(const Variable* const 
         // Check that variable is allocated with malloc
         if (!isMalloc(variable))
             return;
-    } else if (!mTokenizer->isC() && (!variable->typeScope() || variable->typeScope()->getDestructor())) {
+    } else if (!mTokenizer.isC() && (!variable->typeScope() || variable->typeScope()->getDestructor())) {
         // For non-C code a destructor might cleanup members
         return;
     }
@@ -967,7 +973,7 @@ void CheckMemoryLeakStructMemberImpl::checkStructVariable(const Variable* const 
 
 void CheckMemoryLeakStructMember::runChecks(const Tokenizer &tokenizer, ErrorLogger *errorLogger)
 {
-    CheckMemoryLeakStructMemberImpl checkMemoryLeak(&tokenizer, tokenizer.getSettings(), errorLogger);
+    CheckMemoryLeakStructMemberImpl checkMemoryLeak(tokenizer, tokenizer.getSettings(), errorLogger);
     checkMemoryLeak.check();
 }
 
@@ -975,7 +981,7 @@ void CheckMemoryLeakNoVarImpl::check()
 {
     logChecker("CheckMemoryLeakNoVar::check");
 
-    const SymbolDatabase *symbolDatabase = mTokenizer->getSymbolDatabase();
+    const SymbolDatabase *symbolDatabase = mTokenizer.getSymbolDatabase();
 
     // only check functions
     for (const Scope * scope : symbolDatabase->functionScopes) {
@@ -1140,7 +1146,7 @@ void CheckMemoryLeakNoVarImpl::checkForUnusedReturnValue(const Scope *scope)
 void CheckMemoryLeakNoVarImpl::checkForUnsafeArgAlloc(const Scope *scope)
 {
     // This test only applies to C++ source
-    if (!mTokenizer->isCPP())
+    if (!mTokenizer.isCPP())
         return;
 
     if (!mSettings.isPremiumEnabled("leakUnsafeArgAlloc") && (!mSettings.certainty.isEnabled(Certainty::inconclusive) || !mSettings.severity.isEnabled(Severity::warning)))
@@ -1209,13 +1215,16 @@ void CheckMemoryLeakNoVarImpl::unsafeArgAllocError(const Token *tok, const std::
 
 void CheckMemoryLeakNoVar::runChecks(const Tokenizer &tokenizer, ErrorLogger *errorLogger)
 {
-    CheckMemoryLeakNoVarImpl checkMemoryLeak(&tokenizer, tokenizer.getSettings(), errorLogger);
+    CheckMemoryLeakNoVarImpl checkMemoryLeak(tokenizer, tokenizer.getSettings(), errorLogger);
     checkMemoryLeak.check();
 }
 
 void CheckMemoryLeakNoVar::getErrorMessages(ErrorLogger *e, const Settings &settings) const
 {
-    CheckMemoryLeakNoVarImpl c(nullptr, settings, e);
+    TokenList tokenList(settings, Standards::Language::C);
+    Tokenizer tokenizer(std::move(tokenList), *e);
+
+    CheckMemoryLeakNoVarImpl c(tokenizer, settings, e);
     c.functionCallLeak(nullptr, "funcName", "funcName");
     c.returnValueNotUsedError(nullptr, "funcName");
     c.unsafeArgAllocError(nullptr, "funcName", "shared_ptr", "int");

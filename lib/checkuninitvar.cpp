@@ -111,10 +111,10 @@ void CheckUninitVarImpl::check()
 {
     logChecker("CheckUninitVar::check");
 
-    const SymbolDatabase *symbolDatabase = mTokenizer->getSymbolDatabase();
+    const SymbolDatabase *symbolDatabase = mTokenizer.getSymbolDatabase();
 
     std::set<std::string> arrayTypeDefs;
-    for (const Token *tok = mTokenizer->tokens(); tok; tok = tok->next()) {
+    for (const Token *tok = mTokenizer.tokens(); tok; tok = tok->next()) {
         if (Token::Match(tok, "%name% [") && tok->variable() && Token::Match(tok->variable()->typeStartToken(), "%type% %var% ;"))
             arrayTypeDefs.insert(tok->variable()->typeStartToken()->str());
     }
@@ -130,7 +130,7 @@ void CheckUninitVarImpl::check()
 void CheckUninitVarImpl::checkScope(const Scope* scope, const std::set<std::string> &arrayTypeDefs)
 {
     for (const Variable &var : scope->varlist) {
-        if ((mTokenizer->isCPP() && var.type() && !var.isPointer() && var.type()->needInitialization != Type::NeedInitialization::True) ||
+        if ((mTokenizer.isCPP() && var.type() && !var.isPointer() && var.type()->needInitialization != Type::NeedInitialization::True) ||
             var.isStatic() || var.isExtern() || var.isReference())
             continue;
 
@@ -237,12 +237,12 @@ void CheckUninitVarImpl::checkStruct(const Token *tok, const Variable &structvar
     const Token *typeToken = structvar.typeStartToken();
     while (Token::Match(typeToken, "%name% ::"))
         typeToken = typeToken->tokAt(2);
-    const SymbolDatabase * symbolDatabase = mTokenizer->getSymbolDatabase();
+    const SymbolDatabase * symbolDatabase = mTokenizer.getSymbolDatabase();
     for (const Scope *scope2 : symbolDatabase->classAndStructScopes) {
         if (scope2->className == typeToken->str() && scope2->numConstructors == 0U) {
             for (const Variable &var : scope2->varlist) {
                 if (var.isStatic() || var.hasDefault() || var.isArray() ||
-                    (!mTokenizer->isC() && var.isClass() && (!var.type() || var.type()->needInitialization != Type::NeedInitialization::True)))
+                    (!mTokenizer.isC() && var.isClass() && (!var.type() || var.type()->needInitialization != Type::NeedInitialization::True)))
                     continue;
 
                 // is the variable declared in a inner union?
@@ -413,7 +413,7 @@ bool CheckUninitVarImpl::checkScopeForVariable(const Token *tok, const Variable&
                 *possibleInit = true;
 
             // might be a noreturn function..
-            if (mTokenizer->isScopeNoReturn(tok)) {
+            if (mTokenizer.isScopeNoReturn(tok)) {
                 if (noreturn)
                     *noreturn = true;
                 return false;
@@ -770,7 +770,7 @@ bool CheckUninitVarImpl::checkScopeForVariable(const Token *tok, const Variable&
                     }
                 }
             }
-            if (mTokenizer->isCPP() && var.isPointer() && (var.typeStartToken()->isStandardType() || var.typeStartToken()->isEnumType() || (var.type() && var.type()->needInitialization == Type::NeedInitialization::True)) && Token::simpleMatch(tok->next(), "= new")) {
+            if (mTokenizer.isCPP() && var.isPointer() && (var.typeStartToken()->isStandardType() || var.typeStartToken()->isEnumType() || (var.type() && var.type()->needInitialization == Type::NeedInitialization::True)) && Token::simpleMatch(tok->next(), "= new")) {
                 *alloc = CheckUninitVar::CTOR_CALL;
 
                 // type has constructor(s)
@@ -797,7 +797,7 @@ bool CheckUninitVarImpl::checkScopeForVariable(const Token *tok, const Variable&
 
 
             if (!membervar.empty()) {
-                if (mTokenizer->isCPP() && Token::simpleMatch(tok->astParent(), ">>"))
+                if (mTokenizer.isCPP() && Token::simpleMatch(tok->astParent(), ">>"))
                     return true;
 
                 if (isMemberVariableAssignment(tok, membervar)) {
@@ -1612,7 +1612,7 @@ void CheckUninitVarImpl::valueFlowUninit()
 {
     logChecker("CheckUninitVar::valueFlowUninit");
 
-    const SymbolDatabase *symbolDatabase = mTokenizer->getSymbolDatabase();
+    const SymbolDatabase *symbolDatabase = mTokenizer.getSymbolDatabase();
 
     std::unordered_set<nonneg int> ids;
     for (const bool subfunction : {false, true}) {
@@ -1748,7 +1748,10 @@ bool CheckUninitVar::analyseWholeProgram(const CTU::FileInfo &ctu, const std::li
 {
     (void)settings;
 
-    CheckUninitVarImpl dummy(nullptr, settings, &errorLogger);
+    // TODO: find a better way to do this
+    TokenList tokenList(settings, Standards::Language::C);
+    Tokenizer tokenizer(std::move(tokenList), errorLogger);
+    CheckUninitVarImpl dummy(tokenizer, settings, &errorLogger);
     dummy.
     logChecker("CheckUninitVar::analyseWholeProgram");
 
@@ -1794,14 +1797,17 @@ bool CheckUninitVar::analyseWholeProgram(const CTU::FileInfo &ctu, const std::li
 
 void CheckUninitVar::runChecks(const Tokenizer &tokenizer, ErrorLogger *errorLogger)
 {
-    CheckUninitVarImpl checkUninitVar(&tokenizer, tokenizer.getSettings(), errorLogger);
+    CheckUninitVarImpl checkUninitVar(tokenizer, tokenizer.getSettings(), errorLogger);
     checkUninitVar.valueFlowUninit();
     checkUninitVar.check();
 }
 
 void CheckUninitVar::getErrorMessages(ErrorLogger* errorLogger, const Settings& settings) const
 {
-    CheckUninitVarImpl c(nullptr, settings, errorLogger);
+    TokenList tokenList(settings, Standards::Language::C);
+    Tokenizer tokenizer(std::move(tokenList), *errorLogger);
+
+    CheckUninitVarImpl c(tokenizer, settings, errorLogger);
 
     ValueFlow::Value v{};
 

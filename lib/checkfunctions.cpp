@@ -54,11 +54,11 @@ static const CWE CWE688(688U);  // Function Call With Incorrect Variable or Refe
 
 void CheckFunctionsImpl::checkProhibitedFunctions()
 {
-    const bool checkAlloca = mSettings.severity.isEnabled(Severity::warning) && ((mTokenizer->isC() && mSettings.standards.c >= Standards::C99) || mSettings.standards.cpp >= Standards::CPP11);
+    const bool checkAlloca = mSettings.severity.isEnabled(Severity::warning) && ((mTokenizer.isC() && mSettings.standards.c >= Standards::C99) || mSettings.standards.cpp >= Standards::CPP11);
 
     logChecker("CheckFunctions::checkProhibitedFunctions");
 
-    const SymbolDatabase *symbolDatabase = mTokenizer->getSymbolDatabase();
+    const SymbolDatabase *symbolDatabase = mTokenizer.getSymbolDatabase();
     for (const Scope *scope : symbolDatabase->functionScopes) {
         for (const Token* tok = scope->bodyStart; tok != scope->bodyEnd; tok = tok->next()) {
             if (!Token::Match(tok, "%name% (") && tok->varId() == 0)
@@ -108,7 +108,7 @@ void CheckFunctionsImpl::functionCalledError(const Token* tok, Severity severity
 void CheckFunctionsImpl::invalidFunctionUsage()
 {
     logChecker("CheckFunctions::invalidFunctionUsage");
-    const SymbolDatabase* symbolDatabase = mTokenizer->getSymbolDatabase();
+    const SymbolDatabase* symbolDatabase = mTokenizer.getSymbolDatabase();
     for (const Scope *scope : symbolDatabase->functionScopes) {
         for (const Token* tok = scope->bodyStart->next(); tok != scope->bodyEnd; tok = tok->next()) {
             tok = skipUnreachableBranch(tok);
@@ -254,7 +254,7 @@ void CheckFunctionsImpl::checkIgnoredReturnValue()
 
     logChecker("CheckFunctions::checkIgnoredReturnValue"); // style,warning
 
-    const SymbolDatabase *symbolDatabase = mTokenizer->getSymbolDatabase();
+    const SymbolDatabase *symbolDatabase = mTokenizer.getSymbolDatabase();
     for (const Scope *scope : symbolDatabase->functionScopes) {
         for (const Token* tok = scope->bodyStart->next(); tok != scope->bodyEnd; tok = tok->next()) {
             // skip c++11 initialization, ({...})
@@ -316,12 +316,12 @@ static const Token *checkMissingReturnScope(const Token *tok, const Library &lib
 void CheckFunctionsImpl::checkMissingReturn()
 {
     logChecker("CheckFunctions::checkMissingReturn");
-    const SymbolDatabase *symbolDatabase = mTokenizer->getSymbolDatabase();
+    const SymbolDatabase *symbolDatabase = mTokenizer.getSymbolDatabase();
     for (const Scope *scope : symbolDatabase->functionScopes) {
         const Function *function = scope->function;
         if (!function || !function->hasBody())
             continue;
-        if (function->name() == "main" && !(mTokenizer->isC() && mSettings.standards.c < Standards::C99))
+        if (function->name() == "main" && !(mTokenizer.isC() && mSettings.standards.c < Standards::C99))
             continue;
         if (function->type != FunctionType::eFunction && function->type != FunctionType::eOperatorEqual)
             continue;
@@ -441,7 +441,7 @@ void CheckFunctionsImpl::missingReturnError(const Token* tok)
 //---------------------------------------------------------------------------
 void CheckFunctionsImpl::checkMathFunctions()
 {
-    const bool styleC99 = mSettings.severity.isEnabled(Severity::style) && ((mTokenizer->isC() && mSettings.standards.c != Standards::C89) || (mTokenizer->isCPP() && mSettings.standards.cpp != Standards::CPP03));
+    const bool styleC99 = mSettings.severity.isEnabled(Severity::style) && ((mTokenizer.isC() && mSettings.standards.c != Standards::C89) || (mTokenizer.isCPP() && mSettings.standards.cpp != Standards::CPP03));
     const bool printWarnings = mSettings.severity.isEnabled(Severity::warning);
 
     if (!styleC99 && !printWarnings && !mSettings.isPremiumEnabled("wrongmathcall"))
@@ -449,7 +449,7 @@ void CheckFunctionsImpl::checkMathFunctions()
 
     logChecker("CheckFunctions::checkMathFunctions"); // style,warning,c99,c++11
 
-    const SymbolDatabase *symbolDatabase = mTokenizer->getSymbolDatabase();
+    const SymbolDatabase *symbolDatabase = mTokenizer.getSymbolDatabase();
     for (const Scope *scope : symbolDatabase->functionScopes) {
         for (const Token* tok = scope->bodyStart->next(); tok != scope->bodyEnd; tok = tok->next()) {
             if (tok->varId())
@@ -533,7 +533,7 @@ void CheckFunctionsImpl::memsetZeroBytes()
 
     logChecker("CheckFunctions::memsetZeroBytes"); // warning
 
-    const SymbolDatabase *symbolDatabase = mTokenizer->getSymbolDatabase();
+    const SymbolDatabase *symbolDatabase = mTokenizer.getSymbolDatabase();
     for (const Scope *scope : symbolDatabase->functionScopes) {
         for (const Token* tok = scope->bodyStart->next(); tok != scope->bodyEnd; tok = tok->next()) {
             if (Token::Match(tok, "memset|wmemset (") && (numberOfArguments(tok)==3)) {
@@ -574,7 +574,7 @@ void CheckFunctionsImpl::memsetInvalid2ndParam()
 
     logChecker("CheckFunctions::memsetInvalid2ndParam"); // warning,portability
 
-    const SymbolDatabase *symbolDatabase = mTokenizer->getSymbolDatabase();
+    const SymbolDatabase *symbolDatabase = mTokenizer.getSymbolDatabase();
     for (const Scope *scope : symbolDatabase->functionScopes) {
         for (const Token* tok = scope->bodyStart->next(); tok && (tok != scope->bodyEnd); tok = tok->next()) {
             if (!Token::simpleMatch(tok, "memset ("))
@@ -631,7 +631,7 @@ void CheckFunctionsImpl::checkLibraryMatchFunctions()
         return;
 
     bool insideNew = false;
-    for (const Token *tok = mTokenizer->tokens(); tok; tok = tok->next()) {
+    for (const Token *tok = mTokenizer.tokens(); tok; tok = tok->next()) {
         if (!tok->scope() || !tok->scope()->isExecutable())
             continue;
 
@@ -705,7 +705,7 @@ void CheckFunctionsImpl::checkLibraryMatchFunctions()
 // details: https://en.cppreference.com/w/cpp/language/copy_elision
 void CheckFunctionsImpl::returnLocalStdMove()
 {
-    if (!mTokenizer->isCPP() || mSettings.standards.cpp < Standards::CPP11)
+    if (!mTokenizer.isCPP() || mSettings.standards.cpp < Standards::CPP11)
         return;
 
     if (!mSettings.severity.isEnabled(Severity::performance))
@@ -713,7 +713,7 @@ void CheckFunctionsImpl::returnLocalStdMove()
 
     logChecker("CheckFunctions::returnLocalStdMove"); // performance,c++11
 
-    const SymbolDatabase *symbolDatabase = mTokenizer->getSymbolDatabase();
+    const SymbolDatabase *symbolDatabase = mTokenizer.getSymbolDatabase();
     for (const Scope *scope : symbolDatabase->functionScopes) {
         // Expect return by-value
         if (Function::returnsReference(scope->function, /*unknown*/ true, /*includeRValueRef*/ true))
@@ -749,7 +749,7 @@ void CheckFunctionsImpl::useStandardLibrary()
 
     logChecker("CheckFunctions::useStandardLibrary"); // style
 
-    for (const Scope& scope: mTokenizer->getSymbolDatabase()->scopeList) {
+    for (const Scope& scope: mTokenizer.getSymbolDatabase()->scopeList) {
         if (scope.type != ScopeType::eFor)
             continue;
 
@@ -855,7 +855,7 @@ void CheckFunctionsImpl::useStandardLibraryError(const Token *tok, const std::st
 
 void CheckFunctions::runChecks(const Tokenizer &tokenizer, ErrorLogger *errorLogger)
 {
-    CheckFunctionsImpl checkFunctions(&tokenizer, tokenizer.getSettings(), errorLogger);
+    CheckFunctionsImpl checkFunctions(tokenizer, tokenizer.getSettings(), errorLogger);
 
     checkFunctions.checkIgnoredReturnValue();
     checkFunctions.checkMissingReturn();  // Missing "return" in exit path
@@ -874,7 +874,10 @@ void CheckFunctions::runChecks(const Tokenizer &tokenizer, ErrorLogger *errorLog
 
 void CheckFunctions::getErrorMessages(ErrorLogger *errorLogger, const Settings &settings) const
 {
-    CheckFunctionsImpl c(nullptr, settings, errorLogger);
+    TokenList tokenList(settings, Standards::Language::C);
+    Tokenizer tokenizer(std::move(tokenList), *errorLogger);
+
+    CheckFunctionsImpl c(tokenizer, settings, errorLogger);
 
     for (auto i = settings.library.functionwarn().cbegin(); i != settings.library.functionwarn().cend(); ++i) {
         c.functionCalledError(nullptr, Severity::style, i->first, i->second.message);

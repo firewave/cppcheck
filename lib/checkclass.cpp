@@ -106,9 +106,9 @@ static bool isVclTypeInit(const Type *type)
 }
 //---------------------------------------------------------------------------
 
-CheckClassImpl::CheckClassImpl(const Tokenizer *tokenizer, const Settings &settings, ErrorLogger *errorLogger)
+CheckClassImpl::CheckClassImpl(const Tokenizer &tokenizer, const Settings &settings, ErrorLogger *errorLogger)
     : CheckImpl(tokenizer, settings, errorLogger),
-    mSymbolDatabase(tokenizer?tokenizer->getSymbolDatabase():nullptr)
+    mSymbolDatabase(tokenizer.getSymbolDatabase())
 {}
 
 bool CheckClassImpl::isInitialized(const Usage& usage, FunctionType funcType) const
@@ -2074,7 +2074,7 @@ void CheckClassImpl::virtualDestructor()
                     // No deletion of derived class instance through base class pointer found => the code is ok
                     bool ok = true;
 
-                    for (const Token *tok = mTokenizer->tokens(); tok; tok = tok->next()) {
+                    for (const Token *tok = mTokenizer.tokens(); tok; tok = tok->next()) {
                         if (Token::Match(tok, "[;{}] %var% =") &&
                             baseClassPointers.find(tok->next()->varId()) != baseClassPointers.end()) {
                             // new derived class..
@@ -2161,7 +2161,7 @@ void CheckClassImpl::thisSubtraction()
 
     logChecker("CheckClass::thisSubtraction"); // warning
 
-    const Token *tok = mTokenizer->tokens();
+    const Token *tok = mTokenizer.tokens();
     for (;;) {
         tok = Token::findmatch(tok, "this - %name%");
         if (!tok)
@@ -2486,7 +2486,7 @@ static bool isNonConstPtrCast(const Token* tok)
 
 bool CheckClassImpl::checkConstFunc(const Scope *scope, const Function *func, MemberAccess& memberAccessed) const
 {
-    if (mTokenizer->hasIfdef(func->functionScope->bodyStart, func->functionScope->bodyEnd))
+    if (mTokenizer.hasIfdef(func->functionScope->bodyStart, func->functionScope->bodyEnd))
         return false;
 
     auto getFuncTok = [](const Token* tok) -> const Token* {
@@ -3833,8 +3833,12 @@ bool CheckClass::analyseWholeProgram(const CTU::FileInfo &ctu, const std::list<C
     (void)ctu;
     (void)settings;
 
-    CheckClassImpl dummy(nullptr, settings, &errorLogger);
-    dummy.logChecker("CheckClass::analyseWholeProgram");
+    // TODO: find a better way to do this
+    TokenList tokenList(settings, Standards::Language::C);
+    Tokenizer tokenizer(std::move(tokenList), errorLogger);
+    CheckClassImpl dummy(tokenizer, settings, &errorLogger);
+    dummy.
+    logChecker("CheckClass::analyseWholeProgram");
 
     if (fileInfo.empty())
         return false;
@@ -3886,7 +3890,7 @@ void CheckClass::runChecks(const Tokenizer &tokenizer, ErrorLogger *errorLogger)
     if (tokenizer.isC())
         return;
 
-    CheckClassImpl checkClass(&tokenizer, tokenizer.getSettings(), errorLogger);
+    CheckClassImpl checkClass(tokenizer, tokenizer.getSettings(), errorLogger);
 
     // can't be a simplified check .. the 'sizeof' is used.
     checkClass.checkMemset();
@@ -3914,7 +3918,10 @@ void CheckClass::runChecks(const Tokenizer &tokenizer, ErrorLogger *errorLogger)
 
 void CheckClass::getErrorMessages(ErrorLogger *errorLogger, const Settings &settings) const
 {
-    CheckClassImpl c(nullptr, settings, errorLogger);
+    TokenList tokenList(settings, Standards::Language::C);
+    Tokenizer tokenizer(std::move(tokenList), *errorLogger);
+
+    CheckClassImpl c(tokenizer, settings, errorLogger);
     c.noConstructorError(nullptr, "classname", false);
     c.noExplicitConstructorError(nullptr, "classname", false);
     //c.copyConstructorMallocError(nullptr, 0, "var");

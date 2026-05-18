@@ -35,7 +35,7 @@
 void CheckImpl::reportError(const std::list<const Token *> &callstack, Severity severity, const std::string &id, const std::string &msg, const CWE &cwe, Certainty certainty)
 {
     // TODO: report debug warning when error is for a disabled severity
-    const ErrorMessage errmsg(callstack, mTokenizer ? &mTokenizer->list : nullptr, severity, id, msg, cwe, certainty);
+    const ErrorMessage errmsg(callstack, &mTokenizer.list, severity, id, msg, cwe, certainty);
     if (mErrorLogger)
         mErrorLogger->reportErr(errmsg);
     // TODO
@@ -46,7 +46,7 @@ void CheckImpl::reportError(const std::list<const Token *> &callstack, Severity 
 void CheckImpl::reportError(const ErrorPath &errorPath, Severity severity, const char id[], const std::string &msg, const CWE &cwe, Certainty certainty)
 {
     // TODO: report debug warning when error is for a disabled severity
-    const ErrorMessage errmsg(errorPath, mTokenizer ? &mTokenizer->list : nullptr, severity, id, msg, cwe, certainty);
+    const ErrorMessage errmsg(errorPath, &mTokenizer.list, severity, id, msg, cwe, certainty);
     if (mErrorLogger)
         mErrorLogger->reportErr(errmsg);
     // TODO

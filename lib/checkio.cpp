@@ -60,12 +60,12 @@ static const CWE CWE910(910U);  // Use of Expired File Descriptor
 //---------------------------------------------------------------------------
 void CheckIOImpl::checkCoutCerrMisusage()
 {
-    if (mTokenizer->isC())
+    if (mTokenizer.isC())
         return;
 
     logChecker("CheckIO::checkCoutCerrMisusage"); // c
 
-    const SymbolDatabase * const symbolDatabase = mTokenizer->getSymbolDatabase();
+    const SymbolDatabase * const symbolDatabase = mTokenizer.getSymbolDatabase();
     for (const Scope * scope : symbolDatabase->functionScopes) {
         for (const Token *tok = scope->bodyStart; tok && tok != scope->bodyEnd; tok = tok->next()) {
             if (Token::Match(tok, "std :: cout|cerr !!.") && tok->next()->astParent() && tok->next()->astParent()->astOperand1() == tok->next()) {
@@ -129,7 +129,7 @@ void CheckIOImpl::checkFileUsage()
 
     logChecker("CheckIO::checkFileUsage");
 
-    const SymbolDatabase* symbolDatabase = mTokenizer->getSymbolDatabase();
+    const SymbolDatabase* symbolDatabase = mTokenizer.getSymbolDatabase();
     for (const Variable* var : symbolDatabase->variableList()) {
         if (!var || !var->declarationId() || var->isArray() || !Token::simpleMatch(var->typeStartToken(), "FILE *"))
             continue;
@@ -441,7 +441,7 @@ void CheckIOImpl::invalidScanf()
 
     logChecker("CheckIO::invalidScanf");
 
-    const SymbolDatabase * const symbolDatabase = mTokenizer->getSymbolDatabase();
+    const SymbolDatabase * const symbolDatabase = mTokenizer.getSymbolDatabase();
     for (const Scope * scope : symbolDatabase->functionScopes) {
         for (const Token *tok = scope->bodyStart->next(); tok != scope->bodyEnd; tok = tok->next()) {
             const Token *formatToken = nullptr;
@@ -555,7 +555,7 @@ static inline bool typesMatch(const std::string& iToTest, const std::string& iTy
 
 void CheckIOImpl::checkWrongPrintfScanfArguments()
 {
-    const SymbolDatabase *symbolDatabase = mTokenizer->getSymbolDatabase();
+    const SymbolDatabase *symbolDatabase = mTokenizer.getSymbolDatabase();
     const bool isWindows = mSettings.platform.isWindows();
 
     logChecker("CheckIO::checkWrongPrintfScanfArguments");
@@ -722,7 +722,7 @@ void CheckIOImpl::checkFormatString(const Token * const tok,
                 }
 
                 // Perform type checks
-                ArgumentInfo argInfo(argListTok, mSettings, mTokenizer->isCPP());
+                ArgumentInfo argInfo(argListTok, mSettings, mTokenizer.isCPP());
 
                 if ((argInfo.typeToken && !argInfo.isLibraryType(mSettings)) || *i == ']') {
                     if (scan) {
@@ -2052,7 +2052,7 @@ void CheckIOImpl::invalidScanfFormatWidthError(const Token* tok, nonneg int numF
 
 void CheckIO::runChecks(const Tokenizer &tokenizer, ErrorLogger *errorLogger)
 {
-    CheckIOImpl checkIO(&tokenizer, tokenizer.getSettings(), errorLogger);
+    CheckIOImpl checkIO(tokenizer, tokenizer.getSettings(), errorLogger);
 
     checkIO.checkWrongPrintfScanfArguments();
     checkIO.checkCoutCerrMisusage();
@@ -2062,7 +2062,10 @@ void CheckIO::runChecks(const Tokenizer &tokenizer, ErrorLogger *errorLogger)
 
 void CheckIO::getErrorMessages(ErrorLogger *errorLogger, const Settings &settings) const
 {
-    CheckIOImpl c(nullptr, settings, errorLogger);
+    TokenList tokenList(settings, Standards::Language::C);
+    Tokenizer tokenizer(std::move(tokenList), *errorLogger);
+
+    CheckIOImpl c(tokenizer, settings, errorLogger);
     c.coutCerrMisusageError(nullptr,  "cout");
     c.fflushOnInputStreamError(nullptr,  "stdin");
     c.ioWithoutPositioningError(nullptr);

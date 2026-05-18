@@ -46,7 +46,7 @@ void CheckSizeofImpl::checkSizeofForNumericParameter()
 
     logChecker("CheckSizeof::checkSizeofForNumericParameter"); // warning
 
-    const SymbolDatabase *symbolDatabase = mTokenizer->getSymbolDatabase();
+    const SymbolDatabase *symbolDatabase = mTokenizer.getSymbolDatabase();
     for (const Scope * scope : symbolDatabase->functionScopes) {
         for (const Token* tok = scope->bodyStart->next(); tok != scope->bodyEnd; tok = tok->next()) {
             if (Token::Match(tok, "sizeof ( %num% )") ||
@@ -76,7 +76,7 @@ void CheckSizeofImpl::checkSizeofForArrayParameter()
 
     logChecker("CheckSizeof::checkSizeofForArrayParameter"); // warning
 
-    const SymbolDatabase *symbolDatabase = mTokenizer->getSymbolDatabase();
+    const SymbolDatabase *symbolDatabase = mTokenizer.getSymbolDatabase();
     for (const Scope * scope : symbolDatabase->functionScopes) {
         for (const Token* tok = scope->bodyStart->next(); tok != scope->bodyEnd; tok = tok->next()) {
             if (Token::Match(tok, "sizeof ( %var% )") ||
@@ -117,7 +117,7 @@ void CheckSizeofImpl::checkSizeofForPointerSize()
 
     logChecker("CheckSizeof::checkSizeofForPointerSize"); // warning
 
-    const SymbolDatabase *symbolDatabase = mTokenizer->getSymbolDatabase();
+    const SymbolDatabase *symbolDatabase = mTokenizer.getSymbolDatabase();
     for (const Scope * scope : symbolDatabase->functionScopes) {
         for (const Token* tok = scope->bodyStart; tok != scope->bodyEnd; tok = tok->next()) {
             const Token* tokSize;
@@ -286,7 +286,7 @@ void CheckSizeofImpl::sizeofsizeof()
 
     logChecker("CheckSizeof::sizeofsizeof"); // warning
 
-    for (const Token *tok = mTokenizer->tokens(); tok; tok = tok->next()) {
+    for (const Token *tok = mTokenizer.tokens(); tok; tok = tok->next()) {
         if (Token::Match(tok, "sizeof (| sizeof")) {
             sizeofsizeofError(tok);
             tok = tok->next();
@@ -314,7 +314,7 @@ void CheckSizeofImpl::sizeofCalculation()
 
     const bool printInconclusive = mSettings.certainty.isEnabled(Certainty::inconclusive);
 
-    for (const Token *tok = mTokenizer->tokens(); tok; tok = tok->next()) {
+    for (const Token *tok = mTokenizer.tokens(); tok; tok = tok->next()) {
         if (!Token::simpleMatch(tok, "sizeof ("))
             continue;
 
@@ -358,7 +358,7 @@ void CheckSizeofImpl::sizeofFunction()
 
     logChecker("CheckSizeof::sizeofFunction"); // warning
 
-    for (const Token *tok = mTokenizer->tokens(); tok; tok = tok->next()) {
+    for (const Token *tok = mTokenizer.tokens(); tok; tok = tok->next()) {
         if (Token::simpleMatch(tok, "sizeof (")) {
 
             // ignore if the `sizeof` result is cast to void inside a macro, i.e. the calculation is
@@ -401,7 +401,7 @@ void CheckSizeofImpl::suspiciousSizeofCalculation()
 
     logChecker("CheckSizeof::suspiciousSizeofCalculation"); // warning,inconclusive
 
-    for (const Token *tok = mTokenizer->tokens(); tok; tok = tok->next()) {
+    for (const Token *tok = mTokenizer.tokens(); tok; tok = tok->next()) {
         if (Token::simpleMatch(tok, "sizeof (")) {
             const Token* lPar = tok->astParent();
             if (lPar && lPar->str() == "(") {
@@ -445,7 +445,7 @@ void CheckSizeofImpl::sizeofVoid()
 
     logChecker("CheckSizeof::sizeofVoid"); // portability
 
-    for (const Token *tok = mTokenizer->tokens(); tok; tok = tok->next()) {
+    for (const Token *tok = mTokenizer.tokens(); tok; tok = tok->next()) {
         if (Token::simpleMatch(tok, "sizeof ( void )")) {
             sizeofVoidError(tok);
         } else if (Token::simpleMatch(tok, "sizeof (") && tok->next()->astOperand2()) {
@@ -499,7 +499,7 @@ void CheckSizeofImpl::arithOperationsOnVoidPointerError(const Token* tok, const 
 
 void CheckSizeof::runChecks(const Tokenizer& tokenizer, ErrorLogger* errorLogger)
 {
-    CheckSizeofImpl checkSizeof(&tokenizer, tokenizer.getSettings(), errorLogger);
+    CheckSizeofImpl checkSizeof(tokenizer, tokenizer.getSettings(), errorLogger);
 
     // Checks
     checkSizeof.sizeofsizeof();
@@ -514,7 +514,10 @@ void CheckSizeof::runChecks(const Tokenizer& tokenizer, ErrorLogger* errorLogger
 
 void CheckSizeof::getErrorMessages(ErrorLogger* errorLogger, const Settings& settings) const
 {
-    CheckSizeofImpl c(nullptr, settings, errorLogger);
+    TokenList tokenList(settings, Standards::Language::C);
+    Tokenizer tokenizer(std::move(tokenList), *errorLogger);
+
+    CheckSizeofImpl c(tokenizer, settings, errorLogger);
     c.sizeofForArrayParameterError(nullptr);
     c.sizeofForPointerError(nullptr, "varname");
     c.divideBySizeofError(nullptr, "memset");

@@ -46,7 +46,7 @@ void CheckAssertImpl::assertWithSideEffects()
 
     logChecker("CheckAssert::assertWithSideEffects"); // warning
 
-    for (const Token* tok = mTokenizer->list.front(); tok; tok = tok->next()) {
+    for (const Token* tok = mTokenizer.list.front(); tok; tok = tok->next()) {
         if (!Token::simpleMatch(tok, "assert ("))
             continue;
 
@@ -180,13 +180,16 @@ bool CheckAssertImpl::inSameScope(const Token* returnTok, const Token* assignTok
 
 void CheckAssert::runChecks(const Tokenizer &tokenizer, ErrorLogger *errorLogger)
 {
-    CheckAssertImpl checkAssert(&tokenizer, tokenizer.getSettings(), errorLogger);
+    CheckAssertImpl checkAssert(tokenizer, tokenizer.getSettings(), errorLogger);
     checkAssert.assertWithSideEffects();
 }
 
 void CheckAssert::getErrorMessages(ErrorLogger *errorLogger, const Settings &settings) const
 {
-    CheckAssertImpl c(nullptr, settings, errorLogger);
+    TokenList tokenList(settings, Standards::Language::C);
+    Tokenizer tokenizer(std::move(tokenList), *errorLogger);
+
+    CheckAssertImpl c(tokenizer, settings, errorLogger);
     c.sideEffectInAssertError(nullptr, "function");
     c.assignmentInAssertError(nullptr, "var");
 }

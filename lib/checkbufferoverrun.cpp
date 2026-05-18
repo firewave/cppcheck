@@ -288,7 +288,7 @@ void CheckBufferOverrunImpl::arrayIndex()
 {
     logChecker("CheckBufferOverrun::arrayIndex");
 
-    for (const Token *tok = mTokenizer->tokens(); tok; tok = tok->next()) {
+    for (const Token *tok = mTokenizer.tokens(); tok; tok = tok->next()) {
         if (tok->str() != "[")
             continue;
         const Token *array = tok->astOperand1();
@@ -471,7 +471,7 @@ void CheckBufferOverrunImpl::pointerArithmetic()
 
     logChecker("CheckBufferOverrun::pointerArithmetic"); // portability
 
-    for (const Token *tok = mTokenizer->tokens(); tok; tok = tok->next()) {
+    for (const Token *tok = mTokenizer.tokens(); tok; tok = tok->next()) {
         if (!Token::Match(tok, "+|-"))
             continue;
         if (!tok->valueType() || tok->valueType()->pointer == 0)
@@ -588,7 +588,7 @@ ValueFlow::Value CheckBufferOverrunImpl::getBufferSize(const Token *bufTok) cons
 }
 //---------------------------------------------------------------------------
 
-static bool checkBufferSize(const Token *ftok, const Library::ArgumentChecks::MinSize &minsize, const std::vector<const Token *> &args, const MathLib::bigint bufferSize, const Settings &settings, const Tokenizer* tokenizer)
+static bool checkBufferSize(const Token *ftok, const Library::ArgumentChecks::MinSize &minsize, const std::vector<const Token *> &args, const MathLib::bigint bufferSize, const Settings &settings, const Tokenizer& tokenizer)
 {
     const Token * const arg = (minsize.arg > 0 && minsize.arg - 1 < args.size()) ? args[minsize.arg - 1] : nullptr;
     const Token * const arg2 = (minsize.arg2 > 0 && minsize.arg2 - 1 < args.size()) ? args[minsize.arg2 - 1] : nullptr;
@@ -606,7 +606,7 @@ static bool checkBufferSize(const Token *ftok, const Library::ArgumentChecks::Mi
     case Library::ArgumentChecks::MinSize::Type::ARGVALUE: {
         if (arg && arg->hasKnownIntValue()) {
             MathLib::bigint myMinsize = arg->getKnownIntValue();
-            const int baseSize = tokenizer->sizeOfType(minsize.baseType);
+            const int baseSize = tokenizer.sizeOfType(minsize.baseType);
             if (baseSize != 0)
                 myMinsize *= baseSize;
             return myMinsize <= bufferSize;
@@ -622,7 +622,7 @@ static bool checkBufferSize(const Token *ftok, const Library::ArgumentChecks::Mi
         break;
     case Library::ArgumentChecks::MinSize::Type::VALUE: {
         MathLib::bigint myMinsize = minsize.value;
-        const int baseSize = tokenizer->sizeOfType(minsize.baseType);
+        const int baseSize = tokenizer.sizeOfType(minsize.baseType);
         if (baseSize != 0)
             myMinsize *= baseSize;
         return myMinsize <= bufferSize;
@@ -638,7 +638,7 @@ void CheckBufferOverrunImpl::bufferOverflow()
 {
     logChecker("CheckBufferOverrun::bufferOverflow");
 
-    const SymbolDatabase *symbolDatabase = mTokenizer->getSymbolDatabase();
+    const SymbolDatabase *symbolDatabase = mTokenizer.getSymbolDatabase();
     for (const Scope * scope : symbolDatabase->functionScopes) {
         for (const Token *tok = scope->bodyStart; tok != scope->bodyEnd; tok = tok->next()) {
             if (!Token::Match(tok, "%name% (") || Token::simpleMatch(tok, ") {"))
@@ -705,7 +705,7 @@ void CheckBufferOverrunImpl::arrayIndexThenCheck()
 
     logChecker("CheckBufferOverrun::arrayIndexThenCheck"); // style
 
-    const SymbolDatabase *symbolDatabase = mTokenizer->getSymbolDatabase();
+    const SymbolDatabase *symbolDatabase = mTokenizer.getSymbolDatabase();
     for (const Scope * const scope : symbolDatabase->functionScopes) {
         for (const Token *tok = scope->bodyStart; tok && tok != scope->bodyEnd; tok = tok->next()) {
             if (Token::simpleMatch(tok, "sizeof (")) {
@@ -763,7 +763,7 @@ void CheckBufferOverrunImpl::stringNotZeroTerminated()
 
     logChecker("CheckBufferOverrun::stringNotZeroTerminated"); // warning,inconclusive
 
-    const SymbolDatabase *symbolDatabase = mTokenizer->getSymbolDatabase();
+    const SymbolDatabase *symbolDatabase = mTokenizer.getSymbolDatabase();
     for (const Scope * const scope : symbolDatabase->functionScopes) {
         for (const Token *tok = scope->bodyStart; tok && tok != scope->bodyEnd; tok = tok->next()) {
             if (!Token::simpleMatch(tok, "strncpy ("))
@@ -829,7 +829,7 @@ void CheckBufferOverrunImpl::argumentSize()
 
     logChecker("CheckBufferOverrun::argumentSize"); // warning
 
-    const SymbolDatabase *symbolDatabase = mTokenizer->getSymbolDatabase();
+    const SymbolDatabase *symbolDatabase = mTokenizer.getSymbolDatabase();
     for (const Scope * const scope : symbolDatabase->functionScopes) {
         for (const Token *tok = scope->bodyStart; tok != scope->bodyEnd; tok = tok->next()) {
             if (!tok->function() || !Token::Match(tok, "%name% ("))
@@ -991,7 +991,10 @@ Check::FileInfo * CheckBufferOverrun::loadFileInfoFromXml(const tinyxml2::XMLEle
 /** @brief Analyse all file infos for all TU */
 bool CheckBufferOverrun::analyseWholeProgram(const CTU::FileInfo &ctu, const std::list<Check::FileInfo*> &fileInfo, const Settings& settings, ErrorLogger &errorLogger)
 {
-    CheckBufferOverrunImpl dummy(nullptr, settings, &errorLogger);
+    // TODO: find a better way to do this
+    TokenList tokenList(settings, Standards::Language::C);
+    Tokenizer tokenizer(std::move(tokenList), errorLogger);
+    CheckBufferOverrunImpl dummy(tokenizer, settings, &errorLogger);
     dummy.
     logChecker("CheckBufferOverrun::analyseWholeProgram");
 
@@ -1061,7 +1064,7 @@ bool CheckBufferOverrun::analyseWholeProgram1(const std::map<std::string, std::l
 void CheckBufferOverrunImpl::objectIndex()
 {
     logChecker("CheckBufferOverrun::objectIndex");
-    const SymbolDatabase *symbolDatabase = mTokenizer->getSymbolDatabase();
+    const SymbolDatabase *symbolDatabase = mTokenizer.getSymbolDatabase();
     for (const Scope *functionScope : symbolDatabase->functionScopes) {
         for (const Token *tok = functionScope->bodyStart; tok != functionScope->bodyEnd; tok = tok->next()) {
             if (!Token::simpleMatch(tok, "["))
@@ -1170,7 +1173,7 @@ static bool isVLAIndex(const Token* tok)
 void CheckBufferOverrunImpl::negativeArraySize()
 {
     logChecker("CheckBufferOverrun::negativeArraySize");
-    const SymbolDatabase* symbolDatabase = mTokenizer->getSymbolDatabase();
+    const SymbolDatabase* symbolDatabase = mTokenizer.getSymbolDatabase();
     for (const Variable* var : symbolDatabase->variableList()) {
         if (!var || !var->isArray())
             continue;
@@ -1217,7 +1220,7 @@ void CheckBufferOverrunImpl::negativeMemoryAllocationSizeError(const Token* tok,
 
 void CheckBufferOverrun::runChecks(const Tokenizer &tokenizer, ErrorLogger *errorLogger)
 {
-    CheckBufferOverrunImpl checkBufferOverrun(&tokenizer, tokenizer.getSettings(), errorLogger);
+    CheckBufferOverrunImpl checkBufferOverrun(tokenizer, tokenizer.getSettings(), errorLogger);
     checkBufferOverrun.arrayIndex();
     checkBufferOverrun.pointerArithmetic();
     checkBufferOverrun.bufferOverflow();
@@ -1230,7 +1233,10 @@ void CheckBufferOverrun::runChecks(const Tokenizer &tokenizer, ErrorLogger *erro
 
 void CheckBufferOverrun::getErrorMessages(ErrorLogger *errorLogger, const Settings &settings) const
 {
-    CheckBufferOverrunImpl c(nullptr, settings, errorLogger);
+    TokenList tokenList(settings, Standards::Language::C);
+    Tokenizer tokenizer(std::move(tokenList), *errorLogger);
+
+    CheckBufferOverrunImpl c(tokenizer, settings, errorLogger);
     c.arrayIndexError(nullptr, std::vector<Dimension>(), std::vector<ValueFlow::Value>());
     c.pointerArithmeticError(nullptr, nullptr, nullptr);
     c.negativeIndexError(nullptr, std::vector<Dimension>(), std::vector<ValueFlow::Value>());

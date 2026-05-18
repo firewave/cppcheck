@@ -64,7 +64,7 @@ void CheckTypeImpl::checkTooBigBitwiseShift()
 
     logChecker("CheckType::checkTooBigBitwiseShift"); // platform
 
-    for (const Token *tok = mTokenizer->tokens(); tok; tok = tok->next()) {
+    for (const Token *tok = mTokenizer.tokens(); tok; tok = tok->next()) {
         // C++ and macro: OUT(x<<y)
         if (tok->isCpp() && Token::Match(tok, "[;{}] %name% (") && Token::simpleMatch(tok->linkAt(2), ") ;") && tok->next()->isUpperCaseName() && !tok->next()->function())
             tok = tok->linkAt(2);
@@ -133,7 +133,7 @@ void CheckTypeImpl::tooBigSignedBitwiseShiftError(const Token *tok, int lhsbits,
 {
     constexpr char id[] = "shiftTooManyBitsSigned";
 
-    const bool cpp14 = ((tok && tok->isCpp()) || (mTokenizer && mTokenizer->isCPP())) && (mSettings.standards.cpp >= Standards::CPP14);
+    const bool cpp14 = ((tok && tok->isCpp()) || mTokenizer.isCPP()) && (mSettings.standards.cpp >= Standards::CPP14);
 
     std::string behaviour = "undefined";
     if (cpp14)
@@ -172,7 +172,7 @@ void CheckTypeImpl::checkIntegerOverflow()
 
     logChecker("CheckType::checkIntegerOverflow"); // platform
 
-    for (const Token *tok = mTokenizer->tokens(); tok; tok = tok->next()) {
+    for (const Token *tok = mTokenizer.tokens(); tok; tok = tok->next()) {
         if (!tok->isArithmeticalOp())
             continue;
 
@@ -258,7 +258,7 @@ void CheckTypeImpl::checkSignConversion()
 
     logChecker("CheckType::checkSignConversion"); // warning
 
-    for (const Token *tok = mTokenizer->tokens(); tok; tok = tok->next()) {
+    for (const Token *tok = mTokenizer.tokens(); tok; tok = tok->next()) {
         if (!tok->isArithmeticalOp() || Token::Match(tok,"+|-"))
             continue;
 
@@ -344,7 +344,7 @@ void CheckTypeImpl::checkLongCast()
     logChecker("CheckType::checkLongCast"); // style
 
     // Assignments..
-    for (const Token *tok = mTokenizer->tokens(); tok; tok = tok->next()) {
+    for (const Token *tok = mTokenizer.tokens(); tok; tok = tok->next()) {
         if (tok->str() != "=" || !Token::Match(tok->astOperand2(), "*|<<") || tok->astOperand2()->isUnaryOp("*"))
             continue;
 
@@ -370,7 +370,7 @@ void CheckTypeImpl::checkLongCast()
     }
 
     // Return..
-    const SymbolDatabase *symbolDatabase = mTokenizer->getSymbolDatabase();
+    const SymbolDatabase *symbolDatabase = mTokenizer.getSymbolDatabase();
     for (const Scope * scope : symbolDatabase->functionScopes) {
 
         // function must return long data
@@ -448,7 +448,7 @@ void CheckTypeImpl::checkFloatToIntegerOverflow()
 {
     logChecker("CheckType::checkFloatToIntegerOverflow");
 
-    for (const Token *tok = mTokenizer->tokens(); tok; tok = tok->next()) {
+    for (const Token *tok = mTokenizer.tokens(); tok; tok = tok->next()) {
         const ValueType *vtint, *vtfloat;
 
         // Explicit cast
@@ -534,7 +534,7 @@ void CheckTypeImpl::floatToIntegerOverflowError(const Token *tok, const ValueFlo
 void CheckType::runChecks(const Tokenizer &tokenizer, ErrorLogger *errorLogger)
 {
     // These are not "simplified" because casts can't be ignored
-    CheckTypeImpl checkType(&tokenizer, tokenizer.getSettings(), errorLogger);
+    CheckTypeImpl checkType(tokenizer, tokenizer.getSettings(), errorLogger);
     checkType.checkTooBigBitwiseShift();
     checkType.checkIntegerOverflow();
     checkType.checkSignConversion();
@@ -544,7 +544,10 @@ void CheckType::runChecks(const Tokenizer &tokenizer, ErrorLogger *errorLogger)
 
 void CheckType::getErrorMessages(ErrorLogger *errorLogger, const Settings &settings) const
 {
-    CheckTypeImpl c(nullptr, settings, errorLogger);
+    TokenList tokenList(settings, Standards::Language::C);
+    Tokenizer tokenizer(std::move(tokenList), *errorLogger);
+
+    CheckTypeImpl c(tokenizer, settings, errorLogger);
     c.tooBigBitwiseShiftError(nullptr, 32, ValueFlow::Value(64));
     c.tooBigSignedBitwiseShiftError(nullptr, 31, ValueFlow::Value(31));
     c.integerOverflowError(nullptr, ValueFlow::Value(1LL<<32));

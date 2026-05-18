@@ -211,7 +211,7 @@ void CheckAutoVariablesImpl::assignFunctionArg()
 
     logChecker("CheckAutoVariables::assignFunctionArg"); // style,warning
 
-    const SymbolDatabase *symbolDatabase = mTokenizer->getSymbolDatabase();
+    const SymbolDatabase *symbolDatabase = mTokenizer.getSymbolDatabase();
     for (const Scope * scope : symbolDatabase->functionScopes) {
         for (const Token *tok = scope->bodyStart; tok && tok != scope->bodyEnd; tok = tok->next()) {
             // TODO: What happens if this is removed?
@@ -285,7 +285,7 @@ void CheckAutoVariablesImpl::autoVariables()
     logChecker("CheckAutoVariables::autoVariables");
 
     const bool printInconclusive = mSettings.certainty.isEnabled(Certainty::inconclusive);
-    const SymbolDatabase *symbolDatabase = mTokenizer->getSymbolDatabase();
+    const SymbolDatabase *symbolDatabase = mTokenizer.getSymbolDatabase();
     for (const Scope * scope : symbolDatabase->functionScopes) {
         for (const Token *tok = scope->bodyStart; tok && tok != scope->bodyEnd; tok = tok->next()) {
             // Skip lambda..
@@ -708,7 +708,7 @@ void CheckAutoVariablesImpl::checkVarLifetimeScope(const Token * start, const To
 void CheckAutoVariablesImpl::checkVarLifetime()
 {
     logChecker("CheckAutoVariables::checkVarLifetime");
-    const SymbolDatabase *symbolDatabase = mTokenizer->getSymbolDatabase();
+    const SymbolDatabase *symbolDatabase = mTokenizer.getSymbolDatabase();
     for (const Scope * scope : symbolDatabase->functionScopes) {
         if (!scope->function)
             continue;
@@ -819,7 +819,7 @@ void CheckAutoVariablesImpl::errorInvalidDeallocation(const Token *tok, const Va
 
 void CheckAutoVariables::runChecks(const Tokenizer &tokenizer, ErrorLogger *errorLogger)
 {
-    CheckAutoVariablesImpl checkAutoVariables(&tokenizer, tokenizer.getSettings(), errorLogger);
+    CheckAutoVariablesImpl checkAutoVariables(tokenizer, tokenizer.getSettings(), errorLogger);
     checkAutoVariables.assignFunctionArg();
     checkAutoVariables.autoVariables();
     checkAutoVariables.checkVarLifetime();
@@ -827,7 +827,10 @@ void CheckAutoVariables::runChecks(const Tokenizer &tokenizer, ErrorLogger *erro
 
 void CheckAutoVariables::getErrorMessages(ErrorLogger *errorLogger, const Settings &settings) const
 {
-    CheckAutoVariablesImpl c(nullptr,settings,errorLogger);
+    TokenList tokenList(settings, Standards::Language::C);
+    Tokenizer tokenizer(std::move(tokenList), *errorLogger);
+
+    CheckAutoVariablesImpl c(tokenizer,settings,errorLogger);
     c.errorAutoVariableAssignment(nullptr, false);
     c.errorReturnReference(nullptr, ErrorPath{}, false);
     c.errorDanglingReference(nullptr, nullptr, ErrorPath{});

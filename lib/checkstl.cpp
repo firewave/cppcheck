@@ -131,7 +131,7 @@ void CheckStlImpl::outOfBounds()
 {
     logChecker("CheckStl::outOfBounds");
 
-    for (const Scope *function : mTokenizer->getSymbolDatabase()->functionScopes) {
+    for (const Scope *function : mTokenizer.getSymbolDatabase()->functionScopes) {
         for (const Token *tok = function->bodyStart; tok != function->bodyEnd; tok = tok->next()) {
             const Library::Container *container = getLibraryContainer(tok);
             if (!container || container->stdAssociativeLike)
@@ -317,7 +317,7 @@ bool CheckStlImpl::isContainerSizeGE(const Token * containerToken, const Token *
 void CheckStlImpl::outOfBoundsIndexExpression()
 {
     logChecker("CheckStl::outOfBoundsIndexExpression");
-    for (const Scope *function : mTokenizer->getSymbolDatabase()->functionScopes) {
+    for (const Scope *function : mTokenizer.getSymbolDatabase()->functionScopes) {
         for (const Token *tok = function->bodyStart; tok != function->bodyEnd; tok = tok->next()) {
             if (!tok->isName() || !tok->valueType())
                 continue;
@@ -453,7 +453,7 @@ void CheckStlImpl::iterators()
 {
     logChecker("CheckStl::iterators");
 
-    const SymbolDatabase *symbolDatabase = mTokenizer->getSymbolDatabase();
+    const SymbolDatabase *symbolDatabase = mTokenizer.getSymbolDatabase();
 
     // Filling map of iterators id and their scope begin
     std::map<int, const Token*> iteratorScopeBeginInfo;
@@ -811,7 +811,7 @@ void CheckStlImpl::mismatchingContainers()
     logChecker("CheckStl::misMatchingContainers");
 
     // Check if different containers are used in various calls of standard functions
-    const SymbolDatabase *symbolDatabase = mTokenizer->getSymbolDatabase();
+    const SymbolDatabase *symbolDatabase = mTokenizer.getSymbolDatabase();
     for (const Scope * scope : symbolDatabase->functionScopes) {
         for (const Token* tok = scope->bodyStart->next(); tok != scope->bodyEnd; tok = tok->next()) {
             if (Token::Match(tok, "%comp%|-")) {
@@ -871,7 +871,7 @@ void CheckStlImpl::mismatchingContainerIterator()
     logChecker("CheckStl::misMatchingContainerIterator");
 
     // Check if different containers are used in various calls of standard functions
-    const SymbolDatabase *symbolDatabase = mTokenizer->getSymbolDatabase();
+    const SymbolDatabase *symbolDatabase = mTokenizer.getSymbolDatabase();
     for (const Scope * scope : symbolDatabase->functionScopes) {
         for (const Token* tok = scope->bodyStart->next(); tok != scope->bodyEnd; tok = tok->next()) {
             if (!astIsContainer(tok))
@@ -1121,7 +1121,7 @@ static const Token* endOfExpression(const Token* tok)
 void CheckStlImpl::invalidContainer()
 {
     logChecker("CheckStl::invalidContainer");
-    const SymbolDatabase *symbolDatabase = mTokenizer->getSymbolDatabase();
+    const SymbolDatabase *symbolDatabase = mTokenizer.getSymbolDatabase();
     InvalidContainerAnalyzer analyzer;
     analyzer.analyze(symbolDatabase);
     for (const Scope * scope : symbolDatabase->functionScopes) {
@@ -1269,7 +1269,7 @@ void CheckStlImpl::stlOutOfBounds()
 {
     logChecker("CheckStl::stlOutOfBounds");
 
-    const SymbolDatabase* const symbolDatabase = mTokenizer->getSymbolDatabase();
+    const SymbolDatabase* const symbolDatabase = mTokenizer.getSymbolDatabase();
 
     // Scan through all scopes..
     for (const Scope &scope : symbolDatabase->scopeList) {
@@ -1364,7 +1364,7 @@ void CheckStlImpl::negativeIndex()
     logChecker("CheckStl::negativeIndex");
 
     // Negative index is out of bounds..
-    const SymbolDatabase* const symbolDatabase = mTokenizer->getSymbolDatabase();
+    const SymbolDatabase* const symbolDatabase = mTokenizer.getSymbolDatabase();
     for (const Scope * scope : symbolDatabase->functionScopes) {
         for (const Token* tok = scope->bodyStart->next(); tok != scope->bodyEnd; tok = tok->next()) {
             if (!Token::Match(tok, "%var% [") || !tok->next()->astOperand2())
@@ -1401,7 +1401,7 @@ void CheckStlImpl::erase()
 {
     logChecker("CheckStl::erase");
 
-    const SymbolDatabase* const symbolDatabase = mTokenizer->getSymbolDatabase();
+    const SymbolDatabase* const symbolDatabase = mTokenizer.getSymbolDatabase();
 
     for (const Scope &scope : symbolDatabase->scopeList) {
         if (scope.type == ScopeType::eFor && Token::simpleMatch(scope.classDef, "for (")) {
@@ -1466,7 +1466,7 @@ void CheckStlImpl::stlBoundaries()
 {
     logChecker("CheckStl::stlBoundaries");
 
-    const SymbolDatabase* const symbolDatabase = mTokenizer->getSymbolDatabase();
+    const SymbolDatabase* const symbolDatabase = mTokenizer.getSymbolDatabase();
     for (const Variable* var : symbolDatabase->variableList()) {
         if (!var || !var->scope() || !var->scope()->isExecutable())
             continue;
@@ -1525,7 +1525,7 @@ void CheckStlImpl::if_find()
 
     logChecker("CheckStl::if_find"); // warning,performance
 
-    const SymbolDatabase *symbolDatabase = mTokenizer->getSymbolDatabase();
+    const SymbolDatabase *symbolDatabase = mTokenizer.getSymbolDatabase();
 
     for (const Scope &scope : symbolDatabase->scopeList) {
         if ((scope.type != ScopeType::eIf && scope.type != ScopeType::eWhile) || !scope.classDef)
@@ -1691,7 +1691,7 @@ void CheckStlImpl::checkFindInsert()
 
     logChecker("CheckStl::checkFindInsert"); // performance
 
-    const SymbolDatabase *const symbolDatabase = mTokenizer->getSymbolDatabase();
+    const SymbolDatabase *const symbolDatabase = mTokenizer.getSymbolDatabase();
     for (const Scope *scope : symbolDatabase->functionScopes) {
         for (const Token *tok = scope->bodyStart->next(); tok != scope->bodyEnd; tok = tok->next()) {
             if (!Token::simpleMatch(tok, "if ("))
@@ -1772,7 +1772,7 @@ void CheckStlImpl::size()
 
     logChecker("CheckStl::size"); // performance,c++03
 
-    const SymbolDatabase* const symbolDatabase = mTokenizer->getSymbolDatabase();
+    const SymbolDatabase* const symbolDatabase = mTokenizer.getSymbolDatabase();
     for (const Scope * scope : symbolDatabase->functionScopes) {
         for (const Token* tok = scope->bodyStart->next(); tok != scope->bodyEnd; tok = tok->next()) {
             if (Token::Match(tok, "%var% . size ( )") ||
@@ -1830,7 +1830,7 @@ void CheckStlImpl::redundantCondition()
 
     logChecker("CheckStl::redundantCondition"); // style
 
-    const SymbolDatabase *symbolDatabase = mTokenizer->getSymbolDatabase();
+    const SymbolDatabase *symbolDatabase = mTokenizer.getSymbolDatabase();
 
     for (const Scope &scope : symbolDatabase->scopeList) {
         if (scope.type != ScopeType::eIf)
@@ -1871,7 +1871,7 @@ void CheckStlImpl::missingComparison()
 
     logChecker("CheckStl::missingComparison"); // warning
 
-    const SymbolDatabase* const symbolDatabase = mTokenizer->getSymbolDatabase();
+    const SymbolDatabase* const symbolDatabase = mTokenizer.getSymbolDatabase();
 
     for (const Scope &scope : symbolDatabase->scopeList) {
         if (scope.type != ScopeType::eFor || !scope.classDef)
@@ -2029,7 +2029,7 @@ void CheckStlImpl::string_c_str()
     const bool printInconclusive = mSettings.certainty.isEnabled(Certainty::inconclusive);
     const bool printPerformance = mSettings.severity.isEnabled(Severity::performance);
 
-    const SymbolDatabase* symbolDatabase = mTokenizer->getSymbolDatabase();
+    const SymbolDatabase* symbolDatabase = mTokenizer.getSymbolDatabase();
 
     logChecker("CheckStl::string_c_str");
 
@@ -2297,7 +2297,7 @@ void CheckStlImpl::uselessCalls()
 
     logChecker("CheckStl::uselessCalls"); // performance,warning
 
-    const SymbolDatabase* symbolDatabase = mTokenizer->getSymbolDatabase();
+    const SymbolDatabase* symbolDatabase = mTokenizer.getSymbolDatabase();
     for (const Scope * scope : symbolDatabase->functionScopes) {
         for (const Token* tok = scope->bodyStart; tok != scope->bodyEnd; tok = tok->next()) {
             if (printWarning && Token::Match(tok, "%var% . compare|find|rfind|find_first_not_of|find_first_of|find_last_not_of|find_last_of ( %name% [,)]") &&
@@ -2424,7 +2424,7 @@ void CheckStlImpl::checkDereferenceInvalidIterator()
 
     // Iterate over "if", "while", and "for" conditions where there may
     // be an iterator that is dereferenced before being checked for validity.
-    for (const Scope &scope : mTokenizer->getSymbolDatabase()->scopeList) {
+    for (const Scope &scope : mTokenizer.getSymbolDatabase()->scopeList) {
         if (!(scope.type == ScopeType::eIf || scope.isLoopScope()))
             continue;
 
@@ -2485,7 +2485,7 @@ void CheckStlImpl::checkDereferenceInvalidIterator2()
 
     logChecker("CheckStl::checkDereferenceInvalidIterator2");
 
-    for (const Token *tok = mTokenizer->tokens(); tok; tok = tok->next()) {
+    for (const Token *tok = mTokenizer.tokens(); tok; tok = tok->next()) {
         if (Token::Match(tok, "sizeof|decltype|typeid|typeof (")) {
             tok = tok->linkAt(1);
             continue;
@@ -3038,7 +3038,7 @@ void CheckStlImpl::useStlAlgorithm()
         return end && end->varId() != 0;
     };
 
-    for (const Scope *function : mTokenizer->getSymbolDatabase()->functionScopes) {
+    for (const Scope *function : mTokenizer.getSymbolDatabase()->functionScopes) {
         for (const Token *tok = function->bodyStart; tok != function->bodyEnd; tok = tok->next()) {
             // Parse range-based for loop
             if (!Token::simpleMatch(tok, "for ("))
@@ -3273,7 +3273,7 @@ void CheckStlImpl::knownEmptyContainer()
     if (!mSettings.severity.isEnabled(Severity::style) && !mSettings.isPremiumEnabled("knownEmptyContainer"))
         return;
     logChecker("CheckStl::knownEmptyContainer"); // style
-    for (const Scope *function : mTokenizer->getSymbolDatabase()->functionScopes) {
+    for (const Scope *function : mTokenizer.getSymbolDatabase()->functionScopes) {
         for (const Token *tok = function->bodyStart; tok != function->bodyEnd; tok = tok->next()) {
 
             if (!Token::Match(tok, "%name% ( !!)"))
@@ -3359,7 +3359,7 @@ static const ValueFlow::Value* getOOBIterValue(const Token* tok, const ValueFlow
 void CheckStlImpl::eraseIteratorOutOfBounds()
 {
     logChecker("CheckStl::eraseIteratorOutOfBounds");
-    for (const Scope *function : mTokenizer->getSymbolDatabase()->functionScopes) {
+    for (const Scope *function : mTokenizer.getSymbolDatabase()->functionScopes) {
         for (const Token *tok = function->bodyStart; tok != function->bodyEnd; tok = tok->next()) {
 
             if (!tok->valueType())
@@ -3422,7 +3422,7 @@ void CheckStlImpl::checkMutexes()
     if (!mSettings.severity.isEnabled(Severity::warning))
         return;
     logChecker("CheckStl::checkMutexes"); // warning
-    for (const Scope *function : mTokenizer->getSymbolDatabase()->functionScopes) {
+    for (const Scope *function : mTokenizer.getSymbolDatabase()->functionScopes) {
         std::set<nonneg int> checkedVars;
         for (const Token *tok = function->bodyStart; tok != function->bodyEnd; tok = tok->next()) {
             if (!Token::Match(tok, "%var%"))
@@ -3460,7 +3460,7 @@ void CheckStl::runChecks(const Tokenizer &tokenizer, ErrorLogger *errorLogger)
         return;
     }
 
-    CheckStlImpl checkStl(&tokenizer, tokenizer.getSettings(), errorLogger);
+    CheckStlImpl checkStl(tokenizer, tokenizer.getSettings(), errorLogger);
     checkStl.erase();
     checkStl.if_find();
     checkStl.checkFindInsert();
@@ -3493,7 +3493,10 @@ void CheckStl::runChecks(const Tokenizer &tokenizer, ErrorLogger *errorLogger)
 
 void CheckStl::getErrorMessages(ErrorLogger* errorLogger, const Settings& settings) const
 {
-    CheckStlImpl c(nullptr, settings, errorLogger);
+    TokenList tokenList(settings, Standards::Language::C);
+    Tokenizer tokenizer(std::move(tokenList), *errorLogger);
+
+    CheckStlImpl c(tokenizer, settings, errorLogger);
     c.outOfBoundsError(nullptr, "container", nullptr, "x", nullptr);
     c.invalidIteratorError(nullptr, "iterator");
     c.iteratorsError(nullptr, "container1", "container2");

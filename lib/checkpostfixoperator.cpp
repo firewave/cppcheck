@@ -44,7 +44,7 @@ void CheckPostfixOperatorImpl::postfixOperator()
 
     logChecker("CheckPostfixOperator::postfixOperator"); // performance
 
-    const SymbolDatabase *symbolDatabase = mTokenizer->getSymbolDatabase();
+    const SymbolDatabase *symbolDatabase = mTokenizer.getSymbolDatabase();
 
     for (const Scope * scope : symbolDatabase->functionScopes) {
         for (const Token* tok = scope->bodyStart->next(); tok != scope->bodyEnd; tok = tok->next()) {
@@ -99,12 +99,15 @@ void CheckPostfixOperator::runChecks(const Tokenizer &tokenizer, ErrorLogger *er
     if (tokenizer.isC())
         return;
 
-    CheckPostfixOperatorImpl checkPostfixOperator(&tokenizer, tokenizer.getSettings(), errorLogger);
+    CheckPostfixOperatorImpl checkPostfixOperator(tokenizer, tokenizer.getSettings(), errorLogger);
     checkPostfixOperator.postfixOperator();
 }
 
 void CheckPostfixOperator::getErrorMessages(ErrorLogger *errorLogger, const Settings &settings) const
 {
-    CheckPostfixOperatorImpl c(nullptr, settings, errorLogger);
+    TokenList tokenList(settings, Standards::Language::C);
+    Tokenizer tokenizer(std::move(tokenList), *errorLogger);
+
+    CheckPostfixOperatorImpl c(tokenizer, settings, errorLogger);
     c.postfixOperatorError(nullptr);
 }

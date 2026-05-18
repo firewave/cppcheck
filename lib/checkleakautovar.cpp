@@ -167,7 +167,7 @@ void CheckLeakAutoVarImpl::check()
 
     logChecker("CheckLeakAutoVar::check"); // notclang
 
-    const SymbolDatabase *symbolDatabase = mTokenizer->getSymbolDatabase();
+    const SymbolDatabase *symbolDatabase = mTokenizer.getSymbolDatabase();
 
     // Local variables that are known to be non-zero.
     const std::set<int> notzero;
@@ -769,12 +769,12 @@ bool CheckLeakAutoVarImpl::checkScope(const Token * const startToken,
                 if (ftok->isKeyword())
                     continue;
                 bool unknown = false;
-                if (mTokenizer->isScopeNoReturn(tok->tokAt(2), &unknown)) {
+                if (mTokenizer.isScopeNoReturn(tok->tokAt(2), &unknown)) {
                     if (!unknown)
                         varInfo.clear();
                     else {
                         if (ftok->function() && !ftok->function()->isAttributeNoreturn() &&
-                            !(ftok->function()->functionScope && mTokenizer->isScopeNoReturn(ftok->function()->functionScope->bodyEnd))) // check function scope
+                            !(ftok->function()->functionScope && mTokenizer.isScopeNoReturn(ftok->function()->functionScope->bodyEnd))) // check function scope
                             continue;
                         const std::string functionName(mSettings.library.getFunctionName(ftok));
                         if (!mSettings.library.isLeakIgnore(functionName) && !mSettings.library.isUse(functionName)) {
@@ -1182,7 +1182,7 @@ void CheckLeakAutoVarImpl::ret(const Token *tok, VarInfo &varInfo, const bool is
     const auto& possibleUsage = varInfo.possibleUsage;
     std::vector<int> toRemove;
 
-    const SymbolDatabase *symbolDatabase = mTokenizer->getSymbolDatabase();
+    const SymbolDatabase *symbolDatabase = mTokenizer.getSymbolDatabase();
     for (auto it = alloctype.cbegin(); it != alloctype.cend(); ++it) {
         // don't warn if variable is conditionally allocated, unless it leaves the scope
         if (!isEndOfScope && !it->second.managed() && varInfo.conditionalAlloc.find(it->first) != varInfo.conditionalAlloc.end())
@@ -1280,13 +1280,16 @@ void CheckLeakAutoVarImpl::ret(const Token *tok, VarInfo &varInfo, const bool is
 
 void CheckLeakAutoVar::runChecks(const Tokenizer &tokenizer, ErrorLogger *errorLogger)
 {
-    CheckLeakAutoVarImpl checkLeakAutoVar(&tokenizer, tokenizer.getSettings(), errorLogger);
+    CheckLeakAutoVarImpl checkLeakAutoVar(tokenizer, tokenizer.getSettings(), errorLogger);
     checkLeakAutoVar.check();
 }
 
 void CheckLeakAutoVar::getErrorMessages(ErrorLogger *errorLogger, const Settings &settings) const
 {
-    CheckLeakAutoVarImpl c(nullptr, settings, errorLogger);
+    TokenList tokenList(settings, Standards::Language::C);
+    Tokenizer tokenizer(std::move(tokenList), *errorLogger);
+
+    CheckLeakAutoVarImpl c(tokenizer, settings, errorLogger);
     c.deallocReturnError(nullptr, nullptr, "p");
     c.configurationInfo(nullptr, { nullptr, VarInfo::USED });  // user configuration is needed to complete analysis
     c.doubleFreeError(nullptr, nullptr, "varname", 0);

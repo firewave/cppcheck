@@ -41,7 +41,7 @@ static const CWE CWE758(758U);   // Reliance on Undefined, Unspecified, or Imple
 
 void CheckVaargImpl::va_start_argument()
 {
-    const SymbolDatabase* const symbolDatabase = mTokenizer->getSymbolDatabase();
+    const SymbolDatabase* const symbolDatabase = mTokenizer.getSymbolDatabase();
     const std::size_t functions = symbolDatabase->functionScopes.size();
     const bool printWarnings = mSettings.severity.isEnabled(Severity::warning);
 
@@ -97,7 +97,7 @@ void CheckVaargImpl::va_list_usage()
 
     logChecker("CheckVaarg::va_list_usage"); // notclang
 
-    const SymbolDatabase* const symbolDatabase = mTokenizer->getSymbolDatabase();
+    const SymbolDatabase* const symbolDatabase = mTokenizer.getSymbolDatabase();
     for (const Variable* var : symbolDatabase->variableList()) {
         if (!var || var->isPointer() || var->isReference() || var->isArray() || !var->scope() || var->typeStartToken()->str() != "va_list")
             continue;
@@ -175,14 +175,17 @@ void CheckVaargImpl::va_start_subsequentCallsError(const Token *tok, const std::
 
 void CheckVaarg::runChecks(const Tokenizer &tokenizer, ErrorLogger *errorLogger)
 {
-    CheckVaargImpl check(&tokenizer, tokenizer.getSettings(), errorLogger);
+    CheckVaargImpl check(tokenizer, tokenizer.getSettings(), errorLogger);
     check.va_start_argument();
     check.va_list_usage();
 }
 
 void CheckVaarg::getErrorMessages(ErrorLogger *errorLogger, const Settings &settings) const
 {
-    CheckVaargImpl c(nullptr, settings, errorLogger);
+    TokenList tokenList(settings, Standards::Language::C);
+    Tokenizer tokenizer(std::move(tokenList), *errorLogger);
+
+    CheckVaargImpl c(tokenizer, settings, errorLogger);
     c.wrongParameterTo_va_start_error(nullptr, "arg1", "arg2");
     c.referenceAs_va_start_error(nullptr, "arg1");
     c.va_end_missingError(nullptr, "vl");

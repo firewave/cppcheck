@@ -722,10 +722,10 @@ void CheckUnusedVarImpl::checkFunctionVariableUsage_iterateScopes(const Scope* c
                 type = Variables::pointerPointer;
             else if (i->isPointer())
                 type = Variables::pointer;
-            else if (mTokenizer->isC() ||
+            else if (mTokenizer.isC() ||
                      i->typeEndToken()->isStandardType() ||
                      i->isStlType() ||
-                     mTokenizer->getSymbolDatabase()->isRecordTypeWithoutSideEffects(i->type()) ||
+                     mTokenizer.getSymbolDatabase()->isRecordTypeWithoutSideEffects(i->type()) ||
                      mSettings.library.detectContainer(i->typeStartToken()) ||
                      mSettings.library.getTypeCheck("unusedvar", i->typeStartToken()->str()) == Library::TypeCheck::check)
                 type = Variables::standard;
@@ -976,7 +976,7 @@ void CheckUnusedVarImpl::checkFunctionVariableUsage_iterateScopes(const Scope* c
                         // is it a user defined type?
                         if (!type->isStandardType()) {
                             const Variable *variable = start->variable();
-                            if (!variable || !mTokenizer->getSymbolDatabase()->isRecordTypeWithoutSideEffects(variable->type()))
+                            if (!variable || !mTokenizer.getSymbolDatabase()->isRecordTypeWithoutSideEffects(variable->type()))
                                 allocateMemory = false;
                         }
                     }
@@ -1181,7 +1181,7 @@ void CheckUnusedVarImpl::checkFunctionVariableUsage()
     logChecker("CheckUnusedVar::checkFunctionVariableUsage"); // style
 
     // Parse all executing scopes..
-    const SymbolDatabase *symbolDatabase = mTokenizer->getSymbolDatabase();
+    const SymbolDatabase *symbolDatabase = mTokenizer.getSymbolDatabase();
 
     auto reportLibraryCfgError = [this](const Token* tok, const std::string& typeName) {
         if (mSettings.checkLibrary) {
@@ -1324,7 +1324,7 @@ void CheckUnusedVarImpl::checkFunctionVariableUsage()
                     continue;
 
                 // Bailout for unknown template classes, we have no idea what side effects such assignments have
-                if (mTokenizer->isCPP() &&
+                if (mTokenizer.isCPP() &&
                     op1Var->isClass() &&
                     (!op1Var->valueType() || op1Var->valueType()->type == ValueType::Type::UNKNOWN_TYPE)) {
                     // Check in the library if we should bailout or not..
@@ -1457,7 +1457,7 @@ void CheckUnusedVarImpl::checkFunctionVariableUsage()
                     error = precedes(usage._lastAccess, nextStmt);
                 }
                 if (error) {
-                    if (mTokenizer->isCPP() && var->isClass() &&
+                    if (mTokenizer.isCPP() && var->isClass() &&
                         (!var->valueType() || var->valueType()->type == ValueType::Type::UNKNOWN_TYPE)) {
                         const std::string typeName = var->getTypeName();
                         switch (mSettings.library.getTypeCheck("unusedvar", typeName)) {
@@ -1524,7 +1524,7 @@ void CheckUnusedVarImpl::checkStructMemberUsage()
 
     logChecker("CheckUnusedVar::checkStructMemberUsage"); // style
 
-    const SymbolDatabase *symbolDatabase = mTokenizer->getSymbolDatabase();
+    const SymbolDatabase *symbolDatabase = mTokenizer.getSymbolDatabase();
 
     for (const Scope &scope : symbolDatabase->scopeList) {
         if (scope.type != ScopeType::eStruct && scope.type != ScopeType::eClass && scope.type != ScopeType::eUnion)
@@ -1539,7 +1539,7 @@ void CheckUnusedVarImpl::checkStructMemberUsage()
         // Packed struct => possibly used by lowlevel code. Struct members might be required by hardware.
         if (scope.bodyEnd->isAttributePacked())
             continue;
-        if (mTokenizer->isPacked(scope.bodyStart))
+        if (mTokenizer.isPacked(scope.bodyStart))
             continue;
 
         // Bail out for template struct, members might be used in non-matching instantiations
@@ -1641,7 +1641,7 @@ void CheckUnusedVarImpl::checkStructMemberUsage()
 
         for (const Variable &var : scope.varlist) {
             // only warn for variables without side effects
-            if (!var.typeStartToken()->isStandardType() && !var.isPointer() && !astIsContainer(var.nameToken()) && !mTokenizer->getSymbolDatabase()->isRecordTypeWithoutSideEffects(var.type()))
+            if (!var.typeStartToken()->isStandardType() && !var.isPointer() && !astIsContainer(var.nameToken()) && !mTokenizer.getSymbolDatabase()->isRecordTypeWithoutSideEffects(var.type()))
                 continue;
             if (isInherited && !var.isPrivate())
                 continue;
@@ -1649,12 +1649,12 @@ void CheckUnusedVarImpl::checkStructMemberUsage()
             if (!var.nameToken() || var.nameToken()->isAttributeUnused() || var.nameToken()->isAttributeMaybeUnused() || var.nameToken()->isAnonymous())
                 continue;
 
-            if (mTokenizer->isVarUsedInTemplate(var.declarationId()))
+            if (mTokenizer.isVarUsedInTemplate(var.declarationId()))
                 continue;
 
             // Check if the struct member variable is used anywhere in the file
             bool use = false;
-            for (const Token *tok = mTokenizer->tokens(); tok; tok = tok->next()) {
+            for (const Token *tok = mTokenizer.tokens(); tok; tok = tok->next()) {
                 if (Token::Match(tok, ". %name%") && !tok->next()->variable() && !tok->next()->function() && tok->strAt(1) == var.name()) {
                     // not known => assume variable is used
                     use = true;
@@ -1724,16 +1724,21 @@ bool CheckUnusedVarImpl::isEmptyType(const Type* type)
     return (emptyType = false);
 }
 
-void CheckUnusedVar::runChecks(const Tokenizer &tokenizer, ErrorLogger *errorLogger) {
-    CheckUnusedVarImpl checkUnusedVar(&tokenizer, tokenizer.getSettings(), errorLogger);
+void CheckUnusedVar::runChecks(const Tokenizer &tokenizer, ErrorLogger *errorLogger)
+{
+    CheckUnusedVarImpl checkUnusedVar(tokenizer, tokenizer.getSettings(), errorLogger);
 
     // Coding style checks
     checkUnusedVar.checkStructMemberUsage();
     checkUnusedVar.checkFunctionVariableUsage();
 }
 
-void CheckUnusedVar::getErrorMessages(ErrorLogger *errorLogger, const Settings &settings) const {
-    CheckUnusedVarImpl c(nullptr, settings, errorLogger);
+void CheckUnusedVar::getErrorMessages(ErrorLogger *errorLogger, const Settings &settings) const
+{
+    TokenList tokenList(settings, Standards::Language::C);
+    Tokenizer tokenizer(std::move(tokenList), *errorLogger);
+
+    CheckUnusedVarImpl c(tokenizer, settings, errorLogger);
     c.unusedVariableError(nullptr, "varname");
     c.allocatedButUnusedVariableError(nullptr, "varname");
     c.unreadVariableError(nullptr, "varname", false);

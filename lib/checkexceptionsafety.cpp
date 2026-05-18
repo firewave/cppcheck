@@ -47,7 +47,7 @@ void CheckExceptionSafetyImpl::destructors()
 
     logChecker("CheckExceptionSafety::destructors"); // warning
 
-    const SymbolDatabase* const symbolDatabase = mTokenizer->getSymbolDatabase();
+    const SymbolDatabase* const symbolDatabase = mTokenizer.getSymbolDatabase();
 
     // Perform check..
     for (const Scope * scope : symbolDatabase->functionScopes) {
@@ -96,7 +96,7 @@ void CheckExceptionSafetyImpl::deallocThrow()
     logChecker("CheckExceptionSafety::deallocThrow"); // warning
 
     const bool printInconclusive = mSettings.certainty.isEnabled(Certainty::inconclusive);
-    const SymbolDatabase* const symbolDatabase = mTokenizer->getSymbolDatabase();
+    const SymbolDatabase* const symbolDatabase = mTokenizer.getSymbolDatabase();
 
     // Deallocate a global/member pointer and then throw exception
     // the pointer will be a dead pointer
@@ -170,7 +170,7 @@ void CheckExceptionSafetyImpl::checkRethrowCopy()
 
     logChecker("CheckExceptionSafety::checkRethrowCopy"); // style
 
-    const SymbolDatabase* const symbolDatabase = mTokenizer->getSymbolDatabase();
+    const SymbolDatabase* const symbolDatabase = mTokenizer.getSymbolDatabase();
 
     for (const Scope &scope : symbolDatabase->scopeList) {
         if (scope.type != ScopeType::eCatch)
@@ -214,7 +214,7 @@ void CheckExceptionSafetyImpl::checkCatchExceptionByValue()
 
     logChecker("CheckExceptionSafety::checkCatchExceptionByValue"); // style
 
-    const SymbolDatabase* const symbolDatabase = mTokenizer->getSymbolDatabase();
+    const SymbolDatabase* const symbolDatabase = mTokenizer.getSymbolDatabase();
 
     for (const Scope &scope : symbolDatabase->scopeList) {
         if (scope.type != ScopeType::eCatch)
@@ -285,7 +285,7 @@ void CheckExceptionSafetyImpl::nothrowThrows()
 {
     logChecker("CheckExceptionSafety::nothrowThrows");
 
-    const SymbolDatabase* const symbolDatabase = mTokenizer->getSymbolDatabase();
+    const SymbolDatabase* const symbolDatabase = mTokenizer.getSymbolDatabase();
 
     for (const Scope * scope : symbolDatabase->functionScopes) {
         const Function* function = scope->function;
@@ -334,7 +334,7 @@ void CheckExceptionSafetyImpl::unhandledExceptionSpecification()
 
     logChecker("CheckExceptionSafety::unhandledExceptionSpecification"); // style,inconclusive
 
-    const SymbolDatabase* const symbolDatabase = mTokenizer->getSymbolDatabase();
+    const SymbolDatabase* const symbolDatabase = mTokenizer.getSymbolDatabase();
 
     for (const Scope * scope : symbolDatabase->functionScopes) {
         // only check functions without exception specification
@@ -372,7 +372,7 @@ void CheckExceptionSafetyImpl::unhandledExceptionSpecificationError(const Token 
 void CheckExceptionSafetyImpl::rethrowNoCurrentException()
 {
     logChecker("CheckExceptionSafety::rethrowNoCurrentException");
-    const SymbolDatabase* const symbolDatabase = mTokenizer->getSymbolDatabase();
+    const SymbolDatabase* const symbolDatabase = mTokenizer.getSymbolDatabase();
     for (const Scope * scope : symbolDatabase->functionScopes) {
         const Function* function = scope->function;
         if (!function)
@@ -414,7 +414,7 @@ void CheckExceptionSafety::runChecks(const Tokenizer &tokenizer, ErrorLogger *er
     if (tokenizer.isC())
         return;
 
-    CheckExceptionSafetyImpl checkExceptionSafety(&tokenizer, tokenizer.getSettings(), errorLogger);
+    CheckExceptionSafetyImpl checkExceptionSafety(tokenizer, tokenizer.getSettings(), errorLogger);
     checkExceptionSafety.destructors();
     checkExceptionSafety.deallocThrow();
     checkExceptionSafety.checkRethrowCopy();
@@ -426,7 +426,10 @@ void CheckExceptionSafety::runChecks(const Tokenizer &tokenizer, ErrorLogger *er
 
 void CheckExceptionSafety::getErrorMessages(ErrorLogger *errorLogger, const Settings &settings) const
 {
-    CheckExceptionSafetyImpl c(nullptr, settings, errorLogger);
+    TokenList tokenList(settings, Standards::Language::C);
+    Tokenizer tokenizer(std::move(tokenList), *errorLogger);
+
+    CheckExceptionSafetyImpl c(tokenizer, settings, errorLogger);
     c.destructorsError(nullptr, "Class");
     c.deallocThrowError(nullptr, "p");
     c.rethrowCopyError(nullptr, "varname");

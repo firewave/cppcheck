@@ -50,7 +50,7 @@ static const CWE CWE758(758U);   // Reliance on Undefined, Unspecified, or Imple
 void CheckStringImpl::stringLiteralWrite()
 {
     logChecker("CheckString::stringLiteralWrite");
-    const SymbolDatabase *symbolDatabase = mTokenizer->getSymbolDatabase();
+    const SymbolDatabase *symbolDatabase = mTokenizer.getSymbolDatabase();
     for (const Scope * scope : symbolDatabase->functionScopes) {
         for (const Token* tok = scope->bodyStart->next(); tok != scope->bodyEnd; tok = tok->next()) {
             if (!tok->variable() || !tok->variable()->isPointer())
@@ -96,7 +96,7 @@ void CheckStringImpl::checkAlwaysTrueOrFalseStringCompare()
 
     logChecker("CheckString::checkAlwaysTrueOrFalseStringCompare"); // warning
 
-    for (const Token* tok = mTokenizer->tokens(); tok; tok = tok->next()) {
+    for (const Token* tok = mTokenizer.tokens(); tok; tok = tok->next()) {
         if (tok->isName() && tok->strAt(1) == "(" && Token::Match(tok, "memcmp|strncmp|strcmp|stricmp|strverscmp|bcmp|strcmpi|strcasecmp|strncasecmp|strncasecmp_l|strcasecmp_l|wcsncasecmp|wcscasecmp|wmemcmp|wcscmp|wcscasecmp_l|wcsncasecmp_l|wcsncmp|_mbscmp|_mbscmp_l|_memicmp|_memicmp_l|_stricmp|_wcsicmp|wcsicmp|_mbsicmp|_stricmp_l|_wcsicmp_l|_mbsicmp_l")) {
             if (Token::Match(tok->tokAt(2), "%str% , %str% ,|)")) {
                 const std::string &str1 = tok->strAt(2);
@@ -165,7 +165,7 @@ void CheckStringImpl::checkSuspiciousStringCompare()
 
     logChecker("CheckString::checkSuspiciousStringCompare"); // warning
 
-    const SymbolDatabase* symbolDatabase = mTokenizer->getSymbolDatabase();
+    const SymbolDatabase* symbolDatabase = mTokenizer.getSymbolDatabase();
     for (const Scope * scope : symbolDatabase->functionScopes) {
         for (const Token* tok = scope->bodyStart->next(); tok != scope->bodyEnd; tok = tok->next()) {
             if (!tok->isComparisonOp())
@@ -223,7 +223,7 @@ static bool isChar(const Variable* var)
 void CheckStringImpl::strPlusChar()
 {
     logChecker("CheckString::strPlusChar");
-    const SymbolDatabase* symbolDatabase = mTokenizer->getSymbolDatabase();
+    const SymbolDatabase* symbolDatabase = mTokenizer.getSymbolDatabase();
     for (const Scope * scope : symbolDatabase->functionScopes) {
         for (const Token* tok = scope->bodyStart->next(); tok != scope->bodyEnd; tok = tok->next()) {
             if (tok->str() == "+") {
@@ -279,7 +279,7 @@ void CheckStringImpl::checkIncorrectStringCompare()
 
     logChecker("CheckString::checkIncorrectStringCompare"); // warning
 
-    const SymbolDatabase *symbolDatabase = mTokenizer->getSymbolDatabase();
+    const SymbolDatabase *symbolDatabase = mTokenizer.getSymbolDatabase();
     for (const Scope * scope : symbolDatabase->functionScopes) {
         for (const Token* tok = scope->bodyStart->next(); tok != scope->bodyEnd; tok = tok->next()) {
             // skip "assert(str && ..)" and "assert(.. && str)"
@@ -348,7 +348,7 @@ void CheckStringImpl::overlappingStrcmp()
 
     logChecker("CheckString::overlappingStrcmp"); // warning
 
-    const SymbolDatabase *symbolDatabase = mTokenizer->getSymbolDatabase();
+    const SymbolDatabase *symbolDatabase = mTokenizer.getSymbolDatabase();
     for (const Scope * scope : symbolDatabase->functionScopes) {
         for (const Token* tok = scope->bodyStart->next(); tok != scope->bodyEnd; tok = tok->next()) {
             if (tok->str() != "||")
@@ -424,7 +424,7 @@ void CheckStringImpl::sprintfOverlappingData()
 {
     logChecker("CheckString::sprintfOverlappingData");
 
-    const SymbolDatabase* symbolDatabase = mTokenizer->getSymbolDatabase();
+    const SymbolDatabase* symbolDatabase = mTokenizer.getSymbolDatabase();
     for (const Scope * scope : symbolDatabase->functionScopes) {
         for (const Token* tok = scope->bodyStart->next(); tok != scope->bodyEnd; tok = tok->next()) {
             if (!Token::Match(tok, "sprintf|snprintf|swprintf ("))
@@ -473,7 +473,7 @@ void CheckStringImpl::sprintfOverlappingDataError(const Token *funcTok, const To
 
 void CheckString::runChecks(const Tokenizer &tokenizer, ErrorLogger *errorLogger)
 {
-    CheckStringImpl checkString(&tokenizer, tokenizer.getSettings(), errorLogger);
+    CheckStringImpl checkString(tokenizer, tokenizer.getSettings(), errorLogger);
 
     // Checks
     checkString.strPlusChar();
@@ -487,7 +487,10 @@ void CheckString::runChecks(const Tokenizer &tokenizer, ErrorLogger *errorLogger
 
 void CheckString::getErrorMessages(ErrorLogger *errorLogger, const Settings &settings) const
 {
-    CheckStringImpl c(nullptr, settings, errorLogger);
+    TokenList tokenList(settings, Standards::Language::C);
+    Tokenizer tokenizer(std::move(tokenList), *errorLogger);
+
+    CheckStringImpl c(tokenizer, settings, errorLogger);
     c.stringLiteralWriteError(nullptr, nullptr);
     c.sprintfOverlappingDataError(nullptr, nullptr, "varname");
     c.strPlusCharError(nullptr);
