@@ -1799,9 +1799,9 @@ void CheckUninitVar::runChecks(const Tokenizer &tokenizer, ErrorLogger *errorLog
     checkUninitVar.check();
 }
 
-void CheckUninitVar::getErrorMessages(ErrorLogger* errorLogger, const Settings* settings) const
+void CheckUninitVar::getErrorMessages(ErrorLogger* errorLogger, const Settings& settings) const
 {
-    CheckUninitVarImpl c(nullptr, *settings, errorLogger);
+    CheckUninitVarImpl c(nullptr, settings, errorLogger);
 
     ValueFlow::Value v{};
 

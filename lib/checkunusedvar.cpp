@@ -1732,8 +1732,8 @@ void CheckUnusedVar::runChecks(const Tokenizer &tokenizer, ErrorLogger *errorLog
     checkUnusedVar.checkFunctionVariableUsage();
 }
 
-void CheckUnusedVar::getErrorMessages(ErrorLogger *errorLogger, const Settings *settings) const {
-    CheckUnusedVarImpl c(nullptr, *settings, errorLogger);
+void CheckUnusedVar::getErrorMessages(ErrorLogger *errorLogger, const Settings &settings) const {
+    CheckUnusedVarImpl c(nullptr, settings, errorLogger);
     c.unusedVariableError(nullptr, "varname");
     c.allocatedButUnusedVariableError(nullptr, "varname");
     c.unreadVariableError(nullptr, "varname", false);

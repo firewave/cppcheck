@@ -496,8 +496,8 @@ void CheckMemoryLeakInFunction::runChecks(const Tokenizer &tokenizer, ErrorLogge
 }
 
 /** Report all possible errors (for the --errorlist) */
-void CheckMemoryLeakInFunction::getErrorMessages(ErrorLogger *e, const Settings *settings) const {
-    CheckMemoryLeakInFunctionImpl c(nullptr, *settings, e);
+void CheckMemoryLeakInFunction::getErrorMessages(ErrorLogger *e, const Settings &settings) const {
+    CheckMemoryLeakInFunctionImpl c(nullptr, settings, e);
     c.memleakError(nullptr, "varname");
     c.resourceLeakError(nullptr, "varname");
     c.deallocuseError(nullptr, "varname");
@@ -699,9 +699,9 @@ void CheckMemoryLeakInClass::runChecks(const Tokenizer &tokenizer, ErrorLogger *
     checkMemoryLeak.check();
 }
 
-void CheckMemoryLeakInClass::getErrorMessages(ErrorLogger *e, const Settings *settings) const
+void CheckMemoryLeakInClass::getErrorMessages(ErrorLogger *e, const Settings &settings) const
 {
-    CheckMemoryLeakInClassImpl c(nullptr, *settings, e);
+    CheckMemoryLeakInClassImpl c(nullptr, settings, e);
     c.publicAllocationError(nullptr, "varname");
     c.unsafeClassError(nullptr, "class", "class::varname");
 }
@@ -1213,9 +1213,9 @@ void CheckMemoryLeakNoVar::runChecks(const Tokenizer &tokenizer, ErrorLogger *er
     checkMemoryLeak.check();
 }
 
-void CheckMemoryLeakNoVar::getErrorMessages(ErrorLogger *e, const Settings *settings) const
+void CheckMemoryLeakNoVar::getErrorMessages(ErrorLogger *e, const Settings &settings) const
 {
-    CheckMemoryLeakNoVarImpl c(nullptr, *settings, e);
+    CheckMemoryLeakNoVarImpl c(nullptr, settings, e);
     c.functionCallLeak(nullptr, "funcName", "funcName");
     c.returnValueNotUsedError(nullptr, "funcName");
     c.unsafeArgAllocError(nullptr, "funcName", "shared_ptr", "int");
