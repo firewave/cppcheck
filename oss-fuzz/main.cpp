@@ -16,6 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "checks.h"
 #include "cppcheck.h"
 #include "errorlogger.h"
 #include "errortypes.h"
@@ -77,6 +78,7 @@ static Settings create_settings()
 static const Settings s_settings = create_settings();
 static DummyErrorLogger s_errorLogger;
 static const FileWithDetails s_file("test.cpp", Standards::Language::C, 0);
+static const auto& s_checks = CheckInstances::get(); // pre-initialize the checks
 
 static int doCheck(const uint8_t *data, size_t dataSize)
 {
