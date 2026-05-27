@@ -412,6 +412,9 @@ bool CppCheckExecutor::reportUnmatchedSuppressions(const Settings &settings, con
             sourcefile = errmsg.callStack.cbegin()->getfile(false); // TODO: simplify path?
         err |= reportErrorsFn(sourcefile, 0, {errmsg});
     }
+
+    // TODO: report unmatched suppressions for included files
+
     return err;
 }
 
