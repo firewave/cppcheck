@@ -11,7 +11,7 @@ def run(cppcheck_path, options, elapsed_time=None):
         timeout = elapsed_time * 2
     cmd = options.split()
     cmd.insert(0, cppcheck_path)
-    print('running {}'.format(cppcheck_path))
+    print('running (timeout: {}) {}'.format(timeout, cppcheck_path))
     with subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL) as p:
         try:
             stdout, _ = p.communicate(timeout=timeout)
