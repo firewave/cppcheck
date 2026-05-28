@@ -12,9 +12,9 @@ def run(cppcheck_path, options, elapsed_time=None):
     cmd = options.split()
     cmd.insert(0, cppcheck_path)
     print('running {}'.format(cppcheck_path))
-    with subprocess.Popen(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL) as p:
+    with subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL) as p:
         try:
-            p.communicate(timeout=timeout)
+            stdout, _ = p.communicate(timeout=timeout)
             if p.returncode != 0:
                 print('error')
                 return None
@@ -22,8 +22,11 @@ def run(cppcheck_path, options, elapsed_time=None):
         except subprocess.TimeoutExpired:
             print('timeout')
             p.kill()
-            p.communicate()
+            stdout, _ = p.communicate()
             return False
+        finally:
+            stdout = stdout.decode(encoding='utf-8', errors='ignore').replace('\r\n', '\n')
+            print(stdout)
 
     return True
 
@@ -33,6 +36,10 @@ bisect_path = sys.argv[1]
 options = sys.argv[2]
 if '--error-exitcode=0' not in options:
     options += ' --error-exitcode=0'
+if '--showtime=file' not in options:
+    options += ' --showtime=file-total'
+if '-q' not in options:
+    options += ' -q'
 if len(sys.argv) >= 4:
     elapsed_time = float(sys.argv[3])
 else:
