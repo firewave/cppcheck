@@ -631,27 +631,57 @@ std::list<SuppressionList::Suppression> SuppressionList::getSuppressions() const
 void SuppressionList::markUnmatchedInlineSuppressionsAsChecked(const TokenList &tokenlist) {
     std::lock_guard<std::mutex> lg(mSuppressionsSync);
 
+    std::vector<std::reference_wrapper<Suppression>> inlineSupprs;
+    for (auto &suppression : mSuppressions) {
+       if (!suppression.isInline || suppression.checked)
+           continue;
+       inlineSupprs.emplace_back(suppression);
+    }
+
+    if (inlineSupprs.empty())
+        return;
+
     int currLineNr = -1;
     int currFileIdx = -1;
     for (const Token *tok = tokenlist.front(); tok; tok = tok->next()) {
-        if (currFileIdx != tok->fileIndex() || currLineNr != tok->linenr()) {
-            currLineNr = tok->linenr();
-            currFileIdx = tok->fileIndex();
-            for (auto &suppression : mSuppressions) {
-                if (suppression.type == SuppressionList::Type::unique) {
-                    if (!suppression.checked && (suppression.lineNumber == currLineNr) && (suppression.fileName == tokenlist.file(tok))) {
-                        suppression.checked = true;
-                    }
-                } else if (suppression.type == SuppressionList::Type::block) {
-                    if ((!suppression.checked && (suppression.lineBegin <= currLineNr) && (suppression.lineEnd >= currLineNr) && (suppression.fileName == tokenlist.file(tok)))) {
-                        suppression.checked = true;
-                    }
-                } else if (!suppression.checked && suppression.fileName == tokenlist.file(tok)) {
+        if (currFileIdx == tok->fileIndex() && currLineNr == tok->linenr())
+            continue;
+
+        currFileIdx = tok->fileIndex();
+        currLineNr = tok->linenr();
+        auto I = inlineSupprs.begin();
+        while (I != inlineSupprs.end()) {
+            auto& suppression = I->get();
+            if (suppression.fileName != tokenlist.file(tok))
+                continue;
+            if (suppression.type == SuppressionList::Type::unique) {
+                if (suppression.lineNumber == currLineNr) {
                     suppression.checked = true;
+                    I = inlineSupprs.erase(I);
                 }
+                else {
+                    ++I;
+                }
+            } else if (suppression.type == SuppressionList::Type::block) {
+                if (((suppression.lineBegin <= currLineNr) && (suppression.lineEnd >= currLineNr))) {
+                    suppression.checked = true;
+                    I = inlineSupprs.erase(I);
+                }
+                else {
+                    ++I;
+                }
+            } else {
+                suppression.checked = true;
+                I = inlineSupprs.erase(I);
             }
+
+            if (inlineSupprs.empty())
+                break;
         }
     }
+
+    // TODO: handle remaining suppressions
+    //assert(inlineSupprs.empty());
 }
 
 std::string SuppressionList::Suppression::toString() const

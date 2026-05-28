@@ -558,3 +558,27 @@ def test_premium_disabled_unmatched():  #13663
     ]
     assert stdout == ''
     assert ret == 0, stdout
+
+
+@pytest.mark.xfail(strict=True)
+def test_unmatched_preprocessor():  #14241
+    args = [
+        '-q',
+        '--template=simple',
+        '--enable=information',
+        '--inline-suppr',
+        f'{__proj_inline_suppres_path}preprocessor.c'
+    ]
+
+    ret, stdout, stderr = cppcheck(args, cwd=__script_dir)
+    assert stderr.splitlines() == [
+        f'{__proj_inline_suppres_path}preprocessor.c:2:1: information: Unmatched suppression: id0 [unmatchedSuppression]',
+        f'{__proj_inline_suppres_path}preprocessor.c:5:1: information: Unmatched suppression: id1 [unmatchedSuppression]',
+        # id1_0 is in permanently disabled code so it should not be reported
+        f'{__proj_inline_suppres_path}preprocessor.c:11:1: information: Unmatched suppression: id2 [unmatchedSuppression]',
+        f'{__proj_inline_suppres_path}preprocessor.c:13:1: information: Unmatched suppression: id2_1 [unmatchedSuppression]',
+        f'{__proj_inline_suppres_path}preprocessor.c:17:1: information: Unmatched suppression: id3 [unmatchedSuppression]',
+        f'{__proj_inline_suppres_path}preprocessor.c:19:1: information: Unmatched suppression: id3_1 [unmatchedSuppression]'
+    ]
+    assert stdout == ''
+    assert ret == 0, stdout
