@@ -82,5 +82,7 @@ if not run_res:
     sys.exit(EC_BAD if not invert else EC_GOOD)  # timeout occurred
 
 print('run_time: {}'.format(run_time))
+run_time_factor = run_time / elapsed_time
+print('run_time_factor: {}'.format(run_time_factor))
 
 sys.exit(EC_GOOD if not invert else EC_BAD)  # no timeout
