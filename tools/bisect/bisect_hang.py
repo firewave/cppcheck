@@ -63,7 +63,7 @@ if not elapsed_time:
     elapsed_time = time.perf_counter() - t
     print('elapsed_time: {}'.format(elapsed_time))
     # TODO: write to stdout and redirect all all printing to stderr
-    sys.exit(round(elapsed_time + .5))  # return the time
+    sys.exit(max(round(elapsed_time - .5), 1))  # return the time
 
 t = time.perf_counter()
 run_res = run(cppcheck_path, options, elapsed_time)
@@ -73,7 +73,7 @@ if not elapsed_time:
     # TODO: handle error result
     print('elapsed_time: {}'.format(run_time))
     # TODO: write to stdout and redirect all printing to stderr
-    sys.exit(round(run_time + .5))  # return the time
+    sys.exit(max(round(run_time - .5), 1))  # return the time
 
 if run_res is None:
     sys.exit(EC_SKIP)  # error occurred
