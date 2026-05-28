@@ -235,8 +235,8 @@ private:
         SimpleTokenizer tokenizer(s, *this, cpp);
         ASSERT_LOC(tokenizer.tokenize(code), file, line);
 
-        CheckLeakAutoVar check;
-        runChecks(check, tokenizer, this);
+        CheckLeakAutoVarImpl c(&tokenizer, &s, this);
+        (c.check)();
     }
 
     void assign1() {
@@ -3266,8 +3266,8 @@ private:
         // Tokenizer..
         ASSERT_LOC(tokenizer.simplifyTokens1(""), file, line);
 
-        CheckLeakAutoVar check;
-        runChecks(check, tokenizer, this);
+        CheckLeakAutoVarImpl check(tokenizer, &settings, this);
+        (check.check)();
     }
 
     void run() override {
@@ -3313,8 +3313,8 @@ private:
         SimpleTokenizer tokenizer(settings, *this);
         ASSERT_LOC(tokenizer.tokenize(code), file, line);
 
-        CheckLeakAutoVar check;
-        runChecks(check, tokenizer, this);
+        CheckLeakAutoVarImpl c(&tokenizer, &s, this);
+        (c.check)();
     }
 
     void run() override {
@@ -3418,8 +3418,8 @@ private:
         SimpleTokenizer tokenizer(settings, *this, false);
         ASSERT_LOC(tokenizer.tokenize(code), file, line);
 
-        CheckLeakAutoVar check;
-        runChecks(check, tokenizer, this);
+        CheckLeakAutoVarImpl c(&tokenizer, &s, this);
+        (c.check)();
     }
 
     void run() override {
@@ -3491,8 +3491,8 @@ private:
         SimpleTokenizer tokenizer(settings, *this);
         ASSERT_LOC(tokenizer.tokenize(code), file, line);
 
-        CheckLeakAutoVar check;
-        runChecks(check, tokenizer, this);
+        CheckLeakAutoVarImpl c(&tokenizer, &settings, this);
+        (c.check)();
     }
 
     void run() override {
