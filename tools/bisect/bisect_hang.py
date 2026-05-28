@@ -86,6 +86,8 @@ if not run_res:
 print('run_time: {}'.format(run_time))
 run_time_factor = run_time / elapsed_time
 print('run_time_factor: {}'.format(run_time_factor))
+run_time_diff = run_time - elapsed_time
+print('run_time_diff: {}'.format(run_time_diff))
 
 if run_time_factor >= MAX_RT_FACTOR:
     sys.exit(EC_BAD if not invert else EC_GOOD)  # factor exceeded
