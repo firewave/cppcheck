@@ -81,13 +81,7 @@ public:
     /** Check auto variables */
     void autoVariables();
 
-    /**
-     * Check variable assignment.. value must be changed later or there will be a error reported
-     * @return true if error is reported */
-    bool checkAutoVariableAssignment(const Token *expr, bool inconclusive, const Token *startToken = nullptr);
-
     void checkVarLifetime();
-    void checkVarLifetimeScope(const Token * start, const Token * end);
 
     void errorAutoVariableAssignment(const Token *tok, bool inconclusive);
     void errorReturnDanglingLifetime(const Token *tok, const ValueFlow::Value* val);
@@ -104,6 +98,13 @@ public:
 
     /** returns true if tokvalue has already been diagnosed */
 private:
+    /**
+     * Check variable assignment.. value must be changed later or there will be a error reported
+     * @return true if error is reported */
+    bool checkAutoVariableAssignment(const Token *expr, bool inconclusive, const Token *startToken = nullptr);
+
+    void checkVarLifetimeScope(const Token * start, const Token * end);
+
     bool diag(const Token* tokvalue);
 
     std::set<const Token*> mDiagDanglingTemp;

@@ -85,7 +85,7 @@ public:
     /** @brief assigning bool to pointer */
     void checkAssignBoolToPointer();
 
-    /** @brief assigning bool to float */
+    /** @brief assigning bool to flo    void pointerArithBoolCond(const Token *tok);at */
     void checkAssignBoolToFloat();
 
     /** @brief %Check for using bool in bitwise expression */
@@ -96,7 +96,6 @@ public:
 
     /** @brief %Check for 'if (p+1)' etc. either somebody forgot to dereference, or else somebody uses pointer overflow */
     void pointerArithBool();
-    void pointerArithBoolCond(const Token *tok);
 
     /** @brief %Check if a function returning bool returns an integer other than 0 or 1 */
     void returnValueOfFunctionReturningBool();
@@ -113,6 +112,9 @@ public:
     void comparisonOfBoolExpressionWithIntError(const Token *tok, bool not0or1);
     void pointerArithBoolError(const Token *tok);
     void returnValueBoolError(const Token *tok);
+
+private:
+    void pointerArithBoolCond(const Token *tok);
 };
 /// @}
 //---------------------------------------------------------------------------
