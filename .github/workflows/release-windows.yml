@@ -28,7 +28,7 @@ jobs:
       PYTHON_VERSION: 3.14
       # see https://www.pcre.org/original/changelog.txt
       PCRE_VERSION: 8.45
-      QT_VERSION: 6.10.0
+      QT_VERSION: 6.11.1
       BOOST_MINOR_VERSION: 89
 
     steps:
