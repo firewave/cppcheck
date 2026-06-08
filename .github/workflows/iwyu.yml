@@ -146,6 +146,23 @@ jobs:
           make -C cmake.output gui-build-deps
           make -C cmake.output triage-build-ui-deps
 
+      - name: filter copmpile_commands.json
+        run: |     
+          cd cmake.output
+          cp compile_commands.json copmpile_commands_full.json
+          count=$(cat compile_commands.json | jq '. | length')
+          echo $count
+          echo '[' > cc.json
+          i=0
+          while [ $i -le $count ]; do
+            if [ $i -ne 0 ]; then
+              echo ',' >> cc.json
+            fi
+            cat compile_commands.json | jq .[$i] | grep -v '_autogen\/' | grep -v null | grep -v '\/moc_' | grep -v 'qrc_gui' >> cc.json
+            ((i++))
+          done
+          echo ']' >> cc.json
+
       - name: iwyu_tool
         run: |
           iwyu_tool -p cmake.output -j $(nproc) -- -w -Xiwyu --max_line_length=1024 -Xiwyu --comment_style=long -Xiwyu --quoted_includes_first -Xiwyu --update_comments ${{ matrix.mapping_file_opt }} ${{ matrix.clang_inc }} > iwyu.log
