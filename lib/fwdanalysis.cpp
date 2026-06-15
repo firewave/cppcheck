@@ -261,7 +261,6 @@ static Result checkRecursive(What what, const Settings& settings, const Token *e
                 // ({ .. })
                 if (hasGccCompoundStatement(parent->astParent()->astOperand2()))
                     return Result(Result::Type::BAILOUT);
-                // cppcheck-suppress shadowFunction - TODO: fix this
                 const bool reassign = isSameExpression(false, expr, parent, settings, false, false, nullptr);
                 if (reassign)
                     return Result(Result::Type::WRITE, parent->astParent());
