@@ -2869,11 +2869,11 @@ namespace {
     struct LoopAnalyzer {
         const Token* bodyTok = nullptr;
         const Token* loopVar = nullptr;
-        const Settings* settings = nullptr;
+        const Settings& settings;
         std::set<nonneg int> varsChanged;
 
-        explicit LoopAnalyzer(const Token* tok, const Settings* psettings)
-            : bodyTok(tok->linkAt(1)->next()), settings(psettings)
+        explicit LoopAnalyzer(const Token* tok, const Settings& settings)
+            : bodyTok(tok->linkAt(1)->next()), settings(settings)
         {
             const Token* splitTok = tok->next()->astOperand2();
             if (Token::simpleMatch(splitTok, ":") && splitTok->previous()->varId() != 0) {
@@ -2894,11 +2894,11 @@ namespace {
             int n = 1 + (astIsPointer(tok) ? 1 : 0);
             for (int i = 0; i < n; i++) {
                 bool inconclusive = false;
-                if (isVariableChangedByFunctionCall(tok, i, *settings, &inconclusive))
+                if (isVariableChangedByFunctionCall(tok, i, settings, &inconclusive))
                     return true;
                 if (inconclusive)
                     return true;
-                if (isVariableChanged(tok, i, *settings))
+                if (isVariableChanged(tok, i, settings))
                     return true;
             }
             return false;
@@ -3044,7 +3044,7 @@ void CheckStlImpl::useStlAlgorithm()
                 continue;
             if (!Token::simpleMatch(tok->linkAt(1), ") {"))
                 continue;
-            LoopAnalyzer a{tok, &mSettings};
+            LoopAnalyzer a{tok, mSettings};
             std::string algoName = a.findAlgo();
             if (!algoName.empty()) {
                 useStlAlgorithmError(tok, algoName);
