@@ -2867,11 +2867,13 @@ static bool isTernaryAssignment(const Token* assignTok, nonneg int loopVarId, no
 
 namespace {
     struct LoopAnalyzer {
-        const Token* bodyTok = nullptr;
-        const Token* loopVar = nullptr;
+    private:
+        const Token* bodyTok;
+        const Token* loopVar{};
         const Settings& settings;
         std::set<nonneg int> varsChanged;
 
+    public:
         explicit LoopAnalyzer(const Token* tok, const Settings& settings)
             : bodyTok(tok->linkAt(1)->next()), settings(settings)
         {
@@ -2883,6 +2885,7 @@ namespace {
                 findChangedVariables();
             }
         }
+    private:
         bool isLoopVarChanged() const {
             return varsChanged.count(loopVar->varId()) > 0;
         }
@@ -2934,6 +2937,7 @@ namespace {
             return bodyTok && loopVar;
         }
 
+    public:
         std::string findAlgo() const
         {
             if (!valid())
@@ -2965,7 +2969,7 @@ namespace {
             }
             return "";
         }
-
+    private:
         bool isLocalVar(const Variable* var) const
         {
             if (!var)
@@ -2978,7 +2982,6 @@ namespace {
             return scope && scope->isNestedIn(bodyTok->scope());
         }
 
-    private:
         void findChangedVariables()
         {
             std::set<nonneg int> vars;
