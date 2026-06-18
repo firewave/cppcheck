@@ -202,7 +202,6 @@ jobs:
 
       # TODO: run with all configurations
       - name: test/cfg
-        if: matrix.stdlib == 'libstdc++'
         run: |
           # TODO: redirect to log
           ./test/cfg/runtests.sh
