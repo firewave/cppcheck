@@ -2938,31 +2938,30 @@ namespace {
         {
             if (!valid())
                 return "";
-            if (mVarsChanged.empty()) {
-                if (hasGotoOrBreak())
-                    return "";
-                bool alwaysTrue = true;
-                bool alwaysFalse = true;
-                auto hasReturn = [](const Token* tok) {
-                    return Token::simpleMatch(tok, "return");
-                };
-                findTokens(hasReturn, [&](const Token* tok) {
-                    const Token* returnTok = tok->astOperand1();
-                    if (!returnTok || !returnTok->hasKnownIntValue() || !astIsBool(returnTok)) {
-                        alwaysTrue = false;
-                        alwaysFalse = false;
-                        return;
-                    }
-                    (returnTok->getKnownIntValue() ? alwaysTrue : alwaysFalse) &= true;
-                    (returnTok->getKnownIntValue() ? alwaysFalse : alwaysTrue) &= false;
-                });
-                if (alwaysTrue == alwaysFalse)
-                    return "";
-                if (alwaysTrue)
-                    return "std::any_of";
-                return "std::all_of or std::none_of";
-            }
-            return "";
+            if (!mVarsChanged.empty())
+                return "";
+            if (hasGotoOrBreak())
+                return "";
+            bool alwaysTrue = true;
+            bool alwaysFalse = true;
+            const auto hasReturn = [](const Token* tok) {
+                return Token::simpleMatch(tok, "return");
+            };
+            findTokens(hasReturn, [&](const Token* tok) {
+                const Token* returnTok = tok->astOperand1();
+                if (!returnTok || !returnTok->hasKnownIntValue() || !astIsBool(returnTok)) {
+                    alwaysTrue = false;
+                    alwaysFalse = false;
+                    return;
+                }
+                (returnTok->getKnownIntValue() ? alwaysTrue : alwaysFalse) &= true;
+                (returnTok->getKnownIntValue() ? alwaysFalse : alwaysTrue) &= false;
+            });
+            if (alwaysTrue == alwaysFalse)
+                return "";
+            if (alwaysTrue)
+                return "std::any_of";
+            return "std::all_of or std::none_of";
         }
     private:
         bool isLocalVar(const Variable* var) const
