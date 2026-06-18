@@ -2868,18 +2868,18 @@ static bool isTernaryAssignment(const Token* assignTok, nonneg int loopVarId, no
 namespace {
     struct LoopAnalyzer {
     private:
-        const Token* bodyTok;
-        const Token* loopVar{};
-        const Settings& settings;
-        std::set<nonneg int> varsChanged;
+        const Token* mBodyTok;
+        const Token* mLoopVar{};
+        const Settings& mSettings;
+        std::set<nonneg int> mVarsChanged;
 
     public:
         explicit LoopAnalyzer(const Token* tok, const Settings& settings)
-            : bodyTok(tok->linkAt(1)->next()), settings(settings)
+            : mBodyTok(tok->linkAt(1)->next()), mSettings(settings)
         {
             const Token* splitTok = tok->next()->astOperand2();
             if (Token::simpleMatch(splitTok, ":") && splitTok->previous()->varId() != 0) {
-                loopVar = splitTok->previous();
+                mLoopVar = splitTok->previous();
             }
             if (valid()) {
                 findChangedVariables();
@@ -2887,7 +2887,7 @@ namespace {
         }
     private:
         bool isLoopVarChanged() const {
-            return varsChanged.count(loopVar->varId()) > 0;
+            return mVarsChanged.count(mLoopVar->varId()) > 0;
         }
 
         bool isModified(const Token* tok) const
@@ -2897,11 +2897,11 @@ namespace {
             int n = 1 + (astIsPointer(tok) ? 1 : 0);
             for (int i = 0; i < n; i++) {
                 bool inconclusive = false;
-                if (isVariableChangedByFunctionCall(tok, i, settings, &inconclusive))
+                if (isVariableChangedByFunctionCall(tok, i, mSettings, &inconclusive))
                     return true;
                 if (inconclusive)
                     return true;
-                if (isVariableChanged(tok, i, settings))
+                if (isVariableChanged(tok, i, mSettings))
                     return true;
             }
             return false;
@@ -2910,7 +2910,7 @@ namespace {
         template<class Predicate, class F>
         void findTokens(Predicate pred, F f) const
         {
-            for (const Token* tok = bodyTok; precedes(tok, bodyTok->link()); tok = tok->next()) {
+            for (const Token* tok = mBodyTok; precedes(tok, mBodyTok->link()); tok = tok->next()) {
                 if (pred(tok))
                     f(tok);
             }
@@ -2919,7 +2919,7 @@ namespace {
         template<class Predicate>
         const Token* findToken(Predicate pred) const
         {
-            for (const Token* tok = bodyTok; precedes(tok, bodyTok->link()); tok = tok->next()) {
+            for (const Token* tok = mBodyTok; precedes(tok, mBodyTok->link()); tok = tok->next()) {
                 if (pred(tok))
                     return tok;
             }
@@ -2934,7 +2934,7 @@ namespace {
         }
 
         bool valid() const {
-            return bodyTok && loopVar;
+            return mBodyTok && mLoopVar;
         }
 
     public:
@@ -2943,7 +2943,7 @@ namespace {
             if (!valid())
                 return "";
             bool loopVarChanged = isLoopVarChanged();
-            if (!loopVarChanged && varsChanged.empty()) {
+            if (!loopVarChanged && mVarsChanged.empty()) {
                 if (hasGotoOrBreak())
                     return "";
                 bool alwaysTrue = true;
@@ -2976,16 +2976,16 @@ namespace {
                 return false;
             if (var->isPointer() || var->isReference())
                 return false;
-            if (var->declarationId() == loopVar->varId())
+            if (var->declarationId() == mLoopVar->varId())
                 return false;
             const Scope* scope = var->scope();
-            return scope && scope->isNestedIn(bodyTok->scope());
+            return scope && scope->isNestedIn(mBodyTok->scope());
         }
 
         void findChangedVariables()
         {
             std::set<nonneg int> vars;
-            for (const Token* tok = bodyTok; precedes(tok, bodyTok->link()); tok = tok->next()) {
+            for (const Token* tok = mBodyTok; precedes(tok, mBodyTok->link()); tok = tok->next()) {
                 if (tok->varId() == 0)
                     continue;
                 if (vars.count(tok->varId()) > 0)
@@ -2996,7 +2996,7 @@ namespace {
                 }
                 if (!isModified(tok))
                     continue;
-                varsChanged.insert(tok->varId());
+                mVarsChanged.insert(tok->varId());
                 vars.insert(tok->varId());
             }
         }
