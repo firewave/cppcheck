@@ -2886,10 +2886,6 @@ namespace {
             }
         }
     private:
-        bool isLoopVarChanged() const {
-            return mVarsChanged.count(mLoopVar->varId()) > 0;
-        }
-
         bool isModified(const Token* tok) const
         {
             if (tok->variable() && tok->variable()->isConst())
@@ -2942,8 +2938,7 @@ namespace {
         {
             if (!valid())
                 return "";
-            bool loopVarChanged = isLoopVarChanged();
-            if (!loopVarChanged && mVarsChanged.empty()) {
+            if (mVarsChanged.empty()) {
                 if (hasGotoOrBreak())
                     return "";
                 bool alwaysTrue = true;
