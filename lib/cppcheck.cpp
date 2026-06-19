@@ -253,10 +253,10 @@ private:
      *
      * @param outmsg Message to show, e.g. "Checking main.cpp..."
      */
-    void reportOut(const std::string &outmsg, Color c = Color::Reset) override
+    /*void reportOut(const std::string &outmsg, Color c = Color::Reset) override
     {
         mErrorLogger.reportOut(outmsg, c);
-    }
+    }*/
 
     void reportMetric(const std::string &metric) override
     {
@@ -674,7 +674,7 @@ unsigned int CppCheck::checkClang(const FileWithDetails &file)
         mUnusedFunctionsCheck.reset(new CheckUnusedFunctions());
 
     if (!mSettings.quiet)
-        mErrorLogger.reportOut(std::string("Checking ") + file.spath() + " ...", Color::FgGreen);
+        mOutStream.print(std::string("Checking ") + file.spath() + " ...", Color::FgGreen);
 
     // TODO: get language from FileWithDetails object
     std::string clangStderr;
@@ -694,7 +694,7 @@ unsigned int CppCheck::checkClang(const FileWithDetails &file)
                               file.spath();
     const std::string redirect2 = clangStderr.empty() ? "2>&1" : ("2> " + clangStderr);
     if (mSettings.verbose && !mSettings.quiet) {
-        mErrorLogger.reportOut(exe + " " + args2, Color::Reset);
+        mOutStream.print(exe + " " + args2, Color::Reset);
     }
 
     if (!mExecuteCommand) {
@@ -931,22 +931,22 @@ unsigned int CppCheck::checkInternal(const FileWithDetails& file, const std::str
 
     if (!mSettings.quiet) {
         std::string fixedpath = Path::toNativeSeparators(file.spath());
-        mErrorLogger.reportOut(std::string("Checking ") + fixedpath + ' ' + cfgname + std::string("..."), Color::FgGreen);
+        mOutStream.print(std::string("Checking ") + fixedpath + ' ' + cfgname + std::string("..."), Color::FgGreen);
 
         if (mSettings.verbose) {
-            mErrorLogger.reportOut("Defines:" + mSettings.userDefines, Color::Reset);
+            mOutStream.print("Defines:" + mSettings.userDefines, Color::Reset);
             std::string undefs;
             for (const std::string& U : mSettings.userUndefs) {
                 if (!undefs.empty())
                     undefs += ';';
                 undefs += ' ' + U;
             }
-            mErrorLogger.reportOut("Undefines:" + undefs, Color::Reset);
+            mOutStream.print("Undefines:" + undefs, Color::Reset);
             std::string includePaths;
             for (const std::string &I : mSettings.includePaths)
                 includePaths += " -I" + I;
-            mErrorLogger.reportOut("Includes:" + includePaths, Color::Reset);
-            mErrorLogger.reportOut(std::string("Platform:") + mSettings.platform.toString(), Color::Reset);
+            mOutStream.print("Includes:" + includePaths, Color::Reset);
+            mOutStream.print(std::string("Platform:") + mSettings.platform.toString(), Color::Reset);
         }
     }
 
@@ -1139,7 +1139,7 @@ unsigned int CppCheck::checkInternal(const FileWithDetails& file, const std::str
                 std::string::size_type pos = 0;
                 while ((pos = codeWithoutCfg.find(Preprocessor::macroChar,pos)) != std::string::npos)
                     codeWithoutCfg[pos] = ' ';
-                mErrorLogger.reportOut(codeWithoutCfg, Color::Reset);
+                mOutStream.print(codeWithoutCfg, Color::Reset);
                 continue;
             }
 
@@ -1183,7 +1183,7 @@ unsigned int CppCheck::checkInternal(const FileWithDetails& file, const std::str
                 // If only errors are printed, print filename after the check
                 if (!mSettings.quiet && (!currentConfig.empty() || checkCount > 1)) {
                     std::string fixedpath = Path::toNativeSeparators(file.spath());
-                    mErrorLogger.reportOut("Checking " + fixedpath + ": " + currentConfig + "...", Color::FgGreen);
+                    mOutStream.print("Checking " + fixedpath + ": " + currentConfig + "...", Color::FgGreen);
                 }
 
                 if (!tokenizer.tokens())
@@ -1431,7 +1431,7 @@ void CppCheck::executeRules(const std::string &tokenlist, const TokenList &list)
             continue;
 
         if (!mSettings.quiet) {
-            mErrorLogger.reportOut("Processing rule: " + rule.pattern, Color::FgGreen);
+            mOutStream.print("Processing rule: " + rule.pattern, Color::FgGreen);
         }
 
         auto f = [&](int pos1, int pos2) {

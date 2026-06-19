@@ -69,7 +69,7 @@ void Executor::reportStatus(std::size_t fileindex, std::size_t filecount, std::s
         oss << fileindex << '/' << filecount
             << " files checked " << percentDone
             << "% done";
-        mErrorLogger.reportOut(oss.str(), Color::FgBlue);
+        mOutstream.print(oss.str(), Color::FgBlue);
     }
 }
 

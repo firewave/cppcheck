@@ -45,6 +45,20 @@ namespace tinyxml2 {
 /// @addtogroup Core
 /// @{
 
+class CPPCHECKLIB OutStream
+{
+public:
+    virtual ~OutStream();
+
+    virtual std::ostream& stream() = 0;
+
+    /**
+     *
+     * @param outmsg Message to show e.g. "Checking main.cpp..."
+     */
+    virtual void print(const std::string &outmsg, Color c) = 0;
+};
+
 /**
  * Wrapper for error messages, provided by reportErr()
  */
@@ -226,14 +240,6 @@ class CPPCHECKLIB ErrorLogger {
 public:
     ErrorLogger() = default;
     virtual ~ErrorLogger() = default;
-
-    /**
-     * Information about progress is directed here.
-     * Override this to receive the progress messages.
-     *
-     * @param outmsg Message to show e.g. "Checking main.cpp..."
-     */
-    virtual void reportOut(const std::string &outmsg, Color c) = 0;
 
     /**
      * Information about found errors and warnings is directed

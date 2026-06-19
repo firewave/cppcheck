@@ -44,6 +44,7 @@ class Settings;
 struct Suppressions;
 class Preprocessor;
 class TimerResults;
+class OutStream;
 
 namespace simplecpp {
     class TokenList;
@@ -241,6 +242,7 @@ private:
 
     class CppCheckLogger;
     std::unique_ptr<CppCheckLogger> mLogger;
+    OutStream& mOutStream;
     /** the internal ErrorLogger */
     ErrorLogger& mErrorLogger;
     /** the ErrorLogger provided to this instance */

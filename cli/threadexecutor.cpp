@@ -52,12 +52,13 @@ public:
     explicit SyncLogForwarder(ThreadExecutor &threadExecutor, ErrorLogger &errorLogger)
         : mThreadExecutor(threadExecutor), mErrorLogger(errorLogger) {}
 
+        /*
     void reportOut(const std::string &outmsg, Color c) override
     {
         std::lock_guard<std::mutex> lg(mReportSync);
 
         mErrorLogger.reportOut(outmsg, c);
-    }
+    }*/
 
     void reportErr(const ErrorMessage &msg) override {
         if (!mThreadExecutor.hasToLog(msg))

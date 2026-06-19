@@ -32,6 +32,7 @@ struct Suppressions;
 struct FileSettings;
 class FileWithDetails;
 class TimerResults;
+class OutStream;
 
 /// @addtogroup CLI
 /// @{
@@ -72,6 +73,7 @@ protected:
     const std::list<FileSettings>& mFileSettings;
     const Settings &mSettings;
     Suppressions &mSuppressions;
+    OutStream &mOutstream;
     ErrorLogger &mErrorLogger;
     TimerResults *mTimerResults;
 

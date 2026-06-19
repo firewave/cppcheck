@@ -83,9 +83,9 @@ namespace {
 
         explicit PipeWriter(int pipe, bool debug) : mWpipe(pipe), mDebug(debug) {}
 
-        void reportOut(const std::string &outmsg, Color c) override {
+        /*void reportOut(const std::string &outmsg, Color c) override {
             writeToPipe(REPORT_OUT, static_cast<char>(c) + outmsg);
-        }
+        }*/
 
         void reportErr(const ErrorMessage &msg) override {
             writeToPipe(REPORT_ERROR, msg.serialize());
@@ -248,7 +248,7 @@ bool ProcessExecutor::handleRead(int rpipe, unsigned int &result, const std::str
         // the first character is the color
         const auto c = static_cast<Color>(buf[0]);
         // TODO: avoid string copy
-        mErrorLogger.reportOut(buf.substr(1), c);
+        mOutstream.print(buf.substr(1), c);
     } else if (type == PipeWriter::REPORT_ERROR) {
         ErrorMessage msg;
         try {
