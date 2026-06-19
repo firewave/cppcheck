@@ -190,7 +190,7 @@ namespace {
          *
          * @param outmsg Progress message e.g. "Checking main.cpp..."
          */
-        void reportOut(const std::string &outmsg, Color c = Color::Reset) override;
+        //void reportOut(const std::string &outmsg, Color c = Color::Reset) override;
 
         /** xml output of errors */
         void reportErr(const ErrorMessage &msg) override;
