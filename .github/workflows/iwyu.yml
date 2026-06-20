@@ -177,8 +177,8 @@ jobs:
         uses: actions/checkout@v4
         with:
           persist-credentials: false
-          repository: 'include-what-you-use/include-what-you-use'  # TODO: make configurable in trigger
-          ref: ''
+          repository: 'firewave/include-what-you-use'  # TODO: make configurable in trigger
+          ref: 'stream'  # TODO: make configurable in trigger
           path: 'include-what-you-use'
 
       - name: run include-what-you-use CMake
