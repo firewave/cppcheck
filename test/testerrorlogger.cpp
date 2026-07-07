@@ -61,7 +61,7 @@ private:
         TEST_CASE(ToXmlV2);
         TEST_CASE(ToXmlV2RemarkComment);
         TEST_CASE(ToXmlLocations);
-        //TEST_CASE(ToXmlV2Encoding);
+        TEST_CASE(ToXmlV2Encoding);
         TEST_CASE(FromXmlV2);
         TEST_CASE(ToXmlV3);
 
@@ -460,7 +460,6 @@ private:
         ASSERT_EQUALS(message, msg.toXML());
     }
 
-    /*
     void ToXmlV2Encoding() const {
         {
             ErrorMessage msg({}, "", Severity::error, "Programming error.\nComparing \"\203\" with \"\003\"", "errorId", Certainty::normal);
@@ -476,7 +475,6 @@ private:
             ASSERT_EQUALS("        <error id=\"errorId\" severity=\"error\" msg=\"Programming error.\" verbose=\"Reading &quot;\\022&quot;\"/>", msg2.toXML());
         }
     }
-    */
 
     void FromXmlV2() const {
         const char xmldata[] = "<?xml version=\"1.0\"?>\n"
