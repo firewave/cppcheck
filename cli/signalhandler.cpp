@@ -58,7 +58,7 @@ static constexpr size_t MYSTACKSIZE = (16*1024)+32768; // wild guess about a rea
 #else
 static constexpr size_t MYSTACKSIZE = (16*1024)+SIGSTKSZ; // wild guess about a reasonable buffer
 #endif
-static char mytstack[MYSTACKSIZE]= {0}; // alternative stack for signal handler
+static char mytstack[MYSTACKSIZE]= {}; // alternative stack for signal handler
 static bool bStackBelowHeap=false; // lame attempt to locate heap vs. stack address space. See CppCheckExecutor::check_wrapper()
 static FILE* signalOutput = stdout; // TODO: get rid of this
 

@@ -229,7 +229,7 @@ namespace {
             return "regular expression has not been compiled yet";
 
         int pos = 0;
-        int ovector[30]= {0};
+        int ovector[30]= {};
         while (pos < static_cast<int>(str.size())) {
             const int pcreExecRet = pcre_exec(mRe, mExtra, str.c_str(), static_cast<int>(str.size()), pos, 0, ovector, 30);
             if (pcreExecRet == PCRE_ERROR_NOMATCH)
