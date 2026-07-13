@@ -2652,7 +2652,7 @@ static const Token *singleStatement(const Token *start)
     return endStatement;
 }
 
-enum class LoopType : std::uint8_t { OTHER, RANGE, ITERATOR, INDEX };
+enum class LoopType : std::uint8_t { RANGE, ITERATOR, INDEX };
 
 static const Token *singleAssignInScope(const Token *start, nonneg int varid, bool &input, bool &hasBreak, LoopType loopType, const Settings& settings)
 {
