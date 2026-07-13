@@ -261,6 +261,7 @@ private:
         TEST_CASE(premiumOptionsAll);
         TEST_CASE(premiumOptionsMetrics);
         TEST_CASE(premiumOptionsCertCIntPrecision);
+        TEST_CASE(premiumOptionsCertCIntPrecisionInvalid);
         TEST_CASE(premiumOptionsLicenseFile);
         TEST_CASE(premiumOptionsLicenseFilePathWithSpace);
         TEST_CASE(premiumOptionsInvalid1);
@@ -484,7 +485,7 @@ private:
         TEST_CASE(filesdir);
         TEST_CASE(checkUnusedTemplates);
         TEST_CASE(noCheckUnusedTemplates);
-        TEST_CASE(noCheckUnusedTemplates);
+        TEST_CASE(noCheckUnusedTemplates2);
         TEST_CASE(clangTidy);
         TEST_CASE(clangTidyCustom);
         TEST_CASE(projectConfigurationNoProject);

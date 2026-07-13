@@ -31,7 +31,6 @@ public:
     TestIO() : TestFixture("TestIO") {}
 
 private:
-    const Settings settings = settingsBuilder().library("std.cfg").library("windows.cfg").library("qt.cfg").build();
     /*const*/ Settings settings1 = settingsBuilder().library("std.cfg").library("windows.cfg").library("qt.cfg").severity(Severity::warning).severity(Severity::style).build();
 
     void run() override {
