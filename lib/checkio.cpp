@@ -189,7 +189,7 @@ void CheckIOImpl::checkFileUsage()
                 bool isftell = false;
                 const Token* fileTok = nullptr;
                 const Token* fileNameTok = nullptr;
-                Filepointer::Operation operation = Filepointer::Operation::NONE;
+                auto operation = Filepointer::Operation::NONE;
 
                 if ((tok->str() == "fopen" || tok->str() == "freopen" || tok->str() == "tmpfile" ||
                      (windows && (tok->str() == "_wfopen" || tok->str() == "_wfreopen"))) &&

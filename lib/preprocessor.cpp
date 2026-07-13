@@ -105,7 +105,7 @@ static bool parseInlineSuppressionCommentToken(const simplecpp::Token *tok, std:
         return false;
     }
 
-    SuppressionList::Type errorType = SuppressionList::Type::unique;
+    auto errorType = SuppressionList::Type::unique;
 
     // determine prefix if specified
     if (posEndComment >= (pos1 + cppchecksuppress.size() + 1)) {

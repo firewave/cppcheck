@@ -126,7 +126,7 @@ static std::string durationToString(std::chrono::milliseconds duration)
     duration -= minutes; // Subtract the extracted minutes
 
     // Extract seconds
-    std::chrono::duration<double> seconds = std::chrono::duration_cast<std::chrono::duration<double>>(duration);
+    auto seconds = std::chrono::duration_cast<std::chrono::duration<double>>(duration);
 
     std::string ellapsedTime;
     if (hours.count() > 0)

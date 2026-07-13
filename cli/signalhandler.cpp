@@ -302,7 +302,7 @@ void register_signal_handler(FILE * const output)
 
     // determine stack vs. heap
     char stackVariable;
-    char *heapVariable=static_cast<char*>(malloc(1));
+    auto *heapVariable=static_cast<char*>(malloc(1));
     bStackBelowHeap = &stackVariable < heapVariable;
     free(heapVariable);
 

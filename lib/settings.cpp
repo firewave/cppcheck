@@ -774,7 +774,7 @@ bool Settings::isPremiumEnabled(const char id[]) const
 
 Settings::ExecutorType Settings::defaultExecutor()
 {
-    static constexpr ExecutorType defaultExecutor =
+    static constexpr auto defaultExecutor =
 #if defined(HAS_THREADING_MODEL_FORK)
         ExecutorType::Process;
 #elif defined(HAS_THREADING_MODEL_THREAD)

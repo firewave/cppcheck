@@ -652,7 +652,7 @@ Library::Error Library::load(const tinyxml2::XMLDocument &doc)
                             return Error(ErrorCode::MISSING_ATTRIBUTE, "name");
 
                         const char* const action_ptr = functionNode->Attribute("action");
-                        Container::Action action = Container::Action::NO_ACTION;
+                        auto action = Container::Action::NO_ACTION;
                         if (action_ptr) {
                             std::string actionName = action_ptr;
                             action = Container::actionFrom(actionName);
@@ -661,7 +661,7 @@ Library::Error Library::load(const tinyxml2::XMLDocument &doc)
                         }
 
                         const char* const yield_ptr = functionNode->Attribute("yields");
-                        Container::Yield yield = Container::Yield::NO_YIELD;
+                        auto yield = Container::Yield::NO_YIELD;
                         if (yield_ptr) {
                             std::string yieldName = yield_ptr;
                             yield = Container::yieldFrom(yieldName);
@@ -922,7 +922,7 @@ Library::Error Library::loadFunction(const tinyxml2::XMLElement * const node, co
             const char * const argDirection = functionnode->Attribute("direction");
             if (argDirection) {
                 const size_t argDirLen = strlen(argDirection);
-                ArgumentChecks::Direction dir = ArgumentChecks::Direction::DIR_UNKNOWN;
+                auto dir = ArgumentChecks::Direction::DIR_UNKNOWN;
                 if (!strncmp(argDirection, "in", argDirLen)) {
                     dir = ArgumentChecks::Direction::DIR_IN;
                 } else if (!strncmp(argDirection, "out", argDirLen)) {
@@ -1085,7 +1085,7 @@ Library::Error Library::loadFunction(const tinyxml2::XMLElement * const node, co
             mData->mFunctionwarn[name] = std::move(wi);
         } else if (functionnodename == "container") {
             const char* const action_ptr = functionnode->Attribute("action");
-            Container::Action action = Container::Action::NO_ACTION;
+            auto action = Container::Action::NO_ACTION;
             if (action_ptr) {
                 std::string actionName = action_ptr;
                 action = Container::actionFrom(actionName);
@@ -1095,7 +1095,7 @@ Library::Error Library::loadFunction(const tinyxml2::XMLElement * const node, co
             func.containerAction = action;
 
             const char* const yield_ptr = functionnode->Attribute("yields");
-            Container::Yield yield = Container::Yield::NO_YIELD;
+            auto yield = Container::Yield::NO_YIELD;
             if (yield_ptr) {
                 std::string yieldName = yield_ptr;
                 yield = Container::yieldFrom(yieldName);

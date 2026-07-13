@@ -800,7 +800,7 @@ namespace {
                             // The else block is traversed on the main path. If it kills the value
                             // (modified) the main path stops, but the then-fork may still carry the
                             // value forward, so defer the break until after the fork continues.
-                            Progress pElse = Progress::Continue;
+                            auto pElse = Progress::Continue;
                             if (hasElse)
                                 pElse = updateBranch(elseBranch, depth - 1);
                             if (thenBranch.isDead() || elseBranch.isDead()) {
