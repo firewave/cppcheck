@@ -136,7 +136,6 @@ private slots:
 private:
     QString generateStyleString();
 
-private:
     QWidget *mLineNumberArea;
     Highlighter *mHighlighter;
     CodeEditorStyle *mWidgetStyle;

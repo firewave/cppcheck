@@ -144,7 +144,6 @@ OneShotTimer::OneShotTimer(std::string name)
 {
     class MyResults : public TimerResultsIntf
     {
-    private:
         void addResults(const std::string &name, std::chrono::milliseconds duration) override
         {
             std::lock_guard<std::mutex> l(stdCoutLock);

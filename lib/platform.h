@@ -44,7 +44,6 @@ namespace tinyxml2 {
  * @brief Platform settings
  */
 class CPPCHECKLIB Platform {
-private:
     static long long min_value(std::uint8_t bit) {
         assert(bit > 0);
         if (bit >= 64)

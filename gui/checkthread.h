@@ -56,7 +56,6 @@ public:
         QTime startTime;
     };
 
-public:
     CheckThread(ThreadResult &result, int threadIndex);
 
     /**

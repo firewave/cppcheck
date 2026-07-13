@@ -111,8 +111,6 @@ public:
  */
 // NOLINTNEXTLINE(clang-analyzer-optin.performance.Padding)
 class CPPCHECKLIB WARN_UNUSED Settings {
-private:
-
     /** @brief terminate checking */
     static std::atomic<bool> mTerminated;
 

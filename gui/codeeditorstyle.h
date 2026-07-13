@@ -72,7 +72,6 @@ public:
     static CodeEditorStyle loadSettings(QSettings *settings);
     static void saveSettings(QSettings *settings, const CodeEditorStyle& theStyle);
 
-public:
     bool mSystemTheme{};
     QColor widgetFGColor;
     QColor widgetBGColor;
