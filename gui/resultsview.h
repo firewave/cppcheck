@@ -193,12 +193,6 @@ public:
     void stopAnalysis();
 
     /**
-     * @brief Are there successful results?
-     * @return true if analysis finished without critical errors etc
-     */
-    bool isSuccess() const;
-
-    /**
      * @brief Read errors from report XML file.
      * @param filename Report file to read.
      *
