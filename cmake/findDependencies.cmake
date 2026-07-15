@@ -26,6 +26,18 @@ if(BUILD_GUI)
             find_program(QHELPGENERATOR qhelpgenerator HINTS ${_qt_bin_dir} REQUIRED)
         endif()
     endif()
+
+    if(MSVC)
+        find_program(WINDEPLOYQT windeployqt)
+        if(NOT WINDEPLOYQT)
+            # TODO: how to properly get the Qt binary folder?
+            # piggy-back off Qt::qmake for now as it should be in the same folder as the binary we are looking for
+            get_target_property(_qmake_executable Qt::qmake IMPORTED_LOCATION)
+            get_filename_component(_qt_bin_dir ${_qmake_executable} DIRECTORY)
+            message(STATUS "windeployqt not found in PATH - trying ${_qt_bin_dir}")
+            find_program(WINDEPLOYQT windeployqt HINTS ${_qt_bin_dir} REQUIRED)
+        endif()
+    endif()
 endif()
 
 if(HAVE_RULES)

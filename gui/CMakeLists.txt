@@ -71,6 +71,12 @@ CheckOptions:
         add_dependencies(cppcheck-gui online-help.qhc)
     endif()
 
+    # TODO: is there a better way to do this?
+    if(MSVC)
+        add_custom_target(windeployqt ${WINDEPLOYQT} --no-translations ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${CMAKE_CFG_INTDIR})
+        add_dependencies(windeployqt cppcheck-gui)
+    endif()
+
     install(TARGETS cppcheck-gui RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT applications)
     install(FILES ${qms} DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT applications)
 
